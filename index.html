@@ -203,15 +203,30 @@
         .final-button:hover { transform: scale(1.05); box-shadow: 0 0 40px rgba(197, 160, 89, 0.4); }
         .copyright { position: absolute; bottom: 30px; width: 100%; text-align: center; color: rgba(255, 255, 255, 0.2); font-size: 0.65rem; letter-spacing: 2px; text-transform: uppercase; }
 
+        /* МОДАЛЬНЫЕ ОКНА */
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--modal-bg); display: none; justify-content: center; align-items: center; z-index: 2000; backdrop-filter: blur(15px); padding: 20px; }
         .modal-content { background: rgba(255, 255, 255, 0.03); border: 1px solid var(--gold-solid); padding: 40px; border-radius: 30px; max-width: 420px; width: 100%; text-align: center; position: relative; }
         
-        input { width: 100%; padding: 15px; margin: 10px 0; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); border-radius: 12px; color: #fff; font-size: 1rem; }
+        input { width: 100%; padding: 15px; margin: 10px 0; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); border-radius: 12px; color: #fff; font-size: 1rem; transition: 0.3s; }
         input::placeholder { color: rgba(255, 255, 255, 0.5); }
+        input.error-border { border-color: #ff4d4d; box-shadow: 0 0 15px rgba(255, 77, 77, 0.3); }
+
+        .form-error-msg { color: #ff4d4d; font-size: 0.8rem; margin-top: -5px; margin-bottom: 10px; display: none; text-align: left; padding-left: 10px; }
 
         #fullImageModal img { max-width: 90vw; max-height: 80vh; border: 2px solid var(--gold-solid); border-radius: 15px; box-shadow: 0 0 40px rgba(0,0,0,0.8); }
         .close-btn { position: absolute; top: 15px; right: 20px; color: var(--gold-solid); font-size: 28px; cursor: pointer; transition: 0.2s; }
         .close-btn:hover { color: #fff; }
+
+        /* АНИМАЦИЯ ФЕЙЕРВЕРКА ДЛЯ УСПЕХА */
+        .success-box { border-color: var(--gold-solid); box-shadow: 0 0 50px rgba(197, 160, 89, 0.2); }
+        .firework-icon { 
+            font-size: 4rem; 
+            margin-bottom: 10px; 
+            display: inline-block;
+            animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards, goldGlow 2s infinite alternate;
+        }
+        @keyframes popIn { 0% { transform: scale(0); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        @keyframes goldGlow { 0% { filter: drop-shadow(0 0 10px rgba(197,160,89,0.3)); } 100% { filter: drop-shadow(0 0 35px rgba(197,160,89,1)); } }
 
         @media (max-width: 768px) { 
             h1 { font-size: 1.5rem; } 
@@ -245,7 +260,7 @@
             <p class="trust-text">Мы подготовили для вас ознакомительное видео от лица Администрации. Посмотрите его, чтобы быть абсолютно уверенными в нашем подходе и точно знать, кому вы доверяете своё важное событие.</p>
             <div class="video-wrapper" onclick="handleVideoClick()">
                 <div class="video-container">
-                    <video id="mainVideo" autoplay muted loop playsinline poster="photo1.jpg">
+                    <video id="mainVideo" autoplay muted playsinline webkit-playsinline disablePictureInPicture poster="photo1.jpg">
                         <source src="welcome.mp4" type="video/mp4">
                     </video>
                 </div>
@@ -289,9 +304,24 @@
             <span class="close-btn" onclick="closeModal('callModal')">&times;</span>
             <h2 style="color:var(--gold-solid); margin-bottom: 20px;">Обратный звонок</h2>
             <p style="font-size: 0.85rem; margin-bottom: 15px;">Оставьте контакты, и мы оперативно свяжемся с вами.</p>
-            <input type="text" id="nameInput" placeholder="Ваше имя">
-            <input type="tel" id="phoneInput" placeholder="+998 (__) ___-__-__" maxlength="19" value="+998 ">
-            <button class="btn" style="width:100%; margin-top:15px; font-size: 13px;" onclick="sendToTelegram()">Отправить запрос</button>
+            
+            <input type="text" id="nameInput" placeholder="Ваше имя" oninput="removeError(this)">
+            <p id="nameError" class="form-error-msg">Пожалуйста, укажите имя</p>
+            
+            <input type="tel" id="phoneInput" placeholder="+998 (__) ___-__-__" maxlength="19" value="+998 " oninput="removeError(this)">
+            <p id="phoneError" class="form-error-msg">Укажите полный номер</p>
+
+            <button id="submitBtn" class="btn" style="width:100%; margin-top:10px; font-size: 13px;" onclick="sendToTelegram()">Отправить запрос</button>
+        </div>
+    </div>
+
+    <div id="successModal" class="modal" onclick="closeOnOverlay(event, 'successModal')">
+        <div class="modal-content success-box">
+            <span class="close-btn" onclick="closeModal('successModal')">&times;</span>
+            <div class="firework-icon">✨</div>
+            <h2 style="color:var(--gold-solid); margin-bottom: 15px;">Заявка отправлена!</h2>
+            <p style="font-size: 0.9rem;">Благодарим за доверие. Администрация свяжется с вами в ближайшее время.</p>
+            <button class="btn" style="margin-top:25px; width: 140px;" onclick="closeModal('successModal')">Отлично</button>
         </div>
     </div>
 
@@ -312,11 +342,29 @@
     <script>
         const video = document.getElementById('mainVideo');
         const hint = document.getElementById('videoHint');
+
         function handleVideoClick() {
-            video.muted = !video.muted;
-            if(!video.muted) video.currentTime = 0;
-            hint.innerText = video.muted ? "НАЖМИТЕ ДЛЯ ВКЛЮЧЕНИЯ ЗВУКА" : "ЗВУК ВКЛЮЧЕН";
+            if (video.muted) {
+                video.muted = false;
+                video.currentTime = 0; 
+                hint.innerText = "ЗВУК ВКЛЮЧЕН";
+            } else {
+                video.muted = true;
+                hint.innerText = "НАЖМИТЕ ДЛЯ ВКЛЮЧЕНИЯ ЗВУКА";
+            }
         }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            video.muted = true; 
+            let playPromise = video.play();
+            if (playPromise !== undefined) {
+                playPromise.catch(error => {
+                    document.body.addEventListener('touchstart', () => {
+                        video.play();
+                    }, { once: true });
+                });
+            }
+        });
 
         function openModal(id) { document.getElementById(id).style.display = 'flex'; }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
@@ -365,42 +413,62 @@
             e.target.value = formatted;
         });
 
+        function removeError(el) {
+            el.classList.remove('error-border');
+            if(el.id === 'nameInput') document.getElementById('nameError').style.display = 'none';
+            if(el.id === 'phoneInput') document.getElementById('phoneError').style.display = 'none';
+            document.getElementById('submitBtn').innerText = 'Отправить запрос';
+        }
+
         function sendToTelegram() {
-            const name = document.getElementById('nameInput').value.trim();
-            const phone = document.getElementById('phoneInput').value.trim();
+            const nameInput = document.getElementById('nameInput');
+            const phoneInputObj = document.getElementById('phoneInput');
+            const name = nameInput.value.trim();
+            const phone = phoneInputObj.value.trim();
+            let hasError = false;
 
-            if (name === "" || phone.length < 19) {
-                alert('Пожалуйста, введите корректное имя и номер телефона.');
-                return;
+            if (name === "") {
+                nameInput.classList.add('error-border');
+                document.getElementById('nameError').style.display = 'block';
+                hasError = true;
             }
+            if (phone.length < 19) {
+                phoneInputObj.classList.add('error-border');
+                document.getElementById('phoneError').style.display = 'block';
+                hasError = true;
+            }
+            if (hasError) return;
 
-            // ВСТАВЬ СВОИ ДАННЫЕ СЮДА
+            // ДАННЫЕ УЖЕ ВШИТЫ
             const botToken = '8704692826:AAG4n668xcqaza8hFYiBPJ-TEGvN1Uo-4Kk'; 
             const chatId = '8340992547';            
             
             const text = `🔔 НОВАЯ ЗАЯВКА (Family Standard)!\n\nИмя: ${name}\nТелефон: ${phone}`;
             const url = `https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(text)}`;
 
-            const btn = document.querySelector('#callModal .btn');
+            const btn = document.getElementById('submitBtn');
             const originalText = btn.innerText;
             btn.innerText = 'Отправка...';
 
             fetch(url)
                 .then(response => {
                     if (response.ok) {
-                        alert('Заявка успешно отправлена! Администрация скоро свяжется с вами.');
+                        // ЗАКРЫВАЕМ ФОРМУ И ОТКРЫВАЕМ КРАСИВЫЙ ФЕЙЕРВЕРК
                         closeModal('callModal');
-                        document.getElementById('nameInput').value = '';
-                        document.getElementById('phoneInput').value = '+998 ';
+                        openModal('successModal');
+                        nameInput.value = '';
+                        phoneInputObj.value = '+998 ';
                     } else {
-                        alert('Ошибка сети. Попробуйте написать напрямую в Telegram.');
+                        btn.innerText = 'Ошибка сети. Повторить?';
+                        btn.style.borderColor = '#ff4d4d';
                     }
                 })
                 .catch(error => {
-                    alert('Ошибка при отправке. Проверьте интернет.');
+                    btn.innerText = 'Нет интернета. Повторить?';
+                    btn.style.borderColor = '#ff4d4d';
                 })
                 .finally(() => {
-                    btn.innerText = originalText;
+                    if(btn.innerText === 'Отправка...') btn.innerText = originalText;
                 });
         }
     </script>
