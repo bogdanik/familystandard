@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Family Standard | Агентство праздников</title>
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    
+    <link rel="preload" href="background.jpg" as="image">
+    <link rel="preload" href="logo.gif" as="image">
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;500;700&display=swap');
+        
+        :root {
+            --deep-space: #050a14;
+            --gold-linear: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c);
+            --gold-solid: #c5a059;
+            --glass-bg: rgba(255, 255, 255, 0.04);
+            --glass-border: rgba(197, 160, 89, 0.3);
+            --text-gold: #e2c275;
+            --white-soft: #f0f4f8;
+            --modal-bg: rgba(5, 10, 20, 0.95);
+        }
+
+        * { box-sizing: border-box; outline: none; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--white-soft);
+            background-color: var(--deep-space);
+            background-image: url('background.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 10, 20, 0.5); 
+            backdrop-filter: blur(4px);
+            z-index: -2;
+        }
+
+        .dark-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 5, 12, 0.92);
+            opacity: 0;
+            pointer-events: none;
+            z-index: 10;
+            transition: opacity 0.8s ease;
+        }
+        body.is-ended .dark-overlay { opacity: 1; }
+
+        .hero-space {
+            height: 70vh; 
+            height: 70svh;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .container { 
+            position: relative;
+            z-index: 1;
+            max-width: 900px; 
+            margin: 0 auto; 
+            padding: 20px 20px 40px; 
+        }
+        
+        body.is-ended .container { pointer-events: none; } 
+
+        .logo-panel {
+            position: fixed;
+            top: 30px; left: 30px;
+            background: rgba(5, 10, 20, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 60px;
+            padding: 12px 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
+            z-index: 999;
+            cursor: pointer;
+            transition: all 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        .logo-panel:hover { border-color: var(--gold-solid); box-shadow: 0 0 30px rgba(197, 160, 89, 0.4); }
+
+        .logo-panel.at-top {
+            top: 40%; left: 50%;
+            transform: translate(-50%, -50%) scale(1.4);
+            background: rgba(5, 15, 30, 0.95);
+            border-color: var(--gold-solid);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+        }
+
+        .logo-panel.at-bottom {
+            top: 50%; left: 50%;
+            transform: translate(-50%, -130px) scale(1.2);
+            background: rgba(5, 15, 30, 0.95);
+            border-color: var(--gold-solid);
+        }
+        
+        .logo-panel.at-top:hover, .logo-panel.at-bottom:hover { box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6); cursor: default; }
+
+        .logo-img { height: 45px; filter: drop-shadow(0 0 5px rgba(197, 160, 89, 0.3)); }
+        
+        .logo-text { 
+            display: block;
+            line-height: 1.1;
+            font-size: 1.1rem; 
+            letter-spacing: 2px; 
+            text-transform: uppercase; 
+            background: var(--gold-linear); 
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent; 
+            font-weight: 700; 
+            white-space: nowrap; 
+        }
+
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 40px;
+            margin-bottom: 40px;
+            text-align: center;
+            transform: translateZ(0);
+        }
+
+        h1 { font-size: 2rem; background: var(--gold-linear); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 3px; }
+        h2 { color: var(--gold-solid); font-size: 1.1rem; letter-spacing: 4px; text-transform: uppercase; font-weight: 500; margin-bottom: 30px; }
+        h3 { color: var(--gold-solid); letter-spacing: 2px; text-transform: uppercase; font-weight: 600; margin-bottom: 25px; }
+        p { margin-bottom: 15px; font-size: 0.95rem; }
+
+        .trust-text { color: var(--text-gold); font-size: 0.9rem; line-height: 1.5; max-width: 600px; margin: 0 auto 25px; padding: 15px; border-left: 2px solid var(--gold-solid); background: rgba(197, 160, 89, 0.05); border-radius: 0 15px 15px 0; text-align: left; }
+
+        .video-wrapper { max-width: 320px; margin: 0 auto 25px; cursor: pointer; }
+        .video-container { width: 100%; border-radius: 20px; border: 1px solid var(--glass-border); overflow: hidden; background: #000; box-shadow: 0 10px 30px rgba(0,0,0,0.5); line-height: 0;}
+        video { width: 100%; height: auto; display: block; }
+        .video-hint { font-size: 0.65rem; color: var(--gold-solid); margin-top: 10px; letter-spacing: 1.5px; text-align: center; }
+
+        .gallery { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+        .gallery-item { border-radius: 16px; overflow: hidden; border: 1px solid var(--glass-border); height: 350px; cursor: pointer; position: relative; }
+        .gallery-item img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1); }
+        .gallery-item:hover img { transform: scale(1.08); }
+
+        .social-links { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; }
+        .btn { background: transparent; border: 1px solid var(--gold-solid); color: var(--text-gold); padding: 14px; border-radius: 40px; text-decoration: none; font-weight: 600; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; text-align: center; cursor: pointer; transition: 0.3s; }
+        .btn:hover { background: var(--gold-linear); color: #000; box-shadow: 0 0 15px rgba(197,160,89,0.4); }
+
+        .footer-space { 
+            position: relative;
+            z-index: 20;
+            height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: flex-end; 
+            padding-bottom: 120px; 
+        }
+
+        #animationTrigger { position: absolute; bottom: 250px; width: 100%; height: 10px; }
+
+        .footer-cta { text-align: center; opacity: 0; transform: translateY(30px); transition: all 0.8s ease; }
+        .footer-cta.visible { opacity: 1; transform: translateY(0); }
+        
+        .arrow-up { font-size: 2.5rem; color: var(--gold-solid); margin-bottom: 15px; animation: bounce 2s infinite; display: block; }
+        @keyframes bounce { 0%, 20%, 50%, 80%, 100% {transform: translateY(0);} 40% {transform: translateY(-12px);} 60% {transform: translateY(-6px);} }
+
+        .final-phone { 
+            display: block; 
+            color: var(--gold-solid); 
+            font-size: 2rem; 
+            font-weight: 700; 
+            text-decoration: none; 
+            letter-spacing: 3px; 
+            margin-bottom: 25px; 
+            transition: 0.3s; 
+            text-shadow: 0 0 10px rgba(197, 160, 89, 0.2);
+        }
+        .final-phone:hover { 
+            color: #fff; 
+            text-shadow: 0 0 25px rgba(197, 160, 89, 0.8); 
+            transform: scale(1.05);
+        }
+
+        .final-button { display: inline-block; border: 2px solid var(--gold-solid); background: rgba(5, 15, 30, 0.9); padding: 22px 45px; border-radius: 60px; backdrop-filter: blur(15px); color: var(--gold-solid); letter-spacing: 3px; text-transform: uppercase; font-weight: 700; cursor: pointer; box-shadow: 0 0 30px rgba(197, 160, 89, 0.2); transition: 0.3s; }
+        .final-button:hover { transform: scale(1.05); box-shadow: 0 0 40px rgba(197, 160, 89, 0.4); }
+        .copyright { position: absolute; bottom: 30px; width: 100%; text-align: center; color: rgba(255, 255, 255, 0.2); font-size: 0.65rem; letter-spacing: 2px; text-transform: uppercase; }
+
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--modal-bg); display: none; justify-content: center; align-items: center; z-index: 2000; backdrop-filter: blur(15px); padding: 20px; }
+        .modal-content { background: rgba(255, 255, 255, 0.03); border: 1px solid var(--gold-solid); padding: 40px; border-radius: 30px; max-width: 420px; width: 100%; text-align: center; position: relative; }
+        
+        input { width: 100%; padding: 15px; margin: 10px 0; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); border-radius: 12px; color: #fff; font-size: 1rem; }
+        input::placeholder { color: rgba(255, 255, 255, 0.5); }
+
+        #fullImageModal img { max-width: 90vw; max-height: 80vh; border: 2px solid var(--gold-solid); border-radius: 15px; box-shadow: 0 0 40px rgba(0,0,0,0.8); }
+        .close-btn { position: absolute; top: 15px; right: 20px; color: var(--gold-solid); font-size: 28px; cursor: pointer; transition: 0.2s; }
+        .close-btn:hover { color: #fff; }
+
+        @media (max-width: 768px) { 
+            h1 { font-size: 1.5rem; } 
+            h2 { font-size: 0.9rem; } 
+            .logo-text { font-size: 0.95rem; }
+            .logo-panel { top: 15px; left: 15px; padding: 10px 20px; } 
+            .logo-panel.at-top { transform: translate(-50%, -50%) scale(1.1); }
+            .logo-panel.at-bottom { transform: translate(-50%, -150px) scale(1.1); } 
+            .footer-space { height: 90vh; } 
+            .final-phone { font-size: 1.5rem; }
+            .gallery { grid-template-columns: 1fr; }
+            .gallery-item { height: 300px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="dark-overlay"></div>
+
+    <div class="hero-space" id="heroSpace"></div>
+
+    <div id="mainLogo" class="logo-panel at-top" onclick="openModal('callModal')">
+        <img src="logo.gif" alt="FS Logo" class="logo-img">
+        <span class="logo-text">Family<br>Standard</span>
+    </div>
+
+    <div class="container">
+        <div class="glass-panel">
+            <h1>Family Standard</h1>
+            <h2>Агентство премиальных праздников</h2>
+            <p class="trust-text">Мы подготовили для вас ознакомительное видео от лица Администрации. Посмотрите его, чтобы быть абсолютно уверенными в нашем подходе и точно знать, кому вы доверяете своё важное событие.</p>
+            <div class="video-wrapper" onclick="handleVideoClick()">
+                <div class="video-container">
+                    <video id="mainVideo" autoplay muted loop playsinline poster="photo1.jpg">
+                        <source src="welcome.mp4" type="video/mp4">
+                    </video>
+                </div>
+                <p id="videoHint" class="video-hint">НАЖМИТЕ ДЛЯ ВКЛЮЧЕНИЯ ЗВУКА</p>
+            </div>
+        </div>
+
+        <div class="glass-panel">
+            <h3>Наши работы</h3>
+            <div class="gallery">
+                <div class="gallery-item" onclick="viewImage('photo1.jpg')"><img src="photo1.jpg" alt="Работа 1"></div>
+                <div class="gallery-item" onclick="viewImage('photo2.jpg')"><img src="photo2.jpg" alt="Работа 2"></div>
+                <div class="gallery-item" onclick="viewImage('photo3.jpg')"><img src="photo3.jpg" alt="Работа 3"></div>
+                <div class="gallery-item" onclick="viewImage('photo4.jpg')"><img src="photo4.jpg" alt="Работа 4"></div>
+            </div>
+        </div>
+
+        <div class="glass-panel">
+            <h3>Контакты</h3>
+            <div class="social-links">
+                <a href="https://t.me/FamilyStandard" class="btn" target="_blank">Telegram</a>
+                <a href="https://www.instagram.com/familystandard.uz/" class="btn" target="_blank">Instagram</a>
+                <a onclick="openModal('devModal')" class="btn">YouTube</a>
+                <a onclick="openModal('devModal')" class="btn">TikTok</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer-space">
+        <div id="animationTrigger"></div>
+        <div id="finalSection" class="footer-cta">
+            <span class="arrow-up">↑</span>
+            <a href="tel:+998700464000" class="final-phone">+998 700 464 000</a>
+            <div class="final-button" onclick="openModal('callModal')">Заказать обратный звонок</div>
+        </div>
+        <div class="copyright">&copy; 2026 Family Standard | Все права защищены</div>
+    </div>
+
+    <div id="callModal" class="modal" onclick="closeOnOverlay(event, 'callModal')">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('callModal')">&times;</span>
+            <h2 style="color:var(--gold-solid); margin-bottom: 20px;">Обратный звонок</h2>
+            <p style="font-size: 0.85rem; margin-bottom: 15px;">Оставьте контакты, и мы оперативно свяжемся с вами.</p>
+            <input type="text" id="nameInput" placeholder="Ваше имя">
+            <input type="tel" id="phoneInput" placeholder="+998 (__) ___-__-__" maxlength="19" value="+998 ">
+            <button class="btn" style="width:100%; margin-top:15px; font-size: 13px;" onclick="sendToTelegram()">Отправить запрос</button>
+        </div>
+    </div>
+
+    <div id="devModal" class="modal" onclick="closeOnOverlay(event, 'devModal')">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('devModal')">&times;</span>
+            <h3 style="color:var(--gold-solid); margin-bottom: 15px;">Раздел в разработке</h3>
+            <p>Мы готовим нечто грандиозное.</p>
+            <button class="btn" style="margin-top:20px; width: 120px;" onclick="closeModal('devModal')">Понятно</button>
+        </div>
+    </div>
+
+    <div id="fullImageModal" class="modal" onclick="closeModal('fullImageModal')">
+        <span class="close-btn" style="top: 20px; right: 30px; font-size: 40px;" onclick="closeModal('fullImageModal')">&times;</span>
+        <img id="fullImg" src="" alt="Full Screen">
+    </div>
+
+    <script>
+        const video = document.getElementById('mainVideo');
+        const hint = document.getElementById('videoHint');
+        function handleVideoClick() {
+            video.muted = !video.muted;
+            if(!video.muted) video.currentTime = 0;
+            hint.innerText = video.muted ? "НАЖМИТЕ ДЛЯ ВКЛЮЧЕНИЯ ЗВУКА" : "ЗВУК ВКЛЮЧЕН";
+        }
+
+        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        function closeOnOverlay(e, id) { if(e.target.id === id) closeModal(id); }
+        function viewImage(src) { document.getElementById('fullImg').src = src; openModal('fullImageModal'); }
+
+        const logo = document.getElementById('mainLogo');
+        const finalSection = document.getElementById('finalSection');
+        const trigger = document.getElementById('animationTrigger');
+        const body = document.body;
+        
+        window.addEventListener('scroll', () => {
+            if (window.scrollY < 50) {
+                logo.classList.add('at-top');
+            } else {
+                logo.classList.remove('at-top');
+            }
+        });
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    logo.classList.add('at-bottom');
+                    finalSection.classList.add('visible');
+                    body.classList.add('is-ended');
+                } else {
+                    logo.classList.remove('at-bottom');
+                    finalSection.classList.remove('visible');
+                    body.classList.remove('is-ended');
+                }
+            });
+        }, { root: null, threshold: 0 });
+        
+        observer.observe(trigger);
+
+        const phoneInput = document.getElementById('phoneInput');
+        phoneInput.addEventListener('input', function (e) {
+            let input = e.target.value.replace(/\D/g, ''); 
+            if (!input.startsWith('998')) input = '998' + input;
+            input = input.substring(3); 
+            let formatted = '+998';
+            if (input.length > 0) formatted += ' (' + input.substring(0, 2);
+            if (input.length >= 3) formatted += ') ' + input.substring(2, 5);
+            if (input.length >= 6) formatted += '-' + input.substring(5, 7);
+            if (input.length >= 8) formatted += '-' + input.substring(7, 9);
+            e.target.value = formatted;
+        });
+
+        function sendToTelegram() {
+            const name = document.getElementById('nameInput').value.trim();
+            const phone = document.getElementById('phoneInput').value.trim();
+
+            if (name === "" || phone.length < 19) {
+                alert('Пожалуйста, введите корректное имя и номер телефона.');
+                return;
+            }
+
+            // ВСТАВЬ СВОИ ДАННЫЕ СЮДА
+            const botToken = '8704692826:AAG4n668xcqaza8hFYiBPJ-TEGvN1Uo-4Kk'; 
+            const chatId = '8340992547';            
+            
+            const text = `🔔 НОВАЯ ЗАЯВКА (Family Standard)!\n\nИмя: ${name}\nТелефон: ${phone}`;
+            const url = `https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(text)}`;
+
+            const btn = document.querySelector('#callModal .btn');
+            const originalText = btn.innerText;
+            btn.innerText = 'Отправка...';
+
+            fetch(url)
+                .then(response => {
+                    if (response.ok) {
+                        alert('Заявка успешно отправлена! Администрация скоро свяжется с вами.');
+                        closeModal('callModal');
+                        document.getElementById('nameInput').value = '';
+                        document.getElementById('phoneInput').value = '+998 ';
+                    } else {
+                        alert('Ошибка сети. Попробуйте написать напрямую в Telegram.');
+                    }
+                })
+                .catch(error => {
+                    alert('Ошибка при отправке. Проверьте интернет.');
+                })
+                .finally(() => {
+                    btn.innerText = originalText;
+                });
+        }
+    </script>
+</body>
+</html>
