@@ -159,9 +159,58 @@
         .gallery-item img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1); }
         .gallery-item:hover img { transform: scale(1.08); }
 
-        .social-links { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; }
-        .btn { background: transparent; border: 1px solid var(--gold-solid); color: var(--text-gold); padding: 14px; border-radius: 40px; text-decoration: none; font-weight: 600; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; text-align: center; cursor: pointer; transition: 0.3s; }
-        .btn:hover { background: var(--gold-linear); color: #000; box-shadow: 0 0 15px rgba(197,160,89,0.4); }
+        /* ИДЕАЛЬНАЯ СЕТКА КНОПОК И РАЗМЕР ИКОНОК */
+        .social-links-wrapper { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 15px; 
+            width: 100%; 
+            max-width: 700px; 
+            margin: 0 auto;
+        }
+        
+        .social-links-row-top { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr 1fr; /* 3 кнопки в ряд */
+            gap: 15px; 
+            width: 100%;
+        }
+
+        .social-links-row-bottom { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; /* 2 большие кнопки */
+            gap: 15px; 
+            width: 100%;
+        }
+
+        .btn { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 10px; 
+            background: transparent; 
+            border: 1px solid var(--gold-solid); 
+            color: var(--text-gold); 
+            padding: 18px 10px; /* Убавил отступы для баланса */
+            border-radius: 30px; 
+            text-decoration: none; 
+            font-weight: 700; 
+            font-size: 12px; 
+            letter-spacing: 1.5px; 
+            text-transform: uppercase; 
+            cursor: pointer; 
+            transition: 0.3s; 
+            text-align: center;
+        }
+        .btn:hover { background: var(--gold-linear); color: #000; box-shadow: 0 0 20px rgba(197,160,89,0.5); }
+        
+        /* ИДЕАЛЬНЫЙ РАЗМЕР ВЕКТОРА */
+        .social-icon { 
+            width: 36px; /* Не огромные, но и не мелкие */
+            height: 36px; 
+            fill: currentColor; 
+        }
 
         .footer-space { 
             position: relative;
@@ -217,7 +266,6 @@
         .close-btn { position: absolute; top: 15px; right: 20px; color: var(--gold-solid); font-size: 28px; cursor: pointer; transition: 0.2s; }
         .close-btn:hover { color: #fff; }
 
-        /* АНИМАЦИЯ ФЕЙЕРВЕРКА ДЛЯ УСПЕХА */
         .success-box { border-color: var(--gold-solid); box-shadow: 0 0 50px rgba(197, 160, 89, 0.2); }
         .firework-icon { 
             font-size: 4rem; 
@@ -239,6 +287,9 @@
             .final-phone { font-size: 1.5rem; }
             .gallery { grid-template-columns: 1fr; }
             .gallery-item { height: 300px; }
+            /* На мобилках кнопки выстраиваются вертикально, чтобы не мельчить */
+            .social-links-row-top, .social-links-row-bottom { grid-template-columns: 1fr; }
+            .btn { flex-direction: row; padding: 15px; }
         }
     </style>
 </head>
@@ -279,12 +330,35 @@
         </div>
 
         <div class="glass-panel">
-            <h3>Контакты</h3>
-            <div class="social-links">
-                <a href="https://t.me/FamilyStandard" class="btn" target="_blank">Telegram</a>
-                <a href="https://www.instagram.com/familystandard.uz/" class="btn" target="_blank">Instagram</a>
-                <a onclick="openModal('devModal')" class="btn">YouTube</a>
-                <a onclick="openModal('devModal')" class="btn">TikTok</a>
+            <h3>Мы в соцсетях</h3>
+            <div class="social-links-wrapper">
+                
+                <div class="social-links-row-top">
+                    <a onclick="openModal('devModal')" class="btn">
+                        <svg viewBox="0 0 24 24" class="social-icon"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                        Like
+                    </a>
+                    <a onclick="openModal('devModal')" class="btn">
+                        <svg viewBox="0 0 24 24" class="social-icon"><path d="M21.582,6.186c-0.23-0.86-0.908-1.538-1.768-1.768C18.254,4,12,4,12,4S5.746,4,4.186,4.418 c-0.86,0.23-1.538,0.908-1.768,1.768C2,7.746,2,12,2,12s0,4.254,0.418,5.814c0.23,0.86,0.908,1.538,1.768,1.768 C5.746,20,12,20,12,20s6.254,0,7.814-0.418c0.86-0.23,1.538-0.908,1.768-1.768C22,16.254,22,12,22,12S22,7.746,21.582,6.186z M10,15.464V8.536L16,12L10,15.464z"/></svg>
+                        YouTube
+                    </a>
+                    <a onclick="openModal('devModal')" class="btn">
+                        <svg viewBox="0 0 24 24" class="social-icon"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-5.2 1.74 2.89 2.89 0 012.31-4.64 2.93 2.93 0 01.88.13V9.4a6.84 6.84 0 00-1-.05A6.33 6.33 0 005 20.1a6.34 6.34 0 0010.86-4.43v-7a8.16 8.16 0 004.77 1.52v-3.4a4.85 4.85 0 01-1-.1z"/></svg>
+                        TikTok
+                    </a>
+                </div>
+
+                <div class="social-links-row-bottom">
+                    <a href="https://www.instagram.com/familystandard.uz/" class="btn" target="_blank">
+                        <svg viewBox="0 0 24 24" class="social-icon"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.88z"/></svg>
+                        Instagram
+                    </a>
+                    <a href="https://t.me/FamilyStandard" class="btn" target="_blank">
+                        <svg viewBox="0 0 24 24" class="social-icon"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+                        Telegram
+                    </a>
+                </div>
+
             </div>
         </div>
     </div>
@@ -311,7 +385,7 @@
             <input type="tel" id="phoneInput" placeholder="+998 (__) ___-__-__" maxlength="19" value="+998 " oninput="removeError(this)">
             <p id="phoneError" class="form-error-msg">Укажите полный номер</p>
 
-            <button id="submitBtn" class="btn" style="width:100%; margin-top:10px; font-size: 13px;" onclick="sendToTelegram()">Отправить запрос</button>
+            <button id="submitBtn" class="btn" style="width:100%; margin-top:10px; flex-direction: row; font-size: 13px;" onclick="sendToTelegram()">Отправить запрос</button>
         </div>
     </div>
 
@@ -321,7 +395,7 @@
             <div class="firework-icon">✨</div>
             <h2 style="color:var(--gold-solid); margin-bottom: 15px;">Заявка отправлена!</h2>
             <p style="font-size: 0.9rem;">Благодарим за доверие. Администрация свяжется с вами в ближайшее время.</p>
-            <button class="btn" style="margin-top:25px; width: 140px;" onclick="closeModal('successModal')">Отлично</button>
+            <button class="btn" style="margin-top:25px; flex-direction: row; width: 140px; margin-left: auto; margin-right: auto;" onclick="closeModal('successModal')">Отлично</button>
         </div>
     </div>
 
@@ -330,7 +404,7 @@
             <span class="close-btn" onclick="closeModal('devModal')">&times;</span>
             <h3 style="color:var(--gold-solid); margin-bottom: 15px;">Раздел в разработке</h3>
             <p>Мы готовим нечто грандиозное.</p>
-            <button class="btn" style="margin-top:20px; width: 120px;" onclick="closeModal('devModal')">Понятно</button>
+            <button class="btn" style="margin-top:20px; flex-direction: row; width: 120px; margin-left: auto; margin-right: auto;" onclick="closeModal('devModal')">Понятно</button>
         </div>
     </div>
 
@@ -439,7 +513,6 @@
             }
             if (hasError) return;
 
-            // ДАННЫЕ УЖЕ ВШИТЫ
             const botToken = '8704692826:AAG4n668xcqaza8hFYiBPJ-TEGvN1Uo-4Kk'; 
             const chatId = '8340992547';            
             
@@ -453,7 +526,6 @@
             fetch(url)
                 .then(response => {
                     if (response.ok) {
-                        // ЗАКРЫВАЕМ ФОРМУ И ОТКРЫВАЕМ КРАСИВЫЙ ФЕЙЕРВЕРК
                         closeModal('callModal');
                         openModal('successModal');
                         nameInput.value = '';
