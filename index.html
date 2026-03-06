@@ -57,9 +57,10 @@
         }
         body.is-ended .dark-overlay { opacity: 1; }
 
+        /* ИДЕАЛЬНАЯ СИММЕТРИЯ СТАРТОВОГО БЛОКА */
         .hero-space {
-            height: 35vh; 
-            height: 35svh;
+            height: 40vh; 
+            height: 40svh;
             width: 100%;
             display: flex;
             align-items: center;
@@ -98,8 +99,10 @@
 
         .logo-panel:hover { border-color: var(--gold-solid); box-shadow: 0 0 30px rgba(197, 160, 89, 0.4); }
 
+        /* ЛОГОТИП РОВНО ПО ЦЕНТРУ СТАРТОВОГО БЛОКА */
         .logo-panel.at-top {
-            top: 40%; left: 50%;
+            top: 20%; 
+            left: 50%;
             transform: translate(-50%, -50%) scale(1.4);
             background: rgba(5, 15, 30, 0.95);
             border-color: var(--gold-solid);
@@ -491,7 +494,6 @@
             document.getElementById('submitBtn').innerText = 'Отправить запрос';
         }
 
-        // ОБНОВЛЕННАЯ ФУНКЦИЯ ДЛЯ КЛИКАБЕЛЬНОГО НОМЕРА В ТЕЛЕГРАМ
         function sendToTelegram() {
             const nameInput = document.getElementById('nameInput');
             const phoneInputObj = document.getElementById('phoneInput');
@@ -511,14 +513,12 @@
             }
             if (hasError) return;
 
-            // Очистка номера для генерации активной ссылки
             const phoneClean = phoneFormatted.replace(/\D/g, ''); 
             const dialLink = `+${phoneClean}`;
 
             const botToken = '8704692826:AAG4n668xcqaza8hFYiBPJ-TEGvN1Uo-4Kk'; 
             const chatId = '8340992547';            
             
-            // Форматирование HTML для Telegram
             const text = `<b>🔔 НОВАЯ ЗАЯВКА (Family Standard)</b>\n\n<b>Имя:</b> ${name}\n<b>Телефон:</b> <a href="tel:${dialLink}">${phoneFormatted}</a>`;
             const url = `https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(text)}&parse_mode=HTML`;
 
