@@ -58,8 +58,8 @@
         body.is-ended .dark-overlay { opacity: 1; }
 
         .hero-space {
-            height: 70vh; 
-            height: 70svh;
+            height: 35vh; 
+            height: 35svh;
             width: 100%;
             display: flex;
             align-items: center;
@@ -108,7 +108,7 @@
 
         .logo-panel.at-bottom {
             top: 50%; left: 50%;
-            transform: translate(-50%, -130px) scale(1.2);
+            transform: translate(-50%, -100px) scale(1.2);
             background: rgba(5, 15, 30, 0.95);
             border-color: var(--gold-solid);
         }
@@ -159,7 +159,6 @@
         .gallery-item img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1); }
         .gallery-item:hover img { transform: scale(1.08); }
 
-        /* ИДЕАЛЬНАЯ СЕТКА КНОПОК И РАЗМЕР ИКОНОК */
         .social-links-wrapper { 
             display: flex; 
             flex-direction: column; 
@@ -171,14 +170,14 @@
         
         .social-links-row-top { 
             display: grid; 
-            grid-template-columns: 1fr 1fr 1fr; /* 3 кнопки в ряд */
+            grid-template-columns: 1fr 1fr 1fr; 
             gap: 15px; 
             width: 100%;
         }
 
         .social-links-row-bottom { 
             display: grid; 
-            grid-template-columns: 1fr 1fr; /* 2 большие кнопки */
+            grid-template-columns: 1fr 1fr; 
             gap: 15px; 
             width: 100%;
         }
@@ -192,7 +191,7 @@
             background: transparent; 
             border: 1px solid var(--gold-solid); 
             color: var(--text-gold); 
-            padding: 18px 10px; /* Убавил отступы для баланса */
+            padding: 18px 10px; 
             border-radius: 30px; 
             text-decoration: none; 
             font-weight: 700; 
@@ -205,9 +204,8 @@
         }
         .btn:hover { background: var(--gold-linear); color: #000; box-shadow: 0 0 20px rgba(197,160,89,0.5); }
         
-        /* ИДЕАЛЬНЫЙ РАЗМЕР ВЕКТОРА */
         .social-icon { 
-            width: 36px; /* Не огромные, но и не мелкие */
+            width: 36px; 
             height: 36px; 
             fill: currentColor; 
         }
@@ -215,15 +213,15 @@
         .footer-space { 
             position: relative;
             z-index: 20;
-            height: 100vh; 
+            height: 50vh; 
             display: flex; 
             flex-direction: column; 
             align-items: center; 
             justify-content: flex-end; 
-            padding-bottom: 120px; 
+            padding-bottom: 80px; 
         }
 
-        #animationTrigger { position: absolute; bottom: 250px; width: 100%; height: 10px; }
+        #animationTrigger { position: absolute; bottom: 120px; width: 100%; height: 10px; }
 
         .footer-cta { text-align: center; opacity: 0; transform: translateY(30px); transition: all 0.8s ease; }
         .footer-cta.visible { opacity: 1; transform: translateY(0); }
@@ -250,7 +248,7 @@
 
         .final-button { display: inline-block; border: 2px solid var(--gold-solid); background: rgba(5, 15, 30, 0.9); padding: 22px 45px; border-radius: 60px; backdrop-filter: blur(15px); color: var(--gold-solid); letter-spacing: 3px; text-transform: uppercase; font-weight: 700; cursor: pointer; box-shadow: 0 0 30px rgba(197, 160, 89, 0.2); transition: 0.3s; }
         .final-button:hover { transform: scale(1.05); box-shadow: 0 0 40px rgba(197, 160, 89, 0.4); }
-        .copyright { position: absolute; bottom: 30px; width: 100%; text-align: center; color: rgba(255, 255, 255, 0.2); font-size: 0.65rem; letter-spacing: 2px; text-transform: uppercase; }
+        .copyright { position: absolute; bottom: 20px; width: 100%; text-align: center; color: rgba(255, 255, 255, 0.2); font-size: 0.65rem; letter-spacing: 2px; text-transform: uppercase; }
 
         /* МОДАЛЬНЫЕ ОКНА */
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--modal-bg); display: none; justify-content: center; align-items: center; z-index: 2000; backdrop-filter: blur(15px); padding: 20px; }
@@ -282,12 +280,11 @@
             .logo-text { font-size: 0.95rem; }
             .logo-panel { top: 15px; left: 15px; padding: 10px 20px; } 
             .logo-panel.at-top { transform: translate(-50%, -50%) scale(1.1); }
-            .logo-panel.at-bottom { transform: translate(-50%, -150px) scale(1.1); } 
-            .footer-space { height: 90vh; } 
+            .logo-panel.at-bottom { transform: translate(-50%, -120px) scale(1.1); } 
+            .footer-space { height: 45vh; } 
             .final-phone { font-size: 1.5rem; }
             .gallery { grid-template-columns: 1fr; }
             .gallery-item { height: 300px; }
-            /* На мобилках кнопки выстраиваются вертикально, чтобы не мельчить */
             .social-links-row-top, .social-links-row-bottom { grid-template-columns: 1fr; }
             .btn { flex-direction: row; padding: 15px; }
         }
@@ -311,7 +308,7 @@
             <p class="trust-text">Мы подготовили для вас ознакомительное видео от лица Администрации. Посмотрите его, чтобы быть абсолютно уверенными в нашем подходе и точно знать, кому вы доверяете своё важное событие.</p>
             <div class="video-wrapper" onclick="handleVideoClick()">
                 <div class="video-container">
-                    <video id="mainVideo" autoplay muted playsinline webkit-playsinline disablePictureInPicture poster="photo1.jpg">
+                    <video id="mainVideo" autoplay muted playsinline webkit-playsinline disablePictureInPicture preload="auto" poster="poster.jpg">
                         <source src="welcome.mp4" type="video/mp4">
                     </video>
                 </div>
@@ -330,7 +327,7 @@
         </div>
 
         <div class="glass-panel">
-            <h3>Мы в соцсетях</h3>
+            <h3>Следите за нами</h3>
             <div class="social-links-wrapper">
                 
                 <div class="social-links-row-top">
@@ -494,11 +491,12 @@
             document.getElementById('submitBtn').innerText = 'Отправить запрос';
         }
 
+        // ОБНОВЛЕННАЯ ФУНКЦИЯ ДЛЯ КЛИКАБЕЛЬНОГО НОМЕРА В ТЕЛЕГРАМ
         function sendToTelegram() {
             const nameInput = document.getElementById('nameInput');
             const phoneInputObj = document.getElementById('phoneInput');
             const name = nameInput.value.trim();
-            const phone = phoneInputObj.value.trim();
+            const phoneFormatted = phoneInputObj.value.trim();
             let hasError = false;
 
             if (name === "") {
@@ -506,18 +504,23 @@
                 document.getElementById('nameError').style.display = 'block';
                 hasError = true;
             }
-            if (phone.length < 19) {
+            if (phoneFormatted.length < 19) {
                 phoneInputObj.classList.add('error-border');
                 document.getElementById('phoneError').style.display = 'block';
                 hasError = true;
             }
             if (hasError) return;
 
+            // Очистка номера для генерации активной ссылки
+            const phoneClean = phoneFormatted.replace(/\D/g, ''); 
+            const dialLink = `+${phoneClean}`;
+
             const botToken = '8704692826:AAG4n668xcqaza8hFYiBPJ-TEGvN1Uo-4Kk'; 
             const chatId = '8340992547';            
             
-            const text = `🔔 НОВАЯ ЗАЯВКА (Family Standard)!\n\nИмя: ${name}\nТелефон: ${phone}`;
-            const url = `https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(text)}`;
+            // Форматирование HTML для Telegram
+            const text = `<b>🔔 НОВАЯ ЗАЯВКА (Family Standard)</b>\n\n<b>Имя:</b> ${name}\n<b>Телефон:</b> <a href="tel:${dialLink}">${phoneFormatted}</a>`;
+            const url = `https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(text)}&parse_mode=HTML`;
 
             const btn = document.getElementById('submitBtn');
             const originalText = btn.innerText;
