@@ -3,8 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Family Standard | Агентство праздников</title>
-    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    
+    <title>Family Standard | Агентство премиальных праздников в Ташкенте</title>
+    <meta name="description" content="Организация премиальных праздников, корпоративов и мероприятий в Ташкенте. Эксклюзивные шоу-программы, профессиональные аниматоры и безупречный сервис от агентства Family Standard.">
+    <meta name="keywords" content="премиум праздники Ташкент, аниматоры Ташкент, организация мероприятий, детские праздники, Family Standard, заказать шоу, ивент агентство">
+    <meta name="author" content="Family Standard">
+    
+    <meta property="og:title" content="Family Standard | Агентство премиальных праздников">
+    <meta property="og:description" content="Создаем события, которым доверяют. Эксклюзивные шоу, аниматоры и премиум-сервис в Ташкенте.">
+    <meta property="og:image" content="https://familystandard.uz/logo.gif">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://familystandard.uz/">
+
+    <link rel="icon" href="logo.gif" type="image/gif">
     
     <link rel="preload" href="background.jpg" as="image">
     <link rel="preload" href="logo.gif" as="image">
@@ -57,7 +68,6 @@
         }
         body.is-ended .dark-overlay { opacity: 1; }
 
-        /* ИДЕАЛЬНАЯ СИММЕТРИЯ СТАРТОВОГО БЛОКА */
         .hero-space {
             height: 40vh; 
             height: 40svh;
@@ -99,7 +109,6 @@
 
         .logo-panel:hover { border-color: var(--gold-solid); box-shadow: 0 0 30px rgba(197, 160, 89, 0.4); }
 
-        /* ЛОГОТИП РОВНО ПО ЦЕНТРУ СТАРТОВОГО БЛОКА */
         .logo-panel.at-top {
             top: 20%; 
             left: 50%;
@@ -108,15 +117,6 @@
             border-color: var(--gold-solid);
             box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
         }
-
-        .logo-panel.at-bottom {
-            top: 50%; left: 50%;
-            transform: translate(-50%, -100px) scale(1.2);
-            background: rgba(5, 15, 30, 0.95);
-            border-color: var(--gold-solid);
-        }
-        
-        .logo-panel.at-top:hover, .logo-panel.at-bottom:hover { box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6); cursor: default; }
 
         .logo-img { height: 45px; filter: drop-shadow(0 0 5px rgba(197, 160, 89, 0.3)); }
         
@@ -207,11 +207,7 @@
         }
         .btn:hover { background: var(--gold-linear); color: #000; box-shadow: 0 0 20px rgba(197,160,89,0.5); }
         
-        .social-icon { 
-            width: 36px; 
-            height: 36px; 
-            fill: currentColor; 
-        }
+        .social-icon { width: 36px; height: 36px; fill: currentColor; }
 
         .footer-space { 
             position: relative;
@@ -224,10 +220,7 @@
             padding-bottom: 80px; 
         }
 
-        #animationTrigger { position: absolute; bottom: 120px; width: 100%; height: 10px; }
-
-        .footer-cta { text-align: center; opacity: 0; transform: translateY(30px); transition: all 0.8s ease; }
-        .footer-cta.visible { opacity: 1; transform: translateY(0); }
+        .footer-cta { text-align: center; opacity: 0; transform: translateY(30px); transition: none; }
         
         .arrow-up { font-size: 2.5rem; color: var(--gold-solid); margin-bottom: 15px; animation: bounce 2s infinite; display: block; }
         @keyframes bounce { 0%, 20%, 50%, 80%, 100% {transform: translateY(0);} 40% {transform: translateY(-12px);} 60% {transform: translateY(-6px);} }
@@ -243,17 +236,13 @@
             transition: 0.3s; 
             text-shadow: 0 0 10px rgba(197, 160, 89, 0.2);
         }
-        .final-phone:hover { 
-            color: #fff; 
-            text-shadow: 0 0 25px rgba(197, 160, 89, 0.8); 
-            transform: scale(1.05);
-        }
+        .final-phone:hover { color: #fff; text-shadow: 0 0 25px rgba(197, 160, 89, 0.8); transform: scale(1.05); }
 
         .final-button { display: inline-block; border: 2px solid var(--gold-solid); background: rgba(5, 15, 30, 0.9); padding: 22px 45px; border-radius: 60px; backdrop-filter: blur(15px); color: var(--gold-solid); letter-spacing: 3px; text-transform: uppercase; font-weight: 700; cursor: pointer; box-shadow: 0 0 30px rgba(197, 160, 89, 0.2); transition: 0.3s; }
         .final-button:hover { transform: scale(1.05); box-shadow: 0 0 40px rgba(197, 160, 89, 0.4); }
+        
         .copyright { position: absolute; bottom: 20px; width: 100%; text-align: center; color: rgba(255, 255, 255, 0.2); font-size: 0.65rem; letter-spacing: 2px; text-transform: uppercase; }
 
-        /* МОДАЛЬНЫЕ ОКНА */
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--modal-bg); display: none; justify-content: center; align-items: center; z-index: 2000; backdrop-filter: blur(15px); padding: 20px; }
         .modal-content { background: rgba(255, 255, 255, 0.03); border: 1px solid var(--gold-solid); padding: 40px; border-radius: 30px; max-width: 420px; width: 100%; text-align: center; position: relative; }
         
@@ -268,26 +257,16 @@
         .close-btn:hover { color: #fff; }
 
         .success-box { border-color: var(--gold-solid); box-shadow: 0 0 50px rgba(197, 160, 89, 0.2); }
-        .firework-icon { 
-            font-size: 4rem; 
-            margin-bottom: 10px; 
-            display: inline-block;
-            animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards, goldGlow 2s infinite alternate;
-        }
+        .firework-icon { font-size: 4rem; margin-bottom: 10px; display: inline-block; animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards, goldGlow 2s infinite alternate; }
         @keyframes popIn { 0% { transform: scale(0); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
         @keyframes goldGlow { 0% { filter: drop-shadow(0 0 10px rgba(197,160,89,0.3)); } 100% { filter: drop-shadow(0 0 35px rgba(197,160,89,1)); } }
 
         @media (max-width: 768px) { 
-            h1 { font-size: 1.5rem; } 
-            h2 { font-size: 0.9rem; } 
-            .logo-text { font-size: 0.95rem; }
+            h1 { font-size: 1.5rem; } h2 { font-size: 0.9rem; } .logo-text { font-size: 0.95rem; }
             .logo-panel { top: 15px; left: 15px; padding: 10px 20px; } 
             .logo-panel.at-top { transform: translate(-50%, -50%) scale(1.1); }
-            .logo-panel.at-bottom { transform: translate(-50%, -120px) scale(1.1); } 
-            .footer-space { height: 45vh; } 
-            .final-phone { font-size: 1.5rem; }
-            .gallery { grid-template-columns: 1fr; }
-            .gallery-item { height: 300px; }
+            .footer-space { height: 45vh; } .final-phone { font-size: 1.5rem; }
+            .gallery { grid-template-columns: 1fr; } .gallery-item { height: 300px; }
             .social-links-row-top, .social-links-row-bottom { grid-template-columns: 1fr; }
             .btn { flex-direction: row; padding: 15px; }
         }
@@ -305,18 +284,11 @@
     </div>
 
     <div class="container">
+        
         <div class="glass-panel">
             <h1>Family Standard</h1>
             <h2>Агентство премиальных праздников</h2>
-            <p class="trust-text">Мы подготовили для вас ознакомительное видео от лица Администрации. Посмотрите его, чтобы быть абсолютно уверенными в нашем подходе и точно знать, кому вы доверяете своё важное событие.</p>
-            <div class="video-wrapper" onclick="handleVideoClick()">
-                <div class="video-container">
-                    <video id="mainVideo" autoplay muted playsinline webkit-playsinline disablePictureInPicture preload="auto" poster="poster.jpg">
-                        <source src="welcome.mp4" type="video/mp4">
-                    </video>
-                </div>
-                <p id="videoHint" class="video-hint">НАЖМИТЕ ДЛЯ ВКЛЮЧЕНИЯ ЗВУКА</p>
-            </div>
+            <p style="margin-bottom: 0;">Эксклюзивные шоу-программы и безупречный сервис.</p>
         </div>
 
         <div class="glass-panel">
@@ -361,10 +333,23 @@
 
             </div>
         </div>
+
+        <div class="glass-panel">
+            <h3>Обращение администрации</h3>
+            <p class="trust-text">Мы подготовили для вас ознакомительное видео. Посмотрите его, чтобы быть абсолютно уверенными в нашем подходе и точно знать, кому вы доверяете своё важное событие.</p>
+            <div class="video-wrapper" onclick="handleVideoClick()">
+                <div class="video-container">
+                    <video id="mainVideo" autoplay muted playsinline webkit-playsinline disablePictureInPicture preload="auto" poster="poster.jpg">
+                        <source src="welcome.mp4" type="video/mp4">
+                    </video>
+                </div>
+                <p id="videoHint" class="video-hint">НАЖМИТЕ ДЛЯ ВКЛЮЧЕНИЯ ЗВУКА</p>
+            </div>
+        </div>
+
     </div>
 
     <div class="footer-space">
-        <div id="animationTrigger"></div>
         <div id="finalSection" class="footer-cta">
             <span class="arrow-up">↑</span>
             <a href="tel:+998700464000" class="final-phone">+998 700 464 000</a>
@@ -447,32 +432,57 @@
 
         const logo = document.getElementById('mainLogo');
         const finalSection = document.getElementById('finalSection');
-        const trigger = document.getElementById('animationTrigger');
+        const footer = document.querySelector('.footer-space');
         const body = document.body;
         
         window.addEventListener('scroll', () => {
-            if (window.scrollY < 50) {
+            let scrollY = window.scrollY;
+            let windowHeight = window.innerHeight;
+            
+            if (scrollY < 50) {
                 logo.classList.add('at-top');
+                logo.style.transition = 'all 0.8s cubic-bezier(0.25, 1, 0.5, 1)';
+                logo.style.transform = ''; 
+                return;
             } else {
                 logo.classList.remove('at-top');
             }
-        });
 
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    logo.classList.add('at-bottom');
-                    finalSection.classList.add('visible');
-                    body.classList.add('is-ended');
-                } else {
-                    logo.classList.remove('at-bottom');
-                    finalSection.classList.remove('visible');
-                    body.classList.remove('is-ended');
-                }
-            });
-        }, { root: null, threshold: 0 });
-        
-        observer.observe(trigger);
+            let footerRect = footer.getBoundingClientRect();
+            let startTrigger = windowHeight; 
+            
+            if (footerRect.top < startTrigger) {
+                let progress = (startTrigger - footerRect.top) / (footerRect.height - 50);
+                if (progress > 1) progress = 1;
+                if (progress < 0) progress = 0;
+
+                logo.style.transition = 'none';
+                let logoWidth = logo.offsetWidth;
+                let logoHeight = logo.offsetHeight;
+                
+                let targetX = (window.innerWidth / 2) - 30 - (logoWidth / 2);
+                let targetY = (window.innerHeight / 2) - 100 - 30 - (logoHeight / 2);
+
+                let currentX = targetX * progress;
+                let currentY = targetY * progress;
+                let currentScale = 1 + (0.2 * progress); 
+
+                logo.style.transform = `translate(${currentX}px, ${currentY}px) scale(${currentScale})`;
+
+                finalSection.style.opacity = progress;
+                finalSection.style.transform = `translateY(${(1 - progress) * 30}px)`;
+                
+                if(progress === 1) body.classList.add('is-ended');
+                else body.classList.remove('is-ended');
+
+            } else {
+                logo.style.transition = 'all 0.8s cubic-bezier(0.25, 1, 0.5, 1)';
+                logo.style.transform = 'translate(0, 0) scale(1)';
+                finalSection.style.opacity = 0;
+                finalSection.style.transform = 'translateY(30px)';
+                body.classList.remove('is-ended');
+            }
+        });
 
         const phoneInput = document.getElementById('phoneInput');
         phoneInput.addEventListener('input', function (e) {
@@ -513,13 +523,18 @@
             }
             if (hasError) return;
 
-            const phoneClean = phoneFormatted.replace(/\D/g, ''); 
-            const dialLink = `+${phoneClean}`;
+            const phoneClean = '+' + phoneFormatted.replace(/\D/g, ''); 
 
-            const botToken = '8704692826:AAG4n668xcqaza8hFYiBPJ-TEGvN1Uo-4Kk'; 
-            const chatId = '8340992547';            
+            // СЕЙФ ПРЯМО ВНУТРИ КОДА 
+            const _x_t = "ODcwNDY5MjgyNjpBQUc0bjY2OHhjcWF6YThoRllpQlBKLVRFR3ZOMVVvLTRLa3xGUzIwMjY=";
+            const _x_c = "ODM0MDk5MjU0N3xGUzIwMjY=";
+            const secretKey = "|FS2026";
+
+            // РАСШИФРОВКА НА ЛЕТУ 
+            const botToken = atob(_x_t).replace(secretKey, '');
+            const chatId = atob(_x_c).replace(secretKey, '');
             
-            const text = `<b>🔔 НОВАЯ ЗАЯВКА (Family Standard)</b>\n\n<b>Имя:</b> ${name}\n<b>Телефон:</b> <a href="tel:${dialLink}">${phoneFormatted}</a>`;
+            const text = `<b>🔔 НОВАЯ ЗАЯВКА (Family Standard)</b>\n\n<b>Имя:</b> ${name}\n<b>Телефон:</b> ${phoneClean}`;
             const url = `https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(text)}&parse_mode=HTML`;
 
             const btn = document.getElementById('submitBtn');
