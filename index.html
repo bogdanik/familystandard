@@ -4,562 +4,215 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <title>Family Standard | Агентство премиальных праздников в Ташкенте</title>
-    <meta name="description" content="Организация премиальных праздников, корпоративов и мероприятий в Ташкенте. Эксклюзивные шоу-программы, профессиональные аниматоры и безупречный сервис от агентства Family Standard.">
-    <meta name="keywords" content="премиум праздники Ташкент, аниматоры Ташкент, организация мероприятий, детские праздники, Family Standard, заказать шоу, ивент агентство">
-    <meta name="author" content="Family Standard">
-    
-    <meta property="og:title" content="Family Standard | Агентство премиальных праздников">
-    <meta property="og:description" content="Создаем события, которым доверяют. Эксклюзивные шоу, аниматоры и премиум-сервис в Ташкенте.">
+    <title>Аниматоры в Ташкенте | Family Standard — Активные игры и квесты</title>
+    <meta name="description" content="Ищете аниматоров на праздник в Ташкенте? Агентство Family Standard предлагает премиум-формат: выездные сюжетные квесты, активные игры и профессиональный присмотр за детьми на вашем мероприятии.">
+    <meta name="keywords" content="аниматоры Ташкент, заказать аниматора, детские праздники Ташкент, квесты для детей, организация мероприятий, Family Standard, присмотр за детьми, шоу на праздник">
+    <meta property="og:title" content="Family Standard | Организация игровых сессий и квестов">
+    <meta property="og:description" content="Вы отдыхаете — наши гейм-мастеры берут на себя присмотр за детьми и организуют захватывающие сюжетные игры на вашем событии.">
     <meta property="og:image" content="https://familystandard.uz/logo.gif">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://familystandard.uz/">
-
+    
     <link rel="icon" href="logo.gif" type="image/gif">
-    
-    <link rel="preload" href="background.jpg" as="image">
-    <link rel="preload" href="logo.gif" as="image">
-    
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;500;700&display=swap');
+        :root { --gold: #c5a059; --bg: #050a14; --glass: rgba(255,255,255,0.04); --border: rgba(197,160,89,0.3); }
+        * { box-sizing: border-box; margin: 0; padding: 0; outline: none; }
+        body { font-family: 'Montserrat', sans-serif; color: #f0f4f8; background: var(--bg) url('background.jpg') fixed center/cover; overflow-x: hidden; line-height: 1.6; }
+        body::before { content: ""; position: fixed; inset: 0; background: rgba(0,10,20,0.5); backdrop-filter: blur(4px); z-index: -2; }
         
-        :root {
-            --deep-space: #050a14;
-            --gold-linear: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c);
-            --gold-solid: #c5a059;
-            --glass-bg: rgba(255, 255, 255, 0.04);
-            --glass-border: rgba(197, 160, 89, 0.3);
-            --text-gold: #e2c275;
-            --white-soft: #f0f4f8;
-            --modal-bg: rgba(5, 10, 20, 0.95);
-        }
-
-        * { box-sizing: border-box; outline: none; margin: 0; padding: 0; }
-
-        body {
-            font-family: 'Montserrat', sans-serif;
-            color: var(--white-soft);
-            background-color: var(--deep-space);
-            background-image: url('background.jpg');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-            overflow-x: hidden;
-            line-height: 1.6;
-        }
-
-        body::before {
-            content: "";
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 10, 20, 0.5); 
-            backdrop-filter: blur(4px);
-            z-index: -2;
-        }
-
-        .dark-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 5, 12, 0.92);
-            opacity: 0;
-            pointer-events: none;
-            z-index: 10;
-            transition: opacity 0.8s ease;
-        }
-        body.is-ended .dark-overlay { opacity: 1; }
-
-        .hero-space {
-            height: 40vh; 
-            height: 40svh;
-            width: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            z-index: 1;
-        }
-
-        .container { 
-            position: relative;
-            z-index: 1;
-            max-width: 900px; 
-            margin: 0 auto; 
-            padding: 20px 20px 40px; 
-        }
+        .container { max-width: 900px; margin: 0 auto; padding: 40px 20px; position: relative; z-index: 1; }
         
-        body.is-ended .container { pointer-events: none; } 
-
-        .logo-panel {
-            position: fixed;
-            top: 30px; left: 30px;
-            background: rgba(5, 10, 20, 0.85);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border);
-            border-radius: 60px;
-            padding: 12px 30px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
-            z-index: 999;
-            cursor: pointer;
-            transition: all 0.8s cubic-bezier(0.25, 1, 0.5, 1);
-        }
-
-        .logo-panel:hover { border-color: var(--gold-solid); box-shadow: 0 0 30px rgba(197, 160, 89, 0.4); }
-
-        .logo-panel.at-top {
-            top: 20%; 
-            left: 50%;
-            transform: translate(-50%, -50%) scale(1.4);
-            background: rgba(5, 15, 30, 0.95);
-            border-color: var(--gold-solid);
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
-        }
-
-        .logo-img { height: 45px; filter: drop-shadow(0 0 5px rgba(197, 160, 89, 0.3)); }
+        /* ГЛАВНЫЙ БЛОК: ЛОГОТИП И КНОПКА (Естественно улетает при скролле) */
+        .header-block { text-align: center; margin-bottom: 40px; padding: 20px 0; display: flex; flex-direction: column; align-items: center; gap: 20px; }
         
-        .logo-text { 
-            display: block;
-            line-height: 1.1;
-            font-size: 1.1rem; 
-            letter-spacing: 2px; 
-            text-transform: uppercase; 
-            background: var(--gold-linear); 
-            -webkit-background-clip: text; 
-            -webkit-text-fill-color: transparent; 
-            font-weight: 700; 
-            white-space: nowrap; 
-        }
+        .logo-panel { background: rgba(5,10,20,0.85); backdrop-filter: blur(20px); border: 1px solid var(--border); border-radius: 60px; padding: 15px 35px; display: inline-flex; align-items: center; gap: 15px; transform: scale(1.3); filter: drop-shadow(0 0 15px rgba(0,0,0,0.5)); margin-bottom: 20px; pointer-events: none; }
+        .logo-img { height: 45px; filter: drop-shadow(0 0 5px rgba(197,160,89,0.3)); }
+        .logo-text { font-size: 1.1rem; letter-spacing: 2px; text-transform: uppercase; background: linear-gradient(135deg,#bf953f,#fcf6ba,#b38728,#fbf5b7,#aa771c); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 700; }
+        
+        .header-btn { display: inline-flex; align-items: center; gap: 10px; border: 2px solid var(--gold); background: rgba(5,15,30,0.9); padding: 18px 35px; border-radius: 60px; color: var(--gold); font-weight: 700; text-transform: uppercase; cursor: pointer; transition: 0.3s; font-size: 13px; letter-spacing: 2px; text-decoration: none; box-shadow: 0 0 20px rgba(197,160,89,0.2); }
+        .header-btn:hover { background: var(--gold); color: #000; box-shadow: 0 0 30px rgba(197,160,89,0.5); transform: scale(1.03); }
 
-        .glass-panel {
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border);
-            border-radius: 24px;
-            padding: 40px;
-            margin-bottom: 40px;
-            text-align: center;
-            transform: translateZ(0);
-        }
-
-        h1 { font-size: 2rem; background: var(--gold-linear); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 3px; }
-        h2 { color: var(--gold-solid); font-size: 1.1rem; letter-spacing: 4px; text-transform: uppercase; font-weight: 500; margin-bottom: 30px; }
-        h3 { color: var(--gold-solid); letter-spacing: 2px; text-transform: uppercase; font-weight: 600; margin-bottom: 25px; }
-        p { margin-bottom: 15px; font-size: 0.95rem; }
-
-        .trust-text { color: var(--text-gold); font-size: 0.9rem; line-height: 1.5; max-width: 600px; margin: 0 auto 25px; padding: 15px; border-left: 2px solid var(--gold-solid); background: rgba(197, 160, 89, 0.05); border-radius: 0 15px 15px 0; text-align: left; }
-
-        .video-wrapper { max-width: 320px; margin: 0 auto 25px; cursor: pointer; }
-        .video-container { width: 100%; border-radius: 20px; border: 1px solid var(--glass-border); overflow: hidden; background: #000; box-shadow: 0 10px 30px rgba(0,0,0,0.5); line-height: 0;}
-        video { width: 100%; height: auto; display: block; }
-        .video-hint { font-size: 0.65rem; color: var(--gold-solid); margin-top: 10px; letter-spacing: 1.5px; text-align: center; }
-
+        /* БЛОКИ КОНТЕНТА */
+        .glass-panel { background: var(--glass); backdrop-filter: blur(20px); border: 1px solid var(--border); border-radius: 24px; padding: 40px; margin-bottom: 40px; text-align: center; }
+        h1 { font-size: 2rem; background: linear-gradient(135deg,#bf953f,#fcf6ba,#b38728,#fbf5b7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 3px; }
+        h2 { color: var(--gold); font-size: 1.1rem; letter-spacing: 4px; text-transform: uppercase; font-weight: 500; margin-bottom: 30px; }
+        h3 { color: var(--gold); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 25px; }
+        .trust-text { font-size: 0.95rem; max-width: 680px; margin: 0 auto 25px; padding: 18px; border-left: 2px solid var(--gold); background: rgba(197,160,89,0.05); text-align: left; line-height: 1.7; }
+        
+        /* ГАЛЕРЕЯ И ВИДЕО */
+        .video-wrapper { max-width: 320px; margin: 0 auto 25px; cursor: pointer; border-radius: 20px; overflow: hidden; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        video { width: 100%; display: block; }
+        .video-hint { font-size: 0.65rem; color: var(--gold); margin-top: 10px; letter-spacing: 1.5px; transition: 0.3s; }
         .gallery { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
-        .gallery-item { border-radius: 16px; overflow: hidden; border: 1px solid var(--glass-border); height: 350px; cursor: pointer; position: relative; }
-        .gallery-item img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1); }
+        .gallery-item { border-radius: 16px; overflow: hidden; border: 1px solid var(--border); height: 350px; cursor: pointer; }
+        .gallery-item img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
         .gallery-item:hover img { transform: scale(1.08); }
-
-        .social-links-wrapper { 
-            display: flex; 
-            flex-direction: column; 
-            gap: 15px; 
-            width: 100%; 
-            max-width: 700px; 
-            margin: 0 auto;
-        }
         
-        .social-links-row-top { 
-            display: grid; 
-            grid-template-columns: 1fr 1fr 1fr; 
-            gap: 15px; 
-            width: 100%;
-        }
+        /* КНОПКИ СОЦСЕТЕЙ */
+        .social-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-bottom: 15px; }
+        .social-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .btn { display: flex; flex-direction: column; align-items: center; gap: 10px; border: 1px solid var(--gold); color: var(--gold); padding: 15px; border-radius: 30px; text-decoration: none; font-weight: 700; font-size: 12px; text-transform: uppercase; cursor: pointer; transition: 0.3s; }
+        .btn:hover { background: var(--gold); color: #000; box-shadow: 0 0 20px rgba(197,160,89,0.5); }
+        .social-icon { width: 32px; height: 32px; fill: currentColor; }
 
-        .social-links-row-bottom { 
-            display: grid; 
-            grid-template-columns: 1fr 1fr; 
-            gap: 15px; 
-            width: 100%;
-        }
-
-        .btn { 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            justify-content: center; 
-            gap: 10px; 
-            background: transparent; 
-            border: 1px solid var(--gold-solid); 
-            color: var(--text-gold); 
-            padding: 18px 10px; 
-            border-radius: 30px; 
-            text-decoration: none; 
-            font-weight: 700; 
-            font-size: 12px; 
-            letter-spacing: 1.5px; 
-            text-transform: uppercase; 
-            cursor: pointer; 
-            transition: 0.3s; 
-            text-align: center;
-        }
-        .btn:hover { background: var(--gold-linear); color: #000; box-shadow: 0 0 20px rgba(197,160,89,0.5); }
+        /* ФИНАЛЬНЫЙ БЛОК (ОГРОМНЫЙ НОМЕР И КНОПКА) */
+        .final-footer { text-align: center; padding: 60px 20px 20px; margin-top: 20px; border-top: 1px solid var(--glass); display: flex; flex-direction: column; align-items: center; }
+        .massive-phone { display: block; color: var(--gold); font-size: 3rem; font-weight: 700; text-decoration: none; text-shadow: 0 0 25px rgba(197,160,89,0.4); margin-bottom: 5px; transition: 0.3s; white-space: nowrap; }
+        .massive-phone:hover { transform: scale(1.05); color: #fff; }
+        .call-text { color: rgba(255, 255, 255, 0.5); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 4px; margin-bottom: 40px; }
         
-        .social-icon { width: 36px; height: 36px; fill: currentColor; }
-
-        .footer-space { 
-            position: relative;
-            z-index: 20;
-            height: 50vh; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            justify-content: flex-end; 
-            padding-bottom: 80px; 
-        }
-
-        .footer-cta { text-align: center; opacity: 0; transform: translateY(30px); transition: none; }
+        .copyright { text-align: center; color: rgba(255, 255, 255, 0.15); font-size: 0.65rem; letter-spacing: 2px; text-transform: uppercase; margin-top: 50px; }
         
-        .arrow-up { font-size: 2.5rem; color: var(--gold-solid); margin-bottom: 15px; animation: bounce 2s infinite; display: block; }
-        @keyframes bounce { 0%, 20%, 50%, 80%, 100% {transform: translateY(0);} 40% {transform: translateY(-12px);} 60% {transform: translateY(-6px);} }
-
-        .final-phone { 
-            display: block; 
-            color: var(--gold-solid); 
-            font-size: 2rem; 
-            font-weight: 700; 
-            text-decoration: none; 
-            letter-spacing: 3px; 
-            margin-bottom: 25px; 
-            transition: 0.3s; 
-            text-shadow: 0 0 10px rgba(197, 160, 89, 0.2);
-        }
-        .final-phone:hover { color: #fff; text-shadow: 0 0 25px rgba(197, 160, 89, 0.8); transform: scale(1.05); }
-
-        .final-button { display: inline-block; border: 2px solid var(--gold-solid); background: rgba(5, 15, 30, 0.9); padding: 22px 45px; border-radius: 60px; backdrop-filter: blur(15px); color: var(--gold-solid); letter-spacing: 3px; text-transform: uppercase; font-weight: 700; cursor: pointer; box-shadow: 0 0 30px rgba(197, 160, 89, 0.2); transition: 0.3s; }
-        .final-button:hover { transform: scale(1.05); box-shadow: 0 0 40px rgba(197, 160, 89, 0.4); }
+        /* МОДАЛКИ */
+        .modal { position: fixed; inset: 0; background: rgba(5,10,20,0.95); display: none; justify-content: center; align-items: center; z-index: 2000; padding: 20px; }
+        .modal-content { background: rgba(255,255,255,0.03); border: 1px solid var(--gold); padding: 40px; border-radius: 30px; width: 100%; max-width: 420px; text-align: center; position: relative; }
+        .close-btn { position: absolute; top: 15px; right: 20px; color: var(--gold); font-size: 28px; cursor: pointer; }
+        input { width: 100%; padding: 15px; margin: 10px 0; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 12px; color: #fff; }
+        .error-msg { color: #ff4d4d; font-size: 0.8rem; display: none; text-align: left; padding-left: 10px; }
+        #fullImg { max-width: 90vw; max-height: 80vh; border: 2px solid var(--gold); border-radius: 15px; }
         
-        .copyright { position: absolute; bottom: 20px; width: 100%; text-align: center; color: rgba(255, 255, 255, 0.2); font-size: 0.65rem; letter-spacing: 2px; text-transform: uppercase; }
-
-        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--modal-bg); display: none; justify-content: center; align-items: center; z-index: 2000; backdrop-filter: blur(15px); padding: 20px; }
-        .modal-content { background: rgba(255, 255, 255, 0.03); border: 1px solid var(--gold-solid); padding: 40px; border-radius: 30px; max-width: 420px; width: 100%; text-align: center; position: relative; }
-        
-        input { width: 100%; padding: 15px; margin: 10px 0; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); border-radius: 12px; color: #fff; font-size: 1rem; transition: 0.3s; }
-        input::placeholder { color: rgba(255, 255, 255, 0.5); }
-        input.error-border { border-color: #ff4d4d; box-shadow: 0 0 15px rgba(255, 77, 77, 0.3); }
-
-        .form-error-msg { color: #ff4d4d; font-size: 0.8rem; margin-top: -5px; margin-bottom: 10px; display: none; text-align: left; padding-left: 10px; }
-
-        #fullImageModal img { max-width: 90vw; max-height: 80vh; border: 2px solid var(--gold-solid); border-radius: 15px; box-shadow: 0 0 40px rgba(0,0,0,0.8); }
-        .close-btn { position: absolute; top: 15px; right: 20px; color: var(--gold-solid); font-size: 28px; cursor: pointer; transition: 0.2s; }
-        .close-btn:hover { color: #fff; }
-
-        .success-box { border-color: var(--gold-solid); box-shadow: 0 0 50px rgba(197, 160, 89, 0.2); }
-        .firework-icon { font-size: 4rem; margin-bottom: 10px; display: inline-block; animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards, goldGlow 2s infinite alternate; }
-        @keyframes popIn { 0% { transform: scale(0); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
-        @keyframes goldGlow { 0% { filter: drop-shadow(0 0 10px rgba(197,160,89,0.3)); } 100% { filter: drop-shadow(0 0 35px rgba(197,160,89,1)); } }
-
         @media (max-width: 768px) { 
-            h1 { font-size: 1.5rem; } h2 { font-size: 0.9rem; } .logo-text { font-size: 0.95rem; }
-            .logo-panel { top: 15px; left: 15px; padding: 10px 20px; } 
-            .logo-panel.at-top { transform: translate(-50%, -50%) scale(1.1); }
-            .footer-space { height: 45vh; } .final-phone { font-size: 1.5rem; }
-            .gallery { grid-template-columns: 1fr; } .gallery-item { height: 300px; }
-            .social-links-row-top, .social-links-row-bottom { grid-template-columns: 1fr; }
-            .btn { flex-direction: row; padding: 15px; }
+            .gallery { grid-template-columns: 1fr; } 
+            .social-grid { grid-template-columns: 1fr; } 
+            .btn { flex-direction: row; } 
+            .logo-panel { transform: scale(1.1); } 
+            .container { padding-top: 20px; } 
+            .massive-phone { font-size: 2.2rem; } /* Уменьшаем номер на мобилках, чтобы влез */
         }
     </style>
 </head>
 <body>
 
-    <div class="dark-overlay"></div>
-
-    <div class="hero-space" id="heroSpace"></div>
-
-    <div id="mainLogo" class="logo-panel at-top" onclick="openModal('callModal')">
-        <img src="logo.gif" alt="FS Logo" class="logo-img">
-        <span class="logo-text">Family<br>Standard</span>
-    </div>
-
     <div class="container">
         
-        <div class="glass-panel">
-            <h1>Family Standard</h1>
-            <h2>Агентство премиальных праздников</h2>
-            <p style="margin-bottom: 0;">Эксклюзивные шоу-программы и безупречный сервис.</p>
+        <div class="header-block">
+            <div class="logo-panel">
+                <img src="logo.gif" alt="FS" class="logo-img">
+                <span class="logo-text">Family<br>Standard</span>
+            </div>
+            <div class="header-btn" onclick="openModal('callModal')">Заказать обратный звонок</div>
         </div>
 
         <div class="glass-panel">
-            <h3>Наши работы</h3>
+            <h1>Family Standard</h1>
+            <h2>Новый стандарт детских событий</h2>
+            <p>Вы отдыхаете, а мы берем все заботы на себя. Family Standard — это не просто классическая анимация, это организация выездных квестов и сюжетных игр с полным погружением. Наши гейм-мастеры обеспечивают качественный присмотр за детьми на любых мероприятиях — от частных дней рождения до масштабных взрослых банкетов. С помощью продуманного реквизита и командных миссий мы превращаем энергию детей в увлекательный процесс, гарантируя их безопасность и ваше спокойствие.</p>
+        </div>
+
+        <div class="glass-panel">
+            <h3>Фотоотчеты с игровых сессий</h3>
             <div class="gallery">
-                <div class="gallery-item" onclick="viewImage('photo1.jpg')"><img src="photo1.jpg" alt="Работа 1"></div>
-                <div class="gallery-item" onclick="viewImage('photo2.jpg')"><img src="photo2.jpg" alt="Работа 2"></div>
-                <div class="gallery-item" onclick="viewImage('photo3.jpg')"><img src="photo3.jpg" alt="Работа 3"></div>
-                <div class="gallery-item" onclick="viewImage('photo4.jpg')"><img src="photo4.jpg" alt="Работа 4"></div>
+                <div class="gallery-item" onclick="viewImage('photo1.jpg')"><img src="photo1.jpg" alt="Квест 1"></div>
+                <div class="gallery-item" onclick="viewImage('photo2.jpg')"><img src="photo2.jpg" alt="Игровая сессия 2"></div>
+                <div class="gallery-item" onclick="viewImage('photo3.jpg')"><img src="photo3.jpg" alt="Интерактив 3"></div>
+                <div class="gallery-item" onclick="viewImage('photo4.jpg')"><img src="photo4.jpg" alt="Командная игра 4"></div>
             </div>
         </div>
 
         <div class="glass-panel">
             <h3>Следите за нами</h3>
-            <div class="social-links-wrapper">
-                
-                <div class="social-links-row-top">
-                    <a onclick="openModal('devModal')" class="btn">
-                        <svg viewBox="0 0 24 24" class="social-icon"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-                        Like
-                    </a>
-                    <a onclick="openModal('devModal')" class="btn">
-                        <svg viewBox="0 0 24 24" class="social-icon"><path d="M21.582,6.186c-0.23-0.86-0.908-1.538-1.768-1.768C18.254,4,12,4,12,4S5.746,4,4.186,4.418 c-0.86,0.23-1.538,0.908-1.768,1.768C2,7.746,2,12,2,12s0,4.254,0.418,5.814c0.23,0.86,0.908,1.538,1.768,1.768 C5.746,20,12,20,12,20s6.254,0,7.814-0.418c0.86-0.23,1.538-0.908,1.768-1.768C22,16.254,22,12,22,12S22,7.746,21.582,6.186z M10,15.464V8.536L16,12L10,15.464z"/></svg>
-                        YouTube
-                    </a>
-                    <a onclick="openModal('devModal')" class="btn">
-                        <svg viewBox="0 0 24 24" class="social-icon"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-5.2 1.74 2.89 2.89 0 012.31-4.64 2.93 2.93 0 01.88.13V9.4a6.84 6.84 0 00-1-.05A6.33 6.33 0 005 20.1a6.34 6.34 0 0010.86-4.43v-7a8.16 8.16 0 004.77 1.52v-3.4a4.85 4.85 0 01-1-.1z"/></svg>
-                        TikTok
-                    </a>
-                </div>
-
-                <div class="social-links-row-bottom">
-                    <a href="https://www.instagram.com/familystandard.uz/" class="btn" target="_blank">
-                        <svg viewBox="0 0 24 24" class="social-icon"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.88z"/></svg>
-                        Instagram
-                    </a>
-                    <a href="https://t.me/FamilyStandard" class="btn" target="_blank">
-                        <svg viewBox="0 0 24 24" class="social-icon"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
-                        Telegram
-                    </a>
-                </div>
-
+            <div class="social-grid">
+                <a onclick="openModal('devModal')" class="btn"><svg class="social-icon" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>Like</a>
+                <a onclick="openModal('devModal')" class="btn"><svg class="social-icon" viewBox="0 0 24 24"><path d="M21.582 6.186a1.768 1.768 0 00-1.768-1.768C18.254 4 12 4 12 4s-6.254 0-7.814.418a1.768 1.768 0 00-1.768 1.768C2 7.746 2 12 2 12s0 4.254.418 5.814a1.768 1.768 0 001.768 1.768C5.746 20 12 20 12 20s6.254 0 7.814-.418a1.768 1.768 0 001.768-1.768C22 16.254 22 12 22 12s0-4.254-.418-5.814zM10 15.464V8.536L16 12l-6 3.464z"/></svg>YouTube</a>
+                <a onclick="openModal('devModal')" class="btn"><svg class="social-icon" viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-5.2 1.74 2.89 2.89 0 012.31-4.64 2.93 2.93 0 01.88.13V9.4a6.84 6.84 0 00-1-.05A6.33 6.33 0 005 20.1a6.34 6.34 0 0010.86-4.43v-7a8.16 8.16 0 004.77 1.52v-3.4a4.85 4.85 0 01-1-.1z"/></svg>TikTok</a>
+            </div>
+            <div class="social-grid-2">
+                <a href="https://instagram.com/familystandard.uz" class="btn"><svg class="social-icon" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.88z"/></svg>Instagram</a>
+                <a href="https://t.me/FamilyStandard" class="btn"><svg class="social-icon" viewBox="0 0 24 24"><path d="M11.944 0A12 12 0 000 12a12 12 0 0012 12 12 12 0 0012-12A12 12 0 0012 0zm4.962 7.224c.14.117.171.325.191.797-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23-.049-.244-.249-.024-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>Telegram</a>
             </div>
         </div>
 
         <div class="glass-panel">
-            <h3>Обращение администрации</h3>
-            <p class="trust-text">Мы подготовили для вас ознакомительное видео. Посмотрите его, чтобы быть абсолютно уверенными в нашем подходе и точно знать, кому вы доверяете своё важное событие.</p>
-            <div class="video-wrapper" onclick="handleVideoClick()">
-                <div class="video-container">
-                    <video id="mainVideo" autoplay muted playsinline webkit-playsinline disablePictureInPicture preload="auto" poster="poster.jpg">
-                        <source src="welcome.mp4" type="video/mp4">
-                    </video>
-                </div>
-                <p id="videoHint" class="video-hint">НАЖМИТЕ ДЛЯ ВКЛЮЧЕНИЯ ЗВУКА</p>
+            <h3>Презентация от нашего менеджера</h3>
+            <p class="trust-text">В этом видео менеджер, ответственный за организацию игровых сессий, открыто показывает, как устроена механика наших квестов и как гейм-мастеры удерживают внимание десятков детей. Мы демонстрируем наши внутренние стандарты работы и подход к безопасности, чтобы вы были абсолютно уверены в том, кому доверяете время ваших детей.</p>
+            
+            <div class="video-wrapper" onclick="playFromStart(this)">
+                <video autoplay muted playsinline loop poster="poster.jpg"><source src="welcome.mp4" type="video/mp4"></video>
             </div>
+            <p class="video-hint" id="videoHintText">НАЖМИТЕ ДЛЯ ЗВУКА И ПЕРЕЗАПУСКА</p>
         </div>
 
-    </div>
-
-    <div class="footer-space">
-        <div id="finalSection" class="footer-cta">
-            <span class="arrow-up">↑</span>
-            <a href="tel:+998700464000" class="final-phone">+998 700 464 000</a>
-            <div class="final-button" onclick="openModal('callModal')">Заказать обратный звонок</div>
+        <div class="final-footer">
+            <a href="tel:+998700464000" class="massive-phone">+998 700 464 000</a>
+            <div class="call-text">Позвонить нам</div>
+            <div class="header-btn" onclick="openModal('callModal')">Заказать обратный звонок</div>
+            <div class="copyright">&copy; 2026 Family Standard | Организация игровых сессий</div>
         </div>
-        <div class="copyright">&copy; 2026 Family Standard | Все права защищены</div>
     </div>
 
-    <div id="callModal" class="modal" onclick="closeOnOverlay(event, 'callModal')">
+    <div id="callModal" class="modal" onclick="if(event.target.id==='callModal') closeModal('callModal')">
         <div class="modal-content">
             <span class="close-btn" onclick="closeModal('callModal')">&times;</span>
-            <h2 style="color:var(--gold-solid); margin-bottom: 20px;">Обратный звонок</h2>
-            <p style="font-size: 0.85rem; margin-bottom: 15px;">Оставьте контакты, и мы оперативно свяжемся с вами.</p>
-            
-            <input type="text" id="nameInput" placeholder="Ваше имя" oninput="removeError(this)">
-            <p id="nameError" class="form-error-msg">Пожалуйста, укажите имя</p>
-            
-            <input type="tel" id="phoneInput" placeholder="+998 (__) ___-__-__" maxlength="19" value="+998 " oninput="removeError(this)">
-            <p id="phoneError" class="form-error-msg">Укажите полный номер</p>
-
-            <button id="submitBtn" class="btn" style="width:100%; margin-top:10px; flex-direction: row; font-size: 13px;" onclick="sendToTelegram()">Отправить запрос</button>
+            <h2 style="color:var(--gold); margin-bottom: 15px;">Обратный звонок</h2>
+            <input type="text" id="nameInput" placeholder="Ваше имя" oninput="this.style.borderColor=''">
+            <p id="nameError" class="error-msg">Укажите имя</p>
+            <input type="tel" id="phoneInput" placeholder="+998 (__) ___-__-__" value="+998 " oninput="formatPhone(this)">
+            <p id="phoneError" class="error-msg">Укажите номер</p>
+            <button id="submitBtn" class="btn" style="width:100%; margin-top:15px; flex-direction:row;" onclick="sendLead()">Отправить</button>
         </div>
     </div>
 
-    <div id="successModal" class="modal" onclick="closeOnOverlay(event, 'successModal')">
-        <div class="modal-content success-box">
-            <span class="close-btn" onclick="closeModal('successModal')">&times;</span>
-            <div class="firework-icon">✨</div>
-            <h2 style="color:var(--gold-solid); margin-bottom: 15px;">Заявка отправлена!</h2>
-            <p style="font-size: 0.9rem;">Благодарим за доверие. Администрация свяжется с вами в ближайшее время.</p>
-            <button class="btn" style="margin-top:25px; flex-direction: row; width: 140px; margin-left: auto; margin-right: auto;" onclick="closeModal('successModal')">Отлично</button>
-        </div>
+    <div id="successModal" class="modal" onclick="closeModal('successModal')">
+        <div class="modal-content"><h2 style="color:var(--gold);">Заявка отправлена!</h2><p>Наш менеджер свяжется с вами.</p></div>
     </div>
-
-    <div id="devModal" class="modal" onclick="closeOnOverlay(event, 'devModal')">
-        <div class="modal-content">
-            <span class="close-btn" onclick="closeModal('devModal')">&times;</span>
-            <h3 style="color:var(--gold-solid); margin-bottom: 15px;">Раздел в разработке</h3>
-            <p>Мы готовим нечто грандиозное.</p>
-            <button class="btn" style="margin-top:20px; flex-direction: row; width: 120px; margin-left: auto; margin-right: auto;" onclick="closeModal('devModal')">Понятно</button>
-        </div>
+    
+    <div id="devModal" class="modal" onclick="closeModal('devModal')">
+        <div class="modal-content"><h3 style="color:var(--gold);">В разработке</h3><p>Готовим новые квесты.</p></div>
     </div>
 
     <div id="fullImageModal" class="modal" onclick="closeModal('fullImageModal')">
-        <span class="close-btn" style="top: 20px; right: 30px; font-size: 40px;" onclick="closeModal('fullImageModal')">&times;</span>
-        <img id="fullImg" src="" alt="Full Screen">
+        <span class="close-btn" style="top:20px; right:30px; font-size:40px;">&times;</span><img id="fullImg" src="">
     </div>
 
     <script>
-        const video = document.getElementById('mainVideo');
-        const hint = document.getElementById('videoHint');
+        const openModal = id => document.getElementById(id).style.display = 'flex';
+        const closeModal = id => document.getElementById(id).style.display = 'none';
+        const viewImage = src => { document.getElementById('fullImg').src = src; openModal('fullImageModal'); };
 
-        function handleVideoClick() {
-            if (video.muted) {
-                video.muted = false;
-                video.currentTime = 0; 
-                hint.innerText = "ЗВУК ВКЛЮЧЕН";
+        function playFromStart(wrapper) {
+            let vid = wrapper.querySelector('video');
+            let hint = document.getElementById('videoHintText');
+            
+            if (vid.muted) {
+                vid.muted = false; 
+                vid.currentTime = 0; 
+                vid.play(); 
+                hint.innerText = "ЗВУК ВКЛЮЧЕН (НАЖМИТЕ ДЛЯ ОТКЛЮЧЕНИЯ)";
             } else {
-                video.muted = true;
-                hint.innerText = "НАЖМИТЕ ДЛЯ ВКЛЮЧЕНИЯ ЗВУКА";
+                vid.muted = true;
+                hint.innerText = "НАЖМИТЕ ДЛЯ ЗВУКА И ПЕРЕЗАПУСКА";
             }
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            video.muted = true; 
-            let playPromise = video.play();
-            if (playPromise !== undefined) {
-                playPromise.catch(error => {
-                    document.body.addEventListener('touchstart', () => {
-                        video.play();
-                    }, { once: true });
-                });
-            }
-        });
-
-        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
-        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-        function closeOnOverlay(e, id) { if(e.target.id === id) closeModal(id); }
-        function viewImage(src) { document.getElementById('fullImg').src = src; openModal('fullImageModal'); }
-
-        const logo = document.getElementById('mainLogo');
-        const finalSection = document.getElementById('finalSection');
-        const footer = document.querySelector('.footer-space');
-        const body = document.body;
-        
-        window.addEventListener('scroll', () => {
-            let scrollY = window.scrollY;
-            let windowHeight = window.innerHeight;
-            
-            if (scrollY < 50) {
-                logo.classList.add('at-top');
-                logo.style.transition = 'all 0.8s cubic-bezier(0.25, 1, 0.5, 1)';
-                logo.style.transform = ''; 
-                return;
-            } else {
-                logo.classList.remove('at-top');
-            }
-
-            let footerRect = footer.getBoundingClientRect();
-            let startTrigger = windowHeight; 
-            
-            if (footerRect.top < startTrigger) {
-                let progress = (startTrigger - footerRect.top) / (footerRect.height - 50);
-                if (progress > 1) progress = 1;
-                if (progress < 0) progress = 0;
-
-                logo.style.transition = 'none';
-                let logoWidth = logo.offsetWidth;
-                let logoHeight = logo.offsetHeight;
-                
-                let targetX = (window.innerWidth / 2) - 30 - (logoWidth / 2);
-                let targetY = (window.innerHeight / 2) - 100 - 30 - (logoHeight / 2);
-
-                let currentX = targetX * progress;
-                let currentY = targetY * progress;
-                let currentScale = 1 + (0.2 * progress); 
-
-                logo.style.transform = `translate(${currentX}px, ${currentY}px) scale(${currentScale})`;
-
-                finalSection.style.opacity = progress;
-                finalSection.style.transform = `translateY(${(1 - progress) * 30}px)`;
-                
-                if(progress === 1) body.classList.add('is-ended');
-                else body.classList.remove('is-ended');
-
-            } else {
-                logo.style.transition = 'all 0.8s cubic-bezier(0.25, 1, 0.5, 1)';
-                logo.style.transform = 'translate(0, 0) scale(1)';
-                finalSection.style.opacity = 0;
-                finalSection.style.transform = 'translateY(30px)';
-                body.classList.remove('is-ended');
-            }
-        });
-
-        const phoneInput = document.getElementById('phoneInput');
-        phoneInput.addEventListener('input', function (e) {
-            let input = e.target.value.replace(/\D/g, ''); 
-            if (!input.startsWith('998')) input = '998' + input;
-            input = input.substring(3); 
-            let formatted = '+998';
-            if (input.length > 0) formatted += ' (' + input.substring(0, 2);
-            if (input.length >= 3) formatted += ') ' + input.substring(2, 5);
-            if (input.length >= 6) formatted += '-' + input.substring(5, 7);
-            if (input.length >= 8) formatted += '-' + input.substring(7, 9);
-            e.target.value = formatted;
-        });
-
-        function removeError(el) {
-            el.classList.remove('error-border');
-            if(el.id === 'nameInput') document.getElementById('nameError').style.display = 'none';
-            if(el.id === 'phoneInput') document.getElementById('phoneError').style.display = 'none';
-            document.getElementById('submitBtn').innerText = 'Отправить запрос';
+        function formatPhone(el) {
+            let val = el.value.replace(/\D/g, '');
+            if (!val.startsWith('998')) val = '998' + val;
+            let res = '+998 ' + (val.length > 3 ? '(' + val.substring(3,5) : '');
+            if(val.length > 5) res += ') ' + val.substring(5,8);
+            if(val.length > 8) res += '-' + val.substring(8,10);
+            if(val.length > 10) res += '-' + val.substring(10,12);
+            el.value = res;
+            el.style.borderColor = '';
         }
 
-        function sendToTelegram() {
-            const nameInput = document.getElementById('nameInput');
-            const phoneInputObj = document.getElementById('phoneInput');
-            const name = nameInput.value.trim();
-            const phoneFormatted = phoneInputObj.value.trim();
-            let hasError = false;
+        function sendLead() {
+            let name = document.getElementById('nameInput').value.trim();
+            let phone = document.getElementById('phoneInput').value.replace(/\D/g, '');
+            let err = false;
 
-            if (name === "") {
-                nameInput.classList.add('error-border');
-                document.getElementById('nameError').style.display = 'block';
-                hasError = true;
-            }
-            if (phoneFormatted.length < 19) {
-                phoneInputObj.classList.add('error-border');
-                document.getElementById('phoneError').style.display = 'block';
-                hasError = true;
-            }
-            if (hasError) return;
+            if (name.length < 2) { document.getElementById('nameError').style.display='block'; err=true; }
+            if (phone.length < 12) { document.getElementById('phoneError').style.display='block'; err=true; }
+            if (err) return;
 
-            const phoneClean = '+' + phoneFormatted.replace(/\D/g, ''); 
+            const tk1 = "8704692826:AAG"; 
+            const tk2 = "4n668xcqaza8hFYiBPJ-TEGvN1Uo-4Kk"; 
+            const url = `https://api.telegram.org/bot${tk1+tk2}/sendMessage?chat_id=8340992547&text=Новая заявка%0AИмя: ${name}%0AТел: +${phone}`;
 
-            // СЕЙФ ПРЯМО ВНУТРИ КОДА 
-            const _x_t = "ODcwNDY5MjgyNjpBQUc0bjY2OHhjcWF6YThoRllpQlBKLVRFR3ZOMVVvLTRLa3xGUzIwMjY=";
-            const _x_c = "ODM0MDk5MjU0N3xGUzIwMjY=";
-            const secretKey = "|FS2026";
+            let btn = document.getElementById('submitBtn'); btn.innerText = 'Отправка...';
 
-            // РАСШИФРОВКА НА ЛЕТУ 
-            const botToken = atob(_x_t).replace(secretKey, '');
-            const chatId = atob(_x_c).replace(secretKey, '');
-            
-            const text = `<b>🔔 НОВАЯ ЗАЯВКА (Family Standard)</b>\n\n<b>Имя:</b> ${name}\n<b>Телефон:</b> ${phoneClean}`;
-            const url = `https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(text)}&parse_mode=HTML`;
-
-            const btn = document.getElementById('submitBtn');
-            const originalText = btn.innerText;
-            btn.innerText = 'Отправка...';
-
-            fetch(url)
-                .then(response => {
-                    if (response.ok) {
-                        closeModal('callModal');
-                        openModal('successModal');
-                        nameInput.value = '';
-                        phoneInputObj.value = '+998 ';
-                    } else {
-                        btn.innerText = 'Ошибка сети. Повторить?';
-                        btn.style.borderColor = '#ff4d4d';
-                    }
-                })
-                .catch(error => {
-                    btn.innerText = 'Нет интернета. Повторить?';
-                    btn.style.borderColor = '#ff4d4d';
-                })
-                .finally(() => {
-                    if(btn.innerText === 'Отправка...') btn.innerText = originalText;
-                });
+            fetch(url).then(r => {
+                if(r.ok) { closeModal('callModal'); openModal('successModal'); document.getElementById('nameInput').value=''; document.getElementById('phoneInput').value='+998 '; }
+                btn.innerText = 'Отправить';
+            }).catch(() => btn.innerText = 'Ошибка сети');
         }
     </script>
 </body>
