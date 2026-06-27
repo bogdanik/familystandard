@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Event-Сценарий | Дамир & Ангелина</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;500;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg-dark: #070e20;
@@ -126,9 +126,8 @@
             margin-bottom: 10px;
         }
 
-        /* ИСПРАВЛЕНИЕ СПИСКА: чтобы цифры не вылетали за границы */
         .toast-highlight ol {
-            padding-left: 25px; /* Жесткий отступ для цифр */
+            padding-left: 25px;
             margin: 0;
             color: var(--text-main);
         }
@@ -224,7 +223,7 @@
             font-size: 12px;
             text-transform: uppercase;
             font-weight: 700;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
             display: flex;
             align-items: center;
             gap: 8px;
@@ -239,7 +238,29 @@
             color: var(--text-main);
         }
 
-        /* Плашки внимания и запасного плана */
+        /* Блок прямой речи (Шаблоны) */
+        .speech-box {
+            background-color: rgba(59, 130, 246, 0.1);
+            border-left: 2px solid #60a5fa;
+            padding: 10px 15px;
+            margin-top: 10px;
+            font-style: italic;
+            font-size: 13.5px;
+            color: #bfdbfe;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .speech-box strong {
+            display: block;
+            font-style: normal;
+            font-size: 11px;
+            text-transform: uppercase;
+            color: #60a5fa;
+            margin-bottom: 4px;
+            letter-spacing: 0.5px;
+        }
+
+        /* Плашки внимания и фотографа */
         .alert-box {
             background-color: rgba(220, 38, 38, 0.1);
             border: 1px solid rgba(220, 38, 38, 0.5);
@@ -251,20 +272,15 @@
             font-weight: 500;
         }
 
-        .backup-plan {
-            background-color: rgba(245, 158, 11, 0.1);
-            border-left: 3px solid #f59e0b;
-            padding: 10px 15px;
-            margin-top: 12px;
-            border-radius: 0 4px 4px 0;
+        .camera-alert {
+            background-color: rgba(212, 175, 55, 0.1);
+            border: 1px solid rgba(212, 175, 55, 0.5);
+            color: var(--gold-light);
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 15px;
             font-size: 13px;
-            color: #fcd34d;
-        }
-
-        .backup-plan strong {
-            color: #fbbf24;
-            display: block;
-            margin-bottom: 4px;
+            font-weight: 500;
         }
 
     </style>
@@ -294,7 +310,7 @@
                         <li><strong>Хилола Дамировна</strong> — тетя</li>
                         <li><strong>Азиз</strong> — двоюр. брат</li>
                         <li><strong>Шахло</strong> — двоюр. сестра</li>
-                        <li><strong>Друзья:</strong> Шерзод, Камолиддин (свидетель), Дильшод, Джонни, Шохрух, Шахобиддин</li>
+                        <li><strong>Друзья:</strong> Абдулазиз, Шерзод, Камолиддин (свидетель), Дильшод, Джонни, Шохрух, Шахобиддин</li>
                         <li><strong>Мамы друзей:</strong> Азиза опа, Хатира опа</li>
                         <li><strong>Родственники:</strong> Джамшид, Нигора опа, Нафиса опа</li>
                         <li><strong>Подруги мамы:</strong> Дилрабо опа, Зиеда опа</li>
@@ -337,7 +353,13 @@
                     <div class="role-grid">
                         <div class="role-box host">
                             <div class="role-title">🎤 Инструкция: Ведущий</div>
-                            <div class="role-text">Работа без микрофона. Координация рассадки, знакомство со свидетелями (Камолиддин, Тамила) и друзьями. Ненавязчивый сбор фактов для импровизации.</div>
+                            <div class="role-text">
+                                Работа без микрофона. Координация рассадки. Главная задача: подойти к 5-10 активным гостям (друзьям, свидетелям) и дать им микро-задание на вечер.
+                                <div class="speech-box">
+                                    <strong>💬 Прямая речь (Приватно гостям):</strong>
+                                    «Ребят, вспомните какой-нибудь прикольный или необычный факт про Дамира или Ангелину. Сейчас, чуть попозже, это очень пригодится, будем проверять, как хорошо две семьи знают друг друга!»
+                                </div>
+                            </div>
                         </div>
                         <div class="role-box dj">
                             <div class="role-title">🎧 Инструкция: DJ</div>
@@ -345,7 +367,7 @@
                         </div>
                         <div class="role-box kitchen">
                             <div class="role-title">🍽️ Инструкция: Кухня и Сервис</div>
-                            <div class="role-text">Фуршетный режим. На столах только холодные закуски. Официанты предлагают приветственные напитки. Горячее на стопе.</div>
+                            <div class="role-text">Фуршетный режим. На столах только холодные закуски и напитки. Горячее на стопе.</div>
                         </div>
                     </div>
                 </div>
@@ -357,20 +379,27 @@
             <div class="item-header">
                 <div class="time-box">
                     <span class="time">18:45 - 19:00</span>
-                    <span class="title">ИНТЕРАКТИВ 1: Инфо-штурм (Знакомство)</span>
+                    <span class="title">ИНТЕРАКТИВ 1: Факты от Гостей</span>
                 </div>
                 <div class="toggle-icon">+</div>
             </div>
             <div class="item-content">
                 <div class="content-inner">
+                    <div class="camera-alert">📸 В 18:50 приезжает фотограф. Начинает снимать декор, стол и гостей на велкоме.</div>
                     <div class="role-grid">
                         <div class="role-box host">
                             <div class="role-title">🎤 Инструкция: Ведущий</div>
-                            <div class="role-text">Официальное приветствие в микрофон. Ведущий проводит первый интерактив (разогрев). Озвучивает факты про пару (офис, 4 марта, тайные отношения, травма ноги). Подготовка зала к появлению молодоженов.</div>
+                            <div class="role-text">
+                                Официальное приветствие. Запускаем интерактив с фактами, которые просили подготовить на велкоме. Гости называют факт, зал кричит, про кого это.
+                                <div class="speech-box">
+                                    <strong>💬 Прямая речь (В микрофон):</strong>
+                                    «Обычно ведущие долго зачитывают биографию молодоженов, но зачем? Вы знаете их лучше меня! Я просил некоторых из вас подготовиться. Ну что, кто первый хочет поделиться интересным фактом и узнать, насколько хорошо две наши семьи знают друг друга? Чей это секрет — Дамира или Ангелины?»
+                                </div>
+                            </div>
                         </div>
                         <div class="role-box dj">
                             <div class="role-title">🎧 Инструкция: DJ</div>
-                            <div class="role-text">Музыкальные отбивки под шутки ведущего. Готовность торжественного трека на выход.</div>
+                            <div class="role-text">Музыкальные отбивки под ответы гостей. Готовность торжественного трека на выход.</div>
                         </div>
                     </div>
                 </div>
@@ -381,28 +410,28 @@
         <div class="timeline-item">
             <div class="item-header">
                 <div class="time-box">
-                    <span class="time">19:00 - 19:20</span>
-                    <span class="title">Появление пары & Главные тосты</span>
+                    <span class="time">19:00 - 19:10</span>
+                    <span class="title">Появление пары & Первый Танец</span>
                 </div>
                 <div class="toggle-icon">+</div>
             </div>
             <div class="item-content">
                 <div class="content-inner">
-                    <div class="alert-box">⚠️ Внимание Кухне: Сразу после посадки молодых старт подачи салатов/горячих закусок.</div>
+                    <div class="alert-box">⚠️ Внимание: Приглушить основной свет в зале для работы фотографа.</div>
                     <div class="role-grid">
                         <div class="role-box host">
                             <div class="role-title">🎤 Инструкция: Ведущий</div>
                             <div class="role-text">
-                                Торжественная встреча Дамира и Ангелины. После посадки открывается блок тостов. Вызов первых двух пар выступающих (родителей).
-                                <div class="backup-plan">
-                                    <strong>🔄 ПЛАН Б (Если возникла заминка / неловкая пауза):</strong> 
-                                    Мгновенно переключаем внимание на интерактив «Танцевальный алфавит» или любую короткую музыкальную викторину, чтобы сбросить напряжение и вернуть динамику перед следующим тостом.
+                                Бурные овации, встречаем пару. Они садятся, буквально минута на выдох, и сразу подводка к танцу (чтобы фотограф снял это в идеальных условиях).
+                                <div class="speech-box">
+                                    <strong>💬 Прямая речь:</strong>
+                                    «Друзья, прежде чем зазвенят бокалы и мы приступим к нашему вечеру, давайте насладимся самым красивым и важным моментом. Дамир, Ангелина, мы просим вас в центр зала. Этот танец — только для вас!»
                                 </div>
                             </div>
                         </div>
                         <div class="role-box dj">
                             <div class="role-title">🎧 Инструкция: DJ</div>
-                            <div class="role-text">Торжественный трек на выход пары. Фанфары на выход родителей. Трогательный фон во время произнесения тостов.</div>
+                            <div class="role-text">Торжественный выход. Затем плавно переходим на трек Первого танца.</div>
                         </div>
                     </div>
                 </div>
@@ -413,21 +442,30 @@
         <div class="timeline-item">
             <div class="item-header">
                 <div class="time-box">
-                    <span class="time">19:20 - 19:50</span>
-                    <span class="title">Шоу-программа: Сет Певицы (1)</span>
+                    <span class="time">19:10 - 19:35</span>
+                    <span class="title">Фотосессия & Переодевание невесты</span>
                 </div>
                 <div class="toggle-icon">+</div>
             </div>
             <div class="item-content">
                 <div class="content-inner">
+                    <div class="camera-alert">📸 Активная работа фотографа (уезжает ровно в 20:00). Снимаем группы: родители, друзья, родственники.</div>
+                    <div class="alert-box">⚠️ Внимание Кухне: Старт подачи салатов и горячих закусок.</div>
                     <div class="role-grid">
                         <div class="role-box host">
                             <div class="role-title">🎤 Инструкция: Ведущий</div>
-                            <div class="role-text">Объявление артиста. Ведущий отдыхает. Гости наслаждаются вокалом и едят горячие закуски.</div>
+                            <div class="role-text">
+                                Сразу после танца удерживаем гостей.
+                                <div class="speech-box">
+                                    <strong>💬 Прямая речь:</strong>
+                                    «Не расходимся! Пока мы все такие красивые, свежие и заряженные — делаем главные кадры этого вечера!»
+                                </div>
+                                Координация фотосессии. Как только обязательные кадры сняты, **Ангелина уходит переодеваться**.
+                            </div>
                         </div>
                         <div class="role-box kitchen">
                             <div class="role-title">🍽️ Инструкция: Кухня и Сервис</div>
-                            <div class="role-text">Уборка пустой посуды из-под холодных закусок. Зачистка столов перед подачей основного горячего.</div>
+                            <div class="role-text">Официанты активно выносят салаты и первые закуски, пока гости курсируют к фотографу и обратно за столы.</div>
                         </div>
                     </div>
                 </div>
@@ -438,22 +476,30 @@
         <div class="timeline-item">
             <div class="item-header">
                 <div class="time-box">
-                    <span class="time">19:50 - 20:15</span>
-                    <span class="title">ИНТЕРАКТИВ 2: Нейро-треки + Лавстори</span>
+                    <span class="time">19:35 - 19:55</span>
+                    <span class="title">КОНКУРС 2: Нейро-музыка + Лавстори</span>
                 </div>
                 <div class="toggle-icon">+</div>
             </div>
             <div class="item-content">
                 <div class="content-inner">
-                    <div class="alert-box">🛑 СТОП-СЕРВИС ДЛЯ КУХНИ: Полная тишина в зале во время презентации Лавстори.</div>
+                    <div class="alert-box">🛑 СТОП-СЕРВИС ДЛЯ КУХНИ: Полная тишина в зале во время презентации финального трека.</div>
                     <div class="role-grid">
                         <div class="role-box host">
                             <div class="role-title">🎤 Инструкция: Ведущий</div>
-                            <div class="role-text">Проведение второго интерактива (Музыкальный конкурс). Приз за финал — запуск эксклюзивного трека (Лавстори). Ведущий озвучивает пасхалку («В HR-отделе скоро появится третий сотрудник...»). Запуск трека.</div>
+                            <div class="role-text">
+                                Пока Ангелины нет, проводим сидячий интерактив (отгадываем сгенерированные нейросетью хиты). 
+                                В 19:50 возвращается Ангелина.
+                                <div class="speech-box">
+                                    <strong>💬 Прямая речь (ФИНАЛ КОНКУРСА):</strong>
+                                    «Вы отгадали всё! И вы заслужили суперприз. Эксклюзивный трек, которого нет в интернете. Трек о том, как одна подвернутая нога и один вещий сон 1 марта изменили всё... Слушаем историю Дамира и Ангелины!»
+                                </div>
+                                Запуск трека Лавстори.
+                            </div>
                         </div>
                         <div class="role-box dj">
                             <div class="role-title">🎧 Инструкция: DJ</div>
-                            <div class="role-text">Внимательная работа с музыкальными загадками. В конце интерактива — запуск главного трека Лавстори на высокой громкости для эффекта погружения.</div>
+                            <div class="role-text">Внимательная работа с музыкальными загадками. В конце — запуск трека Лавстори на высокой громкости для погружения.</div>
                         </div>
                     </div>
                 </div>
@@ -464,8 +510,8 @@
         <div class="timeline-item">
             <div class="item-header">
                 <div class="time-box">
-                    <span class="time">20:15 - 20:30</span>
-                    <span class="title">Блок Тостов (Родственники)</span>
+                    <span class="time">19:55 - 20:15</span>
+                    <span class="title">КОНКУРС 3: Громкий Разговор (Наушники)</span>
                 </div>
                 <div class="toggle-icon">+</div>
             </div>
@@ -475,18 +521,16 @@
                         <div class="role-box host">
                             <div class="role-title">🎤 Инструкция: Ведущий</div>
                             <div class="role-text">
-                                На эмоциональном пике вызываются родственники:<br>
-                                • Фарида Курбановна (бабушка) и Аброр (брат).<br>
-                                • Хилола Дамировна (тетя) и Азиз (двоюр. брат).
-                                <div class="backup-plan">
-                                    <strong>🔄 ПЛАН Б (Если нет желающих говорить):</strong> 
-                                    Ведущий спасает провисание динамики танцевальным интерактивом («Танцевальный алфавит»). Гости с места или на танцполе показывают движения на заданную букву под качающие биты от диджея. Тосты переносятся или отменяются.
+                                Эмоции улеглись, переходим к юмору на двоих.
+                                <div class="speech-box">
+                                    <strong>💬 Прямая речь:</strong>
+                                    «Трек прозвучал потрясающе. А теперь давайте проверим, как в этой семье настроена базовая связь. Дамир, надеваем наушники, музыка будет очень громкой. Ангелина, читай факты, а Дамир пусть по губам угадает, что ты пытаешься сказать!»
                                 </div>
                             </div>
                         </div>
-                        <div class="role-box kitchen">
-                            <div class="role-title">🍽️ Инструкция: Кухня и Сервис</div>
-                            <div class="role-text">Старт подачи Основного горячего блюда. Официанты аккуратно расставляют тарелки.</div>
+                        <div class="role-box dj">
+                            <div class="role-title">🎧 Инструкция: DJ</div>
+                            <div class="role-text">Плотный качающий трек в наушники жениху (и потом невесте), чтобы они реально ничего не слышали. Смешные отбивки на правильные (и неправильные) ответы.</div>
                         </div>
                     </div>
                 </div>
@@ -497,8 +541,8 @@
         <div class="timeline-item">
             <div class="item-header">
                 <div class="time-box">
-                    <span class="time">20:30 - 20:50</span>
-                    <span class="title">Шоу-программа: Танцевальный коллектив</span>
+                    <span class="time">20:15 - 20:30</span>
+                    <span class="title">Главные Тосты (Родители)</span>
                 </div>
                 <div class="toggle-icon">+</div>
             </div>
@@ -507,7 +551,19 @@
                     <div class="role-grid">
                         <div class="role-box host">
                             <div class="role-title">🎤 Инструкция: Ведущий</div>
-                            <div class="role-text">Представление танцевального коллектива. Перевод внимания гостей на площадку, пока они едят основное горячее.</div>
+                            <div class="role-text">
+                                <div class="speech-box">
+                                    <strong>💬 Прямая речь:</strong>
+                                    «Есть слова, которые звучат важнее любых песен. Это слова людей, подаривших вам жизнь и воспитавших вас теми, кем вы являетесь сегодня...»
+                                </div>
+                                Вызов пар:<br>
+                                1. Лола Дамировна и Аббос Машрабович<br>
+                                2. Наталия Вениаминовна и Оксана Евгеньевна
+                            </div>
+                        </div>
+                        <div class="role-box dj">
+                            <div class="role-title">🎧 Инструкция: DJ</div>
+                            <div class="role-text">Красивые фанфары на выход. Очень тихий, трогательный фон во время тостов.</div>
                         </div>
                     </div>
                 </div>
@@ -518,21 +574,22 @@
         <div class="timeline-item">
             <div class="item-header">
                 <div class="time-box">
-                    <span class="time">20:50 - 21:05</span>
-                    <span class="title">Музыкальный сет ресторана</span>
+                    <span class="time">20:30 - 20:50</span>
+                    <span class="title">Шоу-программа: Сет Певицы (1) + Горячее</span>
                 </div>
                 <div class="toggle-icon">+</div>
             </div>
             <div class="item-content">
                 <div class="content-inner">
+                    <div class="alert-box">⚠️ Внимание Кухне: СТАРТ ПОДАЧИ ОСНОВНОГО ГОРЯЧЕГО.</div>
                     <div class="role-grid">
                         <div class="role-box host">
                             <div class="role-title">🎤 Инструкция: Ведущий</div>
-                            <div class="role-text">Объявление перерыва. Передача эстафеты внутренней танцевальной программе заведения.</div>
+                            <div class="role-text">Объявляем первый вокальный блок певицы (фон / легкий ритм). Гости спокойно наслаждаются горячим, общаются и переваривают эмоции.</div>
                         </div>
                         <div class="role-box kitchen">
                             <div class="role-title">🍽️ Инструкция: Кухня и Сервис</div>
-                            <div class="role-text">Тотальная зачистка столов. Обновление напитков, уборка пустых бутылок и салфеток.</div>
+                            <div class="role-text">Массовая подача мяса/рыбы. Уборка пустой посуды из-под салатов.</div>
                         </div>
                     </div>
                 </div>
@@ -543,8 +600,8 @@
         <div class="timeline-item">
             <div class="item-header">
                 <div class="time-box">
-                    <span class="time">21:05 - 21:40</span>
-                    <span class="title">Шоу-программа: Сет Певицы (2)</span>
+                    <span class="time">20:50 - 21:05</span>
+                    <span class="title">Блок Тостов (Родственники)</span>
                 </div>
                 <div class="toggle-icon">+</div>
             </div>
@@ -553,7 +610,15 @@
                     <div class="role-grid">
                         <div class="role-box host">
                             <div class="role-title">🎤 Инструкция: Ведущий</div>
-                            <div class="role-text">Короткая возможность для спонтанных поздравлений от друзей. Если желающих нет — сразу переход ко второму вокальному блоку певицы (активные танцы).</div>
+                            <div class="role-text">
+                                Возвращаем внимание на наш стол. Вызываем пары родственников:<br>
+                                3. Фарида Курбановна (бабушка) и Аброр (брат)<br>
+                                4. Хилола Дамировна (тетя) и Азиз (двоюр. брат)
+                            </div>
+                        </div>
+                        <div class="role-box dj">
+                            <div class="role-title">🎧 Инструкция: DJ</div>
+                            <div class="role-text">Фоновая поддержка выступающих.</div>
                         </div>
                     </div>
                 </div>
@@ -564,17 +629,21 @@
         <div class="timeline-item">
             <div class="item-header">
                 <div class="time-box">
-                    <span class="time">21:40 - 22:15</span>
-                    <span class="title">DJ-Сет & Свободные танцы</span>
+                    <span class="time">21:05 - 21:20</span>
+                    <span class="title">Шоу-программа: Танцы от Ресторана</span>
                 </div>
                 <div class="toggle-icon">+</div>
             </div>
             <div class="item-content">
                 <div class="content-inner">
                     <div class="role-grid">
-                        <div class="role-box dj">
-                            <div class="role-title">🎧 Инструкция: DJ</div>
-                            <div class="role-text">Плотный клубный/современный сет. Раскачка танцпола. Подготовка трека для первого танца.</div>
+                        <div class="role-box host">
+                            <div class="role-title">🎤 Инструкция: Ведущий</div>
+                            <div class="role-text">Передаем внимание на внутреннюю программу ресторана (танцевальный номер). Гости доедают горячее, отдыхают.</div>
+                        </div>
+                        <div class="role-box kitchen">
+                            <div class="role-title">🍽️ Инструкция: Кухня и Сервис</div>
+                            <div class="role-text">Тотальная зачистка столов. Обновление напитков, графинов с водой. Подготовка к чайному столу.</div>
                         </div>
                     </div>
                 </div>
@@ -585,22 +654,27 @@
         <div class="timeline-item">
             <div class="item-header">
                 <div class="time-box">
-                    <span class="time">22:15 - 22:30</span>
-                    <span class="title">Первый Танец Молодоженов</span>
+                    <span class="time">21:20 - 21:35</span>
+                    <span class="title">КОНКУРС 4: Танцевальный Алфавит (Мостик)</span>
                 </div>
                 <div class="toggle-icon">+</div>
             </div>
             <div class="item-content">
                 <div class="content-inner">
-                    <div class="alert-box">⚠️ Внимание: Приглушить основной свет в зале.</div>
                     <div class="role-grid">
                         <div class="role-box host">
                             <div class="role-title">🎤 Инструкция: Ведущий</div>
-                            <div class="role-text">Сбор гостей вокруг площадки. Лирическая подводка: «Им просто нравится быть вместе». Вызов Дамира и Ангелины на первый танец.</div>
+                            <div class="role-text">
+                                Поднимаем всех из-за столов. Это переход к дискотеке!
+                                <div class="speech-box">
+                                    <strong>💬 Прямая речь:</strong>
+                                    «Ну что ж, мы сказали много теплых слов, мы вкусно поели, а теперь пришло время проверить вашу пластику. Правила простые: я называю букву, вы показываете движение на эту букву под бит диджея!»
+                                </div>
+                            </div>
                         </div>
-                        <div class="role-box kitchen">
-                            <div class="role-title">🍽️ Инструкция: Кухня и Сервис</div>
-                            <div class="role-text">Подготовка праздничного торта (свечи, приборы, тележка). Розлив чая и кофе.</div>
+                        <div class="role-box dj">
+                            <div class="role-title">🎧 Инструкция: DJ</div>
+                            <div class="role-text">Плотные, качающие биты на каждую букву. Разогреваем зал перед танцполом.</div>
                         </div>
                     </div>
                 </div>
@@ -608,6 +682,31 @@
         </div>
 
         <!-- БЛОК 12 -->
+        <div class="timeline-item">
+            <div class="item-header">
+                <div class="time-box">
+                    <span class="time">21:35 - 22:30</span>
+                    <span class="title">Сет Певицы (2) & DJ-Сет</span>
+                </div>
+                <div class="toggle-icon">+</div>
+            </div>
+            <div class="item-content">
+                <div class="content-inner">
+                    <div class="role-grid">
+                        <div class="role-box host">
+                            <div class="role-title">🎤 Инструкция: Ведущий</div>
+                            <div class="role-text">Алфавит раскачал гостей, и мы сразу передаем эстафету певице (активный, танцевальный блок). После нее — плотный диджей-сет. Ведущий отдыхает до выноса торта.</div>
+                        </div>
+                        <div class="role-box dj">
+                            <div class="role-title">🎧 Инструкция: DJ</div>
+                            <div class="role-text">Клубный/современный сет. Раскачка танцпола. Подготовка эпичного трека для выноса торта.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- БЛОК 13 -->
         <div class="timeline-item">
             <div class="item-header">
                 <div class="time-box">
@@ -621,15 +720,22 @@
                     <div class="role-grid">
                         <div class="role-box host">
                             <div class="role-title">🎤 Инструкция: Ведущий</div>
-                            <div class="role-text">Озвучка выноса торта. Организация разрезания. Передача микрофона паре для ответного слова. Официальное завершение программы ведущего.</div>
-                        </div>
-                        <div class="role-box dj">
-                            <div class="role-title">🎧 Инструкция: DJ</div>
-                            <div class="role-text">Торжественные фанфары на торт. После ответного слова молодых — финальный музыкальный сет до 23:00.</div>
+                            <div class="role-text">
+                                Финальный аккорд.
+                                <div class="speech-box">
+                                    <strong>💬 Прямая речь:</strong>
+                                    «Каждая красивая история должна иметь сладкое продолжение. Встречайте — первый семейный торт Дамира и Ангелины!»
+                                </div>
+                                Разрезание, ответное слово молодоженов. Официальное завершение программы ведущего.
+                            </div>
                         </div>
                         <div class="role-box kitchen">
                             <div class="role-title">🍽️ Инструкция: Кухня и Сервис</div>
-                            <div class="role-text">22:30 — Подача Торта в центр зала. Помощь в нарезке и раздаче гостям.</div>
+                            <div class="role-text">Подача Торта в центр зала. Помощь в нарезке и раздаче гостям. Розлив чая и кофе.</div>
+                        </div>
+                        <div class="role-box dj">
+                            <div class="role-title">🎧 Инструкция: DJ</div>
+                            <div class="role-text">Торжественные фанфары на торт. Лиричный фон на слова молодых. После — финальный музыкальный лаунж/танцы до 23:00.</div>
                         </div>
                     </div>
                 </div>
