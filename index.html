@@ -6,99 +6,197 @@
     
     <title>Аниматоры в Ташкенте | Family Standard — Активные игры и квесты</title>
     <meta name="description" content="Ищете аниматоров на праздник в Ташкенте? Агентство Family Standard предлагает премиум-формат: выездные сюжетные квесты, активные игры и профессиональный присмотр за детьми на вашем мероприятии.">
-    <meta name="keywords" content="аниматоры Ташкент, заказать аниматора, детские праздники Ташкент, квесты для детей, организация мероприятий, Family Standard, присмотр за детьми, шоу на праздник">
-    <meta property="og:title" content="Family Standard | Организация игровых сессий и квестов">
-    <meta property="og:description" content="Вы отдыхаете — наши гейм-мастеры берут на себя присмотр за детьми и организуют захватывающие сюжетные игры на вашем событии.">
-    <meta property="og:image" content="https://familystandard.uz/logo.gif">
     
     <link rel="icon" href="logo.gif" type="image/gif">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;500;700&display=swap');
-        :root { --gold: #c5a059; --bg: #050a14; --glass: rgba(255,255,255,0.04); --border: rgba(197,160,89,0.3); }
+        
+        :root { 
+            --gold: #c5a059; 
+            --gold-light: #fcf6ba;
+            --bg: #050a14; 
+            --glass: rgba(255,255,255,0.03); 
+            --border: rgba(197,160,89,0.25); 
+        }
+        
         * { box-sizing: border-box; margin: 0; padding: 0; outline: none; }
-        body { font-family: 'Montserrat', sans-serif; color: #f0f4f8; background: var(--bg) url('background.jpg') fixed center/cover; overflow-x: hidden; line-height: 1.6; }
-        body::before { content: ""; position: fixed; inset: 0; background: rgba(0,10,20,0.5); backdrop-filter: blur(4px); z-index: -2; }
         
-        .container { max-width: 900px; margin: 0 auto; padding: 40px 20px; position: relative; z-index: 1; }
-        
-        /* ГЛАВНЫЙ БЛОК: ЛОГОТИП И КНОПКА (Естественно улетает при скролле) */
-        .header-block { text-align: center; margin-bottom: 40px; padding: 20px 0; display: flex; flex-direction: column; align-items: center; gap: 20px; }
-        
-        .logo-panel { background: rgba(5,10,20,0.85); backdrop-filter: blur(20px); border: 1px solid var(--border); border-radius: 60px; padding: 15px 35px; display: inline-flex; align-items: center; gap: 15px; transform: scale(1.3); filter: drop-shadow(0 0 15px rgba(0,0,0,0.5)); margin-bottom: 20px; pointer-events: none; }
-        .logo-img { height: 45px; filter: drop-shadow(0 0 5px rgba(197,160,89,0.3)); }
-        .logo-text { font-size: 1.1rem; letter-spacing: 2px; text-transform: uppercase; background: linear-gradient(135deg,#bf953f,#fcf6ba,#b38728,#fbf5b7,#aa771c); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 700; }
-        
-        .header-btn { display: inline-flex; align-items: center; gap: 10px; border: 2px solid var(--gold); background: rgba(5,15,30,0.9); padding: 18px 35px; border-radius: 60px; color: var(--gold); font-weight: 700; text-transform: uppercase; cursor: pointer; transition: 0.3s; font-size: 13px; letter-spacing: 2px; text-decoration: none; box-shadow: 0 0 20px rgba(197,160,89,0.2); }
-        .header-btn:hover { background: var(--gold); color: #000; box-shadow: 0 0 30px rgba(197,160,89,0.5); transform: scale(1.03); }
+        body { 
+            font-family: 'Montserrat', sans-serif; 
+            color: #f0f4f8; 
+            background-color: var(--bg);
+            overflow-x: hidden; 
+            line-height: 1.6; 
+        }
 
-        /* БЛОКИ КОНТЕНТА */
-        .glass-panel { background: var(--glass); backdrop-filter: blur(20px); border: 1px solid var(--border); border-radius: 24px; padding: 40px; margin-bottom: 40px; text-align: center; }
-        h1 { font-size: 2rem; background: linear-gradient(135deg,#bf953f,#fcf6ba,#b38728,#fbf5b7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 3px; }
-        h2 { color: var(--gold); font-size: 1.1rem; letter-spacing: 4px; text-transform: uppercase; font-weight: 500; margin-bottom: 30px; }
-        h3 { color: var(--gold); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 25px; }
-        .trust-text { font-size: 0.95rem; max-width: 680px; margin: 0 auto 25px; padding: 18px; border-left: 2px solid var(--gold); background: rgba(197,160,89,0.05); text-align: left; line-height: 1.7; }
+        /* 3D Фон на чистом Canvas */
+        #canvas3d { 
+            position: fixed; 
+            top: 0; left: 0; 
+            width: 100vw; height: 100vh; 
+            z-index: -2; 
+            pointer-events: none; 
+            background: radial-gradient(circle at center, #0a1120 0%, #000000 100%);
+        }
+
+        .container { 
+            max-width: 950px; 
+            margin: 0 auto; 
+            padding: 0 20px 40px; 
+            position: relative; 
+            z-index: 1; 
+        }
         
-        /* ГАЛЕРЕЯ И ВИДЕО */
-        .video-wrapper { max-width: 320px; margin: 0 auto 25px; cursor: pointer; border-radius: 20px; overflow: hidden; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        /* КНОПКА ЗАКАЗА */
+        .header-btn { 
+            display: inline-flex; align-items: center; justify-content: center;
+            gap: 10px; border: 2px solid var(--gold); background: rgba(5,15,30,0.9); 
+            padding: 16px 35px; border-radius: 60px; color: var(--gold); 
+            font-weight: 700; text-transform: uppercase; cursor: pointer; 
+            transition: 0.3s; font-size: 13px; letter-spacing: 2px;
+            box-shadow: 0 0 20px rgba(197,160,89,0.2); 
+            margin: 20px auto;
+        }
+        .header-btn:hover { background: var(--gold); color: #000; box-shadow: 0 0 30px rgba(197,160,89,0.5); transform: translateY(-2px); }
+
+        /* ВРАППЕР ДЛЯ АНИМАЦИИ ЛОГОТИПА ПРИ СКРОЛЛЕ */
+        .hero-scroll-wrapper {
+            height: 160vh; /* Дополнительная высота для прокрутки */
+            position: relative;
+            z-index: 10;
+        }
+
+        .hero-sticky {
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-panel { 
+            background: rgba(5,10,20,0.85); 
+            backdrop-filter: blur(20px); 
+            border: 1px solid var(--border); 
+            border-radius: 60px; 
+            padding: 15px 35px; 
+            display: inline-flex; 
+            align-items: center; 
+            gap: 15px; 
+            transform: scale(1.2); 
+            transition: transform 0.1s ease-out, box-shadow 0.1s ease-out;
+            pointer-events: none; 
+            box-shadow: 0 0 15px rgba(0,0,0,0.5);
+        }
+        
+        .logo-img { height: 45px; filter: drop-shadow(0 0 5px rgba(197,160,89,0.3)); }
+        
+        .logo-text { 
+            font-size: 1.2rem; letter-spacing: 2px; text-transform: uppercase; font-weight: 700;
+            background: linear-gradient(135deg, #bf953f, #fcf6ba, #aa771c); 
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; 
+        }
+
+        .scroll-hint {
+            position: absolute; bottom: 50px;
+            color: var(--gold); font-size: 0.75rem;
+            letter-spacing: 4px; text-transform: uppercase;
+            animation: pulse 2s infinite; opacity: 0.6;
+        }
+
+        @keyframes pulse { 0%, 100% { transform: translateY(0); opacity: 0.6; } 50% { transform: translateY(10px); opacity: 0.2; } }
+
+        /* 3D СТЕКЛЯННЫЕ ПАНЕЛИ */
+        .glass-panel { 
+            background: var(--glass); backdrop-filter: blur(20px); 
+            border: 1px solid var(--border); border-radius: 24px; 
+            padding: 45px; margin-bottom: 40px; text-align: center;
+            transition: transform 0.1s ease-out, box-shadow 0.3s ease;
+            transform-style: preserve-3d;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+        }
+        .glass-panel:hover { box-shadow: 0 15px 45px rgba(197,160,89,0.15); }
+        
+        h1 { font-size: 2.2rem; background: linear-gradient(135deg,#bf953f,#fcf6ba,#aa771c); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-transform: uppercase; letter-spacing: 3px; }
+        h2 { color: var(--gold); font-size: 1.1rem; letter-spacing: 4px; text-transform: uppercase; font-weight: 500; margin: 10px 0 30px; }
+        h3 { color: var(--gold); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 25px; }
+        
+        p { margin-bottom: 20px; line-height: 1.7; font-size: 0.95rem; }
+
+        /* ГАЛЕРЕЯ */
+        .gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
+        .gallery-item { border-radius: 16px; overflow: hidden; border: 1px solid var(--border); height: 280px; cursor: pointer; }
+        .gallery-item img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
+        .gallery-item:hover img { transform: scale(1.1); }
+        
+        /* ВИДЕО */
+        .video-wrapper { max-width: 320px; margin: 0 auto 15px; cursor: pointer; border-radius: 20px; overflow: hidden; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         video { width: 100%; display: block; }
-        .video-hint { font-size: 0.65rem; color: var(--gold); margin-top: 10px; letter-spacing: 1.5px; transition: 0.3s; }
-        .gallery { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
-        .gallery-item { border-radius: 16px; overflow: hidden; border: 1px solid var(--border); height: 350px; cursor: pointer; }
-        .gallery-item img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
-        .gallery-item:hover img { transform: scale(1.08); }
         
         /* КНОПКИ СОЦСЕТЕЙ */
-        .social-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-bottom: 15px; }
-        .social-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .btn { display: flex; flex-direction: column; align-items: center; gap: 10px; border: 1px solid var(--gold); color: var(--gold); padding: 15px; border-radius: 30px; text-decoration: none; font-weight: 700; font-size: 12px; text-transform: uppercase; cursor: pointer; transition: 0.3s; }
-        .btn:hover { background: var(--gold); color: #000; box-shadow: 0 0 20px rgba(197,160,89,0.5); }
-        .social-icon { width: 32px; height: 32px; fill: currentColor; }
+        .social-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; }
+        .btn { border: 1px solid var(--gold); color: var(--gold); padding: 15px; border-radius: 30px; text-decoration: none; font-weight: 700; font-size: 12px; text-transform: uppercase; cursor: pointer; transition: 0.3s; background: transparent; display: flex; align-items: center; justify-content: center; gap: 10px;}
+        .btn:hover { background: var(--gold); color: #000; box-shadow: 0 0 20px rgba(197,160,89,0.5); transform: translateY(-2px); }
 
-        /* ФИНАЛЬНЫЙ БЛОК (ОГРОМНЫЙ НОМЕР И КНОПКА) */
-        .final-footer { text-align: center; padding: 60px 20px 20px; margin-top: 20px; border-top: 1px solid var(--glass); display: flex; flex-direction: column; align-items: center; }
-        .massive-phone { display: block; color: var(--gold); font-size: 3rem; font-weight: 700; text-decoration: none; text-shadow: 0 0 25px rgba(197,160,89,0.4); margin-bottom: 5px; transition: 0.3s; white-space: nowrap; }
-        .massive-phone:hover { transform: scale(1.05); color: #fff; }
-        .call-text { color: rgba(255, 255, 255, 0.5); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 4px; margin-bottom: 40px; }
+        /* ПОДВАЛ */
+        .final-footer { text-align: center; padding: 60px 20px 40px; margin-top: 20px; border-top: 1px solid var(--glass); }
+        .massive-phone { display: block; color: var(--gold); font-size: 3rem; font-weight: 700; text-decoration: none; transition: 0.3s; margin-bottom: 10px; }
+        .massive-phone:hover { transform: scale(1.05); color: #fff; text-shadow: 0 0 20px var(--gold); }
+        .copyright { color: rgba(255, 255, 255, 0.2); font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase; margin-top: 40px; }
         
-        .copyright { text-align: center; color: rgba(255, 255, 255, 0.15); font-size: 0.65rem; letter-spacing: 2px; text-transform: uppercase; margin-top: 50px; }
-        
-        /* МОДАЛКИ */
-        .modal { position: fixed; inset: 0; background: rgba(5,10,20,0.95); display: none; justify-content: center; align-items: center; z-index: 2000; padding: 20px; }
-        .modal-content { background: rgba(255,255,255,0.03); border: 1px solid var(--gold); padding: 40px; border-radius: 30px; width: 100%; max-width: 420px; text-align: center; position: relative; }
+        /* МОДАЛКИ И ФОРМЫ */
+        .modal { position: fixed; inset: 0; background: rgba(5,10,20,0.95); backdrop-filter: blur(5px); display: none; justify-content: center; align-items: center; z-index: 2000; padding: 20px; }
+        .modal-content { background: #0a1120; border: 1px solid var(--gold); padding: 40px; border-radius: 25px; width: 100%; max-width: 420px; text-align: center; position: relative; box-shadow: 0 0 40px rgba(0,0,0,0.8); }
         .close-btn { position: absolute; top: 15px; right: 20px; color: var(--gold); font-size: 28px; cursor: pointer; }
-        input { width: 100%; padding: 15px; margin: 10px 0; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 12px; color: #fff; }
-        .error-msg { color: #ff4d4d; font-size: 0.8rem; display: none; text-align: left; padding-left: 10px; }
+        
+        input { width: 100%; padding: 15px; margin: 10px 0; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 12px; color: #fff; font-family: 'Montserrat', sans-serif; }
+        input:focus { border-color: var(--gold); }
+        .error-msg { color: #ff4d4d; font-size: 0.8rem; display: none; text-align: left; padding-left: 10px; margin-top: -5px; margin-bottom: 5px; }
+        
+        /* Canvas Капча */
+        .captcha-container { display: flex; align-items: center; gap: 15px; margin: 15px 0; background: rgba(255,255,255,0.03); padding: 10px; border-radius: 12px; border: 1px solid var(--border); }
+        #captchaCanvas { border-radius: 8px; background: #050a14; cursor: pointer; width: 120px; height: 50px; }
+        .captcha-input { margin: 0 !important; flex: 1; }
+
         #fullImg { max-width: 90vw; max-height: 80vh; border: 2px solid var(--gold); border-radius: 15px; }
         
         @media (max-width: 768px) { 
-            .gallery { grid-template-columns: 1fr; } 
-            .social-grid { grid-template-columns: 1fr; } 
-            .btn { flex-direction: row; } 
-            .logo-panel { transform: scale(1.1); } 
-            .container { padding-top: 20px; } 
-            .massive-phone { font-size: 2.2rem; } /* Уменьшаем номер на мобилках, чтобы влез */
+            .massive-phone { font-size: 2.2rem; }
+            .hero-scroll-wrapper { height: 130vh; }
+            .glass-panel { transform: none !important; padding: 30px 20px; } 
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        
-        <div class="header-block">
-            <div class="logo-panel">
+    <!-- Интерактивный 3D Фон -->
+    <canvas id="canvas3d"></canvas>
+
+    <!-- Секция с анимацией Логотипа при скролле -->
+    <div class="hero-scroll-wrapper">
+        <div class="hero-sticky">
+            <div class="logo-panel" id="animatedLogo">
                 <img src="logo.gif" alt="FS" class="logo-img">
                 <span class="logo-text">Family<br>Standard</span>
             </div>
-            <div class="header-btn" onclick="openModal('callModal')">Заказать обратный звонок</div>
+            
+            <button class="header-btn" style="margin-top: 30px;" onclick="openModal('callModal')">Заказать обратный звонок</button>
+            <div class="scroll-hint">Скролльте вниз</div>
         </div>
+    </div>
 
-        <div class="glass-panel">
+    <!-- Основной Контент -->
+    <div class="container">
+        
+        <div class="glass-panel 3d-panel">
             <h1>Family Standard</h1>
             <h2>Новый стандарт детских событий</h2>
-            <p>Вы отдыхаете, а мы берем все заботы на себя. Family Standard — это не просто классическая анимация, это организация выездных квестов и сюжетных игр с полным погружением. Наши гейм-мастеры обеспечивают качественный присмотр за детьми на любых мероприятиях — от частных дней рождения до масштабных взрослых банкетов. С помощью продуманного реквизита и командных миссий мы превращаем энергию детей в увлекательный процесс, гарантируя их безопасность и ваше спокойствие.</p>
+            <p>Вы отдыхаете, а мы берем все заботы на себя. Family Standard — это не просто классическая анимация, это организация выездных квестов и сюжетных игр с полным погружением. Наши гейм-мастеры обеспечивают качественный присмотр за детьми на любых мероприятиях — от частных дней рождения до масштабных взрослых банкетов.</p>
         </div>
 
-        <div class="glass-panel">
+        <div class="glass-panel 3d-panel">
             <h3>Фотоотчеты с игровых сессий</h3>
             <div class="gallery">
                 <div class="gallery-item" onclick="viewImage('photo1.jpg')"><img src="photo1.jpg" alt="Квест 1"></div>
@@ -108,79 +206,151 @@
             </div>
         </div>
 
-        <div class="glass-panel">
-            <h3>Следите за нами</h3>
-            <div class="social-grid">
-                <a onclick="openModal('devModal')" class="btn"><svg class="social-icon" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>Like</a>
-                <a onclick="openModal('devModal')" class="btn"><svg class="social-icon" viewBox="0 0 24 24"><path d="M21.582 6.186a1.768 1.768 0 00-1.768-1.768C18.254 4 12 4 12 4s-6.254 0-7.814.418a1.768 1.768 0 00-1.768 1.768C2 7.746 2 12 2 12s0 4.254.418 5.814a1.768 1.768 0 001.768 1.768C5.746 20 12 20 12 20s6.254 0 7.814-.418a1.768 1.768 0 001.768-1.768C22 16.254 22 12 22 12s0-4.254-.418-5.814zM10 15.464V8.536L16 12l-6 3.464z"/></svg>YouTube</a>
-                <a onclick="openModal('devModal')" class="btn"><svg class="social-icon" viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-5.2 1.74 2.89 2.89 0 012.31-4.64 2.93 2.93 0 01.88.13V9.4a6.84 6.84 0 00-1-.05A6.33 6.33 0 005 20.1a6.34 6.34 0 0010.86-4.43v-7a8.16 8.16 0 004.77 1.52v-3.4a4.85 4.85 0 01-1-.1z"/></svg>TikTok</a>
-            </div>
-            <div class="social-grid-2">
-                <a href="https://instagram.com/familystandard.uz" class="btn"><svg class="social-icon" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.88z"/></svg>Instagram</a>
-                <a href="https://t.me/FamilyStandard" class="btn"><svg class="social-icon" viewBox="0 0 24 24"><path d="M11.944 0A12 12 0 000 12a12 12 0 0012 12 12 12 0 0012-12A12 12 0 0012 0zm4.962 7.224c.14.117.171.325.191.797-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23-.049-.244-.249-.024-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>Telegram</a>
-            </div>
-        </div>
-
-        <div class="glass-panel">
-            <h3>Презентация от нашего менеджера</h3>
-            <p class="trust-text">В этом видео менеджер, ответственный за организацию игровых сессий, открыто показывает, как устроена механика наших квестов и как гейм-мастеры удерживают внимание десятков детей. Мы демонстрируем наши внутренние стандарты работы и подход к безопасности, чтобы вы были абсолютно уверены в том, кому доверяете время ваших детей.</p>
-            
+        <div class="glass-panel 3d-panel">
+            <h3>Презентация от менеджера</h3>
+            <p>В этом видео менеджер, ответственный за организацию, открыто показывает механику наших квестов и то, как гейм-мастеры удерживают внимание детей.</p>
             <div class="video-wrapper" onclick="playFromStart(this)">
                 <video autoplay muted playsinline loop poster="poster.jpg"><source src="welcome.mp4" type="video/mp4"></video>
             </div>
-            <p class="video-hint" id="videoHintText">НАЖМИТЕ ДЛЯ ЗВУКА И ПЕРЕЗАПУСКА</p>
+            <p style="font-size: 0.65rem; color: var(--gold); letter-spacing: 1.5px;" id="videoHintText">НАЖМИТЕ ДЛЯ ЗВУКА И ПЕРЕЗАПУСКА</p>
+        </div>
+
+        <div class="glass-panel 3d-panel">
+            <h3>Следите за нами</h3>
+            <div class="social-grid">
+                <a href="https://instagram.com/familystandard.uz" class="btn">Instagram</a>
+                <a href="https://t.me/FamilyStandard" class="btn">Telegram</a>
+                <a onclick="openModal('devModal')" class="btn">YouTube</a>
+            </div>
         </div>
 
         <div class="final-footer">
             <a href="tel:+998700464000" class="massive-phone">+998 700 464 000</a>
-            <div class="call-text">Позвонить нам</div>
-            <div class="header-btn" onclick="openModal('callModal')">Заказать обратный звонок</div>
-            <div class="copyright">&copy; 2026 Family Standard | Организация игровых сессий</div>
+            <p style="color: rgba(255, 255, 255, 0.4); margin-bottom: 25px; font-size: 0.8rem; letter-spacing: 2px;">ПОЗВОНИТЬ НАМ</p>
+            <button class="header-btn" onclick="openModal('callModal')">Оставить заявку</button>
+            <div class="copyright">&copy; 2026 Family Standard</div>
         </div>
     </div>
 
+    <!-- Модальное окно формы -->
     <div id="callModal" class="modal" onclick="if(event.target.id==='callModal') closeModal('callModal')">
         <div class="modal-content">
             <span class="close-btn" onclick="closeModal('callModal')">&times;</span>
-            <h2 style="color:var(--gold); margin-bottom: 15px;">Обратный звонок</h2>
+            <h3 style="color:var(--gold); margin-bottom: 15px;">Обратный звонок</h3>
+            
             <input type="text" id="nameInput" placeholder="Ваше имя" oninput="this.style.borderColor=''">
             <p id="nameError" class="error-msg">Укажите имя</p>
+            
             <input type="tel" id="phoneInput" placeholder="+998 (__) ___-__-__" value="+998 " oninput="formatPhone(this)">
-            <p id="phoneError" class="error-msg">Укажите номер</p>
-            <button id="submitBtn" class="btn" style="width:100%; margin-top:15px; flex-direction:row;" onclick="sendLead()">Отправить</button>
+            <p id="phoneError" class="error-msg">Укажите номер полностью</p>
+            
+            <!-- Защита от ботов: Canvas Captcha -->
+            <div class="captcha-container">
+                <canvas id="captchaCanvas" width="120" height="50" onclick="drawCaptcha()" title="Нажмите, чтобы обновить"></canvas>
+                <input type="text" id="captchaInput" class="captcha-input" placeholder="Код с картинки" maxlength="4" oninput="this.style.borderColor=''">
+            </div>
+            <p style="font-size: 0.7rem; color: rgba(255,255,255,0.4); margin: -5px 0 10px; text-align: left;">Нажмите на картинку для обновления</p>
+            <p id="captchaError" class="error-msg">Код введен неверно</p>
+
+            <button id="submitBtn" class="header-btn" style="width:100%; margin-top:10px;" onclick="sendLead()">Отправить</button>
         </div>
     </div>
 
+    <!-- Инфо Модалки -->
     <div id="successModal" class="modal" onclick="closeModal('successModal')">
-        <div class="modal-content"><h2 style="color:var(--gold);">Заявка отправлена!</h2><p>Наш менеджер свяжется с вами.</p></div>
+        <div class="modal-content"><h2 style="color:var(--gold);">Заявка отправлена!</h2><p style="margin-top: 10px;">Наш менеджер свяжется с вами.</p></div>
     </div>
-    
     <div id="devModal" class="modal" onclick="closeModal('devModal')">
-        <div class="modal-content"><h3 style="color:var(--gold);">В разработке</h3><p>Готовим новые квесты.</p></div>
+        <div class="modal-content"><h3 style="color:var(--gold);">В разработке</h3><p style="margin-top: 10px;">Готовим новые квесты.</p></div>
     </div>
-
     <div id="fullImageModal" class="modal" onclick="closeModal('fullImageModal')">
         <span class="close-btn" style="top:20px; right:30px; font-size:40px;">&times;</span><img id="fullImg" src="">
     </div>
 
     <script>
-        const openModal = id => document.getElementById(id).style.display = 'flex';
-        const closeModal = id => document.getElementById(id).style.display = 'none';
-        const viewImage = src => { document.getElementById('fullImg').src = src; openModal('fullImageModal'); };
+        // === 1. АНИМАЦИЯ СКРОЛЛА ЛОГОТИПА ===
+        window.addEventListener('scroll', () => {
+            const logo = document.getElementById('animatedLogo');
+            const scrollY = window.scrollY;
+            
+            // Логотип увеличивается от 1.2 до 2.5 в зависимости от прокрутки
+            let scale = 1.2 + (scrollY / 300);
+            if (scale > 2.5) scale = 2.5; 
+            
+            // Добавляем золотое свечение при увеличении
+            let shadowOp = (scale - 1.2) / 1.5; 
+            if(shadowOp > 0.6) shadowOp = 0.6;
 
+            logo.style.transform = `scale(${scale})`;
+            logo.style.boxShadow = `0 0 ${25 * scale}px rgba(197, 160, 89, ${shadowOp})`;
+        });
+
+        // === 2. 3D НАКЛОН ПАНЕЛЕЙ (Tilt) ===
+        if (window.innerWidth > 768) {
+            document.querySelectorAll('.3d-panel').forEach(panel => {
+                panel.addEventListener('mousemove', e => {
+                    let rect = panel.getBoundingClientRect();
+                    let x = e.clientX - rect.left - rect.width / 2;
+                    let y = e.clientY - rect.top - rect.height / 2;
+                    panel.style.transform = `perspective(1000px) rotateY(${x / 40}deg) rotateX(${-y / 40}deg)`;
+                });
+                panel.addEventListener('mouseleave', () => {
+                    panel.style.transform = `perspective(1000px) rotateY(0deg) rotateX(0deg)`;
+                });
+            });
+        }
+
+        // === 3. 3D ФОН (Starfield Particles) ===
+        const canvas = document.getElementById('canvas3d');
+        const ctx3d = canvas.getContext('2d');
+        let width, height, particles;
+
+        function init3DBackground() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+            particles = [];
+            for (let i = 0; i < 100; i++) {
+                particles.push({
+                    x: Math.random() * width, y: Math.random() * height,
+                    z: Math.random() * width, size: Math.random() * 1.5 + 0.5,
+                    speed: Math.random() * 0.5 + 0.1
+                });
+            }
+        }
+        function animate3D() {
+            ctx3d.clearRect(0, 0, width, height);
+            ctx3d.fillStyle = 'rgba(197, 160, 89, 0.8)';
+            particles.forEach(p => {
+                p.y -= p.speed;
+                if (p.y < 0) p.y = height;
+                
+                // Легкий параллакс от скролла
+                let scrollOffset = window.scrollY * (p.z / width) * 0.5;
+                
+                ctx3d.beginPath();
+                ctx3d.arc(p.x, p.y - scrollOffset, p.size, 0, Math.PI * 2);
+                ctx3d.fill();
+            });
+            requestAnimationFrame(animate3D);
+        }
+        window.addEventListener('resize', init3DBackground);
+        init3DBackground(); animate3D();
+
+        // === 4. ЛОГИКА ФОРМЫ, КАПЧИ И МОДАЛОК ===
+        function openModal(id) { 
+            document.getElementById(id).style.display = 'flex'; 
+            if(id === 'callModal') { document.getElementById('captchaInput').value = ''; drawCaptcha(); }
+        }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        function viewImage(src) { document.getElementById('fullImg').src = src; openModal('fullImageModal'); }
+        
         function playFromStart(wrapper) {
             let vid = wrapper.querySelector('video');
             let hint = document.getElementById('videoHintText');
-            
             if (vid.muted) {
-                vid.muted = false; 
-                vid.currentTime = 0; 
-                vid.play(); 
+                vid.muted = false; vid.currentTime = 0; vid.play(); 
                 hint.innerText = "ЗВУК ВКЛЮЧЕН (НАЖМИТЕ ДЛЯ ОТКЛЮЧЕНИЯ)";
-            } else {
-                vid.muted = true;
-                hint.innerText = "НАЖМИТЕ ДЛЯ ЗВУКА И ПЕРЕЗАПУСКА";
-            }
+            } else { vid.muted = true; hint.innerText = "НАЖМИТЕ ДЛЯ ЗВУКА И ПЕРЕЗАПУСКА"; }
         }
 
         function formatPhone(el) {
@@ -194,23 +364,61 @@
             el.style.borderColor = '';
         }
 
+        let currentCaptcha = "";
+        function drawCaptcha() {
+            const c = document.getElementById('captchaCanvas');
+            const ctx = c.getContext('2d');
+            ctx.clearRect(0, 0, c.width, c.height);
+            ctx.fillStyle = "#050a14"; ctx.fillRect(0, 0, c.width, c.height);
+            
+            const chars = "123456789ABCDEFGHJKLMNPQRSTUVWXYZ";
+            currentCaptcha = "";
+            for(let i=0; i<4; i++) currentCaptcha += chars.charAt(Math.floor(Math.random() * chars.length));
+            
+            for(let i=0; i<5; i++) {
+                ctx.strokeStyle = `rgba(197, 160, 89, ${Math.random() * 0.5 + 0.2})`;
+                ctx.beginPath(); ctx.moveTo(Math.random() * c.width, Math.random() * c.height);
+                ctx.lineTo(Math.random() * c.width, Math.random() * c.height); ctx.stroke();
+            }
+            
+            ctx.font = "bold 24px Montserrat"; ctx.fillStyle = "#c5a059"; ctx.textBaseline = "middle";
+            ctx.setTransform(1, Math.random()*0.1 - 0.05, Math.random()*0.1 - 0.05, 1, 0, 0);
+            ctx.fillText(currentCaptcha, 18, c.height / 2 + 2);
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
+        }
+
         function sendLead() {
             let name = document.getElementById('nameInput').value.trim();
             let phone = document.getElementById('phoneInput').value.replace(/\D/g, '');
+            let userCaptcha = document.getElementById('captchaInput').value.trim().toUpperCase();
             let err = false;
+
+            document.querySelectorAll('.error-msg').forEach(el => el.style.display = 'none');
 
             if (name.length < 2) { document.getElementById('nameError').style.display='block'; err=true; }
             if (phone.length < 12) { document.getElementById('phoneError').style.display='block'; err=true; }
+            if (userCaptcha !== currentCaptcha) { 
+                document.getElementById('captchaError').style.display='block'; 
+                document.getElementById('captchaInput').style.borderColor = '#ff4d4d';
+                drawCaptcha(); err=true; 
+            }
+            
             if (err) return;
 
+            // Восстановленное разделение токена
             const tk1 = "8704692826:AAG"; 
             const tk2 = "4n668xcqaza8hFYiBPJ-TEGvN1Uo-4Kk"; 
             const url = `https://api.telegram.org/bot${tk1+tk2}/sendMessage?chat_id=8340992547&text=Новая заявка%0AИмя: ${name}%0AТел: +${phone}`;
 
-            let btn = document.getElementById('submitBtn'); btn.innerText = 'Отправка...';
+            let btn = document.getElementById('submitBtn'); 
+            btn.innerText = 'Отправка...';
 
             fetch(url).then(r => {
-                if(r.ok) { closeModal('callModal'); openModal('successModal'); document.getElementById('nameInput').value=''; document.getElementById('phoneInput').value='+998 '; }
+                if(r.ok) { 
+                    closeModal('callModal'); openModal('successModal'); 
+                    document.getElementById('nameInput').value=''; 
+                    document.getElementById('phoneInput').value='+998 '; 
+                }
                 btn.innerText = 'Отправить';
             }).catch(() => btn.innerText = 'Ошибка сети');
         }
