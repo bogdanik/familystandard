@@ -1,1 +1,647 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Сценарий | 1 год Гасану</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;500;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #070e20;
+            --bg-panel: #0f1c3a;
+            --bg-panel-hover: #16264c;
+            --gold: #D4AF37;
+            --gold-light: #f3d46d;
+            --text-main: #e2e8f0;
+            --text-muted: #94a3b8;
+        }
 
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding-bottom: 50px;
+        }
+
+        header {
+            background-color: var(--bg-panel);
+            border-bottom: 2px solid var(--gold);
+            padding: 20px 15px;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+        }
+
+        header h1 {
+            color: var(--gold);
+            font-size: 22px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 5px;
+        }
+
+        header p {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 0 15px;
+        }
+
+        /* Блок Памятки */
+        .directory-box {
+            background-color: rgba(212, 175, 55, 0.05);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .directory-title {
+            color: var(--gold);
+            font-size: 16px;
+            text-transform: uppercase;
+            font-weight: 700;
+            margin-bottom: 15px;
+            text-align: center;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+            padding-bottom: 10px;
+        }
+
+        .directory-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            font-size: 13px;
+        }
+
+        @media (max-width: 600px) {
+            .directory-grid { grid-template-columns: 1fr; }
+        }
+
+        .dir-col h4 {
+            color: #60a5fa;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .dir-list {
+            list-style: none;
+            color: var(--text-muted);
+        }
+        
+        .dir-list li {
+            margin-bottom: 4px;
+            word-wrap: break-word;
+        }
+        
+        .dir-list strong {
+            color: var(--text-main);
+        }
+
+        /* Таймлайн */
+        .timeline-item {
+            background-color: var(--bg-panel);
+            border-left: 4px solid var(--gold);
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            transition: background-color 0.3s;
+        }
+
+        .timeline-item:hover {
+            background-color: var(--bg-panel-hover);
+        }
+
+        .item-header {
+            padding: 15px 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            user-select: none;
+        }
+
+        .time-box {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .time {
+            color: var(--gold);
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .title {
+            font-size: 15px;
+            font-weight: 500;
+            margin-top: 3px;
+        }
+
+        .toggle-icon {
+            color: var(--gold);
+            font-size: 24px;
+            transition: transform 0.3s ease;
+        }
+
+        .timeline-item.active .toggle-icon {
+            transform: rotate(45deg);
+        }
+
+        .item-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+            background-color: #0b152d;
+        }
+
+        .content-inner {
+            padding: 20px;
+            border-top: 1px solid rgba(212, 175, 55, 0.2);
+        }
+
+        /* Роли */
+        .role-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+
+        .role-box {
+            background-color: rgba(0, 0, 0, 0.2);
+            padding: 12px 15px;
+            border-radius: 6px;
+            border-left: 2px solid transparent;
+        }
+
+        .role-box.host { border-color: #3b82f6; }
+        .role-box.dj { border-color: #8b5cf6; }
+        .role-box.kitchen { border-color: var(--gold); }
+
+        .role-title {
+            font-size: 12px;
+            text-transform: uppercase;
+            font-weight: 700;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .role-box.host .role-title { color: #60a5fa; }
+        .role-box.dj .role-title { color: #a78bfa; }
+        .role-box.kitchen .role-title { color: var(--gold); }
+
+        .role-text {
+            font-size: 14px;
+            color: var(--text-main);
+        }
+
+        .role-text ul {
+            padding-left: 20px;
+            margin-top: 10px;
+        }
+
+        .role-text li {
+            margin-bottom: 5px;
+        }
+
+        /* Блок прямой речи */
+        .speech-box {
+            background-color: rgba(59, 130, 246, 0.1);
+            border-left: 2px solid #60a5fa;
+            padding: 10px 15px;
+            margin-top: 10px;
+            font-style: italic;
+            font-size: 13.5px;
+            color: #bfdbfe;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .speech-box strong {
+            display: block;
+            font-style: normal;
+            font-size: 11px;
+            text-transform: uppercase;
+            color: #60a5fa;
+            margin-bottom: 4px;
+            letter-spacing: 0.5px;
+        }
+
+        /* Плашки внимания */
+        .alert-box {
+            background-color: rgba(220, 38, 38, 0.1);
+            border: 1px solid rgba(220, 38, 38, 0.5);
+            color: #fca5a5;
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+        
+        .highlight-box {
+            background-color: rgba(212, 175, 55, 0.1);
+            border: 1px solid rgba(212, 175, 55, 0.5);
+            color: var(--gold-light);
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>1 Год Гасану</h1>
+        <p>Дата: 24 (Пятница) | Начало: 18:00 | Ресторан: «Ченсон»</p>
+    </header>
+
+    <div class="container">
+        
+        <!-- ВВОДНАЯ ИНФОРМАЦИЯ -->
+        <div class="directory-box">
+            <div class="directory-title">📋 Вводная информация по мероприятию</div>
+            <div class="directory-grid">
+                <div class="dir-col">
+                    <h4>Общие данные</h4>
+                    <ul class="dir-list">
+                        <li><strong>Именинник:</strong> Гасан (Гасанчик)</li>
+                        <li><strong>Папа:</strong> Артур</li>
+                        <li><strong>Гости:</strong> ~40 человек (20 взрослых, 6 молодых, остальные дети)</li>
+                    </ul>
+                </div>
+                <div class="dir-col">
+                    <h4>Ключевые активности</h4>
+                    <ul class="dir-list">
+                        <li><strong>Нейромузыка:</strong> Аудио-игра за столом (20 мин)</li>
+                        <li><strong>Активности:</strong> Детская игра + Танцевальный алфавит (30 мин)</li>
+                        <li><strong>Квиз:</strong> Битва генов (20 мин)</li>
+                        <li><strong>Фонд Гасана:</strong> Сбор в лототрон после торта (10 мин)</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- БЛОК 1 -->
+        <div class="timeline-item">
+            <div class="item-header">
+                <div class="time-box">
+                    <span class="time">18:00 - 18:30</span>
+                    <span class="title">Сбор гостей (Welcome Zone)</span>
+                </div>
+                <div class="toggle-icon">+</div>
+            </div>
+            <div class="item-content">
+                <div class="content-inner">
+                    <div class="role-grid">
+                        <div class="role-box host">
+                            <div class="role-title">🎤 Ведущий</div>
+                            <div class="role-text">Без официальных объявлений в микрофон. Легкий контроль обстановки, знакомство с ключевыми гостями, непринужденное общение. Создаем теплую семейную атмосферу перед стартом. Проверяем готовность лототрона на видном месте.</div>
+                        </div>
+                        <div class="role-box dj">
+                            <div class="role-title">🎧 DJ</div>
+                            <div class="role-text">Стильный лаунж. Музыка не мешает общаться (громкость 30-40%).</div>
+                        </div>
+                        <div class="role-box kitchen">
+                            <div class="role-title">🍽️ Кухня и Сервис</div>
+                            <div class="role-text">На столах выставлены холодные закуски и салаты.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- БЛОК 2 -->
+        <div class="timeline-item">
+            <div class="item-header">
+                <div class="time-box">
+                    <span class="time">18:30 - 18:45</span>
+                    <span class="title">Торжественный выход</span>
+                </div>
+                <div class="toggle-icon">+</div>
+            </div>
+            <div class="item-content">
+                <div class="content-inner">
+                    <div class="role-grid">
+                        <div class="role-box host">
+                            <div class="role-title">🎤 Ведущий</div>
+                            <div class="role-text">
+                                Внимание на вход! Эффектное появление.
+                                <div class="speech-box">
+                                    <strong>💬 Прямая речь:</strong>
+                                    «Ну что ж, дорогие гости, вот и начинается наш прекрасный, самый яркий, самый радостный праздник, который только может быть. И, конечно же, это день рождения нашего всеми горячо любимого Гасанчика! Давайте под бурные аплодисменты встретим наших самых главных — тех, кто создал Гасанчика, его родителей. Встречаем Артура с его супругой!»
+                                </div>
+                                <div class="speech-box">
+                                    <strong>💬 Обращение к отцу:</strong>
+                                    «Артур, здравствуйте, рад приветствовать вас. Такой сегодня день особенный для вас, для вашей семьи и для меня в том числе. Я рад, что мы с вами сегодня будем проводить время, повеселимся. Но прежде чем мы начнём, конечно же, нужно услышать от вас напутственную речь, как отца семейства. О том, как вы рады встретить всех своих гостей, друзей и близких, которые сегодня здесь собрались!»
+                                </div>
+                            </div>
+                        </div>
+                        <div class="role-box dj">
+                            <div class="role-title">🎧 DJ</div>
+                            <div class="role-text">Мощный, торжественный трек на выход. Приглушаем для речи Артура.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- БЛОК 3 -->
+        <div class="timeline-item">
+            <div class="item-header">
+                <div class="time-box">
+                    <span class="time">18:45 - 19:20</span>
+                    <span class="title">Свободный микрофон & Первое Горячее</span>
+                </div>
+                <div class="toggle-icon">+</div>
+            </div>
+            <div class="item-content">
+                <div class="content-inner">
+                    <div class="alert-box">⚠️ Внимание Кухне: Сразу после первого тоста стартует подача первого горячего блюда.</div>
+                    <div class="role-grid">
+                        <div class="role-box host">
+                            <div class="role-title">🎤 Ведущий</div>
+                            <div class="role-text">
+                                После слов Артура гости приступают к ужину (35 минут на еду и тосты).
+                                <div class="speech-box">
+                                    <strong>💬 Прямая речь:</strong>
+                                    «Прекрасные, прекрасные поздравления! Вот это да, действительно такие тёплые, душещипательные слова. Теперь-то мы точно сможем насладиться этим прекрасным вечером! У нас открывается формат свободного микрофона: если кто-то ещё хотел бы поздравить Гасанчика и его семью с таким прекрасным днём — выходите, будем вместе радоваться!»
+                                </div>
+                            </div>
+                        </div>
+                        <div class="role-box dj">
+                            <div class="role-title">🎧 DJ</div>
+                            <div class="role-text">Легкий фон, торжественные отбивки (фанфары) перед тем, как гость берет микрофон.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- БЛОК 4 -->
+        <div class="timeline-item">
+            <div class="item-header">
+                <div class="time-box">
+                    <span class="time">19:20 - 19:40</span>
+                    <span class="title">Игра: Нейромузыка (20 мин)</span>
+                </div>
+                <div class="toggle-icon">+</div>
+            </div>
+            <div class="item-content">
+                <div class="content-inner">
+                    <div class="highlight-box">💎 Ключевой момент: Открываем ЛОТОТРОН для сбора бюджета.</div>
+                    <div class="role-grid">
+                        <div class="role-box host">
+                            <div class="role-title">🎤 Ведущий</div>
+                            <div class="role-text">
+                                Гости на слух угадывают сгенерированные мелодии (без слов).
+                                <div class="speech-box">
+                                    <strong>💬 Прямая речь (Финал игры):</strong>
+                                    «Отлично справились! Сегодня у нас не просто праздник, мы собираем "Первый миллион" в инвестиционный фонд Гасанчика! У нас есть прозрачный лототрон. И тот, кто отгадал больше всех мелодий, прямо сейчас через меня выигрывает 100 000 сум! И эти деньги под ваши аплодисменты официально открывают наш банк и отправляются прямо в лототрон! Подарок от победителя и от ведущего!»
+                                </div>
+                                Оставляем лототрон на видном месте.
+                            </div>
+                        </div>
+                        <div class="role-box dj">
+                            <div class="role-title">🎧 DJ</div>
+                            <div class="role-text">Запуск минус-треков (мелодий). Яркая фанфара и звук "монет", когда 100 000 сум падают в лототрон.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- БЛОК 5 -->
+        <div class="timeline-item">
+            <div class="item-header">
+                <div class="time-box">
+                    <span class="time">19:40 - 20:10</span>
+                    <span class="title">Активности: Дети + Алфавит + Фото (30 мин)</span>
+                </div>
+                <div class="toggle-icon">+</div>
+            </div>
+            <div class="item-content">
+                <div class="content-inner">
+                    <div class="role-grid">
+                        <div class="role-box host">
+                            <div class="role-title">🎤 Ведущий</div>
+                            <div class="role-text">
+                                Поднимаем зал на ноги после еды и интерактива!
+                                <br><br>
+                                <strong>1. Детская игра (10 мин):</strong> Зовем всех деток в центр. Играем в «Тише едешь — дальше будешь». Взрослые поддерживают с мест.
+                                <br><br>
+                                <strong>2. Танцевальный Алфавит (15 мин):</strong> Дети вытягивают родителей на танцпол. Ведущий называет букву — они показывают движение.
+                                <br><br>
+                                <strong>3. Финальное фото (5 мин):</strong> В самом конце все гости должны телами выстроить имя <strong>Г-А-С-А-Н</strong> на танцполе. Фиксируем этот момент на камеру.
+                            </div>
+                        </div>
+                        <div class="role-box dj">
+                            <div class="role-title">🎧 DJ</div>
+                            <div class="role-text">Музыка с резкими стопами для детей. Очень качающие биты для Алфавита. Торжественная отбивка, когда выстроят имя.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- БЛОК 6 -->
+        <div class="timeline-item">
+            <div class="item-header">
+                <div class="time-box">
+                    <span class="time">20:10 - 20:40</span>
+                    <span class="title">Второе Горячее & Пауза (30 мин)</span>
+                </div>
+                <div class="toggle-icon">+</div>
+            </div>
+            <div class="item-content">
+                <div class="content-inner">
+                    <div class="alert-box">⚠️ Внимание Кухне: Подача ВТОРОГО ГОРЯЧЕГО блюда. Гости потанцевали и проголодались.</div>
+                    <div class="role-grid">
+                        <div class="role-box host">
+                            <div class="role-title">🎤 Ведущий</div>
+                            <div class="role-text">Отправляем гостей отдыхать и наслаждаться вторым блюдом. Даем полчаса на спокойное общение и передышку перед квизом и тортом.</div>
+                        </div>
+                        <div class="role-box dj">
+                            <div class="role-title">🎧 DJ</div>
+                            <div class="role-text">Легкий приятный фон, громкость убавлена.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- БЛОК 7 -->
+        <div class="timeline-item">
+            <div class="item-header">
+                <div class="time-box">
+                    <span class="time">20:40 - 21:00</span>
+                    <span class="title">Квиз: Битва генов (20 мин)</span>
+                </div>
+                <div class="toggle-icon">+</div>
+            </div>
+            <div class="item-content">
+                <div class="content-inner">
+                    <div class="role-grid">
+                        <div class="role-box host">
+                            <div class="role-title">🎤 Ведущий</div>
+                            <div class="role-text">
+                                Возвращаемся к столам (гости доедают горячее). Артур с супругой — жюри. Гости отгадывают, чьи гены победили в Гасанчике.
+                                <br><br>
+                                <strong>Список вопросов:</strong>
+                                <ul>
+                                    <li>1. Чья у Гасанчика улыбка, когда он в хорошем настроении: папина или мамина?</li>
+                                    <li>2. Чей взгляд он включает, когда злится или что-то требует?</li>
+                                    <li>3. Кто паникует больше, когда Гасанчик случайно падает или чихает: Артур или мама?</li>
+                                    <li>4. В чей аппетит он пошел? Кто в семье любит покушать так же сильно?</li>
+                                    <li>5. Чья у него хитрость в глазах, когда он задумал шкоду?</li>
+                                    <li>6. Кому из родителей требуется больше времени, чтобы убаюкать его ночью?</li>
+                                    <li>7. Какой самый смешной или странный звук он издает, когда возмущается?</li>
+                                    <li>8. К кому он быстрее поползет, если испугается резкого звука?</li>
+                                    <li>9. Чей нос он делает (морщит), когда ему что-то не нравится?</li>
+                                    <li>10. Кто чаще гуглит симптомы в интернете при каждом чихе Гасана?</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="role-box dj">
+                            <div class="role-title">🎧 DJ</div>
+                            <div class="role-text">Музыка для раздумий, веселые звуки (ошибки/правильно) на ответы гостей.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- БЛОК 8 -->
+        <div class="timeline-item">
+            <div class="item-header">
+                <div class="time-box">
+                    <span class="time">21:00 - 21:25</span>
+                    <span class="title">Вынос Торта & Чай (25 мин)</span>
+                </div>
+                <div class="toggle-icon">+</div>
+            </div>
+            <div class="item-content">
+                <div class="content-inner">
+                    <div class="role-grid">
+                        <div class="role-box host">
+                            <div class="role-title">🎤 Ведущий</div>
+                            <div class="role-text">
+                                Эпичная подводка к торту. Все гости собираются вокруг именинника. Красивые фото, задувание свечки. 
+                            </div>
+                        </div>
+                        <div class="role-box kitchen">
+                            <div class="role-title">🍽️ Кухня и Сервис</div>
+                            <div class="role-text">Вывоз Торта. Розлив чая и кофе. Быстрая нарезка торта гостям.</div>
+                        </div>
+                        <div class="role-box dj">
+                            <div class="role-title">🎧 DJ</div>
+                            <div class="role-text">Яркий трек на вынос торта (Happy Birthday). Лиричный фон, пока гости пьют чай.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- БЛОК 9 -->
+        <div class="timeline-item">
+            <div class="item-header">
+                <div class="time-box">
+                    <span class="time">21:25 - 21:35</span>
+                    <span class="title">Сбор в Лототрон / Фонд Гасана (10 мин)</span>
+                </div>
+                <div class="toggle-icon">+</div>
+            </div>
+            <div class="item-content">
+                <div class="content-inner">
+                    <div class="role-grid">
+                        <div class="role-box host">
+                            <div class="role-title">🎤 Ведущий</div>
+                            <div class="role-text">
+                                Торт съеден, настроение на максимуме. 
+                                <div class="speech-box">
+                                    <strong>💬 Прямая речь:</strong>
+                                    «Друзья, наш вечер плавно подходит к танцевальному финалу! И я объявляю финальные 5 минут для инвестиций в "Первый стартап Гасана"! Наш лототрон открыт для всех желающих. Тот, чья поддержка сегодня окажется самой весомой, получит звание Генерального Инвестора и заберет на память эксклюзивный семейный портрет!»
+                                </div>
+                                Торжественно объявляем, что бюджет пополнен, выявляем "Генерального инвестора", вручаем портрет под аплодисменты.
+                            </div>
+                        </div>
+                        <div class="role-box dj">
+                            <div class="role-title">🎧 DJ</div>
+                            <div class="role-text">Бодрая, веселая фоновая музыка во время сбора. Торжественные фанфары инвестору.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- БЛОК 10 -->
+        <div class="timeline-item">
+            <div class="item-header">
+                <div class="time-box">
+                    <span class="time">21:35 - 22:00</span>
+                    <span class="title">Финальные слова & Дискотека (25 мин)</span>
+                </div>
+                <div class="toggle-icon">+</div>
+            </div>
+            <div class="item-content">
+                <div class="content-inner">
+                    <div class="role-grid">
+                        <div class="role-box host">
+                            <div class="role-title">🎤 Ведущий</div>
+                            <div class="role-text">
+                                Передаем микрофон Артуру и его супруге для финальных слов благодарности гостям за этот прекрасный вечер. Окончание работы ведущего.
+                            </div>
+                        </div>
+                        <div class="role-box dj">
+                            <div class="role-title">🎧 DJ</div>
+                            <div class="role-text">Лиричный фон под слова родителей. Затем — плотный танцевальный сет до 22:00.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        document.querySelectorAll('.item-header').forEach(header => {
+            header.addEventListener('click', () => {
+                const item = header.parentElement;
+                const content = header.nextElementSibling;
+                
+                document.querySelectorAll('.timeline-item').forEach(otherItem => {
+                    if (otherItem !== item && otherItem.classList.contains('active')) {
+                        otherItem.classList.remove('active');
+                        otherItem.querySelector('.item-content').style.maxHeight = null;
+                    }
+                });
+
+                item.classList.toggle('active');
+                if (item.classList.contains('active')) {
+                    content.style.maxHeight = content.scrollHeight + "px";
+                } else {
+                    content.style.maxHeight = null;
+                }
+            });
+        });
+    </script>
+</body>
+</html>
