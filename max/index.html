@@ -1,1 +1,476 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Сценарий | Екатерина & Максим</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Premium Dark Theme */
+            --bg-dark: #0a0a0f;
+            --bg-panel: #14141e;
+            --bg-panel-hover: #1a1a27;
+            --gold: #dcb374;
+            --gold-light: #f6d8a3;
+            --gold-glow: rgba(220, 179, 116, 0.15);
+            --text-main: #f0f0f5;
+            --text-muted: #8a8a9d;
+            --border-soft: rgba(255, 255, 255, 0.05);
+            
+            /* Role Colors */
+            --role-host: #60a5fa;
+            --role-dj: #a78bfa;
+            --role-kitchen: #dcb374;
+        }
 
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+        
+        body { 
+            font-family: 'Montserrat', sans-serif; 
+            background-color: var(--bg-dark); 
+            color: var(--text-main); 
+            line-height: 1.6; 
+            padding-bottom: 60px; 
+            background-image: radial-gradient(circle at 50% 0%, #171724 0%, transparent 70%);
+        }
+        
+        h1, h2, h3, .wedding-font { font-family: 'Playfair Display', serif; }
+
+        header { 
+            background-color: rgba(10, 10, 15, 0.85); 
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-soft); 
+            padding: 25px 20px; 
+            text-align: center; 
+            position: sticky; 
+            top: 0; 
+            z-index: 100; 
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4); 
+        }
+        header h1 { color: var(--gold); font-size: 28px; font-weight: 600; letter-spacing: 1px; margin-bottom: 5px; }
+        header p { font-size: 13px; color: var(--text-muted); font-weight: 400; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        .container { max-width: 800px; margin: 30px auto; padding: 0 15px; }
+
+        /* Памятка Box */
+        .directory-box { 
+            background: linear-gradient(145deg, #161512 0%, #1a1814 100%);
+            border: 1px solid rgba(220, 179, 116, 0.2); 
+            border-radius: 16px; 
+            padding: 25px; 
+            margin-bottom: 40px; 
+            box-shadow: 0 8px 20px var(--gold-glow);
+        }
+        .directory-title { 
+            color: var(--gold); 
+            font-size: 20px; 
+            text-align: center; 
+            margin-bottom: 20px; 
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(220, 179, 116, 0.15);
+        }
+        
+        .toast-highlight { margin-top: 10px; }
+        .toast-highlight ul { padding-left: 20px; list-style-type: none; }
+        .toast-highlight li { margin-bottom: 12px; position: relative; font-size: 14.5px; color: #cbd5e1; }
+        .toast-highlight li::before { 
+            content: "✦"; 
+            position: absolute; 
+            left: -20px; 
+            color: var(--gold); 
+            font-size: 14px;
+        }
+        .toast-highlight strong { color: var(--text-main); font-weight: 600; }
+        
+        .note-for-couple {
+            display: block;
+            margin-top: 6px;
+            padding: 10px 14px;
+            background: rgba(255, 255, 255, 0.03);
+            border-left: 2px solid var(--gold);
+            border-radius: 4px;
+            color: var(--gold-light);
+            font-size: 13.5px;
+            font-style: italic;
+        }
+
+        /* Timeline Items */
+        .timeline-item { 
+            background-color: var(--bg-panel); 
+            border: 1px solid var(--border-soft);
+            border-radius: 16px; 
+            margin-bottom: 20px; 
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); 
+            overflow: hidden; 
+            transition: all 0.3s ease; 
+        }
+        .timeline-item:hover { 
+            background-color: var(--bg-panel-hover); 
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+        .item-header { 
+            padding: 20px 25px; 
+            cursor: pointer; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            user-select: none; 
+        }
+        .time-box { display: flex; flex-direction: column; }
+        .time { color: var(--gold); font-size: 22px; font-weight: 700; line-height: 1; margin-bottom: 6px; }
+        .title { font-size: 16px; font-weight: 500; color: #ffffff; letter-spacing: 0.3px; }
+        .toggle-icon { 
+            color: var(--text-muted); 
+            font-size: 24px; 
+            font-weight: 300; 
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); 
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255,255,255,0.03);
+            border-radius: 50%;
+        }
+        .timeline-item.active .toggle-icon { transform: rotate(45deg); color: var(--gold); background: var(--gold-glow); }
+        .item-content { 
+            max-height: 0; 
+            overflow: hidden; 
+            transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1); 
+        }
+        .content-inner { 
+            padding: 0 25px 25px 25px; 
+        }
+
+        /* Role Grids */
+        .role-grid { display: grid; grid-template-columns: 1fr; gap: 12px; margin-top: 15px; }
+        .role-box { 
+            background-color: rgba(0, 0, 0, 0.25); 
+            padding: 16px; 
+            border-radius: 12px; 
+            position: relative;
+            overflow: hidden;
+        }
+        .role-box::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+        }
+        .role-box.host::before { background-color: var(--role-host); }
+        .role-box.dj::before { background-color: var(--role-dj); }
+        .role-box.kitchen::before { background-color: var(--role-kitchen); }
+        
+        .role-title { font-size: 11px; text-transform: uppercase; font-weight: 700; margin-bottom: 8px; letter-spacing: 1px; }
+        .role-box.host .role-title { color: var(--role-host); }
+        .role-box.dj .role-title { color: var(--role-dj); }
+        .role-box.kitchen .role-title { color: var(--role-kitchen); }
+        
+        .role-text { font-size: 14.5px; color: #cbd5e1; font-weight: 400; }
+
+        /* Alerts & Info */
+        .alert-box { 
+            background: linear-gradient(90deg, rgba(220, 38, 38, 0.15) 0%, rgba(220, 38, 38, 0.05) 100%); 
+            border-left: 3px solid #ef4444; 
+            color: #fca5a5; 
+            padding: 12px 16px; 
+            border-radius: 8px; 
+            margin-bottom: 15px; 
+            font-size: 13px; 
+            font-weight: 600; 
+            text-transform: uppercase; 
+            letter-spacing: 0.5px;
+        }
+        .info-alert { 
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 8px; 
+            color: var(--text-muted); 
+            padding: 12px 16px; 
+            margin-bottom: 15px; 
+            font-size: 14px; 
+            font-weight: 400; 
+            text-align: center;
+        }
+        
+        .idea-box {
+            background-color: rgba(220, 179, 116, 0.08);
+            border: 1px dashed rgba(220, 179, 116, 0.3);
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-size: 13.5px;
+            color: var(--gold-light);
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Екатерина & Максим</h1>
+        <p>18 сентября | 18:00 - 23:00 | Ресторан: Боги Диёр | Гости: ~40 чел</p>
+    </header>
+
+    <div class="container">
+        
+        <!-- ПАМЯТКА -->
+        <div class="directory-box">
+            <div class="directory-title wedding-font">Памятка: Формат вечера</div>
+            <div class="toast-highlight">
+                <ul>
+                    <li><strong>Атмосфера:</strong> Должно быть мемно, расслабленно и современно.</li>
+                    <li><strong>Тосты:</strong> Свободный микрофон. Никаких поимённых списков! Передаем слово органично только тем, кто сам желает поздравить.</li>
+                    <li><strong>Тайминг кухни (ЖЕСТКО):</strong> 19:00 — Горячие закуски, 20:00 — Горячее, 21:00 — Торт.</li>
+                    <li><strong>Онлайн-квиз (На уточнении):</strong> Планируется интерактив по QR-кодам на экранах или телефонах.
+                        <span class="note-for-couple">Екатерина, Максим — формат квиза сейчас на стадии утверждения. Жду ваши комментарии и идеи, оставляем или меняем?</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- БЛОК 1: ВЕЛКОМ -->
+        <div class="timeline-item">
+            <div class="item-header">
+                <div class="time-box">
+                    <span class="time">18:00 - 18:45</span>
+                    <span class="title">Сбор гостей (Welcome)</span>
+                </div>
+                <div class="toggle-icon">+</div>
+            </div>
+            <div class="item-content">
+                <div class="content-inner">
+                    <div class="role-grid">
+                        <div class="role-box host">
+                            <div class="role-title">Ведущий</div>
+                            <div class="role-text">Фоновое общение с гостями без микрофона. Погружение в атмосферу, координация рассадки.</div>
+                        </div>
+                        <div class="role-box dj">
+                            <div class="role-title">DJ</div>
+                            <div class="role-text">Лаунж, приятный вокал. Громкость до 40% для комфортного общения.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- БЛОК 2: ВСТРЕЧА И КАРАВАЙ -->
+        <div class="timeline-item">
+            <div class="item-header">
+                <div class="time-box">
+                    <span class="time">18:45 - 19:00</span>
+                    <span class="title">Встреча молодых & Открытие вечера</span>
+                </div>
+                <div class="toggle-icon">+</div>
+            </div>
+            <div class="item-content">
+                <div class="content-inner">
+                    <div class="role-grid">
+                        <div class="role-box host">
+                            <div class="role-title">Ведущий</div>
+                            <div class="role-text">
+                                Построение коридора из гостей. Встреча Екатерины и Максима, традиция с караваем. Затем все рассаживаются.<br><br>
+                                Ведущий открывает вечер легким приветствием, задает тон празднику. Сразу после открытия объявляется гастрономическая пауза (~15 минут), чтобы гости могли спокойно приступить к закускам, выпить первые бокалы и пообщаться.
+                            </div>
+                        </div>
+                        <div class="role-box kitchen">
+                            <div class="role-title">Кухня</div>
+                            <div class="role-text">Подготовка каравая на красивом рушнике (солонка в центре). Розлив напитков перед первым тостом.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- БЛОК 3: ГОРЯЧИЕ ЗАКУСКИ, НЕЙРОМУЗЫКА И LOVE STORY -->
+        <div class="timeline-item">
+            <div class="item-header">
+                <div class="time-box">
+                    <span class="time">19:00 - 19:30</span>
+                    <span class="title">Нейромузыка & Исполнение Love Story</span>
+                </div>
+                <div class="toggle-icon">+</div>
+            </div>
+            <div class="item-content">
+                <div class="content-inner">
+                    <div class="alert-box">🔥 19:00 — Вынос горячих закусок</div>
+                    <div class="role-grid">
+                        <div class="role-box host">
+                            <div class="role-title">Ведущий</div>
+                            <div class="role-text">
+                                Гости перекусывают. Запускаем застольный интерактив "Нейромузыка" (угадываем сгенерированные хиты).<br><br>
+                                <strong>Сюрпризный финал:</strong> Ведущий концептуально подводит к тому, что нейросеть написала идеальную песню про Максима и Екатерину, но машине не хватает души. Поэтому эту историю любви ведущий исполняет вживую.
+                            </div>
+                        </div>
+                        <div class="role-box dj">
+                            <div class="role-title">DJ</div>
+                            <div class="role-text">Заготовки для конкурса "Нейромузыка". В финале — минус для выступления ведущего (Love Story). Эмоциональный свет на сцену.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- БЛОК 4: ПЕРВЫЙ ТАНЕЦ -->
+        <div class="timeline-item">
+            <div class="item-header">
+                <div class="time-box">
+                    <span class="time">19:30 - 20:00</span>
+                    <span class="title">Первый танец & Интерактив</span>
+                </div>
+                <div class="toggle-icon">+</div>
+            </div>
+            <div class="item-content">
+                <div class="content-inner">
+                    <div class="role-grid">
+                        <div class="role-box host">
+                            <div class="role-title">Ведущий</div>
+                            <div class="role-text">
+                                На волне романтики приглашаем пару на первый танец. После танца — легкий застольный интерактив, чтобы плавно подготовить аудиторию ко второму курсу блюд.
+                            </div>
+                        </div>
+                        <div class="role-box dj">
+                            <div class="role-title">DJ</div>
+                            <div class="role-text">Трек для первого танца. Фоновые отбивки для интерактива.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- БЛОК 5: ГОРЯЧЕЕ БЛЮДО И ГРОМКИЙ РАЗГОВОР -->
+        <div class="timeline-item">
+            <div class="item-header">
+                <div class="time-box">
+                    <span class="time">20:00 - 20:30</span>
+                    <span class="title">Горячее блюдо & Громкий разговор</span>
+                </div>
+                <div class="toggle-icon">+</div>
+            </div>
+            <div class="item-content">
+                <div class="content-inner">
+                    <div class="alert-box">🥩 20:00 — Вынос основного горячего блюда</div>
+                    <div class="role-grid">
+                        <div class="role-box host">
+                            <div class="role-title">Ведущий</div>
+                            <div class="role-text">
+                                Гости наслаждаются горячим. Передаем микрофон желающим для тоста. Затем визуальный конкурс «Громкий разговор» (угадываем слова по губам в наушниках) с молодоженами и самыми активными гостями.
+                            </div>
+                        </div>
+                        <div class="role-box dj">
+                            <div class="role-title">DJ</div>
+                            <div class="role-text">Трек-глушилка для наушников на максимальной громкости.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- БЛОК 6: РАСКАЧКА И БАТТЛ -->
+        <div class="timeline-item">
+            <div class="item-header">
+                <div class="time-box">
+                    <span class="time">20:30 - 21:00</span>
+                    <span class="title">Музыкальный алфавит & Танцевальный баттл</span>
+                </div>
+                <div class="toggle-icon">+</div>
+            </div>
+            <div class="item-content">
+                <div class="content-inner">
+                    <div class="role-grid">
+                        <div class="role-box host">
+                            <div class="role-title">Ведущий</div>
+                            <div class="role-text">
+                                Поднимаем зал! Проводим "Музыкальный алфавит", плавно перетекающий в масштабный "Танцевальный баттл" (парни против девушек или старшие против молодых). Выводим всех на танцпол перед десертом.
+                            </div>
+                        </div>
+                        <div class="role-box dj">
+                            <div class="role-title">DJ</div>
+                            <div class="role-text">Мощные танцевальные куски (по 15-20 секунд) на каждую букву и раунды баттла.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- БЛОК 7: ТОРТ И АУКЦИОН -->
+        <div class="timeline-item">
+            <div class="item-header">
+                <div class="time-box">
+                    <span class="time">21:00 - 21:30</span>
+                    <span class="title">Вынос Торта & Продажа</span>
+                </div>
+                <div class="toggle-icon">+</div>
+            </div>
+            <div class="item-content">
+                <div class="content-inner">
+                    <div class="alert-box">🎂 21:00 — Торжественный вынос торта</div>
+                    <div class="role-grid">
+                        <div class="role-box host">
+                            <div class="role-title">Ведущий</div>
+                            <div class="role-text">
+                                Эпичный вынос торта и разрезание. Переводим аукцион (продажу первого куска) в веселую игру. 
+                                <div class="idea-box">
+                                    💡 <strong>Идея на раскачку:</strong> Продавать не просто кусок торта, а привязать к нему бонус от пары (например: сертификат на ужин за их счет, право дать имя их первому питомцу и т.д.). Это добавляет азарта.
+                                </div>
+                                После продажи — ответное слово Екатерины и Максима.
+                            </div>
+                        </div>
+                        <div class="role-box dj">
+                            <div class="role-title">DJ</div>
+                            <div class="role-text">Фанфары на вынос. Динамичный, азартный фон на торги. Лирика на слова благодарности.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- БЛОК 8: ДИСКОТЕКА И ФИНАЛ -->
+        <div class="timeline-item">
+            <div class="item-header">
+                <div class="time-box">
+                    <span class="time">21:30 - 23:00</span>
+                    <span class="title">Дискотека & Финал вечера</span>
+                </div>
+                <div class="toggle-icon">+</div>
+            </div>
+            <div class="item-content">
+                <div class="content-inner">
+                    <div class="info-alert">Ведущий завершает активную часть, передает танцпол Диджею.</div>
+                    <div class="role-grid">
+                        <div class="role-box dj">
+                            <div class="role-title">DJ</div>
+                            <div class="role-text">Главный танцевальный блок. Подстраиваемся под вайб гостей (современные хиты, 90-е, 00-е — смотрим по реакции танцпола). В 22:50 — финальный медляк вечера.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        document.querySelectorAll('.item-header').forEach(header => {
+            header.addEventListener('click', () => {
+                const item = header.parentElement;
+                const content = header.nextElementSibling;
+                
+                document.querySelectorAll('.timeline-item').forEach(otherItem => {
+                    if (otherItem !== item && otherItem.classList.contains('active')) {
+                        otherItem.classList.remove('active');
+                        otherItem.querySelector('.item-content').style.maxHeight = null;
+                    }
+                });
+
+                item.classList.toggle('active');
+                if (item.classList.contains('active')) {
+                    content.style.maxHeight = content.scrollHeight + "px";
+                } else {
+                    content.style.maxHeight = null;
+                }
+            });
+        });
+    </script>
+</body>
+</html>
