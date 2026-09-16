@@ -3,525 +3,799 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
     <title>Family Standard | Мы и есть событие</title>
-    <meta name="description" content="Агентство Family Standard предлагает премиум-формат: выездные сюжетные квесты, активные игры, ведение свадеб и корпоративов.">
-    
+    <meta name="description" content="Премиальное агентство событий Family Standard: детские программы, взрослые праздники, медиа-продакшн, интерактивы и музыка.">
     <link rel="icon" href="logo.gif" type="image/gif">
+    
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;500;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap');
         
         :root { 
-            --gold: #c5a059; 
-            --gold-light: #fcf6ba;
-            --bg: #050a14; 
-            
-            /* Переменные фаз скролла (управляются JS) */
-            --split-p: 0;      /* Фаза 1: Разъезд лого и кнопок (от 0 до 1) */
-            --fade-p: 0;       /* Фаза 2: Проявление панели (от 0 до 1) */
-            --panel-lock-y: 0px; /* Заморозка панели во время фаз 1 и 2 */
-            
-            /* Стартовые и конечные позиции */
-            --logo-start-y: 35vh;
-            --logo-end-y: 65px; 
-            --btn-start-y: 65vh;
-            --btn-end-y: calc(100vh - 45px);
+            --gold-light: #fff5c0;
+            --gold: #e5b967;
+            --gold-mid: #c69538;
+            --gold-dark: #8a6218;
+            --gold-glow: rgba(229, 185, 103, 0.45);
+            --blue-glow: rgba(59, 130, 246, 0.35);
+            --purple-glow: rgba(168, 85, 247, 0.35);
+            --pink-glow: rgba(236, 72, 153, 0.35);
+            --cyan-glow: rgba(6, 182, 212, 0.35);
+            --bg: #030611;
         }
         
-        * { box-sizing: border-box; margin: 0; padding: 0; outline: none; }
+        * { 
+            box-sizing: border-box; 
+            margin: 0; 
+            padding: 0; 
+            -webkit-tap-highlight-color: transparent;
+        }
         
-        body { 
-            font-family: 'Montserrat', sans-serif; 
-            color: #f0f4f8; 
+        html, body {
+            width: 100%;
+            min-height: 100%;
             background-color: var(--bg);
-            overflow-x: hidden; 
-            line-height: 1.6; 
+            font-family: 'Montserrat', sans-serif; 
+            color: #f8fafc; 
+            line-height: 1.6;
+            overflow-x: hidden;
+            text-align: center;
         }
 
-        /* 3D Фон на чистом Canvas (Звезды) */
         #canvas3d { 
             position: fixed; 
             top: 0; left: 0; 
             width: 100vw; height: 100vh; 
-            z-index: -3; 
+            z-index: 1; 
             pointer-events: none; 
-            background: radial-gradient(circle at center, #0a1120 0%, #000000 100%);
+            background: radial-gradient(circle at 50% 30%, #0e172e 0%, #050914 60%, #02040a 100%);
         }
 
-        /* ФОН ИЗ КАРТИНКИ (Проявляется во время Фазы 2) */
-        #bgImage {
+        #bgOverlay {
             position: fixed;
-            top: 0; left: 0; width: 100vw; height: 100vh;
-            background: url('background.jpg') center/cover no-repeat;
-            z-index: -2;
-            opacity: calc(var(--fade-p) * 0.8);
+            top: 0; left: 0; 
+            width: 100vw; height: 100vh;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(59, 130, 246, 0.12) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(229, 185, 103, 0.12) 0%, transparent 50%),
+                radial-gradient(circle at 50% 90%, rgba(168, 85, 247, 0.1) 0%, transparent 50%);
+            z-index: 2;
+            opacity: 0;
             pointer-events: none;
+            transition: opacity 0.3s ease;
         }
 
-        /* =========================================
-           ФИКСИРОВАННЫЕ ЭЛЕМЕНТЫ (ЛОГО И КНОПКИ)
-           Зависят строго от Фазы 1 (--split-p)
-           ========================================= */
+        .glow-aura {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(140px);
+            pointer-events: none;
+            z-index: 2;
+        }
+        .aura-1 { top: 5%; left: 10%; width: 50vw; height: 50vw; background: var(--blue-glow); }
+        .aura-2 { bottom: 10%; right: 5%; width: 45vw; height: 45vw; background: var(--pink-glow); }
+        .aura-3 { top: 60%; left: 30%; width: 40vw; height: 40vw; background: var(--purple-glow); }
 
+        /* LOGO: Centered at top: 50vh initially */
         #animatedLogo {
             position: fixed;
             left: 50%;
-            z-index: 2000;
+            top: 50vh;
+            transform: translate(-50%, -50%) scale(2.2);
+            z-index: 100;
             cursor: pointer;
-            
-            background: rgba(5,15,30,0.95); 
-            border: 2px solid var(--gold); 
+            background: rgba(10, 15, 30, 0.92);
+            border: 1.5px solid var(--gold); 
             border-radius: 60px; 
-            padding: 15px 35px; 
+            padding: 14px 36px; 
             display: inline-flex; 
             align-items: center; 
-            gap: 15px; 
-            
-            top: calc(var(--logo-start-y) + (var(--logo-end-y) - var(--logo-start-y)) * var(--split-p));
-            transform: translate(-50%, -50%) scale(calc(2.5 - 1.5 * var(--split-p)));
-            box-shadow: 0 0 calc(30px + 10px * var(--split-p)) rgba(197, 160, 89, calc(0.3 * var(--split-p)));
+            gap: 16px; 
+            box-shadow: 0 0 30px rgba(229, 185, 103, 0.4), 0 0 50px rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(20px);
+            will-change: transform, top, background, box-shadow;
+            transition: box-shadow 0.3s ease, background 0.3s ease, border-color 0.3s ease;
+        }
+
+        #animatedLogo:hover {
+            border-color: var(--gold-light);
+            box-shadow: 0 0 45px rgba(255, 245, 192, 0.6), 0 0 65px rgba(229, 185, 103, 0.4);
+        }
+
+        #animatedLogo.scrolled {
+            background: rgba(10, 16, 32, 0.45);
+            backdrop-filter: blur(14px);
+            border-color: rgba(229, 185, 103, 0.6);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7), 0 0 25px rgba(229, 185, 103, 0.3);
         }
         
-        .logo-img { height: 45px; filter: drop-shadow(0 0 5px rgba(197,160,89,0.3)); }
+        .logo-img { 
+            height: 40px; 
+            width: auto; 
+            filter: drop-shadow(0 0 8px rgba(229, 185, 103, 0.5));
+        }
+
+        /* Pure Glossy Metallic Gold Typography (No Blue, No Harsh Glow) */
         .logo-text { 
-            font-size: 1.2rem; letter-spacing: 2px; text-transform: uppercase; font-weight: 700;
-            background: linear-gradient(135deg, #bf953f, #fcf6ba, #aa771c); 
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent; 
-        }
-
-        #actionButtons {
-            position: fixed;
-            left: 50%;
-            z-index: 2000;
+            font-size: 1.05rem; 
+            line-height: 1.15;
+            letter-spacing: 2.5px; 
+            text-transform: uppercase; 
+            font-weight: 800;
+            font-family: 'Cinzel', serif;
             display: flex;
-            flex-wrap: nowrap;
-            justify-content: center;
-            align-items: center;
-            border-radius: 60px;
-            width: max-content;
-            
-            top: calc(var(--btn-start-y) + (var(--btn-end-y) - var(--btn-start-y)) * var(--split-p));
-            transform: translate(-50%, -50%);
-            
-            background: rgba(5, 15, 30, calc(0.95 * var(--split-p)));
-            border: calc(2px * var(--split-p)) solid var(--gold);
-            padding: calc(10px * var(--split-p));
-            gap: calc(15px - 5px * var(--split-p));
-            box-shadow: 0 calc(10px * var(--split-p)) calc(30px * var(--split-p)) rgba(197, 160, 89, calc(0.2 * var(--split-p)));
+            flex-direction: column;
+            align-items: flex-start;
+            background: linear-gradient(135deg, #bf953f 0%, #fcf6ba 25%, #b38728 50%, #fbf5b7 75%, #aa771c 100%);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shine 4s linear infinite;
         }
 
-        .header-btn { 
-            display: inline-flex; align-items: center; justify-content: center;
-            border: 2px solid var(--gold); 
-            border-radius: 60px; color: var(--gold); 
-            font-weight: 700; text-transform: uppercase; cursor: pointer; 
-            letter-spacing: 2px;
-            margin: 0; white-space: nowrap;
-            background: rgba(5,15,30,0.95);
-            box-shadow: 0 0 20px rgba(197,160,89,0.2); 
-            
-            font-size: calc(13px - 2.5px * var(--split-p));
-            padding: calc(16px - 4px * var(--split-p)) calc(35px - 20px * var(--split-p));
-            transition: background 0.3s, color 0.3s, box-shadow 0.3s, transform 0.3s;
+        @keyframes shine {
+            to { background-position: 200% center; }
         }
-        .header-btn:hover { background: var(--gold); color: #000; box-shadow: 0 0 30px rgba(197,160,89,0.5); transform: translateY(-2px); }
 
-        /* Подсказка скролла исчезает на 1 фазе */
         #scrollHint {
-            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
-            color: var(--gold); font-size: 0.75rem; letter-spacing: 4px; text-transform: uppercase;
-            animation: pulse 2s infinite; z-index: 10;
-            opacity: calc(0.6 - var(--split-p) * 2);
+            position: fixed; 
+            bottom: 40px; 
+            left: 50%; 
+            transform: translateX(-50%);
+            color: var(--gold); 
+            font-size: 0.75rem; 
+            letter-spacing: 4px; 
+            text-transform: uppercase;
+            animation: pulse 2.2s infinite; 
+            z-index: 90;
+            pointer-events: none;
+            opacity: 1;
+            transition: opacity 0.3s ease;
+            text-shadow: 0 0 12px rgba(229, 185, 103, 0.6);
         }
-        @keyframes pulse { 0%, 100% { transform: translate(-50%, 0); } 50% { transform: translate(-50%, 10px); } }
 
-        /* =========================================
-           ЕДИНАЯ ПАНЕЛЬ КОНТЕНТА (ЕДИНОЕ ОКНО)
-           ========================================= */
+        @keyframes pulse { 
+            0%, 100% { transform: translate(-50%, 0); opacity: 0.95; } 
+            50% { transform: translate(-50%, 9px); opacity: 0.3; } 
+        }
+
+        .scroll-space {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            min-height: 100vh;
+        }
+
+        .panel-spacer {
+            height: 60vh;
+            width: 100%;
+        }
 
         .unified-panel-wrapper {
-            max-width: 950px; 
-            /* Выставляем панель примерно по центру, между лого и кнопками */
-            margin: 20vh auto 0; 
-            padding: 0 20px 0; 
+            max-width: 980px; 
+            margin: 0 auto; 
+            padding: 0 20px 100px; 
             position: relative; 
-            z-index: 11; 
-            
-            /* Магия заморозки: панель сдвигается вниз ровно на столько пикселей, 
-               на сколько ты проскроллил, пока не закончатся Фазы 1 и 2 */
-            transform: translateY(var(--panel-lock-y));
+            z-index: 20; 
+            will-change: opacity;
         }
 
         .unified-panel {
-            background: rgba(5, 15, 30, 0.95); 
-            border: 2px solid var(--gold); 
-            border-radius: 24px; 
-            padding: 60px 40px 0; /* Нижний паддинг убран, чтобы футер прилегал к низу */
+            background: linear-gradient(180deg, rgba(5, 9, 20, 0.94) 0%, rgba(7, 12, 26, 0.92) 100%), 
+                        url('background.jpg') center/cover no-repeat,
+                        radial-gradient(circle, #0e172a 0%, #030611 100%);
+            border: 1px solid rgba(229, 185, 103, 0.4); 
+            border-radius: 32px; 
+            padding: 180px 40px 60px; 
             text-align: center;
-            box-shadow: 0 10px 40px rgba(197, 160, 89, 0.15); 
-            
-            /* Прозрачность привязана к Фазе 2 */
-            opacity: var(--fade-p);
+            box-shadow: 0 35px 80px rgba(0, 0, 0, 0.9), 
+                        inset 0 1px 0 rgba(255, 255, 255, 0.15),
+                        0 0 60px var(--blue-glow);
+            backdrop-filter: blur(24px);
+            position: relative;
+            overflow: hidden;
         }
 
-        /* Разделитель блоков внутри единого окна */
+        .unified-panel::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #3b82f6, var(--gold), #ec4899, transparent);
+        }
+
         .panel-divider {
             border: none;
-            border-top: 1px solid rgba(197, 160, 89, 0.2);
-            margin: 60px auto;
-            width: 80%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(229, 185, 103, 0.5), rgba(59, 130, 246, 0.5), transparent);
+            margin: 65px auto;
+            width: 75%;
         }
 
-        /* Стили текста */
-        h1 { font-size: 2.2rem; background: linear-gradient(135deg,#bf953f,#fcf6ba,#aa771c); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-transform: uppercase; letter-spacing: 3px; }
-        h3 { color: var(--gold); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 25px; }
-        p { line-height: 1.7; font-size: 0.95rem; }
-
-        /* СЕТКА НАПРАВЛЕНИЙ */
-        .tiles-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
-        
-        .nav-tile { 
-            display: block; text-decoration: none; color: inherit; 
-            background: rgba(5, 10, 20, 0.6); 
-            border: 1px solid var(--gold); 
-            border-radius: 16px; padding: 25px; text-align: left; 
-            transition: all 0.3s ease; 
+        /* Subtle, Refined Typography Glows */
+        h1, h2.main-title { 
+            font-size: clamp(1.8rem, 4.5vw, 2.7rem); 
+            color: #ffffff;
+            text-shadow: 0 0 15px rgba(255, 255, 255, 0.4), 0 0 25px rgba(229, 185, 103, 0.35);
+            text-transform: uppercase; 
+            letter-spacing: 4px; 
+            font-weight: 800;
+            font-family: 'Cinzel', serif;
+            margin-bottom: 12px;
+            text-align: center;
         }
-        .nav-tile:hover { 
-            background: rgba(197, 160, 89, 0.15); 
-            box-shadow: 0 10px 20px rgba(197, 160, 89, 0.3); 
-            transform: translateY(-5px);
+
+        .section-subtitle {
+            font-size: 0.95rem;
+            color: #94a3b8;
+            max-width: 680px;
+            margin: 0 auto 40px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            font-weight: 500;
         }
-        .nav-tile h3 { margin-bottom: 10px; font-size: 1.1rem; letter-spacing: 1px; }
-        .nav-tile p { font-size: 0.85rem; color: #a0aab5; margin: 0; line-height: 1.4; }
 
-        /* СОЦСЕТИ */
-        .social-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; }
-        .btn { border: 1px solid var(--gold); color: var(--gold); padding: 15px; border-radius: 30px; text-decoration: none; font-weight: 700; font-size: 12px; text-transform: uppercase; cursor: pointer; transition: 0.3s; background: transparent; display: flex; align-items: center; justify-content: center; gap: 10px;}
-        .btn:hover { background: var(--gold); color: #000; box-shadow: 0 0 20px rgba(197,160,89,0.5); transform: translateY(-2px); }
+        .manifesto-text {
+            margin: 20px auto 0;
+            font-size: 1.05rem;
+            color: #cbd5e1;
+            max-width: 760px;
+            line-height: 1.85;
+            font-weight: 400;
+            text-align: center;
+        }
 
-        /* =========================================
-           ОГРОМНЫЙ НОМЕР ТЕЛЕФОНА (Финал внутри панели)
-           ========================================= */
+        .directions-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 28px;
+            margin-top: 20px;
+        }
+
+        /* ALL CARDS NOW GLOW ACCORDING TO REQUEST */
+        .direction-card {
+            position: relative;
+            border-radius: 24px;
+            padding: 40px 32px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            overflow: hidden;
+            background-size: cover;
+            background-position: center;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            backdrop-filter: blur(8px);
+        }
+
+        .card-overlay {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            transition: opacity 0.4s ease, background 0.4s ease;
+        }
+
+        .card-content {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            max-width: 720px;
+            margin: 0 auto;
+        }
+
+        .card-title-glowing {
+            font-size: clamp(1.3rem, 3.2vw, 1.7rem);
+            font-weight: 800;
+            font-family: 'Cinzel', serif;
+            letter-spacing: 2px;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            text-align: center;
+            color: #ffffff;
+        }
+
+        /* Card 1: Kids (Pink/Magenta Glow) */
+        .card-kids {
+            background-image: url('https://images.unsplash.com/photo-1530103862676-de8c9debad1d?auto=format&fit=crop&w=1200&q=80');
+            border: 1.5px solid rgba(236, 72, 153, 0.6);
+            box-shadow: 0 0 25px rgba(236, 72, 153, 0.25), 0 10px 30px rgba(0, 0, 0, 0.7);
+        }
+        .card-kids .card-overlay {
+            background: linear-gradient(135deg, rgba(15, 10, 30, 0.92) 0%, rgba(45, 15, 45, 0.88) 100%);
+        }
+        .card-kids .card-title-glowing {
+            color: #fce7f3;
+            text-shadow: 0 0 12px rgba(244, 114, 182, 0.7), 0 0 25px rgba(236, 72, 153, 0.4);
+        }
+
+        /* Card 2: Adults (Rich Golden Glow) */
+        .card-adults {
+            background-image: url('https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=1200&q=80');
+            border: 1.5px solid rgba(229, 185, 103, 0.65);
+            box-shadow: 0 0 25px rgba(229, 185, 103, 0.3), 0 10px 30px rgba(0, 0, 0, 0.7);
+        }
+        .card-adults .card-overlay {
+            background: linear-gradient(135deg, rgba(12, 10, 8, 0.93) 0%, rgba(35, 24, 10, 0.9) 100%);
+        }
+        .card-adults .card-title-glowing {
+            color: #fff3be;
+            text-shadow: 0 0 12px rgba(255, 243, 190, 0.7), 0 0 25px rgba(229, 185, 103, 0.5);
+        }
+
+        /* Card 3: Media Photo & Video (Cyan/Blue Glow) */
+        .card-media {
+            background-image: url('https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?auto=format&fit=crop&w=1200&q=80');
+            border: 1.5px solid rgba(6, 182, 212, 0.6);
+            box-shadow: 0 0 25px rgba(6, 182, 212, 0.25), 0 10px 30px rgba(0, 0, 0, 0.7);
+        }
+        .card-media .card-overlay {
+            background: linear-gradient(135deg, rgba(6, 20, 35, 0.92) 0%, rgba(8, 35, 45, 0.88) 100%);
+        }
+        .card-media .card-title-glowing {
+            color: #cffafe;
+            text-shadow: 0 0 12px rgba(34, 211, 238, 0.7), 0 0 25px rgba(6, 182, 212, 0.4);
+        }
+
+        /* Card 4: Interactives (Purple/Violet Glow) */
+        .card-interactives {
+            background-image: url('https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=1200&q=80');
+            border: 1.5px solid rgba(168, 85, 247, 0.6);
+            box-shadow: 0 0 25px rgba(168, 85, 247, 0.3), 0 10px 30px rgba(0, 0, 0, 0.7);
+        }
+        .card-interactives .card-overlay {
+            background: linear-gradient(135deg, rgba(18, 8, 32, 0.92) 0%, rgba(35, 12, 50, 0.88) 100%);
+        }
+        .card-interactives .card-title-glowing {
+            color: #f3e8ff;
+            text-shadow: 0 0 12px rgba(192, 132, 252, 0.7), 0 0 25px rgba(168, 85, 247, 0.4);
+        }
+
+        /* Card 5: Music & Production (Grand Gold-Blue Glow) */
+        .card-music {
+            background-image: url('https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&w=1400&q=80');
+            border: 1.5px solid var(--gold);
+            padding: 48px 36px;
+            box-shadow: 0 0 35px rgba(229, 185, 103, 0.35), 0 0 50px var(--blue-glow), 0 10px 30px rgba(0, 0, 0, 0.8);
+        }
+        .card-music .card-overlay {
+            background: linear-gradient(135deg, rgba(16, 7, 30, 0.94) 0%, rgba(18, 25, 50, 0.9) 50%, rgba(8, 14, 32, 0.94) 100%);
+        }
+        .card-music .card-title-glowing {
+            color: #ffffff;
+            text-shadow: 0 0 15px rgba(255, 255, 255, 0.8), 0 0 30px rgba(229, 185, 103, 0.6);
+        }
+
+        .direction-card:hover {
+            transform: translateY(-5px) scale(1.01);
+            filter: brightness(1.08);
+        }
+
+        .card-desc {
+            font-size: 0.95rem;
+            color: #cbd5e1;
+            line-height: 1.6;
+            font-weight: 400;
+            max-width: 580px;
+            margin: 0 auto 20px;
+            text-align: center;
+        }
+
+        .details-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            color: #ffffff;
+            background: rgba(10, 16, 30, 0.8);
+            border: 1px solid rgba(229, 185, 103, 0.6);
+            border-radius: 30px;
+            padding: 10px 28px;
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: all 0.35s ease;
+            backdrop-filter: blur(6px);
+            box-shadow: 0 0 15px rgba(229, 185, 103, 0.2);
+            text-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+        }
+
+        .details-btn span.arrow {
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            font-size: 1rem;
+        }
+
+        .details-btn:hover {
+            background: rgba(59, 130, 246, 0.3);
+            color: #ffffff;
+            border-color: #60a5fa;
+            box-shadow: 0 0 25px rgba(96, 165, 250, 0.8), 0 0 40px rgba(59, 130, 246, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .details-btn:hover span.arrow {
+            transform: translateX(5px);
+        }
+
+        /* SECTION 3: FOLLOW US (Spacious & Larger Typography) */
+        .social-section {
+            padding: 20px 0;
+        }
+
+        .social-title {
+            color: #fff3be; 
+            text-shadow: 0 0 15px rgba(229, 185, 103, 0.6);
+            letter-spacing: 4px; 
+            text-transform: uppercase; 
+            margin-bottom: 35px; 
+            font-size: clamp(1.3rem, 3.2vw, 1.7rem); 
+            font-weight: 800;
+            font-family: 'Cinzel', serif;
+            text-align: center;
+        }
+
+        .social-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); 
+            gap: 24px; 
+            max-width: 680px;
+            margin: 0 auto;
+        }
+
+        .btn-social { 
+            border: 1px solid rgba(96, 165, 250, 0.55); 
+            color: #ffffff; 
+            padding: 16px 28px; 
+            border-radius: 35px; 
+            text-decoration: none; 
+            font-weight: 700; 
+            font-size: 0.85rem; 
+            text-transform: uppercase; 
+            letter-spacing: 3px;
+            transition: all 0.35s ease; 
+            background: rgba(15, 23, 42, 0.75); 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            backdrop-filter: blur(8px);
+            box-shadow: 0 0 18px rgba(59, 130, 246, 0.25);
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.6);
+        }
+
+        .btn-social:hover { 
+            background: rgba(59, 130, 246, 0.4); 
+            color: #ffffff; 
+            border-color: var(--gold);
+            box-shadow: 0 0 30px rgba(96, 165, 250, 0.8), 0 0 50px rgba(229, 185, 103, 0.5); 
+            transform: translateY(-3px); 
+        }
+
         .final-footer-block {
-            /* Занимает всю доступную высоту экрана, гарантируя центрирование при упоре в дно */
-            min-height: 85vh; 
+            padding: 45px 0 10px;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            padding-bottom: 30px;
+            text-align: center;
+        }
+
+        .phone-caption {
+            color: rgba(229, 185, 103, 0.9); 
+            font-size: 0.85rem; 
+            letter-spacing: 4px; 
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            font-weight: 600;
+            text-shadow: 0 0 12px rgba(229, 185, 103, 0.5);
         }
 
         .massive-phone { 
             display: inline-block; 
-            color: var(--gold); 
-            font-size: clamp(2.2rem, 7vw, 5rem); 
-            font-weight: 700; 
+            color: #ffffff; 
+            font-size: clamp(1.7rem, 4vw, 2.6rem); 
+            font-weight: 800; 
             text-decoration: none; 
-            transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); 
-            margin: 10px 0 20px;
-            text-shadow: 0 0 30px rgba(197,160,89,0.3);
+            transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            margin: 8px 0 18px;
+            text-shadow: 0 0 18px rgba(255, 255, 255, 0.7), 0 0 35px rgba(229, 185, 103, 0.5);
             white-space: nowrap;
+            letter-spacing: 1.5px;
         }
+
         .massive-phone:hover { 
-            transform: scale(1.05); 
-            color: #fff; 
-            text-shadow: 0 0 50px var(--gold); 
+            transform: scale(1.07); 
+            color: #fff3be;
+            text-shadow: 0 0 25px rgba(255, 255, 255, 1), 0 0 50px rgba(96, 165, 250, 0.9);
         }
         
-        .copyright { color: rgba(255, 255, 255, 0.2); font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase; margin-top: 20px; }
-        
-        /* МОДАЛКИ */
-        .modal { position: fixed; inset: 0; background: rgba(5,10,20,0.95); display: none; justify-content: center; align-items: center; z-index: 3000; padding: 20px; }
-        .modal-content { background: rgba(5, 15, 30, 0.95); border: 2px solid var(--gold); padding: 40px; border-radius: 25px; width: 100%; max-width: 420px; text-align: center; position: relative; box-shadow: 0 0 40px rgba(0,0,0,0.8); }
-        .close-btn { position: absolute; top: 15px; right: 20px; color: var(--gold); font-size: 28px; cursor: pointer; }
-        input { width: 100%; padding: 15px; margin: 10px 0; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 12px; color: #fff; font-family: 'Montserrat', sans-serif; }
-        input:focus { border-color: var(--gold); }
-        .error-msg { color: #ff4d4d; font-size: 0.8rem; display: none; text-align: left; padding-left: 10px; margin-top: -5px; margin-bottom: 5px; }
-        .captcha-container { display: flex; align-items: center; gap: 15px; margin: 15px 0; background: rgba(255,255,255,0.03); padding: 10px; border-radius: 12px; border: 1px solid var(--border); }
-        #captchaCanvas { border-radius: 8px; background: #050a14; cursor: pointer; width: 120px; height: 50px; }
-        .captcha-input { margin: 0 !important; flex: 1; }
+        .copyright { 
+            color: rgba(255, 255, 255, 0.4); 
+            font-size: 0.7rem; 
+            letter-spacing: 3px; 
+            text-transform: uppercase; 
+            margin-top: 20px; 
+        }
 
         @media (max-width: 768px) { 
-            :root {
-                --logo-start-y: 30vh;
-                --logo-end-y: 50px; 
-                --btn-start-y: 70vh;
-                --btn-end-y: calc(100vh - 35px);
+            #animatedLogo { 
+                padding: 10px 22px; 
+                gap: 10px;
             }
-            #animatedLogo { transform: translate(-50%, -50%) scale(calc(1.8 - 0.8 * var(--split-p))); padding: 10px 25px; }
-            .header-btn { font-size: calc(11px - 1.5px * var(--split-p)) !important; padding: calc(14px - 4px * var(--split-p)) calc(20px - 10px * var(--split-p)) !important; }
-            .unified-panel { padding: 40px 20px 0; } 
-            .panel-divider { margin: 40px auto; }
-            .final-footer-block { min-height: 75vh; }
+
+            .logo-img { height: 30px; }
+            .logo-text { font-size: 0.85rem; }
+
+            .panel-spacer { height: 45vh; }
+
+            .unified-panel-wrapper { 
+                padding: 0 12px 60px; 
+            }
+
+            .unified-panel { 
+                padding: 130px 20px 40px; 
+                border-radius: 24px; 
+            }
+
+            .direction-card {
+                padding: 30px 20px;
+            }
+
+            .card-music {
+                padding: 36px 20px;
+            }
+
+            .panel-divider { 
+                margin: 45px auto; 
+                width: 85%; 
+            }
         }
     </style>
 </head>
 <body>
 
-    <!-- Интерактивный 3D Фон -->
     <canvas id="canvas3d"></canvas>
+    <div id="bgOverlay"></div>
+    
+    <div class="glow-aura aura-1"></div>
+    <div class="glow-aura aura-2"></div>
+    <div class="glow-aura aura-3"></div>
 
-    <!-- ФОН ИЗ КАРТИНКИ -->
-    <div id="bgImage"></div>
-
-    <!-- Подсказка скролла -->
     <div id="scrollHint">Скролльте вниз</div>
 
-    <!-- Логотип -->
-    <div id="animatedLogo" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
-        <img src="logo.gif" alt="FS" class="logo-img">
-        <span class="logo-text">Family<br>Standard</span>
-    </div>
-    
-    <!-- Кнопки -->
-    <div id="actionButtons">
-        <button class="header-btn" onclick="openModal('callModal')">Заказать звонок</button>
-        <button class="header-btn btn-login" onclick="alert('Открытие логина через Telegram')">Войти в Кабинет</button>
+    <!-- LOGO: STARTS AT PERFECT CENTER (50vh) -->
+    <div id="animatedLogo" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" role="button" aria-label="Наверх">
+        <img src="logo.gif" alt="FS Logo" class="logo-img" onerror="this.src='https://placehold.co/80x80/050914/e5b967?text=FS'">
+        <span class="logo-text">
+            <span>Family</span>
+            <span>Standard</span>
+        </span>
     </div>
 
-    <!-- =====================================
-         ЕДИНОЕ ОКНО СО ВСЕМ КОНТЕНТОМ
-         ===================================== -->
-    <div class="unified-panel-wrapper">
-        <div class="unified-panel">
-            
-            <!-- БЛОК 1: О нас -->
-            <div>
-                <h1>Мы и есть событие</h1>
-                <p style="margin-top: 15px;">Организация и проведение атмосферных мероприятий любого масштаба. Вы отдыхаете, а мы берем все заботы на себя. От выездных квестов для детей до масштабных взрослых банкетов.</p>
-            </div>
+    <div class="scroll-space">
+        <div class="panel-spacer"></div>
+        <div class="unified-panel-wrapper" id="panelWrapper">
+            <main class="unified-panel">
+                
+                <!-- SECTION 1: НАШИ НАПРАВЛЕНИЯ -->
+                <section>
+                    <h2 class="main-title">НАШИ НАПРАВЛЕНИЯ</h2>
+                    <p class="section-subtitle">Создаем события, которые остаются в памяти навсегда</p>
+                    
+                    <div class="directions-grid">
+                        
+                        <!-- 1. KIDS PROGRAM -->
+                        <article class="direction-card card-kids">
+                            <div class="card-overlay"></div>
+                            <div class="card-content">
+                                <h3 class="card-title-glowing">Детские программы</h3>
+                                <p class="card-desc">Фееричные шоу-программы, авторские костюмированные квесты и каталог волшебных персонажей для детей любого возраста.</p>
+                                <a href="kids.html" class="details-btn">
+                                    Подробнее <span class="arrow">→</span>
+                                </a>
+                            </div>
+                        </article>
 
-            <!-- Разделитель -->
-            <hr class="panel-divider">
+                        <!-- 2. ADULT EVENTS -->
+                        <article class="direction-card card-adults">
+                            <div class="card-overlay"></div>
+                            <div class="card-content">
+                                <h3 class="card-title-glowing">Взрослые события</h3>
+                                <p class="card-desc">Авторское интерактивное ведение, стильные свадьбы, концептуальные корпоративы и грандиозные иммерсивные шоу.</p>
+                                <a href="adults.html" class="details-btn">
+                                    Подробнее <span class="arrow">→</span>
+                                </a>
+                            </div>
+                        </article>
 
-            <!-- БЛОК 2: Направления -->
-            <div>
-                <h3>Направления</h3>
-                <div class="tiles-grid">
-                    <a href="#kids" class="nav-tile">
-                        <h3>🎈 Детские программы</h3>
-                        <p>Шоу, авторские квесты и каталог персонажей для вашего ребёнка.</p>
-                    </a>
-                    <a href="#adults" class="nav-tile">
-                        <h3>🎤 Взрослые события</h3>
-                        <p>Ведущий Богдан. Свадьбы, корпоративы и иммерсивные шоу.</p>
-                    </a>
-                    <a href="#media" class="nav-tile">
-                        <h3>📸 Фото и Видео</h3>
-                        <p>Репортажная съёмка и продакшн для сохранения ваших эмоций.</p>
-                    </a>
-                    <a href="#interactives" class="nav-tile">
-                        <h3>📱 Интерактивы и Игры</h3>
-                        <p>Мобильные квизы, «Бункер» и голосования прямо на празднике.</p>
-                    </a>
-                    <a href="#music" class="nav-tile" style="grid-column: 1 / -1; text-align: center;">
-                        <h3>🎵 Музыка и Продакшн</h3>
-                        <p>Авторские треки, написание гимнов и именные песни в подарок.</p>
-                    </a>
-                </div>
-            </div>
+                        <!-- 3. PHOTO & VIDEO -->
+                        <article class="direction-card card-media">
+                            <div class="card-overlay"></div>
+                            <div class="card-content">
+                                <h3 class="card-title-glowing">Фото и Видео</h3>
+                                <p class="card-desc">Профессиональный репортажный видеопродакшн, аэросъёмка 4K и атмосферные фотосессии для сохранения живых эмоций.</p>
+                                <a href="media.html" class="details-btn">
+                                    Подробнее <span class="arrow">→</span>
+                                </a>
+                            </div>
+                        </article>
 
-            <!-- Разделитель -->
-            <hr class="panel-divider">
+                        <!-- 4. INTERACTIVES & GAMES -->
+                        <article class="direction-card card-interactives">
+                            <div class="card-overlay"></div>
+                            <div class="card-content">
+                                <h3 class="card-title-glowing">Интерактивы и Игры</h3>
+                                <p class="card-desc">Мультимедийные мобильные квизы, психометрический «Бункер» и живые голосования прямо на главных экранах вечера.</p>
+                                <a href="interactives.html" class="details-btn">
+                                    Подробнее <span class="arrow">→</span>
+                                </a>
+                            </div>
+                        </article>
 
-            <!-- БЛОК 3: Соцсети -->
-            <div>
-                <h3>Следите за нами</h3>
-                <div class="social-grid">
-                    <a href="https://instagram.com/familystandard.uz" class="btn">Instagram</a>
-                    <a href="https://t.me/FamilyStandard" class="btn">Telegram</a>
-                    <a onclick="openModal('devModal')" class="btn">YouTube</a>
-                </div>
-            </div>
+                        <!-- 5. MUSIC & PRODUCTION -->
+                        <article class="direction-card card-music">
+                            <div class="card-overlay"></div>
+                            <div class="card-content">
+                                <h3 class="card-title-glowing">Музыка и Продакшн</h3>
+                                <p class="card-desc">Написание корпоративных гимнов, авторские поздравительные треки, профессиональная студийная звукозапись и саунд-дизайн под ключ.</p>
+                                <a href="music.html" class="details-btn">
+                                    Подробнее <span class="arrow">→</span>
+                                </a>
+                            </div>
+                        </article>
 
-            <!-- Разделитель -->
-            <hr class="panel-divider">
+                    </div>
+                </section>
 
-            <!-- БЛОК 4: Огромный Финал (внутри окна) -->
-            <div class="final-footer-block">
-                <p style="color: rgba(255, 255, 255, 0.5); font-size: 0.9rem; letter-spacing: 3px; margin-bottom: 5px;">ПОЗВОНИТЬ НАМ</p>
-                <a href="tel:+998700464000" class="massive-phone">+998 700 464 000</a>
-                <div class="copyright">&copy; 2026 Family Standard</div>
-            </div>
+                <hr class="panel-divider">
 
-        </div> <!-- / unified-panel -->
-    </div> <!-- / unified-panel-wrapper -->
+                <!-- SECTION 2: МЫ И ЕСТЬ СОБЫТИЕ -->
+                <section>
+                    <h2 class="main-title">МЫ И ЕСТЬ СОБЫТИЕ</h2>
+                    <p class="manifesto-text">
+                        Family Standard — это не просто агентство, это знак высокого качества атмосферы. Мы берем на себя всю режиссуру, координацию и продакшн вашего праздника. Вы получаете чистые эмоции и безупречный отдых, а мы превращаем любой повод в грандиозное шоу.
+                    </p>
+                </section>
 
+                <hr class="panel-divider">
 
-    <!-- Модалки -->
-    <div id="callModal" class="modal" onclick="if(event.target.id==='callModal') closeModal('callModal')">
-        <div class="modal-content">
-            <span class="close-btn" onclick="closeModal('callModal')">&times;</span>
-            <h3 style="color:var(--gold); margin-bottom: 15px;">Обратный звонок</h3>
-            
-            <input type="text" id="nameInput" placeholder="Ваше имя" oninput="this.style.borderColor=''">
-            <p id="nameError" class="error-msg">Укажите имя</p>
-            
-            <input type="tel" id="phoneInput" placeholder="+998 (__) ___-__-__" value="+998 " oninput="formatPhone(this)">
-            <p id="phoneError" class="error-msg">Укажите номер полностью</p>
-            
-            <div class="captcha-container">
-                <canvas id="captchaCanvas" width="120" height="50" onclick="drawCaptcha()" title="Нажмите, чтобы обновить"></canvas>
-                <input type="text" id="captchaInput" class="captcha-input" placeholder="Код с картинки" maxlength="4" oninput="this.style.borderColor=''">
-            </div>
-            <p style="font-size: 0.7rem; color: rgba(255,255,255,0.4); margin: -5px 0 10px; text-align: left;">Нажмите на картинку для обновления</p>
-            <p id="captchaError" class="error-msg">Код введен неверно</p>
+                <!-- SECTION 3: СЛЕДИТЕ ЗА НАМИ -->
+                <section class="social-section">
+                    <h3 class="social-title">Следите за нами</h3>
+                    <div class="social-grid">
+                        <a href="https://instagram.com/familystandard.uz" target="_blank" rel="noopener" class="btn-social">Instagram</a>
+                        <a href="https://t.me/FamilyStandard" target="_blank" rel="noopener" class="btn-social">Telegram</a>
+                        <a href="https://youtube.com" target="_blank" rel="noopener" class="btn-social">YouTube</a>
+                    </div>
+                </section>
 
-            <button id="submitBtn" class="header-btn" style="width:100%; margin-top:10px;" onclick="sendLead()">Отправить</button>
+                <hr class="panel-divider">
+
+                <!-- SECTION 4: FOOTER -->
+                <footer class="final-footer-block">
+                    <span class="phone-caption">ПОЗВОНИТЬ НАМ</span>
+                    <a href="tel:+998700464000" class="massive-phone">+998 700 464 000</a>
+                    <div class="copyright">&copy; 2026 Family Standard</div>
+                </footer>
+
+            </main>
         </div>
     </div>
 
-    <div id="successModal" class="modal" onclick="closeModal('successModal')">
-        <div class="modal-content"><h2 style="color:var(--gold);">Заявка отправлена!</h2><p style="margin-top: 10px;">Наш менеджер свяжется с вами.</p></div>
-    </div>
-    <div id="devModal" class="modal" onclick="closeModal('devModal')">
-        <div class="modal-content"><h3 style="color:var(--gold);">В разработке</h3><p style="margin-top: 10px;">Готовим новые квесты.</p></div>
-    </div>
-
     <script>
-        // === 1. ГЕНЕРАТОР SCRUB-СКРОЛЛА (Две строгие фазы) ===
-        window.addEventListener('scroll', () => {
-            let y = window.scrollY;
+        const logo = document.getElementById('animatedLogo');
+        const bgOverlay = document.getElementById('bgOverlay');
+        const scrollHint = document.getElementById('scrollHint');
+        const panelWrapper = document.getElementById('panelWrapper');
 
-            // ФАЗА 1: Разъезд логотипа и кнопок (от 0 до 300px скролла)
-            let splitDistance = 300;
-            let splitP = Math.min(y / splitDistance, 1);
+        let isMobile = window.innerWidth <= 768;
 
-            // ФАЗА 2: Проявление центральной панели (от 300px до 600px скролла)
-            // Текст начинает проявляться ТОЛЬКО после того, как завершилась Фаза 1
-            let fadeDistance = 300;
-            let fadeP = 0;
-            if (y > splitDistance) {
-                fadeP = Math.min((y - splitDistance) / fadeDistance, 1);
+        function updateMetrics() {
+            isMobile = window.innerWidth <= 768;
+        }
+        window.addEventListener('resize', updateMetrics);
+
+        let ticking = false;
+
+        function onScroll() {
+            const scrollY = window.scrollY;
+            const maxScrollDist = window.innerHeight * 0.5; 
+            const progress = Math.min(scrollY / maxScrollDist, 1);
+
+            // Smooth Interpolation from CENTER (50vh) to top (42px mobile / 52px desktop)
+            const startY = 50; // exact center (50vh)
+            const endY = isMobile ? 42 : 52; // target top pixels
+            
+            const currentY = (startY * window.innerHeight / 100) * (1 - progress) + endY * progress;
+            const scale = isMobile ? (1.4 - 0.5 * progress) : (2.2 - 1.2 * progress);
+
+            logo.style.top = `${currentY}px`;
+            logo.style.transform = `translate(-50%, -50%) scale(${scale})`;
+
+            if (progress >= 0.92) {
+                logo.classList.add('scrolled');
+            } else {
+                logo.classList.remove('scrolled');
             }
 
-            // МАГИЯ ЗАМОРОЗКИ: 
-            // Пока идут Фаза 1 и Фаза 2 (в сумме 600px), мы жестко сдвигаем панель вниз 
-            // на количество пройденных пикселей. Это компенсирует скролл браузера, 
-            // и панель стоит визуально намертво по центру.
-            let lockTotal = splitDistance + fadeDistance;
-            let panelLockY = y < lockTotal ? y : lockTotal;
+            // Fade background overlay and scroll hint smoothly
+            bgOverlay.style.opacity = progress;
+            scrollHint.style.opacity = Math.max(0, 1 - progress * 2.5);
+            panelWrapper.style.opacity = progress;
 
-            // Отправляем вычисления в CSS
-            document.documentElement.style.setProperty('--split-p', splitP);
-            document.documentElement.style.setProperty('--fade-p', fadeP);
-            document.documentElement.style.setProperty('--panel-lock-y', `${panelLockY}px`);
+            ticking = false;
+        }
+
+        window.addEventListener('scroll', () => {
+            if (!ticking) {
+                requestAnimationFrame(onScroll);
+                ticking = true;
+            }
         });
 
-        window.dispatchEvent(new Event('scroll'));
+        onScroll();
 
-        // === 2. 3D ФОН (Starfield Particles) ===
+        // Canvas Sparkles Animation Loop
         const canvas = document.getElementById('canvas3d');
-        const ctx3d = canvas.getContext('2d');
+        const ctx = canvas.getContext('2d');
         let width, height, particles;
 
         function init3DBackground() {
             width = canvas.width = window.innerWidth;
             height = canvas.height = window.innerHeight;
             particles = [];
-            for (let i = 0; i < 100; i++) {
+            
+            const colors = [
+                'rgba(229, 185, 103, ', 
+                'rgba(255, 245, 192, ', 
+                'rgba(59, 130, 246, ', 
+                'rgba(168, 85, 247, ', 
+                'rgba(6, 182, 212, '
+            ];
+            const count = isMobile ? 55 : 110;
+            
+            for (let i = 0; i < count; i++) {
                 particles.push({
-                    x: Math.random() * width, y: Math.random() * height,
-                    z: Math.random() * width, size: Math.random() * 1.5 + 0.5,
-                    speed: Math.random() * 0.5 + 0.1
+                    x: Math.random() * width, 
+                    y: Math.random() * height,
+                    size: Math.random() * 1.8 + 0.3,
+                    speed: Math.random() * 0.38 + 0.08,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    alpha: Math.random() * 0.65 + 0.25
                 });
             }
         }
+
         function animate3D() {
-            ctx3d.clearRect(0, 0, width, height);
-            ctx3d.fillStyle = 'rgba(197, 160, 89, 0.8)';
+            ctx.clearRect(0, 0, width, height);
+            
+            const scrollOffset = window.scrollY * 0.12;
+            
             particles.forEach(p => {
                 p.y -= p.speed;
                 if (p.y < 0) p.y = height;
                 
-                let scrollOffset = window.scrollY * (p.z / width) * 0.5;
+                const drawY = (p.y - scrollOffset % height + height) % height;
                 
-                ctx3d.beginPath();
-                ctx3d.arc(p.x, p.y - scrollOffset, p.size, 0, Math.PI * 2);
-                ctx3d.fill();
+                ctx.beginPath();
+                ctx.arc(p.x, drawY, p.size, 0, Math.PI * 2);
+                ctx.fillStyle = `${p.color}${p.alpha})`;
+                ctx.fill();
             });
+            
             requestAnimationFrame(animate3D);
         }
+
+        window.onload = function() {
+            init3DBackground();
+            animate3D();
+        };
+
         window.addEventListener('resize', init3DBackground);
-        init3DBackground(); animate3D();
-
-        // === 3. ЛОГИКА ФОРМЫ, КАПЧИ И МОДАЛОК ===
-        function openModal(id) { 
-            document.getElementById(id).style.display = 'flex'; 
-            if(id === 'callModal') { document.getElementById('captchaInput').value = ''; drawCaptcha(); }
-        }
-        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-        
-        function formatPhone(el) {
-            let val = el.value.replace(/\D/g, '');
-            if (!val.startsWith('998')) val = '998' + val;
-            let res = '+998 ' + (val.length > 3 ? '(' + val.substring(3,5) : '');
-            if(val.length > 5) res += ') ' + val.substring(5,8);
-            if(val.length > 8) res += '-' + val.substring(8,10);
-            if(val.length > 10) res += '-' + val.substring(10,12);
-            el.value = res;
-            el.style.borderColor = '';
-        }
-
-        let currentCaptcha = "";
-        function drawCaptcha() {
-            const c = document.getElementById('captchaCanvas');
-            const ctx = c.getContext('2d');
-            ctx.clearRect(0, 0, c.width, c.height);
-            ctx.fillStyle = "#050a14"; ctx.fillRect(0, 0, c.width, c.height);
-            
-            const chars = "123456789ABCDEFGHJKLMNPQRSTUVWXYZ";
-            currentCaptcha = "";
-            for(let i=0; i<4; i++) currentCaptcha += chars.charAt(Math.floor(Math.random() * chars.length));
-            
-            for(let i=0; i<5; i++) {
-                ctx.strokeStyle = `rgba(197, 160, 89, ${Math.random() * 0.5 + 0.2})`;
-                ctx.beginPath(); ctx.moveTo(Math.random() * c.width, Math.random() * c.height);
-                ctx.lineTo(Math.random() * c.width, Math.random() * c.height); ctx.stroke();
-            }
-            
-            ctx.font = "bold 24px Montserrat"; ctx.fillStyle = "#c5a059"; ctx.textBaseline = "middle";
-            ctx.setTransform(1, Math.random()*0.1 - 0.05, Math.random()*0.1 - 0.05, 1, 0, 0);
-            ctx.fillText(currentCaptcha, 18, c.height / 2 + 2);
-            ctx.setTransform(1, 0, 0, 1, 0, 0);
-        }
-
-        function sendLead() {
-            let name = document.getElementById('nameInput').value.trim();
-            let phone = document.getElementById('phoneInput').value.replace(/\D/g, '');
-            let userCaptcha = document.getElementById('captchaInput').value.trim().toUpperCase();
-            let err = false;
-
-            document.querySelectorAll('.error-msg').forEach(el => el.style.display = 'none');
-
-            if (name.length < 2) { document.getElementById('nameError').style.display='block'; err=true; }
-            if (phone.length < 12) { document.getElementById('phoneError').style.display='block'; err=true; }
-            if (userCaptcha !== currentCaptcha) { 
-                document.getElementById('captchaError').style.display='block'; 
-                document.getElementById('captchaInput').style.borderColor = '#ff4d4d';
-                drawCaptcha(); err=true; 
-            }
-            
-            if (err) return;
-
-            const tk1 = "8704692826:AAG"; 
-            const tk2 = "4n668xcqaza8hFYiBPJ-TEGvN1Uo-4Kk"; 
-            const url = `https://api.telegram.org/bot${tk1+tk2}/sendMessage?chat_id=8340992547&text=Новая заявка%0AИмя: ${name}%0AТел: +${phone}`;
-
-            let btn = document.getElementById('submitBtn'); 
-            btn.innerText = 'Отправка...';
-
-            fetch(url).then(r => {
-                if(r.ok) { 
-                    closeModal('callModal'); openModal('successModal'); 
-                    document.getElementById('nameInput').value=''; 
-                    document.getElementById('phoneInput').value='+998 '; 
-                }
-                btn.innerText = 'Отправить';
-            }).catch(() => btn.innerText = 'Ошибка сети');
-        }
     </script>
 </body>
 </html>
