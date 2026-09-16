@@ -20,10 +20,8 @@
             --pink-glow: rgba(236, 72, 153, 0.25);
             --bg: #030611;
             
-            /* CSS Variable Driven Animation Sync for 120Hz */
             --scroll-p: 0;
             --logo-scale: 2.2;
-            --logo-top: 50vh;
         }
         
         * { 
@@ -71,14 +69,14 @@
             transform: translate3d(0,0,0);
         }
 
-        /* GPU Direct Drive Logo Animation */
+        /* GPU Physics Tethered Logo (transform handled via JS for physics engine) */
         #animatedLogo {
             position: fixed;
-            left: 50%;
-            top: var(--logo-top);
-            transform: translate3d(-50%, -50%, 0) scale(var(--logo-scale));
+            left: 0;
+            top: 0;
+            transform: translate(-50%, -50%) scale(var(--logo-scale));
             z-index: 100;
-            cursor: pointer;
+            cursor: grab;
             background: rgba(10, 15, 30, 0.94);
             border: 1.5px solid var(--gold); 
             border-radius: 60px; 
@@ -89,9 +87,15 @@
             box-shadow: 0 0 25px rgba(229, 185, 103, 0.3);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
-            will-change: transform, top, background, box-shadow;
+            will-change: transform, background, box-shadow;
             transform-origin: center center;
             transition: border-color 0.15s ease, background 0.15s ease;
+            user-select: none;
+            touch-action: none;
+        }
+
+        #animatedLogo:active {
+            cursor: grabbing;
         }
 
         #animatedLogo.scrolled {
@@ -103,9 +107,9 @@
         .logo-img { 
             height: 40px; 
             width: auto; 
+            pointer-events: none;
         }
 
-        /* Pure Metallic Gold Gradient with Animated Sheen */
         .logo-text { 
             font-size: 1.05rem; 
             line-height: 1.15;
@@ -121,13 +125,13 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             animation: shine 4s linear infinite;
+            pointer-events: none;
         }
 
         @keyframes shine {
             to { background-position: 200% center; }
         }
 
-        /* Scroll Hint Fade-out Logic */
         #scrollHint {
             position: fixed; 
             bottom: 40px; 
@@ -173,7 +177,6 @@
             contain: layout style;
         }
 
-        /* Main Center Block Container with dark background image overlay */
         .unified-panel {
             background: linear-gradient(180deg, rgba(5, 9, 20, 0.96) 0%, rgba(7, 12, 26, 0.95) 100%), 
                         url('background.jpg') center/cover no-repeat;
@@ -294,7 +297,6 @@
             color: #ffffff;
         }
 
-        /* Individual Card Lighting Themes */
         .card-kids {
             background-image: url('https://images.unsplash.com/photo-1530103862676-de8c9debad1d?auto=format&fit=crop&w=800&q=75');
             border: 1.5px solid rgba(236, 72, 153, 0.5);
@@ -462,7 +464,6 @@
             margin-top: 20px; 
         }
 
-        /* Mobile Performance Overrides for 120 FPS Rendering */
         @media (max-width: 768px) { 
             #animatedLogo, .unified-panel, .direction-card, .btn-social, .details-btn {
                 backdrop-filter: none !important;
@@ -477,32 +478,16 @@
 
             .logo-img { height: 30px; }
             .logo-text { font-size: 0.85rem; }
-
             .panel-spacer { height: 45vh; }
-
-            .unified-panel-wrapper { 
-                padding: 0 12px 60px; 
-            }
-
+            .unified-panel-wrapper { padding: 0 12px 60px; }
             .unified-panel { 
                 padding: 130px 18px 40px; 
                 border-radius: 24px; 
                 background: rgba(5, 9, 20, 0.98);
             }
-
-            .direction-card {
-                padding: 30px 18px;
-                box-shadow: none !important;
-            }
-
-            .card-music {
-                padding: 36px 18px;
-            }
-
-            .panel-divider { 
-                margin: 40px auto; 
-                width: 85%; 
-            }
+            .direction-card { padding: 30px 18px; box-shadow: none !important; }
+            .card-music { padding: 36px 18px; }
+            .panel-divider { margin: 40px auto; width: 85%; }
         }
     </style>
 </head>
@@ -513,7 +498,7 @@
 
     <div id="scrollHint">Скролльте вниз</div>
 
-    <div id="animatedLogo" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" role="button" aria-label="Наверх">
+    <div id="animatedLogo" role="button" aria-label="Family Standard Logo">
         <img src="logo.gif" alt="FS Logo" class="logo-img" onerror="this.src='https://placehold.co/80x80/050914/e5b967?text=FS'">
         <span class="logo-text">
             <span>Family</span>
@@ -632,53 +617,118 @@
         }
         window.addEventListener('resize', updateMetrics, { passive: true });
 
-        /* 120 FPS High Refresh Rate Delta Loop Animation Engine */
-        let ticking = false;
+        /* --- Scroll & Anchor Math --- */
+        let scrollProgress = 0;
+        let targetAnchorY = window.innerHeight * 0.5;
+        let targetScale = isMobile ? 1.3 : 2.2;
 
         function updateScrollVars() {
             const scrollY = window.scrollY;
             const maxScrollDist = window.innerHeight * 0.45; 
-            const progress = Math.min(scrollY / maxScrollDist, 1);
+            scrollProgress = Math.min(scrollY / maxScrollDist, 1);
 
-            // Compute CSS variables for smooth GPU animation
             const startY = 50; 
             const endY = isMobile ? 42 : 52; 
             
-            const currentY = (startY * window.innerHeight / 100) * (1 - progress) + endY * progress;
-            const scale = isMobile ? (1.3 - 0.4 * progress) : (2.2 - 1.2 * progress);
+            targetAnchorY = (startY * window.innerHeight / 100) * (1 - scrollProgress) + endY * scrollProgress;
+            targetScale = isMobile ? (1.3 - 0.4 * scrollProgress) : (2.2 - 1.2 * scrollProgress);
 
-            root.style.setProperty('--scroll-p', progress.toFixed(3));
-            root.style.setProperty('--logo-scale', scale.toFixed(3));
-            root.style.setProperty('--logo-top', `${currentY.toFixed(1)}px`);
+            root.style.setProperty('--scroll-p', scrollProgress.toFixed(3));
+            root.style.setProperty('--logo-scale', targetScale.toFixed(3));
 
-            if (progress >= 0.92) {
+            if (scrollProgress >= 0.92) {
                 logo.classList.add('scrolled');
             } else {
                 logo.classList.remove('scrolled');
             }
 
-            // Scroll Hint Opacity Interpolation
-            const hintOpacity = Math.max(0, 1 - progress * 1.15);
+            const hintOpacity = Math.max(0, 1 - scrollProgress * 1.15);
             scrollHint.style.opacity = hintOpacity.toFixed(2);
-            if (hintOpacity <= 0.05) {
-                scrollHint.style.visibility = 'hidden';
-            } else {
-                scrollHint.style.visibility = 'visible';
-            }
-
-            ticking = false;
+            scrollHint.style.visibility = hintOpacity <= 0.05 ? 'hidden' : 'visible';
         }
 
-        window.addEventListener('scroll', () => {
-            if (!ticking) {
-                requestAnimationFrame(updateScrollVars);
-                ticking = true;
-            }
-        }, { passive: true });
-
+        window.addEventListener('scroll', updateScrollVars, { passive: true });
         updateScrollVars();
 
-        /* High Precision Delta-Time 120Hz Canvas Engine */
+        /* --- Invisible Spring / Tether Physics Engine --- */
+        const logoPhysics = {
+            x: window.innerWidth / 2,
+            y: window.innerHeight / 2,
+            vx: 0,
+            vy: 0,
+            isDragging: false,
+            dragStartX: 0,
+            dragStartY: 0,
+            logoStartX: 0,
+            logoStartY: 0,
+            lastPointerX: 0,
+            lastPointerY: 0,
+            pointerVx: 0,
+            pointerVy: 0,
+            dragDistance: 0
+        };
+
+        const stiffness = 0.08;  // Жесткость невидимой нити/пружины
+        const damping = 0.82;    // Коэффициент затухания колебаний
+        const bounce = 0.7;      // Упругость при ударе о края экрана
+
+        function startDrag(e) {
+            logoPhysics.isDragging = true;
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+            logoPhysics.dragStartX = clientX;
+            logoPhysics.dragStartY = clientY;
+            logoPhysics.logoStartX = logoPhysics.x;
+            logoPhysics.logoStartY = logoPhysics.y;
+            logoPhysics.lastPointerX = clientX;
+            logoPhysics.lastPointerY = clientY;
+            logoPhysics.pointerVx = 0;
+            logoPhysics.pointerVy = 0;
+            logoPhysics.dragDistance = 0;
+        }
+
+        function moveDrag(e) {
+            if (!logoPhysics.isDragging) return;
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+            const dx = clientX - logoPhysics.dragStartX;
+            const dy = clientY - logoPhysics.dragStartY;
+            logoPhysics.dragDistance = Math.hypot(dx, dy);
+
+            logoPhysics.pointerVx = clientX - logoPhysics.lastPointerX;
+            logoPhysics.pointerVy = clientY - logoPhysics.lastPointerY;
+            logoPhysics.lastPointerX = clientX;
+            logoPhysics.lastPointerY = clientY;
+
+            logoPhysics.x = logoPhysics.logoStartX + dx;
+            logoPhysics.y = logoPhysics.logoStartY + dy;
+        }
+
+        function endDrag() {
+            if (!logoPhysics.isDragging) return;
+            logoPhysics.isDragging = false;
+            
+            // Импульс зависит от скорости свайпа / броска
+            logoPhysics.vx = logoPhysics.pointerVx * 1.5;
+            logoPhysics.vy = logoPhysics.pointerVy * 1.5;
+
+            // Если кликнули без движения — скролл наверх
+            if (logoPhysics.dragDistance < 6) {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        logo.addEventListener('mousedown', startDrag);
+        window.addEventListener('mousemove', moveDrag);
+        window.addEventListener('mouseup', endDrag);
+
+        logo.addEventListener('touchstart', startDrag, { passive: true });
+        window.addEventListener('touchmove', moveDrag, { passive: true });
+        window.addEventListener('touchend', endDrag);
+
+        /* --- 120Hz Optimized Delta-Time Render & Physics Loop --- */
         const canvas = document.getElementById('canvas3d');
         const ctx = canvas.getContext('2d', { alpha: false });
         let width, height, particles;
@@ -701,34 +751,82 @@
                     color: colors[Math.floor(Math.random() * colors.length)]
                 });
             }
+            logoPhysics.x = width / 2;
+            logoPhysics.y = targetAnchorY;
         }
 
-        function animate3D(now) {
-            const dt = Math.min(now - lastTime, 32); // Delta-time cap for HRR stability
+        function animateFrame(now) {
+            const dt = Math.min(now - lastTime, 32); 
+            const timeScale = dt / 16.666;
             lastTime = now;
 
+            // 1. Рендер фона на Canvas
             ctx.fillStyle = '#030611';
             ctx.fillRect(0, 0, width, height);
             
             const scrollOffset = window.scrollY * 0.1;
-            
             for (let i = 0; i < particles.length; i++) {
                 const p = particles[i];
                 p.y -= p.speed * dt;
                 if (p.y < 0) p.y = height;
-                
                 const drawY = (p.y - scrollOffset % height + height) % height;
-                
                 ctx.fillStyle = p.color;
                 ctx.fillRect(p.x, drawY, p.size, p.size);
             }
-            
-            requestAnimationFrame(animate3D);
+
+            // 2. Расчет физики невидимой нити (тяготения к якорю траектории)
+            const anchorX = width / 2;
+            const anchorY = targetAnchorY;
+
+            if (!logoPhysics.isDragging) {
+                // Закон Гука: F = -k * смещение
+                const fx = (anchorX - logoPhysics.x) * stiffness;
+                const fy = (anchorY - logoPhysics.y) * stiffness;
+
+                logoPhysics.vx += fx * timeScale;
+                logoPhysics.vy += fy * timeScale;
+
+                logoPhysics.vx *= Math.pow(damping, timeScale);
+                logoPhysics.vy *= Math.pow(damping, timeScale);
+
+                logoPhysics.x += logoPhysics.vx * timeScale;
+                logoPhysics.y += logoPhysics.vy * timeScale;
+
+                // Столкновение с границами экрана с отскоком
+                const rect = logo.getBoundingClientRect();
+                const halfW = rect.width / 2;
+                const halfH = rect.height / 2;
+
+                if (logoPhysics.x - halfW < 0) {
+                    logoPhysics.x = halfW;
+                    logoPhysics.vx *= -bounce;
+                } else if (logoPhysics.x + halfW > width) {
+                    logoPhysics.x = width - halfW;
+                    logoPhysics.vx *= -bounce;
+                }
+
+                if (logoPhysics.y - halfH < 0) {
+                    logoPhysics.y = halfH;
+                    logoPhysics.vy *= -bounce;
+                } else if (logoPhysics.y + halfH > height) {
+                    logoPhysics.y = height - halfH;
+                    logoPhysics.vy *= -bounce;
+                }
+            } else {
+                // Если пользователь держит логотип, плавно подтягиваем скорость к нулю
+                logoPhysics.vx = 0;
+                logoPhysics.vy = 0;
+            }
+
+            // 3. Плавное обновление координат логотипа через GPU-трансформацию
+            logo.style.transform = `translate3d(calc(${logoPhysics.x.toFixed(2)}px - 50%), calc(${logoPhysics.y.toFixed(2)}px - 50%), 0) scale(${targetScale.toFixed(3)})`;
+
+            requestAnimationFrame(animateFrame);
         }
 
         window.onload = function() {
             init3DBackground();
-            requestAnimationFrame(animate3D);
+            requestAnimationFrame(animateFrame);
         };
 
         window.addEventListener('resize', init3DBackground, { passive: true });
