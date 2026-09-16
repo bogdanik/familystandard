@@ -2,24 +2,22 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
     <title>Family Standard | Мы и есть событие</title>
     <meta name="description" content="Премиальное агентство событий Family Standard: детские программы, взрослые праздники, медиа-продакшн, интерактивы и музыка.">
     <link rel="icon" href="logo.gif" type="image/gif">
     
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Montserrat:wght@400;500;600;700;800&display=swap');
         
         :root { 
             --gold-light: #fff5c0;
             --gold: #e5b967;
             --gold-mid: #c69538;
             --gold-dark: #8a6218;
-            --gold-glow: rgba(229, 185, 103, 0.45);
-            --blue-glow: rgba(59, 130, 246, 0.35);
-            --purple-glow: rgba(168, 85, 247, 0.35);
-            --pink-glow: rgba(236, 72, 153, 0.35);
-            --cyan-glow: rgba(6, 182, 212, 0.35);
+            --blue-glow: rgba(59, 130, 246, 0.25);
+            --purple-glow: rgba(168, 85, 247, 0.25);
+            --pink-glow: rgba(236, 72, 153, 0.25);
             --bg: #030611;
         }
         
@@ -48,6 +46,8 @@
             z-index: 1; 
             pointer-events: none; 
             background: radial-gradient(circle at 50% 30%, #0e172e 0%, #050914 60%, #02040a 100%);
+            will-change: transform;
+            transform: translate3d(0,0,0);
         }
 
         #bgOverlay {
@@ -55,66 +55,58 @@
             top: 0; left: 0; 
             width: 100vw; height: 100vh;
             background: 
-                radial-gradient(circle at 20% 30%, rgba(59, 130, 246, 0.12) 0%, transparent 50%),
-                radial-gradient(circle at 80% 70%, rgba(229, 185, 103, 0.12) 0%, transparent 50%),
-                radial-gradient(circle at 50% 90%, rgba(168, 85, 247, 0.1) 0%, transparent 50%);
+                radial-gradient(circle at 20% 30%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(229, 185, 103, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 50% 90%, rgba(168, 85, 247, 0.08) 0%, transparent 50%);
             z-index: 2;
             opacity: 0;
             pointer-events: none;
-            transition: opacity 0.3s ease;
+            will-change: opacity;
+            transform: translate3d(0,0,0);
         }
 
         .glow-aura {
             position: fixed;
             border-radius: 50%;
-            filter: blur(140px);
             pointer-events: none;
             z-index: 2;
+            transform: translate3d(0,0,0);
         }
-        .aura-1 { top: 5%; left: 10%; width: 50vw; height: 50vw; background: var(--blue-glow); }
-        .aura-2 { bottom: 10%; right: 5%; width: 45vw; height: 45vw; background: var(--pink-glow); }
-        .aura-3 { top: 60%; left: 30%; width: 40vw; height: 40vw; background: var(--purple-glow); }
+        .aura-1 { top: 5%; left: 10%; width: 50vw; height: 50vw; background: var(--blue-glow); filter: blur(100px); }
+        .aura-2 { bottom: 10%; right: 5%; width: 45vw; height: 45vw; background: var(--pink-glow); filter: blur(100px); }
 
-        /* LOGO: Centered at top: 50vh initially */
         #animatedLogo {
             position: fixed;
             left: 50%;
             top: 50vh;
-            transform: translate(-50%, -50%) scale(2.2);
+            transform: translate3d(-50%, -50%, 0) scale(2.2);
             z-index: 100;
             cursor: pointer;
-            background: rgba(10, 15, 30, 0.92);
+            background: rgba(10, 15, 30, 0.94);
             border: 1.5px solid var(--gold); 
             border-radius: 60px; 
             padding: 14px 36px; 
             display: inline-flex; 
             align-items: center; 
             gap: 16px; 
-            box-shadow: 0 0 30px rgba(229, 185, 103, 0.4), 0 0 50px rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(20px);
-            will-change: transform, top, background, box-shadow;
-            transition: box-shadow 0.3s ease, background 0.3s ease, border-color 0.3s ease;
-        }
-
-        #animatedLogo:hover {
-            border-color: var(--gold-light);
-            box-shadow: 0 0 45px rgba(255, 245, 192, 0.6), 0 0 65px rgba(229, 185, 103, 0.4);
+            box-shadow: 0 0 25px rgba(229, 185, 103, 0.3);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            will-change: transform, top, background, opacity;
+            transform-origin: center center;
         }
 
         #animatedLogo.scrolled {
-            background: rgba(10, 16, 32, 0.45);
-            backdrop-filter: blur(14px);
+            background: rgba(10, 16, 32, 0.85);
             border-color: rgba(229, 185, 103, 0.6);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7), 0 0 25px rgba(229, 185, 103, 0.3);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.7);
         }
         
         .logo-img { 
             height: 40px; 
             width: auto; 
-            filter: drop-shadow(0 0 8px rgba(229, 185, 103, 0.5));
         }
 
-        /* Pure Glossy Metallic Gold Typography (No Blue, No Harsh Glow) */
         .logo-text { 
             font-size: 1.05rem; 
             line-height: 1.15;
@@ -140,22 +132,22 @@
             position: fixed; 
             bottom: 40px; 
             left: 50%; 
-            transform: translateX(-50%);
+            transform: translate3d(-50%, 0, 0);
             color: var(--gold); 
             font-size: 0.75rem; 
             letter-spacing: 4px; 
             text-transform: uppercase;
-            animation: pulse 2.2s infinite; 
+            animation: pulseHint 2s infinite ease-in-out; 
             z-index: 90;
             pointer-events: none;
             opacity: 1;
-            transition: opacity 0.3s ease;
-            text-shadow: 0 0 12px rgba(229, 185, 103, 0.6);
+            will-change: opacity, transform;
+            text-shadow: 0 0 10px rgba(229, 185, 103, 0.5);
         }
 
-        @keyframes pulse { 
-            0%, 100% { transform: translate(-50%, 0); opacity: 0.95; } 
-            50% { transform: translate(-50%, 9px); opacity: 0.3; } 
+        @keyframes pulseHint { 
+            0%, 100% { transform: translate3d(-50%, 0, 0); } 
+            50% { transform: translate3d(-50%, 8px, 0); } 
         }
 
         .scroll-space {
@@ -163,6 +155,7 @@
             z-index: 10;
             width: 100%;
             min-height: 100vh;
+            contain: layout style;
         }
 
         .panel-spacer {
@@ -177,22 +170,22 @@
             position: relative; 
             z-index: 20; 
             will-change: opacity;
+            contain: layout style;
         }
 
         .unified-panel {
-            background: linear-gradient(180deg, rgba(5, 9, 20, 0.94) 0%, rgba(7, 12, 26, 0.92) 100%), 
-                        url('background.jpg') center/cover no-repeat,
-                        radial-gradient(circle, #0e172a 0%, #030611 100%);
+            background: linear-gradient(180deg, rgba(5, 9, 20, 0.96) 0%, rgba(7, 12, 26, 0.95) 100%), 
+                        url('background.jpg') center/cover no-repeat;
             border: 1px solid rgba(229, 185, 103, 0.4); 
             border-radius: 32px; 
             padding: 180px 40px 60px; 
             text-align: center;
-            box-shadow: 0 35px 80px rgba(0, 0, 0, 0.9), 
-                        inset 0 1px 0 rgba(255, 255, 255, 0.15),
-                        0 0 60px var(--blue-glow);
-            backdrop-filter: blur(24px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
             position: relative;
             overflow: hidden;
+            contain: content;
         }
 
         .unified-panel::before {
@@ -206,16 +199,15 @@
         .panel-divider {
             border: none;
             height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(229, 185, 103, 0.5), rgba(59, 130, 246, 0.5), transparent);
-            margin: 65px auto;
+            background: linear-gradient(90deg, transparent, rgba(229, 185, 103, 0.4), rgba(59, 130, 246, 0.4), transparent);
+            margin: 60px auto;
             width: 75%;
         }
 
-        /* Subtle, Refined Typography Glows */
         h1, h2.main-title { 
             font-size: clamp(1.8rem, 4.5vw, 2.7rem); 
             color: #ffffff;
-            text-shadow: 0 0 15px rgba(255, 255, 255, 0.4), 0 0 25px rgba(229, 185, 103, 0.35);
+            text-shadow: 0 0 15px rgba(255, 255, 255, 0.3), 0 0 20px rgba(229, 185, 103, 0.3);
             text-transform: uppercase; 
             letter-spacing: 4px; 
             font-weight: 800;
@@ -251,7 +243,6 @@
             margin-top: 20px;
         }
 
-        /* ALL CARDS NOW GLOW ACCORDING TO REQUEST */
         .direction-card {
             position: relative;
             border-radius: 24px;
@@ -264,15 +255,15 @@
             overflow: hidden;
             background-size: cover;
             background-position: center;
-            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-            backdrop-filter: blur(8px);
+            transition: transform 0.3s ease;
+            transform: translate3d(0,0,0);
+            contain: content;
         }
 
         .card-overlay {
             position: absolute;
             inset: 0;
             z-index: 1;
-            transition: opacity 0.4s ease, background 0.4s ease;
         }
 
         .card-content {
@@ -298,81 +289,47 @@
             color: #ffffff;
         }
 
-        /* Card 1: Kids (Pink/Magenta Glow) */
+        /* Card Light Styling Optimization */
         .card-kids {
-            background-image: url('https://images.unsplash.com/photo-1530103862676-de8c9debad1d?auto=format&fit=crop&w=1200&q=80');
-            border: 1.5px solid rgba(236, 72, 153, 0.6);
-            box-shadow: 0 0 25px rgba(236, 72, 153, 0.25), 0 10px 30px rgba(0, 0, 0, 0.7);
+            background-image: url('https://images.unsplash.com/photo-1530103862676-de8c9debad1d?auto=format&fit=crop&w=800&q=75');
+            border: 1.5px solid rgba(236, 72, 153, 0.5);
+            box-shadow: 0 0 20px rgba(236, 72, 153, 0.2);
         }
-        .card-kids .card-overlay {
-            background: linear-gradient(135deg, rgba(15, 10, 30, 0.92) 0%, rgba(45, 15, 45, 0.88) 100%);
-        }
-        .card-kids .card-title-glowing {
-            color: #fce7f3;
-            text-shadow: 0 0 12px rgba(244, 114, 182, 0.7), 0 0 25px rgba(236, 72, 153, 0.4);
-        }
+        .card-kids .card-overlay { background: linear-gradient(135deg, rgba(15, 10, 30, 0.93) 0%, rgba(45, 15, 45, 0.9) 100%); }
+        .card-kids .card-title-glowing { color: #fce7f3; text-shadow: 0 0 10px rgba(236, 72, 153, 0.5); }
 
-        /* Card 2: Adults (Rich Golden Glow) */
         .card-adults {
-            background-image: url('https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=1200&q=80');
-            border: 1.5px solid rgba(229, 185, 103, 0.65);
-            box-shadow: 0 0 25px rgba(229, 185, 103, 0.3), 0 10px 30px rgba(0, 0, 0, 0.7);
+            background-image: url('https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=800&q=75');
+            border: 1.5px solid rgba(229, 185, 103, 0.55);
+            box-shadow: 0 0 20px rgba(229, 185, 103, 0.2);
         }
-        .card-adults .card-overlay {
-            background: linear-gradient(135deg, rgba(12, 10, 8, 0.93) 0%, rgba(35, 24, 10, 0.9) 100%);
-        }
-        .card-adults .card-title-glowing {
-            color: #fff3be;
-            text-shadow: 0 0 12px rgba(255, 243, 190, 0.7), 0 0 25px rgba(229, 185, 103, 0.5);
-        }
+        .card-adults .card-overlay { background: linear-gradient(135deg, rgba(12, 10, 8, 0.94) 0%, rgba(35, 24, 10, 0.91) 100%); }
+        .card-adults .card-title-glowing { color: #fff3be; text-shadow: 0 0 10px rgba(229, 185, 103, 0.5); }
 
-        /* Card 3: Media Photo & Video (Cyan/Blue Glow) */
         .card-media {
-            background-image: url('https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?auto=format&fit=crop&w=1200&q=80');
-            border: 1.5px solid rgba(6, 182, 212, 0.6);
-            box-shadow: 0 0 25px rgba(6, 182, 212, 0.25), 0 10px 30px rgba(0, 0, 0, 0.7);
+            background-image: url('https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?auto=format&fit=crop&w=800&q=75');
+            border: 1.5px solid rgba(6, 182, 212, 0.5);
+            box-shadow: 0 0 20px rgba(6, 182, 212, 0.2);
         }
-        .card-media .card-overlay {
-            background: linear-gradient(135deg, rgba(6, 20, 35, 0.92) 0%, rgba(8, 35, 45, 0.88) 100%);
-        }
-        .card-media .card-title-glowing {
-            color: #cffafe;
-            text-shadow: 0 0 12px rgba(34, 211, 238, 0.7), 0 0 25px rgba(6, 182, 212, 0.4);
-        }
+        .card-media .card-overlay { background: linear-gradient(135deg, rgba(6, 20, 35, 0.93) 0%, rgba(8, 35, 45, 0.9) 100%); }
+        .card-media .card-title-glowing { color: #cffafe; text-shadow: 0 0 10px rgba(6, 182, 212, 0.5); }
 
-        /* Card 4: Interactives (Purple/Violet Glow) */
         .card-interactives {
-            background-image: url('https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=1200&q=80');
-            border: 1.5px solid rgba(168, 85, 247, 0.6);
-            box-shadow: 0 0 25px rgba(168, 85, 247, 0.3), 0 10px 30px rgba(0, 0, 0, 0.7);
+            background-image: url('https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=800&q=75');
+            border: 1.5px solid rgba(168, 85, 247, 0.5);
+            box-shadow: 0 0 20px rgba(168, 85, 247, 0.2);
         }
-        .card-interactives .card-overlay {
-            background: linear-gradient(135deg, rgba(18, 8, 32, 0.92) 0%, rgba(35, 12, 50, 0.88) 100%);
-        }
-        .card-interactives .card-title-glowing {
-            color: #f3e8ff;
-            text-shadow: 0 0 12px rgba(192, 132, 252, 0.7), 0 0 25px rgba(168, 85, 247, 0.4);
-        }
+        .card-interactives .card-overlay { background: linear-gradient(135deg, rgba(18, 8, 32, 0.93) 0%, rgba(35, 12, 50, 0.9) 100%); }
+        .card-interactives .card-title-glowing { color: #f3e8ff; text-shadow: 0 0 10px rgba(168, 85, 247, 0.5); }
 
-        /* Card 5: Music & Production (Grand Gold-Blue Glow) */
         .card-music {
-            background-image: url('https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&w=1400&q=80');
+            background-image: url('https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&w=900&q=75');
             border: 1.5px solid var(--gold);
             padding: 48px 36px;
-            box-shadow: 0 0 35px rgba(229, 185, 103, 0.35), 0 0 50px var(--blue-glow), 0 10px 30px rgba(0, 0, 0, 0.8);
+            box-shadow: 0 0 25px rgba(229, 185, 103, 0.3);
         }
-        .card-music .card-overlay {
-            background: linear-gradient(135deg, rgba(16, 7, 30, 0.94) 0%, rgba(18, 25, 50, 0.9) 50%, rgba(8, 14, 32, 0.94) 100%);
-        }
-        .card-music .card-title-glowing {
-            color: #ffffff;
-            text-shadow: 0 0 15px rgba(255, 255, 255, 0.8), 0 0 30px rgba(229, 185, 103, 0.6);
-        }
-
-        .direction-card:hover {
-            transform: translateY(-5px) scale(1.01);
-            filter: brightness(1.08);
-        }
+        .card-music .card-overlay { background: linear-gradient(135deg, rgba(16, 7, 30, 0.95) 0%, rgba(18, 25, 50, 0.92) 100%); }
+        .card-music .card-title-glowing { color: #ffffff; text-shadow: 0 0 15px rgba(229, 185, 103, 0.5); }
 
         .card-desc {
             font-size: 0.95rem;
@@ -390,8 +347,8 @@
             justify-content: center;
             gap: 10px;
             color: #ffffff;
-            background: rgba(10, 16, 30, 0.8);
-            border: 1px solid rgba(229, 185, 103, 0.6);
+            background: rgba(10, 16, 30, 0.85);
+            border: 1px solid rgba(229, 185, 103, 0.5);
             border-radius: 30px;
             padding: 10px 28px;
             text-decoration: none;
@@ -399,37 +356,30 @@
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 2px;
-            transition: all 0.35s ease;
-            backdrop-filter: blur(6px);
-            box-shadow: 0 0 15px rgba(229, 185, 103, 0.2);
-            text-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+            transition: background 0.2s ease, border-color 0.2s ease;
         }
 
         .details-btn span.arrow {
-            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transition: transform 0.2s ease;
             font-size: 1rem;
         }
 
         .details-btn:hover {
             background: rgba(59, 130, 246, 0.3);
-            color: #ffffff;
             border-color: #60a5fa;
-            box-shadow: 0 0 25px rgba(96, 165, 250, 0.8), 0 0 40px rgba(59, 130, 246, 0.5);
-            transform: translateY(-2px);
         }
 
         .details-btn:hover span.arrow {
-            transform: translateX(5px);
+            transform: translate3d(5px, 0, 0);
         }
 
-        /* SECTION 3: FOLLOW US (Spacious & Larger Typography) */
         .social-section {
             padding: 20px 0;
         }
 
         .social-title {
             color: #fff3be; 
-            text-shadow: 0 0 15px rgba(229, 185, 103, 0.6);
+            text-shadow: 0 0 12px rgba(229, 185, 103, 0.5);
             letter-spacing: 4px; 
             text-transform: uppercase; 
             margin-bottom: 35px; 
@@ -448,7 +398,7 @@
         }
 
         .btn-social { 
-            border: 1px solid rgba(96, 165, 250, 0.55); 
+            border: 1px solid rgba(96, 165, 250, 0.5); 
             color: #ffffff; 
             padding: 16px 28px; 
             border-radius: 35px; 
@@ -457,22 +407,16 @@
             font-size: 0.85rem; 
             text-transform: uppercase; 
             letter-spacing: 3px;
-            transition: all 0.35s ease; 
-            background: rgba(15, 23, 42, 0.75); 
+            transition: background 0.2s ease, border-color 0.2s ease; 
+            background: rgba(15, 23, 42, 0.8); 
             display: flex; 
             align-items: center; 
             justify-content: center; 
-            backdrop-filter: blur(8px);
-            box-shadow: 0 0 18px rgba(59, 130, 246, 0.25);
-            text-shadow: 0 0 10px rgba(255, 255, 255, 0.6);
         }
 
         .btn-social:hover { 
-            background: rgba(59, 130, 246, 0.4); 
-            color: #ffffff; 
+            background: rgba(59, 130, 246, 0.35); 
             border-color: var(--gold);
-            box-shadow: 0 0 30px rgba(96, 165, 250, 0.8), 0 0 50px rgba(229, 185, 103, 0.5); 
-            transform: translateY(-3px); 
         }
 
         .final-footer-block {
@@ -491,7 +435,6 @@
             margin-bottom: 10px;
             text-transform: uppercase;
             font-weight: 600;
-            text-shadow: 0 0 12px rgba(229, 185, 103, 0.5);
         }
 
         .massive-phone { 
@@ -500,17 +443,10 @@
             font-size: clamp(1.7rem, 4vw, 2.6rem); 
             font-weight: 800; 
             text-decoration: none; 
-            transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
             margin: 8px 0 18px;
-            text-shadow: 0 0 18px rgba(255, 255, 255, 0.7), 0 0 35px rgba(229, 185, 103, 0.5);
+            text-shadow: 0 0 15px rgba(255, 255, 255, 0.5), 0 0 25px rgba(229, 185, 103, 0.4);
             white-space: nowrap;
             letter-spacing: 1.5px;
-        }
-
-        .massive-phone:hover { 
-            transform: scale(1.07); 
-            color: #fff3be;
-            text-shadow: 0 0 25px rgba(255, 255, 255, 1), 0 0 50px rgba(96, 165, 250, 0.9);
         }
         
         .copyright { 
@@ -522,9 +458,20 @@
         }
 
         @media (max-width: 768px) { 
+            /* Remove heavy backdrop-filters on mobile to eliminate scrolling stutter */
+            #animatedLogo, .unified-panel, .direction-card, .btn-social, .details-btn {
+                backdrop-filter: none !important;
+                -webkit-backdrop-filter: none !important;
+            }
+
+            .glow-aura {
+                display: none !important; /* Remove heavy CPU blur overlays on phones */
+            }
+
             #animatedLogo { 
                 padding: 10px 22px; 
                 gap: 10px;
+                background: rgba(10, 15, 30, 0.97);
             }
 
             .logo-img { height: 30px; }
@@ -537,20 +484,22 @@
             }
 
             .unified-panel { 
-                padding: 130px 20px 40px; 
+                padding: 130px 18px 40px; 
                 border-radius: 24px; 
+                background: rgba(5, 9, 20, 0.98);
             }
 
             .direction-card {
-                padding: 30px 20px;
+                padding: 30px 18px;
+                box-shadow: none !important;
             }
 
             .card-music {
-                padding: 36px 20px;
+                padding: 36px 18px;
             }
 
             .panel-divider { 
-                margin: 45px auto; 
+                margin: 40px auto; 
                 width: 85%; 
             }
         }
@@ -563,11 +512,9 @@
     
     <div class="glow-aura aura-1"></div>
     <div class="glow-aura aura-2"></div>
-    <div class="glow-aura aura-3"></div>
 
     <div id="scrollHint">Скролльте вниз</div>
 
-    <!-- LOGO: STARTS AT PERFECT CENTER (50vh) -->
     <div id="animatedLogo" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" role="button" aria-label="Наверх">
         <img src="logo.gif" alt="FS Logo" class="logo-img" onerror="this.src='https://placehold.co/80x80/050914/e5b967?text=FS'">
         <span class="logo-text">
@@ -581,14 +528,11 @@
         <div class="unified-panel-wrapper" id="panelWrapper">
             <main class="unified-panel">
                 
-                <!-- SECTION 1: НАШИ НАПРАВЛЕНИЯ -->
                 <section>
                     <h2 class="main-title">НАШИ НАПРАВЛЕНИЯ</h2>
                     <p class="section-subtitle">Создаем события, которые остаются в памяти навсегда</p>
                     
                     <div class="directions-grid">
-                        
-                        <!-- 1. KIDS PROGRAM -->
                         <article class="direction-card card-kids">
                             <div class="card-overlay"></div>
                             <div class="card-content">
@@ -600,7 +544,6 @@
                             </div>
                         </article>
 
-                        <!-- 2. ADULT EVENTS -->
                         <article class="direction-card card-adults">
                             <div class="card-overlay"></div>
                             <div class="card-content">
@@ -612,7 +555,6 @@
                             </div>
                         </article>
 
-                        <!-- 3. PHOTO & VIDEO -->
                         <article class="direction-card card-media">
                             <div class="card-overlay"></div>
                             <div class="card-content">
@@ -624,7 +566,6 @@
                             </div>
                         </article>
 
-                        <!-- 4. INTERACTIVES & GAMES -->
                         <article class="direction-card card-interactives">
                             <div class="card-overlay"></div>
                             <div class="card-content">
@@ -636,7 +577,6 @@
                             </div>
                         </article>
 
-                        <!-- 5. MUSIC & PRODUCTION -->
                         <article class="direction-card card-music">
                             <div class="card-overlay"></div>
                             <div class="card-content">
@@ -647,13 +587,11 @@
                                 </a>
                             </div>
                         </article>
-
                     </div>
                 </section>
 
                 <hr class="panel-divider">
 
-                <!-- SECTION 2: МЫ И ЕСТЬ СОБЫТИЕ -->
                 <section>
                     <h2 class="main-title">МЫ И ЕСТЬ СОБЫТИЕ</h2>
                     <p class="manifesto-text">
@@ -663,7 +601,6 @@
 
                 <hr class="panel-divider">
 
-                <!-- SECTION 3: СЛЕДИТЕ ЗА НАМИ -->
                 <section class="social-section">
                     <h3 class="social-title">Следите за нами</h3>
                     <div class="social-grid">
@@ -675,7 +612,6 @@
 
                 <hr class="panel-divider">
 
-                <!-- SECTION 4: FOOTER -->
                 <footer class="final-footer-block">
                     <span class="phone-caption">ПОЗВОНИТЬ НАМ</span>
                     <a href="tel:+998700464000" class="massive-phone">+998 700 464 000</a>
@@ -697,24 +633,25 @@
         function updateMetrics() {
             isMobile = window.innerWidth <= 768;
         }
-        window.addEventListener('resize', updateMetrics);
+        window.addEventListener('resize', updateMetrics, { passive: true });
 
         let ticking = false;
 
+        /* Precise Scroll Progress Logic */
         function onScroll() {
             const scrollY = window.scrollY;
-            const maxScrollDist = window.innerHeight * 0.5; 
+            const maxScrollDist = window.innerHeight * 0.45; 
             const progress = Math.min(scrollY / maxScrollDist, 1);
 
-            // Smooth Interpolation from CENTER (50vh) to top (42px mobile / 52px desktop)
-            const startY = 50; // exact center (50vh)
-            const endY = isMobile ? 42 : 52; // target top pixels
+            // 1. Logo scale & translation interpolation
+            const startY = 50; 
+            const endY = isMobile ? 42 : 52; 
             
             const currentY = (startY * window.innerHeight / 100) * (1 - progress) + endY * progress;
-            const scale = isMobile ? (1.4 - 0.5 * progress) : (2.2 - 1.2 * progress);
+            const scale = isMobile ? (1.3 - 0.4 * progress) : (2.2 - 1.2 * progress);
 
+            logo.style.transform = `translate3d(-50%, -50%, 0) scale(${scale})`;
             logo.style.top = `${currentY}px`;
-            logo.style.transform = `translate(-50%, -50%) scale(${scale})`;
 
             if (progress >= 0.92) {
                 logo.classList.add('scrolled');
@@ -722,10 +659,18 @@
                 logo.classList.remove('scrolled');
             }
 
-            // Fade background overlay and scroll hint smoothly
-            bgOverlay.style.opacity = progress;
-            scrollHint.style.opacity = Math.max(0, 1 - progress * 2.5);
-            panelWrapper.style.opacity = progress;
+            // 2. Exact scroll hint opacity fade
+            // 0% scroll -> opacity 1.0 | 50% scroll -> opacity 0.5 | >=90% scroll -> opacity 0.0
+            const hintOpacity = Math.max(0, 1 - progress * 1.1);
+            scrollHint.style.opacity = hintOpacity.toFixed(2);
+            if (hintOpacity <= 0.05) {
+                scrollHint.style.visibility = 'hidden';
+            } else {
+                scrollHint.style.visibility = 'visible';
+            }
+
+            bgOverlay.style.opacity = progress.toFixed(2);
+            panelWrapper.style.opacity = progress.toFixed(2);
 
             ticking = false;
         }
@@ -735,13 +680,13 @@
                 requestAnimationFrame(onScroll);
                 ticking = true;
             }
-        });
+        }, { passive: true });
 
         onScroll();
 
-        // Canvas Sparkles Animation Loop
+        /* High-performance Mobile Lightweight Particles */
         const canvas = document.getElementById('canvas3d');
-        const ctx = canvas.getContext('2d');
+        const ctx = canvas.getContext('2d', { alpha: false });
         let width, height, particles;
 
         function init3DBackground() {
@@ -749,43 +694,36 @@
             height = canvas.height = window.innerHeight;
             particles = [];
             
-            const colors = [
-                'rgba(229, 185, 103, ', 
-                'rgba(255, 245, 192, ', 
-                'rgba(59, 130, 246, ', 
-                'rgba(168, 85, 247, ', 
-                'rgba(6, 182, 212, '
-            ];
-            const count = isMobile ? 55 : 110;
+            const colors = ['#e5b967', '#fff5c0', '#3b82f6', '#a855f7'];
+            const count = isMobile ? 22 : 80; // Dramatically reduced count for mobile fluidity
             
             for (let i = 0; i < count; i++) {
                 particles.push({
                     x: Math.random() * width, 
                     y: Math.random() * height,
-                    size: Math.random() * 1.8 + 0.3,
-                    speed: Math.random() * 0.38 + 0.08,
-                    color: colors[Math.floor(Math.random() * colors.length)],
-                    alpha: Math.random() * 0.65 + 0.25
+                    size: Math.random() * 1.5 + 0.5,
+                    speed: Math.random() * 0.3 + 0.1,
+                    color: colors[Math.floor(Math.random() * colors.length)]
                 });
             }
         }
 
         function animate3D() {
-            ctx.clearRect(0, 0, width, height);
+            ctx.fillStyle = '#030611';
+            ctx.fillRect(0, 0, width, height);
             
-            const scrollOffset = window.scrollY * 0.12;
+            const scrollOffset = window.scrollY * 0.1;
             
-            particles.forEach(p => {
+            for (let i = 0; i < particles.length; i++) {
+                const p = particles[i];
                 p.y -= p.speed;
                 if (p.y < 0) p.y = height;
                 
                 const drawY = (p.y - scrollOffset % height + height) % height;
                 
-                ctx.beginPath();
-                ctx.arc(p.x, drawY, p.size, 0, Math.PI * 2);
-                ctx.fillStyle = `${p.color}${p.alpha})`;
-                ctx.fill();
-            });
+                ctx.fillStyle = p.color;
+                ctx.fillRect(p.x, drawY, p.size, p.size); // Using fillRect is 3x faster than arc()
+            }
             
             requestAnimationFrame(animate3D);
         }
@@ -795,7 +733,7 @@
             animate3D();
         };
 
-        window.addEventListener('resize', init3DBackground);
+        window.addEventListener('resize', init3DBackground, { passive: true });
     </script>
 </body>
 </html>
