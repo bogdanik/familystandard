@@ -19,6 +19,11 @@
             --purple-glow: rgba(168, 85, 247, 0.25);
             --pink-glow: rgba(236, 72, 153, 0.25);
             --bg: #030611;
+            
+            /* CSS Variable Driven Animation Sync for 120Hz */
+            --scroll-p: 0;
+            --logo-scale: 2.2;
+            --logo-top: 50vh;
         }
         
         * { 
@@ -39,6 +44,7 @@
             text-align: center;
         }
 
+        /* Hardware Accelerated Canvas */
         #canvas3d { 
             position: fixed; 
             top: 0; left: 0; 
@@ -55,31 +61,22 @@
             top: 0; left: 0; 
             width: 100vw; height: 100vh;
             background: 
-                radial-gradient(circle at 20% 30%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 80% 70%, rgba(229, 185, 103, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 50% 90%, rgba(168, 85, 247, 0.08) 0%, transparent 50%);
+                radial-gradient(circle at 20% 30%, rgba(59, 130, 246, 0.12) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(229, 185, 103, 0.12) 0%, transparent 50%),
+                radial-gradient(circle at 50% 90%, rgba(168, 85, 247, 0.1) 0%, transparent 50%);
             z-index: 2;
-            opacity: 0;
+            opacity: var(--scroll-p);
             pointer-events: none;
             will-change: opacity;
             transform: translate3d(0,0,0);
         }
 
-        .glow-aura {
-            position: fixed;
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: 2;
-            transform: translate3d(0,0,0);
-        }
-        .aura-1 { top: 5%; left: 10%; width: 50vw; height: 50vw; background: var(--blue-glow); filter: blur(100px); }
-        .aura-2 { bottom: 10%; right: 5%; width: 45vw; height: 45vw; background: var(--pink-glow); filter: blur(100px); }
-
+        /* GPU Direct Drive Logo Animation */
         #animatedLogo {
             position: fixed;
             left: 50%;
-            top: 50vh;
-            transform: translate3d(-50%, -50%, 0) scale(2.2);
+            top: var(--logo-top);
+            transform: translate3d(-50%, -50%, 0) scale(var(--logo-scale));
             z-index: 100;
             cursor: pointer;
             background: rgba(10, 15, 30, 0.94);
@@ -92,13 +89,14 @@
             box-shadow: 0 0 25px rgba(229, 185, 103, 0.3);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
-            will-change: transform, top, background, opacity;
+            will-change: transform, top, background, box-shadow;
             transform-origin: center center;
+            transition: border-color 0.15s ease, background 0.15s ease;
         }
 
         #animatedLogo.scrolled {
-            background: rgba(10, 16, 32, 0.85);
-            border-color: rgba(229, 185, 103, 0.6);
+            background: rgba(10, 16, 32, 0.88);
+            border-color: rgba(229, 185, 103, 0.65);
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.7);
         }
         
@@ -107,6 +105,7 @@
             width: auto; 
         }
 
+        /* Pure Metallic Gold Gradient with Animated Sheen */
         .logo-text { 
             font-size: 1.05rem; 
             line-height: 1.15;
@@ -128,6 +127,7 @@
             to { background-position: 200% center; }
         }
 
+        /* Scroll Hint Fade-out Logic */
         #scrollHint {
             position: fixed; 
             bottom: 40px; 
@@ -140,8 +140,7 @@
             animation: pulseHint 2s infinite ease-in-out; 
             z-index: 90;
             pointer-events: none;
-            opacity: 1;
-            will-change: opacity, transform;
+            will-change: opacity, transform, visibility;
             text-shadow: 0 0 10px rgba(229, 185, 103, 0.5);
         }
 
@@ -169,10 +168,12 @@
             padding: 0 20px 100px; 
             position: relative; 
             z-index: 20; 
+            opacity: var(--scroll-p);
             will-change: opacity;
             contain: layout style;
         }
 
+        /* Main Center Block Container with dark background image overlay */
         .unified-panel {
             background: linear-gradient(180deg, rgba(5, 9, 20, 0.96) 0%, rgba(7, 12, 26, 0.95) 100%), 
                         url('background.jpg') center/cover no-repeat;
@@ -255,9 +256,13 @@
             overflow: hidden;
             background-size: cover;
             background-position: center;
-            transition: transform 0.3s ease;
+            transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
             transform: translate3d(0,0,0);
             contain: content;
+        }
+
+        .direction-card:hover {
+            transform: translate3d(0, -6px, 0);
         }
 
         .card-overlay {
@@ -289,7 +294,7 @@
             color: #ffffff;
         }
 
-        /* Card Light Styling Optimization */
+        /* Individual Card Lighting Themes */
         .card-kids {
             background-image: url('https://images.unsplash.com/photo-1530103862676-de8c9debad1d?auto=format&fit=crop&w=800&q=75');
             border: 1.5px solid rgba(236, 72, 153, 0.5);
@@ -457,15 +462,11 @@
             margin-top: 20px; 
         }
 
+        /* Mobile Performance Overrides for 120 FPS Rendering */
         @media (max-width: 768px) { 
-            /* Remove heavy backdrop-filters on mobile to eliminate scrolling stutter */
             #animatedLogo, .unified-panel, .direction-card, .btn-social, .details-btn {
                 backdrop-filter: none !important;
                 -webkit-backdrop-filter: none !important;
-            }
-
-            .glow-aura {
-                display: none !important; /* Remove heavy CPU blur overlays on phones */
             }
 
             #animatedLogo { 
@@ -509,9 +510,6 @@
 
     <canvas id="canvas3d"></canvas>
     <div id="bgOverlay"></div>
-    
-    <div class="glow-aura aura-1"></div>
-    <div class="glow-aura aura-2"></div>
 
     <div id="scrollHint">Скролльте вниз</div>
 
@@ -623,10 +621,9 @@
     </div>
 
     <script>
+        const root = document.documentElement;
         const logo = document.getElementById('animatedLogo');
-        const bgOverlay = document.getElementById('bgOverlay');
         const scrollHint = document.getElementById('scrollHint');
-        const panelWrapper = document.getElementById('panelWrapper');
 
         let isMobile = window.innerWidth <= 768;
 
@@ -635,23 +632,24 @@
         }
         window.addEventListener('resize', updateMetrics, { passive: true });
 
+        /* 120 FPS High Refresh Rate Delta Loop Animation Engine */
         let ticking = false;
 
-        /* Precise Scroll Progress Logic */
-        function onScroll() {
+        function updateScrollVars() {
             const scrollY = window.scrollY;
             const maxScrollDist = window.innerHeight * 0.45; 
             const progress = Math.min(scrollY / maxScrollDist, 1);
 
-            // 1. Logo scale & translation interpolation
+            // Compute CSS variables for smooth GPU animation
             const startY = 50; 
             const endY = isMobile ? 42 : 52; 
             
             const currentY = (startY * window.innerHeight / 100) * (1 - progress) + endY * progress;
             const scale = isMobile ? (1.3 - 0.4 * progress) : (2.2 - 1.2 * progress);
 
-            logo.style.transform = `translate3d(-50%, -50%, 0) scale(${scale})`;
-            logo.style.top = `${currentY}px`;
+            root.style.setProperty('--scroll-p', progress.toFixed(3));
+            root.style.setProperty('--logo-scale', scale.toFixed(3));
+            root.style.setProperty('--logo-top', `${currentY.toFixed(1)}px`);
 
             if (progress >= 0.92) {
                 logo.classList.add('scrolled');
@@ -659,9 +657,8 @@
                 logo.classList.remove('scrolled');
             }
 
-            // 2. Exact scroll hint opacity fade
-            // 0% scroll -> opacity 1.0 | 50% scroll -> opacity 0.5 | >=90% scroll -> opacity 0.0
-            const hintOpacity = Math.max(0, 1 - progress * 1.1);
+            // Scroll Hint Opacity Interpolation
+            const hintOpacity = Math.max(0, 1 - progress * 1.15);
             scrollHint.style.opacity = hintOpacity.toFixed(2);
             if (hintOpacity <= 0.05) {
                 scrollHint.style.visibility = 'hidden';
@@ -669,25 +666,23 @@
                 scrollHint.style.visibility = 'visible';
             }
 
-            bgOverlay.style.opacity = progress.toFixed(2);
-            panelWrapper.style.opacity = progress.toFixed(2);
-
             ticking = false;
         }
 
         window.addEventListener('scroll', () => {
             if (!ticking) {
-                requestAnimationFrame(onScroll);
+                requestAnimationFrame(updateScrollVars);
                 ticking = true;
             }
         }, { passive: true });
 
-        onScroll();
+        updateScrollVars();
 
-        /* High-performance Mobile Lightweight Particles */
+        /* High Precision Delta-Time 120Hz Canvas Engine */
         const canvas = document.getElementById('canvas3d');
         const ctx = canvas.getContext('2d', { alpha: false });
         let width, height, particles;
+        let lastTime = performance.now();
 
         function init3DBackground() {
             width = canvas.width = window.innerWidth;
@@ -695,20 +690,23 @@
             particles = [];
             
             const colors = ['#e5b967', '#fff5c0', '#3b82f6', '#a855f7'];
-            const count = isMobile ? 22 : 80; // Dramatically reduced count for mobile fluidity
+            const count = isMobile ? 24 : 85; 
             
             for (let i = 0; i < count; i++) {
                 particles.push({
                     x: Math.random() * width, 
                     y: Math.random() * height,
                     size: Math.random() * 1.5 + 0.5,
-                    speed: Math.random() * 0.3 + 0.1,
+                    speed: Math.random() * 0.04 + 0.015,
                     color: colors[Math.floor(Math.random() * colors.length)]
                 });
             }
         }
 
-        function animate3D() {
+        function animate3D(now) {
+            const dt = Math.min(now - lastTime, 32); // Delta-time cap for HRR stability
+            lastTime = now;
+
             ctx.fillStyle = '#030611';
             ctx.fillRect(0, 0, width, height);
             
@@ -716,13 +714,13 @@
             
             for (let i = 0; i < particles.length; i++) {
                 const p = particles[i];
-                p.y -= p.speed;
+                p.y -= p.speed * dt;
                 if (p.y < 0) p.y = height;
                 
                 const drawY = (p.y - scrollOffset % height + height) % height;
                 
                 ctx.fillStyle = p.color;
-                ctx.fillRect(p.x, drawY, p.size, p.size); // Using fillRect is 3x faster than arc()
+                ctx.fillRect(p.x, drawY, p.size, p.size);
             }
             
             requestAnimationFrame(animate3D);
@@ -730,7 +728,7 @@
 
         window.onload = function() {
             init3DBackground();
-            animate3D();
+            requestAnimationFrame(animate3D);
         };
 
         window.addEventListener('resize', init3DBackground, { passive: true });
