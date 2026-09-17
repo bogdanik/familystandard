@@ -7,14 +7,15 @@
     <style>
         :root {
             --bg-main: #090d16;
-            --card-bg: rgba(255, 255, 255, 0.04);
-            --card-border: rgba(255, 255, 255, 0.08);
-            --accent-purple: #7c3aed;
-            --accent-blue: #2563eb;
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --card-border: rgba(255, 255, 255, 0.12);
+            --accent-purple: #8b5cf6;
+            --accent-blue: #3b82f6;
             --accent-cyan: #06b6d4;
             --accent-pink: #ec4899;
+            --accent-green: #10b981;
             --text-main: #f8fafc;
-            --text-muted: #94a3b8;
+            --text-muted: #cbd5e1;
         }
 
         * {
@@ -28,19 +29,20 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             background-color: var(--bg-main);
             color: var(--text-main);
-            line-height: 1.5;
-            padding: 16px;
-            max-width: 600px;
+            line-height: 1.6;
+            padding: 20px 16px;
+            max-width: 720px; /* Расширено по просьбе */
             margin: 0 auto;
             overflow-x: hidden;
+            font-size: 17px; /* Увеличен базовый шрифт */
             background-image: 
-                radial-gradient(circle at 10% 10%, rgba(124, 58, 237, 0.15) 0%, transparent 40%),
-                radial-gradient(circle at 90% 80%, rgba(6, 182, 212, 0.15) 0%, transparent 40%);
+                radial-gradient(circle at 10% 10%, rgba(139, 92, 246, 0.18) 0%, transparent 45%),
+                radial-gradient(circle at 90% 80%, rgba(6, 182, 212, 0.18) 0%, transparent 45%);
             background-attachment: fixed;
         }
 
-        /* 120 FPS Hardware Acceleration optimization */
-        .glass-card, .accordion-content, .badge, .btn-tab {
+        /* 120 FPS Hardware Acceleration */
+        .glass-card, .accordion-content, .badge, .role-card {
             will-change: transform, opacity;
             transform: translateZ(0);
             backface-visibility: hidden;
@@ -48,11 +50,11 @@
 
         header {
             text-align: center;
-            padding: 24px 0 16px;
+            padding: 28px 0 20px;
         }
 
         .title {
-            font-size: 1.6rem;
+            font-size: 2rem;
             font-weight: 800;
             background: linear-gradient(135deg, #a855f7, #3b82f6, #06b6d4);
             -webkit-background-clip: text;
@@ -62,47 +64,47 @@
         }
 
         .subtitle {
-            font-size: 0.9rem;
+            font-size: 1.05rem;
             color: var(--text-muted);
         }
 
         .glass-card {
             background: var(--card-bg);
             border: 1px solid var(--card-border);
-            border-radius: 16px;
-            padding: 16px;
-            margin-bottom: 16px;
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            box-shadow: 0 10px 35px 0 rgba(0, 0, 0, 0.35);
         }
 
         .card-header-title {
-            font-size: 1.1rem;
-            font-weight: 700;
+            font-size: 1.3rem;
+            font-weight: 800;
             display: flex;
             align-items: center;
-            gap: 8px;
-            margin-bottom: 12px;
+            gap: 10px;
+            margin-bottom: 14px;
         }
 
         .badge {
             display: inline-block;
-            padding: 4px 10px;
+            padding: 6px 14px;
             border-radius: 20px;
-            font-size: 0.75rem;
+            font-size: 0.85rem;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
-        .badge-purple { background: rgba(124, 58, 237, 0.2); color: #c084fc; border: 1px solid rgba(192, 132, 252, 0.3); }
-        .badge-cyan { background: rgba(6, 182, 212, 0.2); color: #22d3ee; border: 1px solid rgba(34, 211, 238, 0.3); }
-        .badge-pink { background: rgba(236, 72, 153, 0.2); color: #f472b6; border: 1px solid rgba(244, 114, 182, 0.3); }
+        .badge-purple { background: rgba(139, 92, 246, 0.25); color: #c084fc; border: 1px solid rgba(192, 132, 252, 0.4); }
+        .badge-cyan { background: rgba(6, 182, 212, 0.25); color: #22d3ee; border: 1px solid rgba(34, 211, 238, 0.4); }
+        .badge-green { background: rgba(16, 185, 129, 0.25); color: #34d399; border: 1px solid rgba(52, 211, 153, 0.4); }
 
-        /* Accordion Style */
+        /* Accordions */
         .accordion-item {
             border-bottom: 1px solid var(--card-border);
-            padding: 12px 0;
+            padding: 14px 0;
         }
         .accordion-item:last-child { border-bottom: none; }
 
@@ -111,19 +113,19 @@
             background: none;
             border: none;
             color: var(--text-main);
-            font-size: 0.95rem;
-            font-weight: 600;
+            font-size: 1.15rem;
+            font-weight: 700;
             text-align: left;
             display: flex;
             justify-content: space-between;
             align-items: center;
             cursor: pointer;
-            padding: 4px 0;
+            padding: 6px 0;
         }
 
         .accordion-icon {
             transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-            font-size: 1.2rem;
+            font-size: 1.3rem;
             color: var(--accent-cyan);
         }
 
@@ -134,16 +136,16 @@
         .accordion-content {
             max-height: 0;
             overflow: hidden;
-            transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease-in-out;
+            transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease-in-out;
             opacity: 0;
             padding-top: 0;
-            font-size: 0.88rem;
-            color: #cbd5e1;
+            font-size: 1rem;
+            color: #e2e8f0;
         }
 
         .accordion-item.active .accordion-content {
             opacity: 1;
-            padding-top: 10px;
+            padding-top: 14px;
         }
 
         ul {
@@ -153,90 +155,70 @@
 
         li {
             position: relative;
-            padding-left: 18px;
-            margin-bottom: 8px;
+            padding-left: 22px;
+            margin-bottom: 10px;
+            line-height: 1.5;
         }
         li::before {
             content: "•";
             position: absolute;
             left: 0;
             color: var(--accent-cyan);
-            font-size: 1.2rem;
+            font-size: 1.4rem;
             line-height: 1;
         }
 
-        /* Question Tabs */
-        .tabs-nav {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 12px;
-            background: rgba(0,0,0,0.3);
-            padding: 4px;
-            border-radius: 12px;
+        /* Questions Box inside Blocks */
+        .question-block {
+            background: rgba(6, 182, 212, 0.08);
+            border-left: 4px solid var(--accent-cyan);
+            padding: 14px 16px;
+            margin: 12px 0;
+            border-radius: 0 12px 12px 0;
         }
-
-        .btn-tab {
-            flex: 1;
-            padding: 8px 12px;
-            border: none;
-            border-radius: 8px;
-            background: transparent;
-            color: var(--text-muted);
-            font-size: 0.8rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .btn-tab.active {
-            background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue));
-            color: #fff;
-            box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
-        }
-
-        .tab-pane {
-            display: none;
-        }
-        .tab-pane.active {
-            display: block;
-        }
-
-        .question-box {
-            background: rgba(255, 255, 255, 0.03);
-            border-left: 3px solid var(--accent-cyan);
-            padding: 10px 12px;
+        .question-title {
+            font-size: 0.95rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            color: var(--accent-cyan);
             margin-bottom: 8px;
-            border-radius: 0 8px 8px 0;
-            font-style: italic;
+            letter-spacing: 0.5px;
         }
+        .question-item {
+            font-style: italic;
+            margin-bottom: 6px;
+            color: #ffffff;
+            font-size: 1.02rem;
+        }
+        .question-item:last-child { margin-bottom: 0; }
 
         .role-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-top: 8px;
+            gap: 12px;
+            margin-top: 10px;
         }
 
         .role-card {
-            background: rgba(0, 0, 0, 0.25);
-            padding: 10px;
-            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 14px;
+            border-radius: 14px;
             border: 1px solid var(--card-border);
         }
         .role-title {
-            font-size: 0.85rem;
-            font-weight: 700;
+            font-size: 1rem;
+            font-weight: 800;
             color: var(--accent-cyan);
-            margin-bottom: 4px;
+            margin-bottom: 6px;
         }
 
         .tech-tag {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 2px 6px;
-            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.12);
+            padding: 3px 8px;
+            border-radius: 6px;
             font-family: monospace;
-            font-size: 0.8rem;
-            color: #f1f5f9;
+            font-size: 0.95rem;
+            color: #fff;
         }
     </style>
 </head>
@@ -244,42 +226,68 @@
 
     <header>
         <div class="title">ТЕХНИЧЕСКОЕ ЗАДАНИЕ</div>
-        <div class="subtitle">Интерактивный гайд для мобилографов</div>
+        <div class="subtitle">Полный гид съёмки мероприятия для мобилографов</div>
     </header>
 
-    <!-- ПОЧЕМУ 9:16 -->
+    <!-- ПУНКТ 1: ЛАЙФХАКИ И ПОЗИЦИОНИРОВАНИЕ (В ПЕРВУЮ ОЧЕРЕДЬ) -->
     <div class="glass-card">
         <div class="card-header-title">
-            <span>📱</span> Формат съемки: Вертикальный (9:16)
+            <span class="badge badge-green">1. Работа на площадке & Правила</span>
         </div>
-        <p style="font-size: 0.85rem; color: #cbd5e1; margin-bottom: 10px;">
-            Все съемки проводятся <strong>строго вертикально (9:16)</strong> в <span class="tech-tag">4K / 60 FPS</span>.
-        </p>
-        <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.4;">
-            <strong>Почему именно так:</strong> Контент готовится под формат Reels/Shorts. При кропе из горизонтального теряется 60% качества и режутся детали. Свадебный архив для пары в формате 9:16 — современный тренд: молодожены смотрят видео с телефонов, и вертикальный контент удобнее всего.
+        
+        <div class="accordion-item active">
+            <button class="accordion-trigger">
+                <span>📍 Выбор фона и освещения</span>
+                <span class="accordion-icon">▼</span>
+            </button>
+            <div class="accordion-content" style="max-height: 1000px; opacity: 1;">
+                <ul>
+                    <li><strong>Где КАТЕГОРИЧЕСКИ НЕЛЬЗЯ снимать:</strong> На фоне туалетов, служебных дверей, проходов официантов с подносами, хаоса из проводов, колонок и пустых коробок.</li>
+                    <li><strong>Идеальные локации:</strong> Велком-зона, фотозона, красивая архитектура зала, глубина зала с мягким размытым светом гирлянд и софитов.</li>
+                    <li><strong>Главное правило света:</strong> Свет всегда должен падать **НА ЛИЦО** человека! Ни в коем случае не снимайте людей спиной к ярким окнам или прожекторам (иначе лица будут черными).</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="accordion-item">
+            <button class="accordion-trigger">
+                <span>🚶‍♂️ Позиционирование и движения</span>
+                <span class="accordion-icon">▼</span>
+            </button>
+            <div class="accordion-content">
+                <ul>
+                    <li><strong>Правило 90 градусов:</strong> Оператор А и Оператор Б никогда не стоят друг напротив друга, чтобы не попадать в кадр коллеге! Становитесь под углом 90° к объекту съёмки.</li>
+                    <li><strong>"Походка ниндзя":</strong> Двигайтесь на слегка согнутых ногах, мягко перекатываясь с пятки на носок. Это полностью убирает тряску смартфона.</li>
+                    <li><strong>Фиксация фокуса:</strong> Зажмите пальцем на экране лицо ведущего/гостя, чтобы заблокировать фокус и экспозицию (чтобы кадр не мигал по яркости).</li>
+                    <li><strong>Правило 3–4 секунд:</strong> Держать каждый статический кадр не менее 3 секунд! Не дергайте камеру в стороны.</li>
+                </ul>
+            </div>
         </div>
     </div>
 
-    <!-- РАСПРЕДЕЛЕНИЕ РОЛЕЙ -->
+    <!-- ПУНКТ 2: ТЕХНИЧЕСКИЕ НАСТРОЙКИ И РОЛИ -->
     <div class="glass-card">
         <div class="card-header-title">
-            <span class="badge badge-purple">Разделение ролей</span>
+            <span>📱</span> Формат и разделение ролей
         </div>
+        <p style="margin-bottom: 12px; color: #cbd5e1;">
+            Съемка строго <strong>ВЕРТИКАЛЬНАЯ (9:16)</strong> в режиме <span class="tech-tag">4K / 60 FPS</span>.
+        </p>
         <div class="role-grid">
             <div class="role-card">
                 <div class="role-title">ОПЕРАТОР А</div>
-                <div style="font-size: 0.78rem; color: #94a3b8;">
+                <div style="font-size: 0.9rem; color: #cbd5e1;">
                     • <strong>Фокус:</strong> Ведущий.<br>
                     • <strong>Планы:</strong> Средний / Крупный.<br>
-                    • <strong>Звук:</strong> Контроль петлички на ведущем.<br>
-                    • <strong>Ракурс:</strong> Снизу-вверх (для статуса).
+                    • <strong>Звук:</strong> Петличка ведущего.<br>
+                    • <strong>Ракурс:</strong> Чуть снизу-вверх.
                 </div>
             </div>
             <div class="role-card">
                 <div class="role-title" style="color: var(--accent-pink);">ОПЕРАТОР Б</div>
-                <div style="font-size: 0.78rem; color: #94a3b8;">
-                    • <strong>Фокус:</strong> Гости & Эмоции.<br>
-                    • <strong>Планы:</strong> Крупный (лица) / Общий.<br>
+                <div style="font-size: 0.9rem; color: #cbd5e1;">
+                    • <strong>Фокус:</strong> Гости и эмоции.<br>
+                    • <strong>Планы:</strong> Крупные лица / Общий.<br>
                     • <strong>Звук:</strong> Интершум зала.<br>
                     • <strong>Ракурс:</strong> На уровне глаз.
                 </div>
@@ -287,10 +295,10 @@
         </div>
     </div>
 
-    <!-- ПОШАГОВЫЙ СЦЕНАРИЙ -->
+    <!-- ПУНКТ 3: ДЕТАЛЬНЫЙ СЦЕНАРИЙ С ВСТРОЕННЫМИ ВОПРОСАМИ -->
     <div class="glass-card">
         <div class="card-header-title">
-            <span>🎬</span> Сценарий по блокам
+            <span class="badge badge-purple">2. Пошаговый сценарий по блокам</span>
         </div>
 
         <!-- Блок 1 -->
@@ -301,24 +309,30 @@
             </button>
             <div class="accordion-content">
                 <ul>
-                    <li><strong>Оператор А:</strong> Снимает блиц-опрос гостей с ведущим (или самостоятельно). Микрофон/петличка в кадре.</li>
-                    <li><strong>Оператор Б:</strong> Снимает перебивки (B-roll): бокалы, велком-зону, детали декора, смеющиеся группы гостей.</li>
-                    <li><strong>Кадрирование:</strong> По пояс. Оставляйте немного места сверху над головой.</li>
+                    <li><strong>Задачи операторов:</strong> Снять атмосферу велкома. Снимать бокалы, наряды, улыбки, обнимашки гостей.</li>
+                    <li><strong>Блиц-опрос на входе:</strong> Записывать гостей с микрофоном/петличкой. <u>ВНИМАНИЕ: Про ведущего в начале ничего НЕ спрашиваем!</u> Задаем вопросы в подарок паре и про ожидания от вечера.</li>
                 </ul>
+
+                <div class="question-block">
+                    <div class="question-title">🎤 Вопросы на велкоме (Записываем на микрофон):</div>
+                    <div class="question-item">— "Чего вы больше всего ждете от сегодняшнего вечера?"</div>
+                    <div class="question-item">— "Кому сегодня несете самые искренние поздравления и пожелания?"</div>
+                    <div class="question-item">— "Какой главный совет вы дадите парам на 50 лет совместной жизни?"</div>
+                    <div class="question-item">— "Как думаете, кто сегодня первым уйдет в абсолютный разрыв на танцполе?"</div>
+                </div>
             </div>
         </div>
 
         <!-- Блок 2 -->
         <div class="accordion-item">
             <button class="accordion-trigger">
-                <span>2. Речь ведущего / Нейромузыка 🔥</span>
+                <span>2. Встреча молодых и каравай</span>
                 <span class="accordion-icon">▼</span>
             </button>
             <div class="accordion-content">
-                <p style="color: #f472b6; font-weight: 700; margin-bottom: 6px;">КЛЮЧЕВОЙ БЛОК ДЛЯ ПРОМО!</p>
                 <ul>
-                    <li><strong>Оператор А:</strong> Снимает ТОЛЬКО ведущего. Ракурс чуть снизу. Показываем харизму, жесты, мимику. Съемка непрерывная!</li>
-                    <li><strong>Оператор Б:</strong> Охотится за эмоциями! Ищет гостей с мурашками, слезами, улыбками. Кадр держим 3-4 секунды.</li>
+                    <li><strong>Оператор А:</strong> Снимает средний план ведущего, который координирует гостей и задает громкие аплодисменты.</li>
+                    <li><strong>Оператор Б:</strong> Общий план коридора из гостей + крупные счастливые лица молодоженов при разламывании каравая.</li>
                 </ul>
             </div>
         </div>
@@ -326,13 +340,14 @@
         <!-- Блок 3 -->
         <div class="accordion-item">
             <button class="accordion-trigger">
-                <span>3. Свадебный квиз 🔥</span>
+                <span>3. Речь ведущего / Нейромузыка 🔥</span>
                 <span class="accordion-icon">▼</span>
             </button>
             <div class="accordion-content">
+                <p style="color: #f472b6; font-weight: 800; margin-bottom: 8px;">ГЛАВНЫЙ БЛОК ДЛЯ ПРОМО РОЛИКА!</p>
                 <ul>
-                    <li><strong>Оператор А:</strong> Ведущий у экрана, взаимодействует с командами, подносит микрофон.</li>
-                    <li><strong>Оператор Б:</strong> Крупный план реакций: кто-то смеется до слез, доказывает ответ, кричит от победы, тыкает в экран.</li>
+                    <li><strong>Оператор А:</strong> Снимает **ТОЛЬКО ведущего**. Включить петличку! Крупный план (от груди до головы) и средний (по пояс). Фокус на движениях рук, уверенной мимике и эмоциях. Не прерывать съемку 1-2 минуты!</li>
+                    <li><strong>Оператор Б:</strong> Снимает **РЕАКЦИИ**. Улавливать мурашки, слезы, затаенное дыхание гостей, улыбки, то, как пара держится за руки.</li>
                 </ul>
             </div>
         </div>
@@ -340,13 +355,13 @@
         <!-- Блок 4 -->
         <div class="accordion-item">
             <button class="accordion-trigger">
-                <span>4. Алфавит & Танцевальный баттл</span>
+                <span>4. Свадебный квиз 🔥</span>
                 <span class="accordion-icon">▼</span>
             </button>
             <div class="accordion-content">
                 <ul>
-                    <li><strong>Оператор А:</strong> Ведущий в центре круга как дирижер процесса. Динамичная съемка в движении.</li>
-                    <li><strong>Оператор Б:</strong> Самые яркие танцевальные движения гостей, ноги, ноги в драйве, синхронные движения.</li>
+                    <li><strong>Оператор А:</strong> Снимает ведущего у экрана — как он общается с залом, отпускает шутки, подносит микрофон к столикам.</li>
+                    <li><strong>Оператор Б:</strong> Охотится за взрывами эмоций! Снимать крупно: людей, смеющихся до слез, тыкающих в экран, кричащих "Дай пять!" при правильном ответе.</li>
                 </ul>
             </div>
         </div>
@@ -354,82 +369,58 @@
         <!-- Блок 5 -->
         <div class="accordion-item">
             <button class="accordion-trigger">
-                <span>5. Вынос торта & Дискотека</span>
+                <span>5. Алфавит & Танцевальный баттл</span>
                 <span class="accordion-icon">▼</span>
             </button>
             <div class="accordion-content">
                 <ul>
-                    <li><strong>Оператор А:</strong> Эпичные моменты с ведущим на дискотеке, когда он «зажигает» вместе с толпой.</li>
-                    <li><strong>Оператор Б:</strong> Торт, огоньки свечей, искренние взгляды пары и гостей.</li>
-                </ul>
-            </div>
-        </div>
-    </div>
-
-    <!-- ИНТЕРАКТИВНЫЕ ВОПРОСЫ -->
-    <div class="glass-card">
-        <div class="card-header-title">
-            <span>🎤</span> Вопросы для блиц-интервью
-        </div>
-
-        <div class="tabs-nav">
-            <button class="btn-tab active" onclick="switchTab('promo')">Для Промо Ведущего</button>
-            <button class="btn-tab" onclick="switchTab('wedding')">В подарок Паре</button>
-        </div>
-
-        <div id="tab-promo" class="tab-pane active">
-            <div class="question-box">"Насколько этот ведущий опасен для скучных людей по шкале от 1 до 10?"</div>
-            <div class="question-box">"Если бы ведущий был супергероем, какая у него была бы суперсила?"</div>
-            <div class="question-box">"Опишите ведущего одним словом, которое первично пришло в голову!"</div>
-            <div class="question-box">"Кто сегодня победит в танцевальном баттле — сторона жениха или невесты?"</div>
-            <div class="question-box"><em>Финал вечера:</em> "Честно: насколько разрядил и зажег этот вечер ведущий?"</div>
-        </div>
-
-        <div id="tab-wedding" class="tab-pane">
-            <div class="question-box">"Какой самый главный совет вы дадите новобрачным на 50 лет вперед?"</div>
-            <div class="question-box">"Вспомните самую смешную или трогательную историю про жениха/невесту."</div>
-            <div class="question-box">"Как думаете, кто в их семье будет главным хранителем пульта от телевизора?"</div>
-            <div class="question-box">"Пожелайте одно слово, но самое искреннее и от чистого сердца!"</div>
-        </div>
-    </div>
-
-    <!-- РАБОТА НА ПЛОЩАДКЕ -->
-    <div class="glass-card">
-        <div class="card-header-title">
-            <span class="badge badge-cyan">Лайфхаки & Позиционирование</span>
-        </div>
-        
-        <div class="accordion-item">
-            <button class="accordion-trigger">
-                <span>📍 Выбор фона и света</span>
-                <span class="accordion-icon">▼</span>
-            </button>
-            <div class="accordion-content">
-                <ul>
-                    <li><strong>Не снимайте на фоне:</strong> Туалетов, служебных дверей, официантов с грязными подносами, хаотичных проводов.</li>
-                    <li><strong>Ищите:</strong> Фотозону, декор, красивую глубину зала с гирляндами/подсветкой.</li>
-                    <li><strong>Правило света:</strong> Свет должен падать НА ЛИЦО спикеров. Никогда не снимайте людей спиной к ярким окнам или прожекторам (иначе получим темные силуэты).</li>
+                    <li><strong>Оператор А:</strong> Снимает ведущего в центре танцпола. Ракурс снизу-вверх, чтобы ведущий смотрелся максимально динамично и мощно.</li>
+                    <li><strong>Оператор Б:</strong> Самые жесткие и смешные танцевальные движения гостей. Крупные планы: ноги, лица в драйве, синхронный кач толпы.</li>
                 </ul>
             </div>
         </div>
 
+        <!-- Блок 6 -->
         <div class="accordion-item">
             <button class="accordion-trigger">
-                <span>🚶‍♂️ Позиционирование в зале</span>
+                <span>6. Вынос торта & Дискотека</span>
                 <span class="accordion-icon">▼</span>
             </button>
             <div class="accordion-content">
                 <ul>
-                    <li><strong>Правило 90 градусов:</strong> Операторы не должны стоять друг напротив друга, чтобы не попадать в кадр коллеге. Оптимально — угол 90°.</li>
-                    <li><strong>Походка ниндзя:</strong> Двигайтесь на слегка согнутых ногах, мягко перекатываясь с пятки на носок. Это убирает тряску смартфона.</li>
-                    <li><strong>Фиксация экспозиции:</strong> Зажмите пальцем на экране лицо человека, чтобы зафиксировать фокус и яркость.</li>
+                    <li><strong>Оператор А:</strong> Зажигательные моменты ведущего на танцполе вместе с толпой.</li>
+                    <li><strong>Оператор Б:</strong> Торт, огоньки бенгальских свечей, крупные кадры обнимающихся гостей.</li>
                 </ul>
+            </div>
+        </div>
+
+        <!-- Блок 7 -->
+        <div class="accordion-item">
+            <button class="accordion-trigger">
+                <span>7. Финал вечера & Опрос 🔥</span>
+                <span class="accordion-icon">▼</span>
+            </button>
+            <div class="accordion-content">
+                <p style="color: #34d399; font-weight: 800; margin-bottom: 8px;">ОБЯЗАТЕЛЬНЫЙ ФИНАЛЬНЫЙ ОПРОС!</p>
+                <ul>
+                    <li>В самом конце вечера с микрофоном подходим к 3–5 самым активным гостям и молодоженам.</li>
+                    <li>Сначала задаем общий вопрос про вечер (в подарок паре), а потом сразу плавно переходим к вопросам про ведущего (для промо).</li>
+                </ul>
+
+                <div class="question-block" style="border-left-color: var(--accent-pink); background: rgba(236, 72, 153, 0.08);">
+                    <div class="question-title" style="color: var(--accent-pink);">🎤 Вопросы финального блица (Смешанный формат):</div>
+                    <div class="question-item">1. "Как вам вообще сегодняшний вечер? Поделитесь самыми свежими эмоциями!"</div>
+                    <div class="question-item">2. "Какой момент или фишка вечера запомнились больше всего?"</div>
+                    <div class="question-item">3. "Честно: насколько от 1 до 10 ведущий разрядил и зажег этот праздник?"</div>
+                    <div class="question-item">4. "Если бы ведущий был супергероем, какая у него была бы суперсила?"</div>
+                    <div class="question-item">5. "Порекомендовали бы вы его своим друзьям и близким на праздник?"</div>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Accordion logic
+        // Accordion functionality
         document.querySelectorAll('.accordion-trigger').forEach(button => {
             button.addEventListener('click', () => {
                 const item = button.parentElement;
@@ -437,32 +428,15 @@
                 
                 const isActive = item.classList.contains('active');
                 
-                // Close other accordions in the same card for clean UI
-                item.parentElement.querySelectorAll('.accordion-item').forEach(other => {
-                    other.classList.remove('active');
-                    other.querySelector('.accordion-content').style.maxHeight = null;
-                });
-
-                if (!isActive) {
+                if (isActive) {
+                    item.classList.remove('active');
+                    content.style.maxHeight = null;
+                } else {
                     item.classList.add('active');
                     content.style.maxHeight = content.scrollHeight + "px";
                 }
             });
         });
-
-        // Tab Switcher logic
-        function switchTab(tabName) {
-            document.querySelectorAll('.btn-tab').forEach(btn => btn.classList.remove('active'));
-            document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
-
-            if(tabName === 'promo') {
-                event.target.classList.add('active');
-                document.getElementById('tab-promo').classList.add('active');
-            } else {
-                event.target.classList.add('active');
-                document.getElementById('tab-wedding').classList.add('active');
-            }
-        }
     </script>
 </body>
 </html>
