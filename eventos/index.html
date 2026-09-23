@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Event OS — Control Center</title>
+    <title>Event OS — Master Hub</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,11 +14,13 @@
     <style>
         :root {
             --bg-black: #030712;
-            --gold-main: #f59e0b;
             --gold-light: #fff3a1;
-            --glass-card: rgba(15, 23, 42, 0.92);
-            --glass-border: rgba(245, 158, 11, 0.3);
+            --gold-main: #f59e0b;
+            --gold-dark: #b45309;
+            --glass-card: rgba(15, 23, 42, 0.75);
+            --glass-border: rgba(245, 158, 11, 0.25);
             --text-main: #f8fafc;
+            --danger-red: #ef4444;
         }
 
         * {
@@ -36,6 +38,43 @@
             min-height: 100vh;
             overflow-x: hidden;
             position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* --- ЖИВОЙ ЗОЛОТОЙ ФОН --- */
+        .bg-glow {
+            position: fixed;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(245, 158, 11, 0.15) 0%, rgba(3, 7, 18, 0) 70%);
+            top: 50%;
+            left: 50%;
+            transform: translate3d(-50%, -50%, 0);
+            pointer-events: none;
+            z-index: 0;
+            animation: pulseGlow 8s ease-in-out infinite alternate;
+            will-change: transform, opacity;
+        }
+
+        @keyframes pulseGlow {
+            0% { transform: translate3d(-50%, -50%, 0) scale(0.8); opacity: 0.5; }
+            100% { transform: translate3d(-50%, -50%, 0) scale(1.2); opacity: 0.9; }
+        }
+
+        /* --- ЗОЛОТОЙ ПЕРЕЛИВАЮЩИЙСЯ ГРАДИЕНТ ТЕКСТА --- */
+        .gold-shimmer-text {
+            background: linear-gradient(135deg, #fff3a1 0%, #f59e0b 25%, #d97706 50%, #f59e0b 75%, #fff3a1 100%);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: goldMove 4s linear infinite;
+        }
+
+        @keyframes goldMove {
+            0% { background-position: 0% center; }
+            100% { background-position: 200% center; }
         }
 
         /* --- 1. АВТОРИЗАЦИЯ --- */
@@ -47,58 +86,131 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            background: radial-gradient(circle at center, #0f172a 0%, #030712 100%);
             padding: 20px;
+            background: radial-gradient(circle at center, rgba(15, 23, 42, 0.8) 0%, var(--bg-black) 100%);
+            backdrop-filter: blur(10px);
         }
 
         .login-card {
             background: var(--glass-card);
             border: 1px solid var(--glass-border);
-            padding: 32px 24px;
-            border-radius: 24px;
+            padding: 40px 28px;
+            border-radius: 28px;
             width: 100%;
-            max-width: 380px;
+            max-width: 400px;
             text-align: center;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.8), 0 0 40px rgba(245, 158, 11, 0.1);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            transform: translate3d(0, 0, 0);
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.4s ease, box-shadow 0.4s ease;
+            will-change: transform;
         }
 
-        .login-card h1 {
+        .login-card.shake {
+            animation: shake 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+            border-color: var(--danger-red);
+        }
+
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-2px, 0, 0); }
+            20%, 80% { transform: translate3d(4px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-6px, 0, 0); }
+            40%, 60% { transform: translate3d(6px, 0, 0); }
+        }
+
+        .brand-logo {
             font-family: 'Cinzel', serif;
-            color: var(--gold-light);
-            font-size: 1.8rem;
+            font-size: 2.2rem;
+            font-weight: 900;
+            letter-spacing: 3px;
             margin-bottom: 6px;
+            cursor: pointer;
+            user-select: none;
+            display: inline-block;
+            transition: transform 0.2s ease;
         }
 
-        .login-card p {
+        .brand-logo:active {
+            transform: scale(0.95);
+        }
+
+        .card-subtitle {
             color: #94a3b8;
-            font-size: 0.85rem;
-            margin-bottom: 22px;
+            font-size: 0.9rem;
+            margin-bottom: 28px;
+            min-height: 22px;
+            transition: color 0.3s ease;
+        }
+
+        .admin-badge {
+            display: none;
+            background: rgba(245, 158, 11, 0.2);
+            border: 1px solid var(--gold-main);
+            color: var(--gold-light);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 16px;
         }
 
         input.input-field {
             width: 100%;
-            padding: 16px 18px;
-            border-radius: 14px;
+            padding: 18px 20px;
+            border-radius: 16px;
             border: 1px solid var(--glass-border);
-            background: rgba(3, 7, 18, 0.8);
+            background: rgba(3, 7, 18, 0.7);
             color: #ffffff;
-            font-size: 1rem;
-            margin-bottom: 12px;
+            font-size: 1.05rem;
+            font-weight: 600;
             outline: none;
             text-align: center;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        input.input-field:focus {
+            border-color: var(--gold-main);
+            background: rgba(3, 7, 18, 0.9);
+            box-shadow: 0 0 20px rgba(245, 158, 11, 0.25);
+        }
+
+        .error-toast {
+            color: var(--danger-red);
+            font-size: 0.8rem;
+            font-weight: 700;
+            margin-top: -8px;
+            margin-bottom: 16px;
+            display: none;
         }
 
         button.btn-primary {
             width: 100%;
-            padding: 16px;
-            border-radius: 14px;
+            padding: 18px;
+            border-radius: 16px;
             border: none;
-            background: linear-gradient(135deg, var(--gold-light), var(--gold-main));
+            background: linear-gradient(135deg, var(--gold-light) 0%, var(--gold-main) 50%, var(--gold-dark) 100%);
+            background-size: 200% auto;
             color: #030712;
             font-weight: 800;
-            font-size: 1rem;
+            font-size: 1.05rem;
+            letter-spacing: 1px;
             cursor: pointer;
-            box-shadow: 0 8px 20px rgba(245, 158, 11, 0.3);
+            box-shadow: 0 10px 25px rgba(245, 158, 11, 0.3);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            will-change: transform, box-shadow;
+        }
+
+        button.btn-primary:active {
+            transform: scale(0.98);
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2);
         }
 
         /* --- 2. ЭКРАН ПРОЕКТОРА (ПИН 222) --- */
@@ -119,7 +231,7 @@
             background: rgba(245, 158, 11, 0.15);
             border: 1px solid var(--gold-main);
             color: var(--gold-light);
-            padding: 8px 22px;
+            padding: 8px 24px;
             border-radius: 30px;
             font-size: 0.95rem;
             font-weight: 700;
@@ -130,9 +242,9 @@
 
         .screen-title {
             font-family: 'Cinzel', serif;
-            font-size: 3.5rem;
+            font-size: 3.8rem;
             color: #ffffff;
-            text-shadow: 0 0 30px rgba(245, 158, 11, 0.5);
+            text-shadow: 0 0 35px rgba(245, 158, 11, 0.6);
         }
 
         /* --- 3. ПУЛЬТ ВЕДУЩЕГО (ПИН 111) --- */
@@ -148,7 +260,6 @@
             pointer-events: auto;
         }
 
-        /* 3A. ВЕРХНИЙ БЛОК: МУЗЫКА И НАСТРОЕНИЕ */
         #host-top-music {
             position: fixed;
             top: 0;
@@ -158,7 +269,7 @@
             background: rgba(3, 7, 18, 0.96);
             border-bottom: 1px solid var(--glass-border);
             backdrop-filter: blur(20px);
-            padding: 10px 12px;
+            padding: 10px 14px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -183,6 +294,7 @@
             font-weight: 800;
             cursor: pointer;
             text-align: center;
+            transition: all 0.2s ease;
         }
 
         .btn-vol.active {
@@ -204,7 +316,6 @@
             outline: none;
         }
 
-        /* 3B. ПРАВЫЙ БЛОК: САУНДБОРД (3 ТАПА ЗАЩИТЫ) */
         #host-right-soundboard {
             position: fixed;
             top: 95px;
@@ -258,7 +369,6 @@
             background: rgba(239, 68, 68, 0.45);
         }
 
-        /* 3C. ЦЕНТРАЛЬНАЯ СЕТКА МОДУЛЕЙ */
         #host-modules-container {
             position: fixed;
             top: 100px;
@@ -284,14 +394,22 @@
 </head>
 <body>
 
+    <div class="bg-glow"></div>
+
     <!-- 1. АВТОРИЗАЦИЯ -->
     <div id="view-login">
-        <div class="login-card">
-            <h1>EVENT OS</h1>
-            <p>Система режиссуры мероприятий</p>
-            <input type="password" id="input-pin" class="input-field" placeholder="ПИН-код (111 / 222)" autocomplete="off">
-            <input type="text" id="input-name" class="input-field" placeholder="Ваше имя (для гостей)" autocomplete="off">
-            <button class="btn-primary" onclick="submitLogin()">ВОЙТИ</button>
+        <div class="login-card" id="login-card">
+            <div id="admin-badge" class="admin-badge">Режим управления</div>
+            <div class="brand-logo gold-shimmer-text" id="brand-logo" onclick="handleLogoTap()">EVENT OS</div>
+            <p class="card-subtitle" id="card-subtitle">Введите имя для входа в лобби</p>
+            
+            <div class="input-group">
+                <input type="text" id="main-input" class="input-field" placeholder="Ваше имя" autocomplete="off" maxlength="25">
+            </div>
+            
+            <div id="error-toast" class="error-toast">Пожалуйста, используйте корректное имя</div>
+
+            <button class="btn-primary" onclick="submitEntry()">ВОЙТИ</button>
         </div>
     </div>
 
@@ -303,8 +421,6 @@
 
     <!-- 3. ПУЛЬТ ВЕДУЩЕГО (ПИН 111) -->
     <div id="view-host">
-        
-        <!-- СВЕРХУ: МУЗЫКАЛЬНЫЙ БЛОК -->
         <div id="host-top-music" class="host-interactive">
             <div class="music-controls-row">
                 <span style="font-size: 0.75rem; color: var(--gold-light); font-weight: 800;">🔊 ГРОМКОСТЬ:</span>
@@ -320,7 +436,6 @@
             </select>
         </div>
 
-        <!-- СПРАВА: САУНДБОРД (3 ТАПА) -->
         <div id="host-right-soundboard" class="host-interactive">
             <div class="sfx-btn" onclick="handleSfxTap('applause', this)">
                 <span>👏 Аплодисменты</span>
@@ -340,29 +455,107 @@
             </div>
         </div>
 
-        <!-- ЦЕНТР: СЕТКА БУДУЩИХ МОДУЛЕЙ -->
         <div id="host-modules-container" class="host-interactive"></div>
     </div>
 
     <!-- 4. ЭКРАН ГОСТЯ -->
     <div id="view-guest">
-        <h2 style="color: var(--gold-light); margin-top: 40px;">Добро пожаловать!</h2>
-        <p style="color: #94a3b8; margin-top: 10px;">Ожидайте запуска интерактивов от Ведущего.</p>
+        <h2 style="color: var(--gold-light); margin-top: 40px; font-family: 'Cinzel', serif;">Добро пожаловать!</h2>
+        <p style="color: #94a3b8; margin-top: 10px;" id="guest-welcome-msg">Ожидайте запуска интерактивов от Ведущего.</p>
     </div>
 
     <script>
         const socket = io();
         let currentRole = null;
 
-        const sfxTaps = {};
-        const sfxTimers = {};
+        // --- ФИЛЬТР МАТЕРНЫХ СЛОВ (Регулярное выражение) ---
+        const PROFANITY_REGEX = /хуй|пизд|еба|еб|бля|сук|чмо|говн|урод|шлюх|пидор|гандон|fuck|shit|bitch|asshole|cunt/i;
 
-        function submitLogin() {
-            const pin = document.getElementById('input-pin').value;
-            const name = document.getElementById('input-name').value;
-            socket.emit('login', { pin: pin, name: name });
+        // --- ЛОГИКА ПАСХАЛКИ (5 ТАПОВ СЕКРЕТНОГО РЕЖИМА) ---
+        let logoTapCount = 0;
+        let logoTapTimer = null;
+        let isAdminMode = false;
+
+        function handleLogoTap() {
+            logoTapCount++;
+            clearTimeout(logoTapTimer);
+
+            if (logoTapCount >= 5) {
+                toggleAdminMode();
+                logoTapCount = 0;
+            } else {
+                logoTapTimer = setTimeout(() => {
+                    logoTapCount = 0;
+                }, 1800);
+            }
         }
 
+        function toggleAdminMode() {
+            isAdminMode = !isAdminMode;
+            const cardSubtitle = document.getElementById('card-subtitle');
+            const mainInput = document.getElementById('main-input');
+            const adminBadge = document.getElementById('admin-badge');
+            const errorToast = document.getElementById('error-toast');
+
+            errorToast.style.display = 'none';
+            mainInput.value = '';
+
+            if (isAdminMode) {
+                adminBadge.style.display = 'inline-block';
+                cardSubtitle.innerText = 'Режим управления';
+                cardSubtitle.style.color = '#f59e0b';
+                mainInput.placeholder = 'Код доступа';
+                mainInput.type = 'password';
+            } else {
+                adminBadge.style.display = 'none';
+                cardSubtitle.innerText = 'Введите имя для входа в лобби';
+                cardSubtitle.style.color = '#94a3b8';
+                mainInput.placeholder = 'Ваше имя';
+                mainInput.type = 'text';
+            }
+        }
+
+        // --- ОТПРАВКА ФОРМЫ ---
+        function submitEntry() {
+            const inputVal = document.getElementById('main-input').value.trim();
+            const errorToast = document.getElementById('error-toast');
+            const loginCard = document.getElementById('login-card');
+
+            if (!inputVal) {
+                showError('Поле не может быть пустым');
+                return;
+            }
+
+            if (isAdminMode) {
+                // Вход по ПИН-коду (Ведущий / Экран)
+                socket.emit('login', { pin: inputVal });
+            } else {
+                // Вход для Гостей (С проверкой на мат)
+                if (PROFANITY_REGEX.test(inputVal)) {
+                    showError('Пожалуйста, используйте корректное имя');
+                    return;
+                }
+                socket.emit('login', { name: inputVal });
+            }
+        }
+
+        function showError(msg) {
+            const errorToast = document.getElementById('error-toast');
+            const loginCard = document.getElementById('login-card');
+
+            errorToast.innerText = msg;
+            errorToast.style.display = 'block';
+
+            loginCard.classList.remove('shake');
+            void loginCard.offsetWidth; // Триггер reflow для перезапуска анимации
+            loginCard.classList.add('shake');
+
+            setTimeout(() => {
+                loginCard.classList.remove('shake');
+            }, 500);
+        }
+
+        // --- СОКЕТЫ И ОТВЕТЫ ---
         socket.on('login_response', (data) => {
             if (data.success) {
                 document.getElementById('view-login').style.display = 'none';
@@ -375,7 +568,12 @@
                     document.getElementById('view-screen').style.display = 'flex';
                 } else {
                     document.getElementById('view-guest').style.display = 'block';
+                    if (data.name) {
+                        document.getElementById('guest-welcome-msg').innerText = `Привет, ${data.name}! Ожидай запуска интерактивов.`;
+                    }
                 }
+            } else {
+                showError('Неверный код доступа');
             }
         });
 
@@ -384,7 +582,7 @@
             document.getElementById('screen-badge').innerText = state.screen_badge;
         });
 
-        // --- ЛОГИКА МУЗЫКИ ---
+        // --- МУЗЫКА И САУНДБОРД ---
         function setVolume(vol, btn) {
             document.querySelectorAll('.btn-vol').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
@@ -395,7 +593,9 @@
             socket.emit('host_audio_control', { emotion: emotion });
         }
 
-        // --- ЗАЩИТА 3-Х ТАПОВ СAУНДБОРДА ---
+        const sfxTaps = {};
+        const sfxTimers = {};
+
         function handleSfxTap(sfxType, btnEl) {
             if (!sfxTaps[sfxType]) sfxTaps[sfxType] = 0;
             
@@ -412,16 +612,13 @@
                 btnEl.classList.add('tap-2');
                 counterEl.innerText = '2/3';
             } else if (sfxTaps[sfxType] >= 3) {
-                // 3-й ТАП: Отправка сигнала!
                 socket.emit('host_trigger_sfx', { sfx: sfxType });
-                
                 sfxTaps[sfxType] = 0;
                 btnEl.classList.remove('tap-1', 'tap-2');
                 counterEl.innerText = '0/3';
                 return;
             }
 
-            // Таймер 1.5 секунды на повторный тап
             sfxTimers[sfxType] = setTimeout(() => {
                 sfxTaps[sfxType] = 0;
                 btnEl.classList.remove('tap-1', 'tap-2');
