@@ -1,10 +1,11 @@
 import os
 import json
-from flask import Flask, render_template, request
+from flask import Flask, render_template
 from flask_socketio import SocketIO, emit
 
 app = Flask(__name__, template_folder='.')
-socketio = SocketIO(app, cors_allowed_origins="*")
+# Явно разрешаем polling и websocket для любых источников
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode='gevent', ping_timeout=20, ping_interval=10)
 
 CONFIG_FILE = 'event_data.json'
 
@@ -14,7 +15,7 @@ def load_event_config():
             with open(CONFIG_FILE, 'r', encoding='utf-8') as f:
                 return json.load(f)
         except Exception as e:
-            print(f"Ошибка чтения {CONFIG_FILE}: {e}")
+            print(f"Ошибка JSON: {e}")
     return {"event_title": "Свадебный Вечер", "host_pin": "111", "screen_pin": "222"}
 
 event_config = load_event_config()
@@ -46,7 +47,7 @@ def handle_login(data):
     host_pin = str(event_config.get('host_pin', '111'))
     screen_pin = str(event_config.get('screen_pin', '222'))
 
-    if pin is not None:
+    if pin is not None and pin != "":
         if pin == host_pin:
             emit('login_response', {'success': True, 'role': 'HOST', 'config': event_config})
         elif pin == screen_pin:
