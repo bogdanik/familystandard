@@ -1,12 +1,13 @@
 {
-  "event_title": "Family Standard OS",
+  "event_title": "FAMILY STANDARD OS",
+  "event_subtitle": "С Днем Рождения! Поздравляем от всей души!",
   "host_name": "Богдан",
   "host_pin": "111",
   "screen_pin": "222",
   "modules": [
-    {"id": "lobby", "name": "👥 Лобби участников", "path": "lobby/lobby.html"},
-    {"id": "video", "name": "🎬 Видео-Заставка", "path": "video/video.html"},
-    {"id": "quiz", "name": "🎮 Квиз Интерактив", "path": "quiz/quiz.html"},
-    {"id": "bunker", "name": "🏚️ Игра Бункер", "path": "bunker/bunker.html"}
+    {"id": "lobby", "name": "👥 Лобби Участников", "path": "modules/lobby/lobby.html"},
+    {"id": "video", "name": "🎬 Видео-Заставка", "path": "modules/video/video.html"},
+    {"id": "quiz", "name": "🎮 Квиз Интерактив", "path": "modules/quiz/quiz.html"},
+    {"id": "bunker", "name": "🏚️ Игра Бункер", "path": "modules/bunker/bunker.html"}
   ]
 }
