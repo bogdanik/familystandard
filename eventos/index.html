@@ -42,7 +42,6 @@
             justify-content: center;
         }
 
-        /* --- 1. АВТОРИЗАЦИЯ --- */
         #view-login {
             position: fixed;
             inset: 0;
@@ -83,7 +82,6 @@
             40%, 60% { transform: translate3d(6px, 0, 0); }
         }
 
-        /* ЛОГОТИП С ЛОКАЛЬНЫМ ЗОЛОТЫМ СВЕЧЕНИЕМ */
         .brand-logo {
             font-family: 'Cinzel', serif;
             font-size: 2.4rem;
@@ -97,13 +95,10 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             text-shadow: 0 0 20px rgba(245, 158, 11, 0.4);
-            transition: transform 0.15s ease, text-shadow 0.15s ease;
+            transition: transform 0.15s ease;
         }
 
-        .brand-logo:active {
-            transform: scale(0.92);
-            text-shadow: 0 0 35px rgba(245, 158, 11, 0.8);
-        }
+        .brand-logo:active { transform: scale(0.92); }
 
         .card-subtitle {
             color: #94a3b8;
@@ -126,10 +121,7 @@
             text-transform: uppercase;
         }
 
-        .input-group {
-            position: relative;
-            margin-bottom: 14px;
-        }
+        .input-group { margin-bottom: 14px; }
 
         input.input-field {
             width: 100%;
@@ -170,12 +162,10 @@
             letter-spacing: 1px;
             cursor: pointer;
             box-shadow: 0 8px 20px rgba(245, 158, 11, 0.3);
-            transition: transform 0.15s ease, box-shadow 0.15s ease;
+            transition: transform 0.15s ease;
         }
 
-        button.btn-primary:active {
-            transform: scale(0.97);
-        }
+        button.btn-primary:active { transform: scale(0.97); }
 
         /* --- 2. ЭКРАН ПРОЕКТОРА (ПИН 222) --- */
         #view-screen {
@@ -224,9 +214,7 @@
 
         #host-top-music {
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
+            top: 0; left: 0; right: 0;
             height: 95px;
             background: rgba(3, 7, 18, 0.96);
             border-bottom: 1px solid var(--glass-border);
@@ -279,9 +267,7 @@
 
         #host-right-soundboard {
             position: fixed;
-            top: 95px;
-            right: 0;
-            bottom: 0;
+            top: 95px; right: 0; bottom: 0;
             width: 115px;
             background: rgba(3, 7, 18, 0.94);
             border-left: 1px solid var(--glass-border);
@@ -323,17 +309,13 @@
 
         #host-modules-container {
             position: fixed;
-            top: 100px;
-            left: 10px;
-            right: 125px;
-            bottom: 20px;
+            top: 100px; left: 10px; right: 125px; bottom: 20px;
             overflow-y: auto;
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
             gap: 10px;
         }
 
-        /* --- 4. РЕЖИМ ГОСТЯ (ЛОББИ) --- */
         #view-guest {
             display: none;
             position: fixed;
@@ -416,23 +398,29 @@
     </div>
 
     <script>
-        const socket = io();
-        let currentRole = null;
-        let isSocketConnected = false;
-
-        socket.on('connect', () => {
-            isSocketConnected = true;
-            document.getElementById('btn-submit').innerText = 'ВОЙТИ';
+        // Принудительно подключаемся сперва через polling, затем апгрейдимся до websocket
+        const socket = io({
+            transports: ['polling', 'websocket'],
+            reconnection: true,
+            reconnectionDelay: 500,
+            reconnectionAttempts: 10
         });
 
-        socket.on('connect_error', () => {
-            isSocketConnected = false;
+        let currentRole = null;
+        let pendingLoginPayload = null;
+
+        socket.on('connect', () => {
+            document.getElementById('btn-submit').innerText = 'ВОЙТИ';
+            if (pendingLoginPayload) {
+                socket.emit('login', pendingLoginPayload);
+                pendingLoginPayload = null;
+            }
         });
 
         // --- ФИЛЬТР МАТЕРНЫХ СЛОВ ---
         const PROFANITY_REGEX = /хуй|пизд|еба|еб|бля|сук|чмо|говн|урод|шлюх|пидор|гандон|fuck|shit|bitch|asshole|cunt/i;
 
-        // --- ЛОГИКА 5 ТАПОВ ПО ЛОГОТИПУ ---
+        // --- 5 ТАПОВ ПО ЛОГОТИПУ ---
         let logoTapCount = 0;
         let logoTapTimer = null;
         let isAdminMode = false;
@@ -442,7 +430,7 @@
             clearTimeout(logoTapTimer);
 
             const logo = document.getElementById('brand-logo');
-            logo.style.transform = `scale(${1 + logoTapCount * 0.05})`;
+            logo.style.transform = `scale(${1 + logoTapCount * 0.04})`;
 
             if (logoTapCount >= 5) {
                 toggleAdminMode();
@@ -491,21 +479,19 @@
                 return;
             }
 
-            if (!isSocketConnected) {
-                showError('Соединение с сервером... Повторите через секунду');
+            const payload = isAdminMode ? { pin: inputVal } : { name: inputVal };
+
+            if (!isAdminMode && PROFANITY_REGEX.test(inputVal)) {
+                showError('Пожалуйста, используйте корректное имя');
                 return;
             }
 
-            if (isAdminMode) {
-                // Вход Ведущего / Экрана по ПИН-коду
-                socket.emit('login', { pin: inputVal });
+            if (socket.connected) {
+                socket.emit('login', payload);
             } else {
-                // Вход Гостя с проверкой мата
-                if (PROFANITY_REGEX.test(inputVal)) {
-                    showError('Пожалуйста, используйте корректное имя');
-                    return;
-                }
-                socket.emit('login', { name: inputVal });
+                document.getElementById('btn-submit').innerText = 'ПОДКЛЮЧЕНИЕ...';
+                pendingLoginPayload = payload;
+                socket.connect();
             }
         }
 
@@ -525,21 +511,19 @@
             }, 500);
         }
 
-        // --- СОКЕТЫ И РАСПРЕДЕЛЕНИЕ РОЛЕЙ ---
+        // --- СОКЕТЫ И ОТВЕТ СЕРВЕРА ---
         socket.on('login_response', (data) => {
+            document.getElementById('btn-submit').innerText = 'ВОЙТИ';
             if (data.success) {
                 document.getElementById('view-login').style.display = 'none';
                 currentRole = data.role;
 
                 if (currentRole === 'HOST') {
-                    // ВЕДУЩИЙ (ПИН 111): Видит экран + пульт
                     document.getElementById('view-screen').style.display = 'flex';
                     document.getElementById('view-host').style.display = 'block';
                 } else if (currentRole === 'SCREEN') {
-                    // ПРОЕКТОР (ПИН 222): Только экран
                     document.getElementById('view-screen').style.display = 'flex';
                 } else {
-                    // ГОСТЬ: Вход в лобби
                     document.getElementById('view-guest').style.display = 'block';
                     if (data.name) {
                         document.getElementById('guest-welcome-msg').innerText = `Привет, ${data.name}! Вы в лобби вечера.`;
@@ -555,7 +539,7 @@
             document.getElementById('screen-badge').innerText = state.screen_badge;
         });
 
-        // --- АУДИО И УПРАВЛЕНИЕ ---
+        // --- АУДИО И САУНДБОРД ---
         function setVolume(vol, btn) {
             document.querySelectorAll('.btn-vol').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
@@ -571,10 +555,8 @@
 
         function handleSfxTap(sfxType, btnEl) {
             if (!sfxTaps[sfxType]) sfxTaps[sfxType] = 0;
-            
             sfxTaps[sfxType]++;
             const counterEl = btnEl.querySelector('.tap-counter');
-            
             clearTimeout(sfxTimers[sfxType]);
 
             if (sfxTaps[sfxType] === 1) {
