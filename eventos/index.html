@@ -15,8 +15,9 @@
             --bg-black: #000000;
             --gold-light: #fff3a1;
             --gold-main: #f59e0b;
-            --glass-card: rgba(18, 24, 38, 0.88);
-            --glass-border: rgba(245, 158, 11, 0.25);
+            --gold-dark: #b45309;
+            --glass-card: rgba(15, 23, 42, 0.88);
+            --glass-border: rgba(245, 158, 11, 0.35);
             --ios-font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Plus Jakarta Sans", sans-serif;
         }
 
@@ -29,13 +30,122 @@
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             opacity: 1; transition: opacity 1s ease;
         }
-        .ios-hello-text { font-size: 3.5rem; font-weight: 300; color: #ffffff; animation: iosFadeIn 2.5s ease forwards; }
+        .ios-hello-text { 
+            font-family: 'Cinzel', serif;
+            font-size: 3.5rem; 
+            font-weight: 900; 
+            background: linear-gradient(135deg, #fff3a1 0%, #f59e0b 50%, #b45309 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px rgba(245, 158, 11, 0.5);
+            animation: iosFadeIn 2.5s ease forwards; 
+        }
         @keyframes iosFadeIn { 0% { opacity: 0; filter: blur(8px); } 50% { opacity: 1; filter: blur(0); } 100% { opacity: 0; } }
 
-        /* AUTH CARD */
-        #auth-overlay { position: fixed; inset: 0; z-index: 10000; background: #000; display: flex; align-items: center; justify-content: center; padding: 20px; }
-        .auth-card { background: var(--glass-card); border: 1px solid var(--glass-border); padding: 35px; border-radius: 28px; width: 100%; max-width: 360px; text-align: center; }
-        .brand-header { font-family: 'Cinzel', serif; font-size: 2.2rem; font-weight: 900; color: var(--gold-main); cursor: pointer; user-select: none; }
+        /* AUTH CARD WITH GOLDEN GLOW BACKGROUND */
+        #auth-overlay { 
+            position: fixed; 
+            inset: 0; 
+            z-index: 10000; 
+            background: radial-gradient(circle at 50% 45%, rgba(245, 158, 11, 0.18) 0%, rgba(15, 23, 42, 0.95) 50%, #000000 100%);
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            padding: 20px; 
+        }
+
+        .auth-card { 
+            background: var(--glass-card); 
+            border: 1px solid var(--glass-border); 
+            padding: 40px 30px; 
+            border-radius: 28px; 
+            width: 100%; 
+            max-width: 370px; 
+            text-align: center;
+            box-shadow: 0 0 50px rgba(245, 158, 11, 0.2), 0 20px 40px rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(25px);
+            transition: transform 0.2s ease, border-color 0.2s ease;
+        }
+
+        /* BRAND LOGO WITH CLICK TAP ANIMATION */
+        .brand-header { 
+            font-family: 'Cinzel', serif; 
+            font-size: 2.6rem; 
+            font-weight: 900; 
+            letter-spacing: 2px;
+            background: linear-gradient(135deg, #fff3a1 0%, #f59e0b 50%, #d97706 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 25px rgba(245, 158, 11, 0.4);
+            cursor: pointer; 
+            user-select: none;
+            display: inline-block;
+            transition: transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275), text-shadow 0.2s ease;
+        }
+
+        .brand-header:active {
+            transform: scale(0.92);
+        }
+
+        /* ADMIN MODE BADGE */
+        .admin-badge {
+            display: none;
+            background: rgba(245, 158, 11, 0.15);
+            border: 1px solid var(--gold-main);
+            color: var(--gold-light);
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+        }
+
+        .auth-sub {
+            color: #94a3b8;
+            font-size: 0.9rem;
+            margin: 12px 0 22px;
+            transition: color 0.2s ease;
+        }
+
+        .auth-input {
+            width: 100%; 
+            padding: 16px; 
+            border-radius: 14px; 
+            border: 1px solid var(--glass-border); 
+            background: rgba(3, 7, 18, 0.7); 
+            color: #fff; 
+            text-align: center;
+            font-size: 1.05rem;
+            font-weight: 600;
+            outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .auth-input:focus {
+            border-color: var(--gold-main);
+            box-shadow: 0 0 15px rgba(245, 158, 11, 0.3);
+        }
+
+        .auth-btn {
+            width: 100%; 
+            margin-top: 16px; 
+            padding: 16px; 
+            border-radius: 14px; 
+            border: none; 
+            background: linear-gradient(135deg, var(--gold-light) 0%, var(--gold-main) 100%); 
+            color: #000;
+            font-weight: 800; 
+            font-size: 1rem;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(245, 158, 11, 0.3);
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .auth-btn:active {
+            transform: scale(0.97);
+        }
 
         /* MAIN VIEWPORT */
         #main-viewport { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; width: 100%; }
@@ -56,11 +166,12 @@
 
     <!-- AUTHENTICATION -->
     <div id="auth-overlay">
-        <div class="auth-card">
-            <div class="brand-header" onclick="handleLogoTap()">EVENT OS</div>
-            <p style="color: #94a3b8; margin: 15px 0;" id="auth-sub">Введите имя для входа</p>
-            <input type="text" id="auth-input" style="width: 100%; padding: 14px; border-radius: 12px; border: 1px solid var(--glass-border); background: rgba(0,0,0,0.5); color: #fff; text-align: center;" placeholder="Ваше имя">
-            <button onclick="submitAuth()" style="width: 100%; margin-top: 15px; padding: 14px; border-radius: 12px; border: none; background: var(--gold-main); font-weight: 800; cursor: pointer;">ВОЙТИ</button>
+        <div class="auth-card" id="auth-card">
+            <div class="admin-badge" id="admin-badge">Режим управления</div>
+            <div class="brand-header" id="brand-logo" onclick="handleLogoTap()">EVENT OS</div>
+            <p class="auth-sub" id="auth-sub">Введите имя для входа в лобби</p>
+            <input type="text" id="auth-input" class="auth-input" placeholder="Ваше имя" autocomplete="off" onkeydown="if(event.key==='Enter') submitAuth()">
+            <button onclick="submitAuth()" class="auth-btn">ВОЙТИ</button>
         </div>
     </div>
 
@@ -79,7 +190,7 @@
         <div class="auth-card" style="max-width: 400px;">
             <h3 style="color: var(--gold-light); font-family: 'Cinzel', serif;">👥 Управление Лобби</h3>
             <p style="color: #94a3b8; margin: 10px 0;">Сейчас подключено гостей: <b id="modal-guest-count" style="color: #fff;">0</b></p>
-            <button onclick="socket.emit('switch_module', { module: 'lobby/lobby.html' }); closeLobbyModal();" style="width: 100%; padding: 14px; border-radius: 12px; border: none; background: var(--gold-main); font-weight: 800; cursor: pointer; margin-top: 10px;">📺 Показать Лобби на Экран</button>
+            <button onclick="socket.emit('switch_module', { module: 'lobby/lobby.html' }); closeLobbyModal();" class="auth-btn" style="margin-top: 10px;">📺 Показать Лобби на Экран</button>
             <button onclick="closeLobbyModal()" style="width: 100%; padding: 10px; border-radius: 12px; border: none; background: transparent; color: #94a3b8; margin-top: 5px; cursor: pointer;">Закрыть</button>
         </div>
     </div>
@@ -92,31 +203,84 @@
     </nav>
 
     <script>
-        // Автоматическое определение хоста Render
-        const socket = io(window.location.origin, { transports: ['polling', 'websocket'] });
+        // ПРЯМАЯ ССЫЛКА НА RENDER СЕРВЕР
+        const RENDER_SERVER_URL = "https://event-os-wqoa.onrender.com";
+
+        const socket = io(RENDER_SERVER_URL, { 
+            transports: ['polling', 'websocket'],
+            reconnection: true,
+            reconnectionAttempts: 10
+        });
+
         let isAdmin = false, tapCount = 0, tapTimer = null;
         let myRole = 'GUEST';
         let currentLoadedModule = '';
         const bgPlayer = document.getElementById('bg-audio-player');
 
         setTimeout(() => {
-            document.getElementById('ios-boot-screen').style.opacity = '0';
-            setTimeout(() => document.getElementById('ios-boot-screen').style.display = 'none', 1000);
+            const bootScreen = document.getElementById('ios-boot-screen');
+            if (bootScreen) {
+                bootScreen.style.opacity = '0';
+                setTimeout(() => bootScreen.style.display = 'none', 1000);
+            }
         }, 2500);
 
         function handleLogoTap() {
-            tapCount++; clearTimeout(tapTimer);
+            tapCount++; 
+            clearTimeout(tapTimer);
+
+            const logo = document.getElementById('brand-logo');
+            if (logo) {
+                logo.style.transform = `scale(${1 + tapCount * 0.05})`;
+                logo.style.textShadow = `0 0 ${25 + tapCount * 10}px rgba(245, 158, 11, 0.8)`;
+            }
+
             if (tapCount >= 5) {
-                isAdmin = !isAdmin;
-                document.getElementById('auth-sub').innerText = isAdmin ? "Режим управления (ПИН)" : "Введите имя";
-                document.getElementById('auth-input').type = isAdmin ? "password" : "text";
+                toggleAdminMode();
                 tapCount = 0;
-            } else { tapTimer = setTimeout(() => tapCount = 0, 1500); }
+                if (logo) {
+                    logo.style.transform = 'scale(1)';
+                    logo.style.textShadow = '0 0 25px rgba(245, 158, 11, 0.4)';
+                }
+            } else { 
+                tapTimer = setTimeout(() => { 
+                    tapCount = 0; 
+                    if (logo) {
+                        logo.style.transform = 'scale(1)';
+                        logo.style.textShadow = '0 0 25px rgba(245, 158, 11, 0.4)';
+                    }
+                }, 1500); 
+            }
+        }
+
+        function toggleAdminMode() {
+            isAdmin = !isAdmin;
+            const badge = document.getElementById('admin-badge');
+            const sub = document.getElementById('auth-sub');
+            const input = document.getElementById('auth-input');
+
+            input.value = '';
+
+            if (isAdmin) {
+                badge.style.display = 'inline-block';
+                sub.innerText = 'Режим управления';
+                sub.style.color = '#f59e0b';
+                input.placeholder = 'Введите PIN';
+                input.type = 'password';
+                input.focus();
+            } else {
+                badge.style.display = 'none';
+                sub.innerText = 'Введите имя для входа в лобби';
+                sub.style.color = '#94a3b8';
+                input.placeholder = 'Ваше имя';
+                input.type = 'text';
+            }
         }
 
         function submitAuth() {
             const val = document.getElementById('auth-input').value.trim();
-            if (val) socket.emit('login', isAdmin ? { pin: val } : { name: val });
+            if (!val) return;
+            socket.emit('login', isAdmin ? { pin: val } : { name: val });
         }
 
         socket.on('login_response', (res) => {
@@ -128,13 +292,17 @@
                     fetchWidget('player', '/modules/player/player.html');
                     fetchWidget('sfx', '/modules/soundboard/soundboard.html');
                 }
+            } else {
+                alert(res.message || 'Ошибка входа');
             }
         });
 
         socket.on('state_update', (state) => {
             if (state.guest_count !== undefined) {
-                document.getElementById('dock-guest-count').innerText = state.guest_count;
-                document.getElementById('modal-guest-count').innerText = state.guest_count;
+                const dockCount = document.getElementById('dock-guest-count');
+                const modalCount = document.getElementById('modal-guest-count');
+                if (dockCount) dockCount.innerText = state.guest_count;
+                if (modalCount) modalCount.innerText = state.guest_count;
             }
 
             if (state.active_module && currentLoadedModule !== state.active_module) {
@@ -143,8 +311,8 @@
 
             // ЗВУК ИГРАЕТ ТОЛЬКО НА РОЛИ SCREEN
             if (myRole === 'SCREEN') {
-                if (bgPlayer.src !== window.location.origin + state.current_track) {
-                    bgPlayer.src = state.current_track;
+                if (bgPlayer.src !== RENDER_SERVER_URL + state.current_track) {
+                    bgPlayer.src = RENDER_SERVER_URL + state.current_track;
                 }
                 bgPlayer.volume = state.audio_volume;
 
@@ -159,7 +327,7 @@
         // ЭФФЕКТЫ ИГРАЮТ ТОЛЬКО НА РОЛИ SCREEN
         socket.on('play_sfx_stream', (data) => {
             if (myRole === 'SCREEN') {
-                const sfxAudio = new Audio(data.file);
+                const sfxAudio = new Audio(RENDER_SERVER_URL + data.file);
                 sfxAudio.volume = data.volume;
                 sfxAudio.play().catch(() => {});
             }
@@ -176,8 +344,10 @@
         }
 
         async function fetchWidget(id, url) {
-            const res = await fetch(url);
-            if (res.ok) document.getElementById(`panel-${id}`).innerHTML = await res.text();
+            try {
+                const res = await fetch(url);
+                if (res.ok) document.getElementById(`panel-${id}`).innerHTML = await res.text();
+            } catch(e) {}
         }
 
         function toggleWidget(id) {
