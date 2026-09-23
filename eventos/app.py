@@ -4,8 +4,9 @@ from flask import Flask, render_template, jsonify
 from flask_socketio import SocketIO, emit
 
 app = Flask(__name__, template_folder='.')
-app.config['SECRET_KEY'] = 'eventos-secret-2026'
+app.config['SECRET_KEY'] = 'eventos-2026'
 
+# Работаем на стандартных многопоточных сокетах
 socketio = SocketIO(
     app, 
     cors_allowed_origins="*", 
@@ -21,8 +22,8 @@ def load_event_config():
         try:
             with open(CONFIG_FILE, 'r', encoding='utf-8') as f:
                 return json.load(f)
-        except Exception as e:
-            print(f"Ошибка JSON: {e}")
+        except Exception:
+            pass
     return {"event_title": "Свадебный Вечер", "host_pin": "111", "screen_pin": "222"}
 
 event_config = load_event_config()
@@ -41,11 +42,10 @@ def home():
 
 @app.route('/ping')
 def ping():
-    return jsonify({"status": "ok", "message": "Server Alive"})
+    return jsonify({"status": "ok"})
 
 @socketio.on('connect')
 def handle_connect():
-    print(">>> Socket.IO клиент успешно подключился")
     emit('state_update', system_state)
 
 @socketio.on('login')
@@ -87,5 +87,4 @@ def handle_trigger_sfx(data):
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 10000))
-    # Разрешаем запуск Werkzeug в продакшн-среде Render
-    socketio.run(app, host='0.0.0.0', port=port, allow_unsafe_werkzeug=True)
+    socketio.run(app, host='0.0.0.0', port=port)
