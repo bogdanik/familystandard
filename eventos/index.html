@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Event OS — Master Hub</title>
+    <title>Event OS — Control Center</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -17,8 +17,8 @@
             --gold-light: #fff3a1;
             --gold-main: #f59e0b;
             --gold-dark: #b45309;
-            --glass-card: rgba(15, 23, 42, 0.75);
-            --glass-border: rgba(245, 158, 11, 0.25);
+            --glass-card: rgba(15, 23, 42, 0.85);
+            --glass-border: rgba(245, 158, 11, 0.3);
             --text-main: #f8fafc;
             --danger-red: #ef4444;
         }
@@ -37,44 +37,9 @@
             color: var(--text-main);
             min-height: 100vh;
             overflow-x: hidden;
-            position: relative;
             display: flex;
             align-items: center;
             justify-content: center;
-        }
-
-        /* --- ЖИВОЙ ЗОЛОТОЙ ФОН --- */
-        .bg-glow {
-            position: fixed;
-            width: 600px;
-            height: 600px;
-            background: radial-gradient(circle, rgba(245, 158, 11, 0.15) 0%, rgba(3, 7, 18, 0) 70%);
-            top: 50%;
-            left: 50%;
-            transform: translate3d(-50%, -50%, 0);
-            pointer-events: none;
-            z-index: 0;
-            animation: pulseGlow 8s ease-in-out infinite alternate;
-            will-change: transform, opacity;
-        }
-
-        @keyframes pulseGlow {
-            0% { transform: translate3d(-50%, -50%, 0) scale(0.8); opacity: 0.5; }
-            100% { transform: translate3d(-50%, -50%, 0) scale(1.2); opacity: 0.9; }
-        }
-
-        /* --- ЗОЛОТОЙ ПЕРЕЛИВАЮЩИЙСЯ ГРАДИЕНТ ТЕКСТА --- */
-        .gold-shimmer-text {
-            background: linear-gradient(135deg, #fff3a1 0%, #f59e0b 25%, #d97706 50%, #f59e0b 75%, #fff3a1 100%);
-            background-size: 200% auto;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: goldMove 4s linear infinite;
-        }
-
-        @keyframes goldMove {
-            0% { background-position: 0% center; }
-            100% { background-position: 200% center; }
         }
 
         /* --- 1. АВТОРИЗАЦИЯ --- */
@@ -87,8 +52,7 @@
             align-items: center;
             justify-content: center;
             padding: 20px;
-            background: radial-gradient(circle at center, rgba(15, 23, 42, 0.8) 0%, var(--bg-black) 100%);
-            backdrop-filter: blur(10px);
+            background: radial-gradient(circle at center, #0f172a 0%, var(--bg-black) 100%);
         }
 
         .login-card {
@@ -97,13 +61,13 @@
             padding: 40px 28px;
             border-radius: 28px;
             width: 100%;
-            max-width: 400px;
+            max-width: 390px;
             text-align: center;
-            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.8), 0 0 40px rgba(245, 158, 11, 0.1);
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.9), 0 0 30px rgba(245, 158, 11, 0.15);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             transform: translate3d(0, 0, 0);
-            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.4s ease, box-shadow 0.4s ease;
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease;
             will-change: transform;
         }
 
@@ -119,28 +83,33 @@
             40%, 60% { transform: translate3d(6px, 0, 0); }
         }
 
+        /* ЛОГОТИП С ЛОКАЛЬНЫМ ЗОЛОТЫМ СВЕЧЕНИЕМ */
         .brand-logo {
             font-family: 'Cinzel', serif;
-            font-size: 2.2rem;
+            font-size: 2.4rem;
             font-weight: 900;
             letter-spacing: 3px;
             margin-bottom: 6px;
             cursor: pointer;
             user-select: none;
             display: inline-block;
-            transition: transform 0.2s ease;
+            background: linear-gradient(135deg, #fff3a1 0%, #f59e0b 50%, #d97706 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 20px rgba(245, 158, 11, 0.4);
+            transition: transform 0.15s ease, text-shadow 0.15s ease;
         }
 
         .brand-logo:active {
-            transform: scale(0.95);
+            transform: scale(0.92);
+            text-shadow: 0 0 35px rgba(245, 158, 11, 0.8);
         }
 
         .card-subtitle {
             color: #94a3b8;
-            font-size: 0.9rem;
-            margin-bottom: 28px;
-            min-height: 22px;
-            transition: color 0.3s ease;
+            font-size: 0.88rem;
+            margin-bottom: 26px;
+            min-height: 20px;
         }
 
         .admin-badge {
@@ -148,7 +117,7 @@
             background: rgba(245, 158, 11, 0.2);
             border: 1px solid var(--gold-main);
             color: var(--gold-light);
-            padding: 4px 12px;
+            padding: 4px 14px;
             border-radius: 20px;
             font-size: 0.75rem;
             font-weight: 800;
@@ -159,7 +128,7 @@
 
         .input-group {
             position: relative;
-            margin-bottom: 16px;
+            margin-bottom: 14px;
         }
 
         input.input-field {
@@ -167,27 +136,25 @@
             padding: 18px 20px;
             border-radius: 16px;
             border: 1px solid var(--glass-border);
-            background: rgba(3, 7, 18, 0.7);
+            background: rgba(3, 7, 18, 0.8);
             color: #ffffff;
             font-size: 1.05rem;
             font-weight: 600;
             outline: none;
             text-align: center;
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
         }
 
         input.input-field:focus {
             border-color: var(--gold-main);
-            background: rgba(3, 7, 18, 0.9);
-            box-shadow: 0 0 20px rgba(245, 158, 11, 0.25);
+            box-shadow: 0 0 20px rgba(245, 158, 11, 0.3);
         }
 
         .error-toast {
             color: var(--danger-red);
-            font-size: 0.8rem;
+            font-size: 0.82rem;
             font-weight: 700;
-            margin-top: -8px;
-            margin-bottom: 16px;
+            margin-bottom: 14px;
             display: none;
         }
 
@@ -196,21 +163,18 @@
             padding: 18px;
             border-radius: 16px;
             border: none;
-            background: linear-gradient(135deg, var(--gold-light) 0%, var(--gold-main) 50%, var(--gold-dark) 100%);
-            background-size: 200% auto;
+            background: linear-gradient(135deg, var(--gold-light) 0%, var(--gold-main) 100%);
             color: #030712;
             font-weight: 800;
             font-size: 1.05rem;
             letter-spacing: 1px;
             cursor: pointer;
-            box-shadow: 0 10px 25px rgba(245, 158, 11, 0.3);
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-            will-change: transform, box-shadow;
+            box-shadow: 0 8px 20px rgba(245, 158, 11, 0.3);
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
         }
 
         button.btn-primary:active {
-            transform: scale(0.98);
-            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2);
+            transform: scale(0.97);
         }
 
         /* --- 2. ЭКРАН ПРОЕКТОРА (ПИН 222) --- */
@@ -256,9 +220,7 @@
             pointer-events: none;
         }
 
-        .host-interactive {
-            pointer-events: auto;
-        }
+        .host-interactive { pointer-events: auto; }
 
         #host-top-music {
             position: fixed;
@@ -294,7 +256,6 @@
             font-weight: 800;
             cursor: pointer;
             text-align: center;
-            transition: all 0.2s ease;
         }
 
         .btn-vol.active {
@@ -343,8 +304,6 @@
             font-weight: 800;
             text-align: center;
             cursor: pointer;
-            position: relative;
-            transition: all 0.15s ease;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -359,15 +318,8 @@
             color: var(--gold-main);
         }
 
-        .sfx-btn.tap-1 {
-            border-color: #f59e0b;
-            background: rgba(245, 158, 11, 0.3);
-        }
-
-        .sfx-btn.tap-2 {
-            border-color: #ef4444;
-            background: rgba(239, 68, 68, 0.45);
-        }
+        .sfx-btn.tap-1 { border-color: #f59e0b; background: rgba(245, 158, 11, 0.3); }
+        .sfx-btn.tap-2 { border-color: #ef4444; background: rgba(239, 68, 68, 0.45); }
 
         #host-modules-container {
             position: fixed;
@@ -381,7 +333,7 @@
             gap: 10px;
         }
 
-        /* --- 4. РЕЖИМ ГОСТЯ --- */
+        /* --- 4. РЕЖИМ ГОСТЯ (ЛОББИ) --- */
         #view-guest {
             display: none;
             position: fixed;
@@ -389,27 +341,26 @@
             z-index: 50;
             padding: 20px;
             text-align: center;
+            background: radial-gradient(circle at center, #0f172a 0%, var(--bg-black) 100%);
         }
     </style>
 </head>
 <body>
 
-    <div class="bg-glow"></div>
-
     <!-- 1. АВТОРИЗАЦИЯ -->
     <div id="view-login">
         <div class="login-card" id="login-card">
             <div id="admin-badge" class="admin-badge">Режим управления</div>
-            <div class="brand-logo gold-shimmer-text" id="brand-logo" onclick="handleLogoTap()">EVENT OS</div>
+            <div class="brand-logo" id="brand-logo" onclick="handleLogoTap()">EVENT OS</div>
             <p class="card-subtitle" id="card-subtitle">Введите имя для входа в лобби</p>
             
             <div class="input-group">
-                <input type="text" id="main-input" class="input-field" placeholder="Ваше имя" autocomplete="off" maxlength="25">
+                <input type="text" id="main-input" class="input-field" placeholder="Ваше имя" autocomplete="off" maxlength="25" onkeydown="if(event.key==='Enter') submitEntry()">
             </div>
             
             <div id="error-toast" class="error-toast">Пожалуйста, используйте корректное имя</div>
 
-            <button class="btn-primary" onclick="submitEntry()">ВОЙТИ</button>
+            <button class="btn-primary" id="btn-submit" onclick="submitEntry()">ВОЙТИ</button>
         </div>
     </div>
 
@@ -458,20 +409,30 @@
         <div id="host-modules-container" class="host-interactive"></div>
     </div>
 
-    <!-- 4. ЭКРАН ГОСТЯ -->
+    <!-- 4. ЭКРАН ГОСТЯ (ЛОББИ) -->
     <div id="view-guest">
-        <h2 style="color: var(--gold-light); margin-top: 40px; font-family: 'Cinzel', serif;">Добро пожаловать!</h2>
-        <p style="color: #94a3b8; margin-top: 10px;" id="guest-welcome-msg">Ожидайте запуска интерактивов от Ведущего.</p>
+        <h2 style="color: var(--gold-light); margin-top: 60px; font-family: 'Cinzel', serif; font-size: 2.2rem;">EVENT OS</h2>
+        <p style="color: #94a3b8; margin-top: 15px; font-size: 1.1rem;" id="guest-welcome-msg">Ожидайте запуска интерактивов от Ведущего.</p>
     </div>
 
     <script>
         const socket = io();
         let currentRole = null;
+        let isSocketConnected = false;
 
-        // --- ФИЛЬТР МАТЕРНЫХ СЛОВ (Регулярное выражение) ---
+        socket.on('connect', () => {
+            isSocketConnected = true;
+            document.getElementById('btn-submit').innerText = 'ВОЙТИ';
+        });
+
+        socket.on('connect_error', () => {
+            isSocketConnected = false;
+        });
+
+        // --- ФИЛЬТР МАТЕРНЫХ СЛОВ ---
         const PROFANITY_REGEX = /хуй|пизд|еба|еб|бля|сук|чмо|говн|урод|шлюх|пидор|гандон|fuck|shit|bitch|asshole|cunt/i;
 
-        // --- ЛОГИКА ПАСХАЛКИ (5 ТАПОВ СЕКРЕТНОГО РЕЖИМА) ---
+        // --- ЛОГИКА 5 ТАПОВ ПО ЛОГОТИПУ ---
         let logoTapCount = 0;
         let logoTapTimer = null;
         let isAdminMode = false;
@@ -480,12 +441,17 @@
             logoTapCount++;
             clearTimeout(logoTapTimer);
 
+            const logo = document.getElementById('brand-logo');
+            logo.style.transform = `scale(${1 + logoTapCount * 0.05})`;
+
             if (logoTapCount >= 5) {
                 toggleAdminMode();
                 logoTapCount = 0;
+                logo.style.transform = 'scale(1)';
             } else {
                 logoTapTimer = setTimeout(() => {
                     logoTapCount = 0;
+                    logo.style.transform = 'scale(1)';
                 }, 1800);
             }
         }
@@ -519,18 +485,22 @@
         function submitEntry() {
             const inputVal = document.getElementById('main-input').value.trim();
             const errorToast = document.getElementById('error-toast');
-            const loginCard = document.getElementById('login-card');
 
             if (!inputVal) {
                 showError('Поле не может быть пустым');
                 return;
             }
 
+            if (!isSocketConnected) {
+                showError('Соединение с сервером... Повторите через секунду');
+                return;
+            }
+
             if (isAdminMode) {
-                // Вход по ПИН-коду (Ведущий / Экран)
+                // Вход Ведущего / Экрана по ПИН-коду
                 socket.emit('login', { pin: inputVal });
             } else {
-                // Вход для Гостей (С проверкой на мат)
+                // Вход Гостя с проверкой мата
                 if (PROFANITY_REGEX.test(inputVal)) {
                     showError('Пожалуйста, используйте корректное имя');
                     return;
@@ -547,7 +517,7 @@
             errorToast.style.display = 'block';
 
             loginCard.classList.remove('shake');
-            void loginCard.offsetWidth; // Триггер reflow для перезапуска анимации
+            void loginCard.offsetWidth;
             loginCard.classList.add('shake');
 
             setTimeout(() => {
@@ -555,25 +525,28 @@
             }, 500);
         }
 
-        // --- СОКЕТЫ И ОТВЕТЫ ---
+        // --- СОКЕТЫ И РАСПРЕДЕЛЕНИЕ РОЛЕЙ ---
         socket.on('login_response', (data) => {
             if (data.success) {
                 document.getElementById('view-login').style.display = 'none';
                 currentRole = data.role;
 
                 if (currentRole === 'HOST') {
+                    // ВЕДУЩИЙ (ПИН 111): Видит экран + пульт
                     document.getElementById('view-screen').style.display = 'flex';
                     document.getElementById('view-host').style.display = 'block';
                 } else if (currentRole === 'SCREEN') {
+                    // ПРОЕКТОР (ПИН 222): Только экран
                     document.getElementById('view-screen').style.display = 'flex';
                 } else {
+                    // ГОСТЬ: Вход в лобби
                     document.getElementById('view-guest').style.display = 'block';
                     if (data.name) {
-                        document.getElementById('guest-welcome-msg').innerText = `Привет, ${data.name}! Ожидай запуска интерактивов.`;
+                        document.getElementById('guest-welcome-msg').innerText = `Привет, ${data.name}! Вы в лобби вечера.`;
                     }
                 }
             } else {
-                showError('Неверный код доступа');
+                showError(data.message || 'Неверный код доступа');
             }
         });
 
@@ -582,7 +555,7 @@
             document.getElementById('screen-badge').innerText = state.screen_badge;
         });
 
-        // --- МУЗЫКА И САУНДБОРД ---
+        // --- АУДИО И УПРАВЛЕНИЕ ---
         function setVolume(vol, btn) {
             document.querySelectorAll('.btn-vol').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
