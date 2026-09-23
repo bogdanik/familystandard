@@ -20,16 +20,16 @@
             --glass-border: rgba(245, 158, 11, 0.35);
             --danger-red: #ef4444;
             --ios-font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Plus Jakarta Sans", sans-serif;
-            --top-bar-height: 110px;
-            --bottom-bar-height: 115px;
+            --top-height: 110px;
+            --bottom-height: 115px;
         }
 
-        * {
+        * { 
             box-sizing: border-box; margin: 0; padding: 0; font-family: var(--ios-font);
-            user-select: none; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none;
+            user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
         }
 
-        body { background: var(--bg-black); color: #f8fafc; min-height: 100vh; overflow: hidden; display: flex; flex-direction: column; position: relative; }
+        body { background: var(--bg-black); color: #f8fafc; min-height: 100vh; overflow: hidden; position: relative; }
 
         /* CANVAS PARTICLES (120 FPS) */
         #particles-canvas { position: fixed; inset: 0; z-index: 1; pointer-events: none; }
@@ -38,16 +38,14 @@
         /* FLASH EFFECT */
         #flash-overlay { position: fixed; inset: 0; z-index: 99998; background: #ffffff; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
 
-        /* ELEGANT AUTH CARD */
+        /* AUTH OVERLAY & CARD */
         #auth-overlay { position: fixed; inset: 0; z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 20px; }
         .auth-card {
-            background: var(--glass-card); border: 1px solid var(--glass-border); padding: 42px 32px;
-            border-radius: 28px; width: 100%; max-width: 380px; text-align: center;
-            box-shadow: 0 0 60px rgba(245, 158, 11, 0.2), 0 20px 50px rgba(0, 0, 0, 0.9);
-            backdrop-filter: blur(25px); transition: all 0.3s ease;
+            background: var(--glass-card); border: 1px solid var(--glass-border); padding: 36px 28px;
+            border-radius: 28px; width: 100%; max-width: 360px; text-align: center;
+            box-shadow: 0 0 60px rgba(245, 158, 11, 0.25), 0 20px 40px rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(25px); transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        .auth-card.pop { animation: cardPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); border-color: var(--gold-main); }
-        @keyframes cardPop { 0% { transform: scale(0.85); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
         .auth-card.shake { animation: shake 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97) both; border-color: var(--danger-red); }
         @keyframes shake {
             10%, 90% { transform: translate3d(-3px, 0, 0); }
@@ -61,132 +59,126 @@
             background: linear-gradient(135deg, #fff3a1 0%, #f59e0b 50%, #d97706 100%);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
             text-shadow: 0 0 25px rgba(245, 158, 11, 0.4);
-            cursor: pointer; display: inline-block; transition: transform 0.15s ease;
+            cursor: pointer; display: inline-block; transition: transform 0.2s ease, opacity 0.3s ease;
         }
-        .brand-header:active { transform: scale(0.94); }
+        .brand-header:active { transform: scale(0.92); }
 
-        .auth-sub { color: #94a3b8; font-size: 0.85rem; margin: 14px 0 20px; transition: color 0.3s ease; }
-
-        /* PIN CONTAINER WITH SMOOTH ANIMATION */
-        #pin-container {
-            display: none; opacity: 0; transform: translateY(15px);
-            transition: opacity 0.4s ease, transform 0.4s ease; margin-top: 10px;
+        .auth-sub { color: #94a3b8; font-size: 0.85rem; margin: 12px 0 0; transition: color 0.3s ease; }
+        
+        #pin-container { 
+            max-height: 0; opacity: 0; overflow: hidden; 
+            transition: max-height 0.4s ease, opacity 0.4s ease, margin-top 0.4s ease; 
         }
-        #pin-container.show { display: block; opacity: 1; transform: translateY(0); }
+        #pin-container.active { max-height: 200px; opacity: 1; margin-top: 20px; }
 
         .auth-input {
             width: 100%; padding: 16px; border-radius: 14px; border: 1px solid var(--glass-border);
-            background: rgba(3, 7, 18, 0.85); color: #fff; text-align: center; font-size: 1.2rem;
-            font-weight: 700; outline: none; letter-spacing: 6px; user-select: text; -webkit-user-select: text;
+            background: rgba(3, 7, 18, 0.8); color: #fff; text-align: center; font-size: 1.2rem; font-weight: 800; outline: none; letter-spacing: 6px;
+            user-select: text; -webkit-user-select: text;
         }
-        .auth-input:focus { border-color: var(--gold-main); box-shadow: 0 0 15px rgba(245, 158, 11, 0.3); }
-
         .btn-gold {
             width: 100%; padding: 16px; border-radius: 14px; border: none;
             background: linear-gradient(135deg, var(--gold-light) 0%, var(--gold-main) 100%);
-            color: #000; font-weight: 800; font-size: 0.95rem; cursor: pointer; margin-top: 14px;
+            color: #000; font-weight: 800; font-size: 0.95rem; cursor: pointer; margin-top: 12px;
             box-shadow: 0 4px 20px rgba(245, 158, 11, 0.3); transition: transform 0.15s ease;
-            display: inline-flex; align-items: center; justify-content: center;
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
         }
         .btn-gold:active { transform: scale(0.97); }
 
-        /* HOST TOP BAR (MUSIC + SEEKBAR + VOLUME) */
+        /* HOST TOP CONTROL BAR */
         #host-top-bar {
-            display: none; position: fixed; top: 0; left: 0; right: 0; height: var(--top-bar-height); z-index: 500;
+            display: none; position: fixed; top: 0; left: 0; right: 0; height: var(--top-height); z-index: 500;
             background: rgba(15, 23, 42, 0.96); border-bottom: 1px solid var(--glass-border);
-            backdrop-filter: blur(20px); padding: 10px 16px; flex-direction: column; gap: 8px; justify-content: center;
+            backdrop-filter: blur(20px); padding: 8px 14px; flex-direction: column; gap: 6px; justify-content: center;
         }
         .control-row { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
         .btn-control {
             flex: 1; height: 36px; border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.12);
             background: rgba(30, 41, 59, 0.7); color: #ffffff; font-size: 0.78rem; font-weight: 800; cursor: pointer;
-            transition: all 0.2s ease; display: inline-flex; align-items: center; justify-content: center; text-align: center;
+            transition: all 0.2s ease; display: inline-flex; align-items: center; justify-content: center;
         }
         .btn-control:active { transform: scale(0.95); }
         .btn-control.active { background: var(--gold-main); color: #000; border-color: var(--gold-light); box-shadow: 0 0 12px rgba(245, 158, 11, 0.4); }
 
-        .seek-container { display: flex; align-items: center; gap: 10px; width: 100%; margin: 1px 0; }
+        .seek-container { display: flex; align-items: center; gap: 8px; width: 100%; margin: 1px 0; }
         .seek-bar {
-            flex: 1; -webkit-appearance: none; height: 6px; border-radius: 3px;
+            flex: 1; -webkit-appearance: none; height: 5px; border-radius: 3px;
             background: rgba(255, 255, 255, 0.15); outline: none; cursor: pointer;
         }
         .seek-bar::-webkit-slider-thumb {
-            -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%;
+            -webkit-appearance: none; width: 15px; height: 15px; border-radius: 50%;
             background: var(--gold-main); cursor: pointer; box-shadow: 0 0 8px var(--gold-main);
         }
 
-        .eq-bar-container { display: flex; align-items: flex-end; gap: 3px; height: 16px; }
+        .eq-bar-container { display: flex; align-items: flex-end; gap: 3px; height: 14px; }
         .eq-bar { width: 3px; background: var(--gold-main); border-radius: 2px; animation: eqAnim 1s ease-in-out infinite alternate; }
         .eq-bar:nth-child(2) { animation-delay: 0.2s; }
         .eq-bar:nth-child(3) { animation-delay: 0.4s; }
-        @keyframes eqAnim { 0% { height: 4px; } 100% { height: 16px; } }
+        @keyframes eqAnim { 0% { height: 3px; } 100% { height: 14px; } }
 
-        /* HOST BOTTOM BAR (SFX & LAUNCHER) */
+        /* HOST BOTTOM BAR */
         #host-bottom-bar {
-            display: none; position: fixed; bottom: 0; left: 0; right: 0; height: var(--bottom-bar-height); z-index: 500;
+            display: none; position: fixed; bottom: 0; left: 0; right: 0; height: var(--bottom-height); z-index: 500;
             background: rgba(15, 23, 42, 0.98); border-top: 1px solid var(--glass-border);
-            backdrop-filter: blur(20px); padding: 8px 14px; flex-direction: column; gap: 8px; justify-content: center;
+            backdrop-filter: blur(20px); padding: 8px 14px; flex-direction: column; gap: 6px; justify-content: center;
         }
-        .launcher-row { display: flex; gap: 8px; width: 100%; align-items: center; }
-        
+        .launcher-row { display: flex; gap: 6px; width: 100%; }
         .btn-launch-trigger {
-            flex: 2; height: 42px; border-radius: 12px; border: 1px solid var(--gold-main);
+            flex: 1; height: 42px; border-radius: 12px; border: 1px solid var(--gold-main);
             background: linear-gradient(135deg, rgba(245, 158, 11, 0.25) 0%, rgba(180, 83, 9, 0.25) 100%);
             color: var(--gold-light); font-weight: 800; font-size: 0.85rem; cursor: pointer;
-            display: inline-flex; align-items: center; justify-content: center; gap: 6px; text-align: center;
+            display: inline-flex; align-items: center; justify-content: center; gap: 6px;
         }
-        
         .btn-close-interactive {
-            display: none; flex: 1.5; height: 42px; border-radius: 12px; border: 1px solid var(--danger-red);
+            display: none; flex: 1; height: 42px; border-radius: 12px; border: 1px solid var(--danger-red);
             background: rgba(239, 68, 68, 0.2); color: #fca5a5; font-weight: 800; font-size: 0.85rem; cursor: pointer;
-            align-items: center; justify-content: center; gap: 6px; text-align: center;
+            align-items: center; justify-content: center; gap: 6px;
         }
 
-        .btn-exit-session {
-            flex: 0.6; height: 42px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.15);
-            background: rgba(30, 41, 59, 0.7); color: #94a3b8; font-weight: 800; font-size: 0.8rem; cursor: pointer;
-            display: inline-flex; align-items: center; justify-content: center; gap: 4px; text-align: center;
-        }
-        .btn-exit-session:active { color: #fff; border-color: var(--danger-red); }
-
-        .sfx-grid { display: flex; gap: 8px; width: 100%; }
+        .sfx-grid { display: flex; gap: 6px; width: 100%; }
         .sfx-btn {
             flex: 1; height: 42px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.15);
             background: rgba(30, 41, 59, 0.8); color: #fff; font-size: 0.78rem; font-weight: 800; cursor: pointer;
-            transition: transform 0.15s ease; display: inline-flex; align-items: center; justify-content: center; text-align: center;
+            display: inline-flex; align-items: center; justify-content: center; gap: 4px;
+            transition: transform 0.15s ease;
         }
         .sfx-btn:active { transform: scale(0.95); }
+        .btn-logout {
+            width: 42px; height: 42px; border-radius: 12px; border: 1px solid rgba(239, 68, 68, 0.4);
+            background: rgba(239, 68, 68, 0.15); color: #fca5a5; font-size: 1rem; cursor: pointer;
+            display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
+        }
 
-        /* MODAL LAUNCHER MENU */
-        #launcher-modal {
+        /* MODALS */
+        .modal-overlay {
             display: none; position: fixed; inset: 0; z-index: 20000;
             background: rgba(0, 0, 0, 0.88); backdrop-filter: blur(20px);
             align-items: center; justify-content: center; padding: 20px;
         }
         .modal-card {
             background: var(--glass-card); border: 1px solid var(--glass-border);
-            border-radius: 28px; padding: 28px; width: 100%; max-width: 400px; text-align: center;
+            border-radius: 28px; padding: 26px; width: 100%; max-width: 380px; text-align: center;
             box-shadow: 0 0 50px rgba(0, 0, 0, 0.9);
         }
-        .modules-grid { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
+        .modules-grid { display: flex; flex-direction: column; gap: 10px; margin-top: 18px; }
         .mod-btn {
-            padding: 16px; border-radius: 14px; border: 1px solid var(--glass-border);
-            background: rgba(30, 41, 59, 0.8); color: #fff; font-size: 0.95rem; font-weight: 800; cursor: pointer;
-            display: inline-flex; align-items: center; justify-content: center; text-align: center;
+            padding: 15px; border-radius: 14px; border: 1px solid var(--glass-border);
+            background: rgba(30, 41, 59, 0.8); color: #fff; font-size: 0.92rem; font-weight: 800; cursor: pointer;
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
         }
 
-        /* MAIN VIEWPORT - DYNAMIC VIEWPORT FULLSCREEN EXPANSION */
+        /* MAIN VIEWPORT (FULLSCREEN GEOMETRY) */
         #main-viewport {
-            position: absolute; inset: 0; width: 100vw; height: 100vh; z-index: 10;
+            position: fixed; inset: 0; z-index: 10; width: 100vw; height: 100vh;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
 
-        /* HOST ROLE: IFRAME SPANS EXACTLY BETWEEN TOP AND BOTTOM CONTROL BARS */
+        /* HOST SPECIFIC GEOMETRY FIT */
         body.is-host #main-viewport {
-            top: var(--top-bar-height);
-            bottom: var(--bottom-bar-height);
-            height: calc(100vh - var(--top-bar-height) - var(--bottom-bar-height));
-            width: 100vw;
+            top: var(--top-height) !important;
+            bottom: var(--bottom-height) !important;
+            height: calc(100vh - var(--top-height) - var(--bottom-height)) !important;
+            width: 100vw !important;
         }
 
         #module-iframe {
@@ -194,7 +186,7 @@
         }
 
         #main-display-content {
-            text-align: center; max-width: 650px; width: 100%; padding: 20px; z-index: 10;
+            text-align: center; max-width: 600px; width: 100%; padding: 20px; z-index: 10;
         }
         .shimmer-title {
             font-family: 'Cinzel', serif; font-size: 3.2rem; font-weight: 900;
@@ -204,9 +196,7 @@
         }
         @keyframes shine { to { background-position: 200% center; } }
 
-        .subtitle-text {
-            color: #94a3b8; font-size: 1.15rem; font-weight: 600; margin-top: 14px; letter-spacing: 1px;
-        }
+        .subtitle-text { color: #94a3b8; font-size: 1.15rem; font-weight: 600; margin-top: 14px; letter-spacing: 1px; }
     </style>
 </head>
 <body>
@@ -235,7 +225,7 @@
             <div class="eq-bar-container">
                 <div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div>
             </div>
-            <span style="font-size: 0.75rem; color: var(--gold-light); font-weight: 800; margin-right: auto; margin-left: 8px;">ГРОМКОСТЬ:</span>
+            <span style="font-size: 0.72rem; color: var(--gold-light); font-weight: 800; margin-right: auto; margin-left: 6px;">ГРОМКОСТЬ:</span>
             <button class="btn-control" onclick="setVolumeSmooth(0.1, this)">10%</button>
             <button class="btn-control" onclick="setVolumeSmooth(0.2, this)">20%</button>
             <button class="btn-control active" onclick="setVolumeSmooth(0.3, this)">30%</button>
@@ -243,9 +233,8 @@
             <button class="btn-control" onclick="setVolumeSmooth(1.0, this)">100%</button>
         </div>
 
-        <!-- TRACK SEEKBAR -->
         <div class="seek-container">
-            <span style="font-size: 0.7rem; color: #94a3b8; font-weight: 700;">ПЕРЕМОТКА:</span>
+            <span style="font-size: 0.68rem; color: #94a3b8; font-weight: 700;">ПЕРЕМОТКА:</span>
             <input type="range" id="host-seek-bar" class="seek-bar" min="0" max="180" value="0" onchange="seekAudioTrack(this.value)">
         </div>
 
@@ -256,7 +245,7 @@
         </div>
     </div>
 
-    <!-- MAIN VIEWPORT (EXPANDS FULLSCREEN OR BETWEEN BARS) -->
+    <!-- MAIN VIEWPORT -->
     <div id="main-viewport">
         <iframe id="module-iframe" src="about:blank"></iframe>
         
@@ -266,39 +255,46 @@
         </div>
     </div>
 
-    <!-- MODAL LAUNCHER MENU -->
-    <div id="launcher-modal">
+    <!-- LAUNCHER MODAL -->
+    <div class="modal-overlay" id="launcher-modal">
         <div class="modal-card">
-            <h3 style="color: var(--gold-light); font-family: 'Cinzel', serif; font-size: 1.4rem;">➕ Выбор интерактива</h3>
+            <h3 style="color: var(--gold-light); font-family: 'Cinzel', serif; font-size: 1.3rem;">➕ Выбор интерактива</h3>
             <div class="modules-grid" id="modules-list-box"></div>
             <button onclick="closeLauncherModal()" style="width: 100%; padding: 12px; border-radius: 12px; border: none; background: transparent; color: #94a3b8; margin-top: 14px; cursor: pointer; font-weight: 700;">Закрыть</button>
         </div>
     </div>
 
-    <!-- HOST BOTTOM BAR (SFX & LAUNCHER & LOGOUT) -->
-    <div id="host-bottom-bar">
-        <div class="launcher-row">
-            <button class="btn-launch-trigger" onclick="openLauncherModal()">
-                <span>➕</span>
-                <span>ВЫБРАТЬ ИНТЕРАКТИВ</span>
-            </button>
-            <button class="btn-close-interactive" id="btn-close-interactive" onclick="closeActiveInteractive()">
-                <span>❌</span>
-                <span>ЗАКРЫТЬ</span>
-            </button>
-            <button class="btn-exit-session" onclick="confirmExitSession()">
-                <span>🚪</span>
-                <span>ВЫХОД</span>
-            </button>
-        </div>
-        <div class="sfx-grid">
-            <button class="sfx-btn" onclick="triggerSfx('applause')">👏 Аплодисменты</button>
-            <button class="sfx-btn" onclick="triggerSfx('correct')">✅ Тыдыщ!</button>
-            <button class="sfx-btn" onclick="triggerSfx('wrong')">❌ Ошибка</button>
+    <!-- LOGOUT CONFIRM MODAL -->
+    <div class="modal-overlay" id="logout-modal">
+        <div class="modal-card">
+            <h3 style="color: var(--gold-light); font-family: 'Cinzel', serif; font-size: 1.2rem;">🚪 Завершение сессии</h3>
+            <p style="color: #94a3b8; font-size: 0.9rem; margin-top: 10px;">Завершить рабочую сессию и выйти из пульта управления?</p>
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button onclick="confirmLogout()" class="btn-gold" style="margin: 0; background: var(--danger-red); color: #fff;">Завершить</button>
+                <button onclick="closeLogoutModal()" style="flex: 1; padding: 14px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.1); background: transparent; color: #fff; font-weight: 700; cursor: pointer;">Отмена</button>
+            </div>
         </div>
     </div>
 
-    <!-- DUAL AUDIO PLAYERS FOR DYNAMIC CROSSFADE (ТОЛЬКО ДЛЯ РОЛИ 'SCREEN') -->
+    <!-- HOST BOTTOM BAR -->
+    <div id="host-bottom-bar">
+        <div class="launcher-row">
+            <button class="btn-launch-trigger" onclick="openLauncherModal()">
+                <span>➕</span><span>ВЫБРАТЬ ИНТЕРАКТИВ</span>
+            </button>
+            <button class="btn-close-interactive" id="btn-close-interactive" onclick="closeActiveInteractive()">
+                <span>❌</span><span>ЗАКРЫТЬ ИНТЕРАКТИВ</span>
+            </button>
+        </div>
+        <div class="sfx-grid">
+            <button class="sfx-btn" onclick="triggerSfx('applause')"><span>👏</span><span>Аплодисменты</span></button>
+            <button class="sfx-btn" onclick="triggerSfx('correct')"><span>✅</span><span>Тыдыщ!</span></button>
+            <button class="sfx-btn" onclick="triggerSfx('wrong')"><span>❌</span><span>Ошибка</span></button>
+            <button class="btn-logout" onclick="openLogoutModal()" title="Завершить сессию">🚪</button>
+        </div>
+    </div>
+
+    <!-- DUAL AUDIO PLAYERS -->
     <audio id="audio-a" loop></audio>
     <audio id="audio-b" loop></audio>
 
@@ -315,6 +311,7 @@
         let myRole = 'GUEST';
         let currentLoadedModule = '';
         let availableModules = [];
+        let activePin = '';
 
         const audioA = document.getElementById('audio-a');
         const audioB = document.getElementById('audio-b');
@@ -360,15 +357,21 @@
         }
         requestAnimationFrame(animateParticles);
 
-        // --- 2. AUTO-RECONNECT SESSION (LOCALSTORAGE) ---
-        window.addEventListener('DOMContentLoaded', () => {
-            const savedPin = localStorage.getItem('event_os_saved_pin');
-            if (savedPin) {
-                socket.emit('login', { pin: savedPin });
+        // --- 2. AUTO SESSION RESTORE ---
+        socket.on('connect', () => {
+            const savedSession = localStorage.getItem('eventos_active_session');
+            if (savedSession) {
+                try {
+                    const sessData = JSON.parse(savedSession);
+                    if (sessData.pin) {
+                        activePin = sessData.pin;
+                        socket.emit('login', { pin: sessData.pin });
+                    }
+                } catch(e) {}
             }
         });
 
-        // --- 3. 3 TAPS REVEAL PIN LOGIC ---
+        // --- 3. 3 TAPS BURST & ANIMATION LOGIC ---
         function handleLogoTap() {
             tapCount++; clearTimeout(tapTimer);
             const logo = document.getElementById('brand-logo');
@@ -377,23 +380,20 @@
 
             if (tapCount >= 3) {
                 const flash = document.getElementById('flash-overlay');
-                const card = document.getElementById('auth-card');
-                const pinContainer = document.getElementById('pin-container');
-                
                 if (flash) {
                     flash.style.opacity = '0.9';
                     setTimeout(() => flash.style.opacity = '0', 300);
                 }
                 
-                if (card) card.classList.add('pop');
+                logo.style.opacity = '0';
+                setTimeout(() => {
+                    logo.innerText = 'EVENT OS';
+                    logo.style.opacity = '1';
+                }, 150);
 
-                logo.innerText = 'EVENT OS';
                 document.getElementById('auth-sub').innerText = 'Введите PIN-код для входа';
-                
-                if (pinContainer) {
-                    pinContainer.classList.add('show');
-                    document.getElementById('auth-input').focus();
-                }
+                document.getElementById('pin-container').classList.add('active');
+                document.getElementById('auth-input').focus();
 
                 tapCount = 0;
             } else { 
@@ -424,14 +424,20 @@
                 return;
             }
 
+            activePin = val;
             socket.emit('login', { pin: val });
         }
 
-        // --- 4. SOCKET RESPONSES & STATE ---
+        // --- 4. SOCKET RESPONSES & SESSION SAVE ---
         socket.on('login_response', (res) => {
             if (res.success) {
                 myRole = res.role;
-                if (res.pin) localStorage.setItem('event_os_saved_pin', res.pin);
+                
+                // Сохраняем сессию в локальную память
+                localStorage.setItem('eventos_active_session', JSON.stringify({
+                    role: myRole,
+                    pin: activePin
+                }));
 
                 document.getElementById('auth-overlay').style.display = 'none';
 
@@ -443,7 +449,7 @@
                     document.body.classList.add('is-screen');
                 }
             } else {
-                localStorage.removeItem('event_os_saved_pin');
+                localStorage.removeItem('eventos_active_session');
                 triggerErrorShake();
                 alert(res.message || 'Ошибка доступа');
             }
@@ -474,7 +480,6 @@
             if (state.event_title) document.getElementById('display-title').innerText = state.event_title;
             if (state.event_subtitle) document.getElementById('display-subtitle').innerText = state.event_subtitle;
 
-            // Смена уровня громкости с плавной анимацией
             if (masterVolume !== state.audio_volume) {
                 applySmoothVolumeTransition(state.audio_volume);
             }
@@ -483,7 +488,6 @@
                 loadModuleIframe(state.active_module);
             }
 
-            // ⛔️ ЗВУК И КРОССФЕЙД ТОЛЬКО НА ЭКРАНЕ ПРОЕКТОРА
             if (myRole === 'SCREEN') {
                 const trackUrl = RENDER_SERVER_URL + state.current_track;
                 const targetTime = state.seek_position || 0;
@@ -496,7 +500,6 @@
             }
         });
 
-        // ПЛАВНАЯ РЕГУЛИРОВКА ГРОМКОСТИ (500 МС)
         function applySmoothVolumeTransition(targetVol) {
             masterVolume = targetVol;
             if (myRole !== 'SCREEN') return;
@@ -519,7 +522,6 @@
             }, 25);
         }
 
-        // ПЛАВНЫЙ КРОССФЕЙД ПРИ СМЕНЕ ТРЕКА ИЛИ ПЕРЕМОТКЕ (1.2 СЕКУНДЫ)
         function performAudioCrossfade(newTrackUrl, targetTime) {
             inactiveAudio.src = newTrackUrl;
             inactiveAudio.volume = 0;
@@ -555,7 +557,6 @@
             }
         });
 
-        // ПОДГРУЗКА ЛЮБОГО ВНЕШНЕГО САЙТА ИЛИ ФАЙЛА В IFRAME
         function loadModuleIframe(modulePath) {
             currentLoadedModule = modulePath;
             const iframe = document.getElementById('module-iframe');
@@ -575,38 +576,28 @@
             }
         }
 
-        // --- 5. HOST CONTROLS & EXIT ---
+        // --- 5. HOST CONTROLS & LOGOUT ---
         function setVolumeSmooth(vol, btn) {
             document.querySelectorAll('#host-top-bar .btn-control').forEach(b => b.classList.remove('active'));
             if (btn) btn.classList.add('active');
             socket.emit('host_audio_control', { volume: vol });
         }
 
-        function setMood(mood) {
-            socket.emit('host_audio_control', { mood: mood });
-        }
-
-        function seekAudioTrack(seekTimeSeconds) {
-            socket.emit('host_audio_control', { seek: seekTimeSeconds });
-        }
-
-        function triggerSfx(sfxType) {
-            socket.emit('host_trigger_sfx', { sfx: sfxType });
-        }
-
-        function closeActiveInteractive() {
-            socket.emit('switch_module', { module: '' });
-        }
-
-        function confirmExitSession() {
-            if (confirm('Вы действительно хотите завершить сессию и выйти из управления?')) {
-                localStorage.removeItem('event_os_saved_pin');
-                window.location.reload();
-            }
-        }
+        function setMood(mood) { socket.emit('host_audio_control', { mood: mood }); }
+        function seekAudioTrack(seekTimeSeconds) { socket.emit('host_audio_control', { seek: seekTimeSeconds }); }
+        function triggerSfx(sfxType) { socket.emit('host_trigger_sfx', { sfx: sfxType }); }
+        function closeActiveInteractive() { socket.emit('switch_module', { module: '' }); }
 
         function openLauncherModal() { document.getElementById('launcher-modal').style.display = 'flex'; }
         function closeLauncherModal() { document.getElementById('launcher-modal').style.display = 'none'; }
+        
+        function openLogoutModal() { document.getElementById('logout-modal').style.display = 'flex'; }
+        function closeLogoutModal() { document.getElementById('logout-modal').style.display = 'none'; }
+        
+        function confirmLogout() {
+            localStorage.removeItem('eventos_active_session');
+            location.reload();
+        }
     </script>
 </body>
 </html>
