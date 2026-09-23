@@ -17,10 +17,11 @@
             --gold-light: #fff3a1;
             --gold-main: #f59e0b;
             --gold-dark: #b45309;
-            --glass-card: rgba(15, 23, 42, 0.88);
+            --glass-card: rgba(15, 23, 42, 0.92);
             --glass-border: rgba(245, 158, 11, 0.3);
             --text-main: #f8fafc;
             --danger-red: #ef4444;
+            --success-green: #22c55e;
         }
 
         * {
@@ -42,7 +43,7 @@
             justify-content: center;
         }
 
-        /* --- 1. АНИМАЦИЯ ПРИВЕТСТВИЯ (SPLASH) --- */
+        /* --- SPLASH SCREEN --- */
         #view-splash {
             display: none;
             position: fixed;
@@ -80,7 +81,7 @@
             100% { opacity: 1; transform: scale(1.02); }
         }
 
-        /* --- 2. ФОРМА ВХОДА --- */
+        /* --- LOGIN FORM --- */
         #view-login {
             position: fixed;
             inset: 0;
@@ -204,7 +205,7 @@
             cursor: not-allowed;
         }
 
-        /* --- 3. ЭКРАН ПРОЕКТОРА --- */
+        /* --- SCREEN VIEW (ПРОЕКТОР) --- */
         #view-screen {
             display: none;
             position: fixed;
@@ -216,6 +217,7 @@
             background: #000000;
             text-align: center;
             padding: 40px;
+            overflow: hidden;
         }
 
         .screen-badge {
@@ -229,6 +231,7 @@
             letter-spacing: 2px;
             text-transform: uppercase;
             margin-bottom: 20px;
+            z-index: 2;
         }
 
         .screen-title {
@@ -236,24 +239,44 @@
             font-size: 3.8rem;
             color: #ffffff;
             text-shadow: 0 0 35px rgba(245, 158, 11, 0.6);
+            z-index: 2;
         }
 
-        /* --- 4. ПУЛЬТ ВЕДУЩЕГО --- */
+        #screen-timer-display {
+            display: none;
+            font-family: 'Cinzel', serif;
+            font-size: 5rem;
+            color: var(--gold-light);
+            margin-top: 20px;
+            text-shadow: 0 0 40px rgba(245, 158, 11, 0.8);
+            z-index: 2;
+        }
+
+        video#screen-video-player {
+            display: none;
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 1;
+        }
+
+        /* --- HOST CONTROL VIEW (ПУЛЬТ ВЕДУЩЕГО) --- */
         #view-host {
             display: none;
             position: fixed;
             inset: 0;
             z-index: 100;
-            pointer-events: none;
+            background: var(--bg-black);
         }
 
-        .host-interactive { pointer-events: auto; }
-
+        /* ВЕРХНЯЯ ПАНЕЛЬ МУЗЫКИ */
         #host-top-music {
             position: fixed;
             top: 0; left: 0; right: 0;
-            height: 95px;
-            background: rgba(3, 7, 18, 0.96);
+            height: 90px;
+            background: rgba(15, 23, 42, 0.95);
             border-bottom: 1px solid var(--glass-border);
             backdrop-filter: blur(20px);
             padding: 10px 14px;
@@ -272,12 +295,12 @@
 
         .btn-vol {
             flex: 1;
-            padding: 10px 4px;
+            padding: 10px 2px;
             border-radius: 10px;
             border: 1px solid rgba(255, 255, 255, 0.12);
             background: rgba(30, 41, 59, 0.7);
             color: #ffffff;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             font-weight: 800;
             cursor: pointer;
             text-align: center;
@@ -302,58 +325,151 @@
             outline: none;
         }
 
-        #host-right-soundboard {
+        /* ЦЕНТРАЛЬНАЯ РАБОЧАЯ ЗОНА ВЕДУЩЕГО */
+        #host-main-center {
             position: fixed;
-            top: 95px; right: 0; bottom: 0;
-            width: 115px;
-            background: rgba(3, 7, 18, 0.94);
-            border-left: 1px solid var(--glass-border);
-            backdrop-filter: blur(20px);
-            padding: 12px 8px;
+            top: 95px; left: 10px; right: 10px; bottom: 85px;
+            overflow-y: auto;
+            padding: 15px 5px;
             display: flex;
             flex-direction: column;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .btn-official-start {
+            width: 100%;
+            max-width: 400px;
+            padding: 22px;
+            border-radius: 20px;
+            border: 2px solid var(--gold-light);
+            background: linear-gradient(135deg, var(--gold-light) 0%, var(--gold-main) 100%);
+            color: #030712;
+            font-family: 'Cinzel', serif;
+            font-size: 1.4rem;
+            font-weight: 900;
+            letter-spacing: 2px;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(245, 158, 11, 0.4);
+            transition: transform 0.15s ease;
+        }
+
+        .btn-official-start:active { transform: scale(0.96); }
+
+        .btn-add-launcher {
+            width: 100%;
+            max-width: 400px;
+            padding: 16px;
+            border-radius: 18px;
+            border: 1px dashed var(--gold-main);
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--gold-light);
+            font-size: 1rem;
+            font-weight: 800;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             gap: 10px;
+        }
+
+        .status-box {
+            background: var(--glass-card);
+            border: 1px solid var(--glass-border);
+            padding: 16px 20px;
+            border-radius: 18px;
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        /* НИЖНЯЯ ПАНЕЛЬ ЭФФЕКТОВ И ТАЙМЕРА (FIXED BOTTOM) */
+        #host-bottom-soundboard {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            height: 75px;
+            background: rgba(15, 23, 42, 0.98);
+            border-top: 1px solid var(--glass-border);
+            backdrop-filter: blur(20px);
+            padding: 8px 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 6px;
             z-index: 110;
         }
 
-        .sfx-btn {
-            width: 100%;
-            padding: 14px 6px;
-            border-radius: 14px;
+        .sfx-bottom-btn {
+            flex: 1;
+            height: 56px;
+            border-radius: 12px;
             border: 1px solid rgba(255, 255, 255, 0.15);
             background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.9));
             color: #ffffff;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             font-weight: 800;
             text-align: center;
             cursor: pointer;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 4px;
+            justify-content: center;
+            gap: 2px;
         }
 
-        .sfx-btn .tap-counter {
-            font-size: 0.65rem;
-            padding: 2px 6px;
-            border-radius: 10px;
+        .sfx-bottom-btn .tap-counter {
+            font-size: 0.6rem;
+            padding: 1px 4px;
+            border-radius: 8px;
             background: rgba(0, 0, 0, 0.6);
             color: var(--gold-main);
         }
 
-        .sfx-btn.tap-1 { border-color: #f59e0b; background: rgba(245, 158, 11, 0.3); }
-        .sfx-btn.tap-2 { border-color: #ef4444; background: rgba(239, 68, 68, 0.45); }
+        .sfx-bottom-btn.tap-1 { border-color: #f59e0b; background: rgba(245, 158, 11, 0.3); }
+        .sfx-bottom-btn.tap-2 { border-color: #ef4444; background: rgba(239, 68, 68, 0.45); }
 
-        #host-modules-container {
+        /* MODAL WINDOWS */
+        .modal-overlay {
+            display: none;
             position: fixed;
-            top: 100px; left: 10px; right: 125px; bottom: 20px;
-            overflow-y: auto;
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-            gap: 10px;
+            inset: 0;
+            z-index: 99999;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(10px);
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
         }
 
-        /* --- 5. ЭКРАН ГОСТЯ --- */
+        .modal-content {
+            background: var(--glass-card);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 24px;
+            width: 100%;
+            max-width: 360px;
+            text-align: center;
+        }
+
+        .modal-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 16px;
+        }
+
+        .modal-btn {
+            padding: 14px;
+            border-radius: 14px;
+            border: 1px solid var(--glass-border);
+            background: rgba(30, 41, 59, 0.8);
+            color: #ffffff;
+            font-weight: 700;
+            font-size: 0.85rem;
+            cursor: pointer;
+        }
+
+        /* --- GUEST VIEW --- */
         #view-guest {
             display: none;
             position: fixed;
@@ -390,18 +506,22 @@
         </div>
     </div>
 
-    <!-- 3. SCREEN VIEW -->
+    <!-- 3. SCREEN VIEW (ПРОЕКТОР) -->
     <div id="view-screen">
+        <video id="screen-video-player" src="intro.mp4" playsinline></video>
         <div class="screen-badge" id="screen-badge">Заставка</div>
         <div class="screen-title" id="screen-title">Загрузка...</div>
+        <div id="screen-timer-display">00:00</div>
     </div>
 
-    <!-- 4. HOST CONTROL VIEW -->
+    <!-- 4. HOST CONTROL VIEW (ПУЛЬТ ВЕДУЩЕГО) -->
     <div id="view-host">
-        <div id="host-top-music" class="host-interactive">
+        <!-- ВЕРХ ПАНЕЛЬ МУЗЫКИ -->
+        <div id="host-top-music">
             <div class="music-controls-row">
                 <span style="font-size: 0.75rem; color: var(--gold-light); font-weight: 800;">🔊 ГРОМКОСТЬ:</span>
                 <button class="btn-vol" onclick="setVolume(0, this)">0%</button>
+                <button class="btn-vol" onclick="setVolume(0.2, this)">20%</button>
                 <button class="btn-vol active" onclick="setVolume(0.4, this)">40%</button>
                 <button class="btn-vol" onclick="setVolume(0.7, this)">70%</button>
                 <button class="btn-vol" onclick="setVolume(1.0, this)">100%</button>
@@ -413,26 +533,73 @@
             </select>
         </div>
 
-        <div id="host-right-soundboard" class="host-interactive">
-            <div class="sfx-btn" onclick="handleSfxTap('applause', this)">
-                <span>👏 Аплодисменты</span>
-                <span class="tap-counter">0/3</span>
-            </div>
-            <div class="sfx-btn" onclick="handleSfxTap('fanfare', this)">
-                <span>🎉 Фанфары</span>
-                <span class="tap-counter">0/3</span>
-            </div>
-            <div class="sfx-btn" onclick="handleSfxTap('correct', this)">
-                <span>✅ Тыдыщ!</span>
-                <span class="tap-counter">0/3</span>
-            </div>
-            <div class="sfx-btn" onclick="handleSfxTap('wrong', this)">
-                <span>❌ Ошибка</span>
-                <span class="tap-counter">0/3</span>
+        <!-- ЦЕНТР ЗОНА ВЕДУЩЕГО -->
+        <div id="host-main-center">
+            <button class="btn-official-start" onclick="officialStart()">🚀 СТАРТ СОБЫТИЯ</button>
+            
+            <button class="btn-add-launcher" onclick="openLauncherModal()">
+                <span style="font-size: 1.4rem;">➕</span>
+                <span>Запустить модуль / Видео</span>
+            </button>
+
+            <div class="status-box">
+                <div style="font-size: 0.8rem; color: #94a3b8;">ПОДКЛЮЧЕНО ГОСТЕЙ В ЛОББИ:</div>
+                <div style="font-size: 2rem; font-weight: 900; color: var(--gold-light);" id="host-guest-counter">0</div>
             </div>
         </div>
 
-        <div id="host-modules-container" class="host-interactive"></div>
+        <!-- НИЗ ПАНЕЛЬ ЗВУКОВ И ТАЙМЕРА -->
+        <div id="host-bottom-soundboard">
+            <div class="sfx-bottom-btn" onclick="handleSfxTap('applause', this)">
+                <span>👏 Аплодисменты</span>
+                <span class="tap-counter">0/3</span>
+            </div>
+            <div class="sfx-bottom-btn" onclick="handleSfxTap('fanfare', this)">
+                <span>🎉 Фанфары</span>
+                <span class="tap-counter">0/3</span>
+            </div>
+            <div class="sfx-bottom-btn" onclick="handleSfxTap('correct', this)">
+                <span>✅ Тыдыщ!</span>
+                <span class="tap-counter">0/3</span>
+            </div>
+            <div class="sfx-bottom-btn" onclick="handleSfxTap('wrong', this)">
+                <span>❌ Ошибка</span>
+                <span class="tap-counter">0/3</span>
+            </div>
+            <div class="sfx-bottom-btn" style="border-color: var(--gold-main);" onclick="openTimerModal()">
+                <span>⏱️ Таймер</span>
+                <span class="tap-counter" id="timer-status-btn">Стоп</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: ТАЙМЕР -->
+    <div class="modal-overlay" id="modal-timer">
+        <div class="modal-content">
+            <h3 style="color: var(--gold-light);">⏱️ Запуск Таймера</h3>
+            <div class="modal-grid">
+                <button class="modal-btn" onclick="startTimer(30)">30 секунд</button>
+                <button class="modal-btn" onclick="startTimer(60)">1 минута</button>
+                <button class="modal-btn" onclick="startTimer(120)">2 минуты</button>
+                <button class="modal-btn" onclick="startTimer(300)">5 минут</button>
+            </div>
+            <button class="modal-btn" style="width: 100%; margin-top: 12px; background: rgba(239, 68, 68, 0.3); border-color: var(--danger-red);" onclick="stopTimer()">Остановить таймер</button>
+            <button class="modal-btn" style="width: 100%; margin-top: 8px; background: transparent; border: none;" onclick="closeTimerModal()">Отмена</button>
+        </div>
+    </div>
+
+    <!-- MODAL: ЛАУНЧЕР МОДУЛЕЙ (+) -->
+    <div class="modal-overlay" id="modal-launcher">
+        <div class="modal-content">
+            <h3 style="color: var(--gold-light);">➕ Выбор модуля</h3>
+            <div class="modal-grid">
+                <button class="modal-btn" onclick="launchModule('VIDEO_INTRO')">🎬 Видео-Заставка</button>
+                <button class="modal-btn" onclick="launchModule('LOBBY')">🏠 Главный Экран</button>
+                <button class="modal-btn" onclick="launchModule('GAME')">🎮 Интерактив 1</button>
+                <button class="modal-btn" onclick="launchModule('GAME_2')">🎯 Викторина</button>
+            </div>
+            <button class="modal-btn" style="width: 100%; margin-top: 14px; background: transparent; border: none;" onclick="closeLauncherModal()">Закрыть</button>
+        </div>
     </div>
 
     <!-- 5. GUEST VIEW -->
@@ -442,7 +609,6 @@
     </div>
 
     <script>
-        // Жестко привязанный адрес твоего сервера на Render
         const RENDER_SERVER_URL = "https://event-os-wqoa.onrender.com"; 
 
         const socket = io(RENDER_SERVER_URL, {
@@ -456,9 +622,21 @@
         let logoTapCount = 0;
         let logoTapTimer = null;
         let isAdminMode = false;
-        let loginTimeout = null;
+        let timerInterval = null;
 
-        // Скрытое переключение режима управления по 5 тапам на логотип
+        // --- 1. АВТОСОХРАНЕНИЕ И ВОССТАНОВЛЕНИЕ СЕССИИ (LOCAL STORAGE) ---
+        socket.on('connect', () => {
+            const savedSession = localStorage.getItem('eventos_session');
+            if (savedSession) {
+                try {
+                    const sessionData = JSON.parse(savedSession);
+                    socket.emit('login', sessionData);
+                } catch(e) {
+                    localStorage.removeItem('eventos_session');
+                }
+            }
+        });
+
         function handleLogoTap() {
             logoTapCount++;
             clearTimeout(logoTapTimer);
@@ -514,7 +692,6 @@
 
         function submitEntry() {
             const inputEl = document.getElementById('main-input');
-            const btn = document.getElementById('btn-submit');
             const val = inputEl ? inputEl.value.trim() : '';
 
             if (!val) {
@@ -527,19 +704,12 @@
                 return;
             }
 
-            btn.innerText = 'АВТОРИЗАЦИЯ...';
-            btn.disabled = true;
-
             const payload = isAdminMode ? { pin: val } : { name: val };
+            
+            // Сохраняем сессию в память устройства
+            localStorage.setItem('eventos_session', JSON.stringify(payload));
 
             socket.emit('login', payload);
-
-            clearTimeout(loginTimeout);
-            loginTimeout = setTimeout(() => {
-                btn.innerText = 'ВОЙТИ';
-                btn.disabled = false;
-                showError('Сервер долго отвечает. Попробуйте ещё раз');
-            }, 4000);
         }
 
         function showError(msg) {
@@ -563,13 +733,6 @@
         }
 
         socket.on('login_response', (data) => {
-            clearTimeout(loginTimeout);
-            const btn = document.getElementById('btn-submit');
-            if (btn) {
-                btn.innerText = 'ВОЙТИ';
-                btn.disabled = false;
-            }
-
             if (data.success) {
                 document.getElementById('view-login').style.display = 'none';
 
@@ -598,6 +761,7 @@
                 }, 1600);
 
             } else {
+                localStorage.removeItem('eventos_session');
                 showError(data.message || 'Неверный код доступа');
             }
         });
@@ -605,7 +769,44 @@
         socket.on('state_update', (state) => {
             if (state.screen_text) document.getElementById('screen-title').innerText = state.screen_text;
             if (state.screen_badge) document.getElementById('screen-badge').innerText = state.screen_badge;
+            if (state.guest_count !== undefined) document.getElementById('host-guest-counter').innerText = state.guest_count;
+
+            // Обработка видео заставки на Экране
+            const videoEl = document.getElementById('screen-video-player');
+            if (videoEl) {
+                if (state.video_playing) {
+                    videoEl.style.display = 'block';
+                    videoEl.play().catch(() => {});
+                } else {
+                    videoEl.style.display = 'none';
+                    videoEl.pause();
+                }
+            }
+
+            // Обработка Таймера
+            const timerDisplay = document.getElementById('screen-timer-display');
+            if (state.timer && state.timer.active) {
+                timerDisplay.style.display = 'block';
+                clearInterval(timerInterval);
+                timerInterval = setInterval(() => {
+                    const remaining = Math.max(0, Math.round(state.timer.end_time - (Date.now() / 1000)));
+                    const mins = String(Math.floor(remaining / 60)).padStart(2, '0');
+                    const secs = String(remaining % 60).padStart(2, '0');
+                    timerDisplay.innerText = `${mins}:${secs}`;
+                    document.getElementById('timer-status-btn').innerText = `${mins}:${secs}`;
+                    if (remaining <= 0) clearInterval(timerInterval);
+                }, 1000);
+            } else {
+                clearInterval(timerInterval);
+                if (timerDisplay) timerDisplay.style.display = 'none';
+                document.getElementById('timer-status-btn').innerText = 'Стоп';
+            }
         });
+
+        // --- УПРАВЛЕНИЕ ВЕДУЩЕГО ---
+        function officialStart() {
+            socket.emit('host_official_start');
+        }
 
         function setVolume(vol, btn) {
             document.querySelectorAll('.btn-vol').forEach(b => b.classList.remove('active'));
@@ -617,6 +818,27 @@
             socket.emit('host_audio_control', { emotion: emotion });
         }
 
+        // --- ТАЙМЕР МОДАЛКА ---
+        function openTimerModal() { document.getElementById('modal-timer').style.display = 'flex'; }
+        function closeTimerModal() { document.getElementById('modal-timer').style.display = 'none'; }
+        function startTimer(sec) {
+            socket.emit('host_start_timer', { seconds: sec });
+            closeTimerModal();
+        }
+        function stopTimer() {
+            socket.emit('host_stop_timer');
+            closeTimerModal();
+        }
+
+        // --- ЛАУНЧЕР МОДУЛЕЙ МОДАЛКА ---
+        function openLauncherModal() { document.getElementById('modal-launcher').style.display = 'flex'; }
+        function closeLauncherModal() { document.getElementById('modal-launcher').style.display = 'none'; }
+        function launchModule(mod) {
+            socket.emit('host_launch_module', { module: mod });
+            closeLauncherModal();
+        }
+
+        // --- ЭФФЕКТЫ (ЗВУКИ) ---
         const sfxTaps = {};
         const sfxTimers = {};
 
