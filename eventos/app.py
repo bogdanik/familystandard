@@ -93,7 +93,7 @@ def handle_login(data):
 
 @socketio.on('switch_module')
 def handle_switch_module(data):
-    module_path = data.get('module')
+    module_path = data.get('module', '')
     system_state['active_module'] = module_path
     socketio.emit('state_update', system_state)
 
