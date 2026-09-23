@@ -23,7 +23,8 @@ def load_config():
         except Exception:
             pass
     return {
-        "event_title": "Family Standard OS", 
+        "event_title": "FAMILY STANDARD OS", 
+        "event_subtitle": "С праздником!",
         "host_name": "Богдан", 
         "host_pin": "111", 
         "screen_pin": "222",
@@ -36,7 +37,8 @@ connected_users = {}
 system_state = {
     "active_module": "lobby/lobby.html",
     "host_name": config_data.get("host_name", "Богдан"),
-    "event_title": config_data.get("event_title", "Family Standard OS"),
+    "event_title": config_data.get("event_title", "FAMILY STANDARD OS"),
+    "event_subtitle": config_data.get("event_subtitle", "С праздником!"),
     "audio_volume": 0.3,
     "current_mood": "lounge",
     "current_track": "/static/audio/music/lounge.mp3",
@@ -44,7 +46,7 @@ system_state = {
     "guest_count": 0
 }
 
-# --- РУТЫ ---
+# --- МАРШРУТИЗАЦИЯ ---
 
 @app.route('/')
 def index():
@@ -120,7 +122,7 @@ def handle_audio_control(data):
 
 @socketio.on('host_trigger_sfx')
 def handle_trigger_sfx(data):
-    sfx_type = data.get('sfx') # 'applause', 'correct', 'wrong'
+    sfx_type = data.get('sfx')
     var_id = random.randint(1, 3)
     file_path = f"/static/audio/sfx/{sfx_type}_{var_id}.mp3"
     
