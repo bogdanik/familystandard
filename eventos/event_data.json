@@ -1,6 +1,12 @@
 {
-  "event_title": "Праздник",
+  "event_title": "Family Standard OS",
   "host_name": "Богдан",
   "host_pin": "111",
-  "screen_pin": "222"
+  "screen_pin": "222",
+  "modules": [
+    {"id": "lobby", "name": "👥 Лобби участников", "path": "lobby/lobby.html"},
+    {"id": "video", "name": "🎬 Видео-Заставка", "path": "video/video.html"},
+    {"id": "quiz", "name": "🎮 Квиз Интерактив", "path": "quiz/quiz.html"},
+    {"id": "bunker", "name": "🏚️ Игра Бункер", "path": "bunker/bunker.html"}
+  ]
 }
