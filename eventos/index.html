@@ -2,15 +2,15 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Event OS — Control Center</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Event OS</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet">
     
-    <!-- Загружаем Socket.IO напрямую с нашего сервера без сторонних CDN -->
-    <script src="/socket.io/socket.io.js"></script>
+    <!-- Рабочий и проверенный CDN Socket.IO -->
+    <script src="https://cdnjs.cloudflare.net/ajax/libs/socket.io/4.7.5/socket.io.min.js"></script>
 
     <style>
         :root {
@@ -22,7 +22,6 @@
             --glass-border: rgba(245, 158, 11, 0.3);
             --text-main: #f8fafc;
             --danger-red: #ef4444;
-            --success-green: #22c55e;
         }
 
         * {
@@ -93,17 +92,6 @@
             justify-content: center;
             padding: 20px;
             background: radial-gradient(circle at center, #0f172a 0%, var(--bg-black) 100%);
-        }
-
-        .server-status-dot {
-            font-size: 0.8rem;
-            color: #ef4444;
-            margin-bottom: 16px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            justify-content: center;
-            font-weight: 700;
         }
 
         .login-card {
@@ -375,16 +363,12 @@
 <body>
 
     <div id="view-splash">
-        <div class="splash-title" id="splash-title">EVENT OS</div>
+        <div class="splash-title">EVENT OS</div>
         <div class="splash-sub" id="splash-sub">ПРИВЕТСТВУЕТ ВАС</div>
     </div>
 
     <div id="view-login">
         <div class="login-card" id="login-card">
-            <div class="server-status-dot" id="server-status">
-                <span id="status-icon">🔴</span> <span id="status-text">Соединение с сервером...</span>
-            </div>
-            
             <div id="admin-badge" class="admin-badge">Режим управления</div>
             <div class="brand-logo" id="brand-logo" onclick="handleLogoTap()">EVENT OS</div>
             <p class="card-subtitle" id="card-subtitle">Введите имя для входа в лобби</p>
@@ -448,89 +432,9 @@
     </div>
 
     <script>
-        let socket = null;
-
-        function updateStatus(isOk, text) {
-            const icon = document.getElementById('status-icon');
-            const label = document.getElementById('status-text');
-            const container = document.getElementById('server-status');
-            if (icon && label && container) {
-                icon.innerText = isOk ? '🟢' : '🔴';
-                label.innerText = text;
-                container.style.color = isOk ? '#22c55e' : '#ef4444';
-            }
-        }
-
-        try {
-            if (typeof io !== 'undefined') {
-                socket = io({
-                    transports: ['polling', 'websocket'],
-                    reconnection: true,
-                    reconnectionDelay: 1000
-                });
-
-                socket.on('connect', () => {
-                    updateStatus(true, 'Сервер онлайн');
-                });
-
-                socket.on('disconnect', () => {
-                    updateStatus(false, 'Переподключение...');
-                });
-
-                socket.on('connect_error', () => {
-                    updateStatus(false, 'Ошибка подключения к серверу');
-                });
-
-                socket.on('login_response', (data) => {
-                    if (data.success) {
-                        document.getElementById('view-login').style.display = 'none';
-                        const currentRole = data.role;
-
-                        const splash = document.getElementById('view-splash');
-                        const splashSub = document.getElementById('splash-sub');
-                        if (splash) splash.style.display = 'flex';
-
-                        setTimeout(() => {
-                            if (splashSub) splashSub.innerText = 'HELLO';
-                        }, 900);
-
-                        setTimeout(() => {
-                            if (splash) splash.style.display = 'none';
-
-                            if (currentRole === 'HOST') {
-                                document.getElementById('view-screen').style.display = 'flex';
-                                document.getElementById('view-host').style.display = 'block';
-                            } else if (currentRole === 'SCREEN') {
-                                document.getElementById('view-screen').style.display = 'flex';
-                            } else {
-                                document.getElementById('view-guest').style.display = 'block';
-                                if (data.name) {
-                                    document.getElementById('guest-welcome-msg').innerText = `Привет, ${data.name}! Вы в лобби вечера.`;
-                                }
-                            }
-                        }, 1800);
-
-                    } else {
-                        showError(data.message || 'Неверный код доступа');
-                    }
-                });
-
-                socket.on('state_update', (state) => {
-                    if (state.screen_text) document.getElementById('screen-title').innerText = state.screen_text;
-                    if (state.screen_badge) document.getElementById('screen-badge').innerText = state.screen_badge;
-                });
-
-                socket.on('play_sfx_on_screen', (data) => {
-                    console.log("🔊 SFX:", data.sfx);
-                });
-
-            } else {
-                updateStatus(false, 'Скрипт сокетов не загружен');
-            }
-        } catch (e) {
-            console.error("Socket error:", e);
-            updateStatus(false, 'Ошибка инициализации');
-        }
+        const socket = io({
+            transports: ['polling', 'websocket']
+        });
 
         const PROFANITY_REGEX = /хуй|пизд|еба|еб|бля|сук|чмо|говн|урод|шлюх|пидор|гандон|fuck|shit|bitch|asshole|cunt/i;
 
@@ -605,14 +509,7 @@
                 return;
             }
 
-            if (socket && socket.connected) {
-                socket.emit('login', payload);
-            } else if (socket) {
-                showError('Соединяемся с сервером... Попробуйте через секунду');
-                socket.connect();
-            } else {
-                showError('Сокет недоступен');
-            }
+            socket.emit('login', payload);
         }
 
         function showError(msg) {
@@ -635,14 +532,53 @@
             }
         }
 
+        socket.on('login_response', (data) => {
+            if (data.success) {
+                document.getElementById('view-login').style.display = 'none';
+                const currentRole = data.role;
+
+                const splash = document.getElementById('view-splash');
+                const splashSub = document.getElementById('splash-sub');
+                if (splash) splash.style.display = 'flex';
+
+                setTimeout(() => {
+                    if (splashSub) splashSub.innerText = 'HELLO';
+                }, 900);
+
+                setTimeout(() => {
+                    if (splash) splash.style.display = 'none';
+
+                    if (currentRole === 'HOST') {
+                        document.getElementById('view-screen').style.display = 'flex';
+                        document.getElementById('view-host').style.display = 'block';
+                    } else if (currentRole === 'SCREEN') {
+                        document.getElementById('view-screen').style.display = 'flex';
+                    } else {
+                        document.getElementById('view-guest').style.display = 'block';
+                        if (data.name) {
+                            document.getElementById('guest-welcome-msg').innerText = `Привет, ${data.name}! Вы в лобби вечера.`;
+                        }
+                    }
+                }, 1800);
+
+            } else {
+                showError(data.message || 'Неверный код доступа');
+            }
+        });
+
+        socket.on('state_update', (state) => {
+            if (state.screen_text) document.getElementById('screen-title').innerText = state.screen_text;
+            if (state.screen_badge) document.getElementById('screen-badge').innerText = state.screen_badge;
+        });
+
         function setVolume(vol, btn) {
             document.querySelectorAll('.btn-vol').forEach(b => b.classList.remove('active'));
             if (btn) btn.classList.add('active');
-            if (socket) socket.emit('host_audio_control', { volume: vol });
+            socket.emit('host_audio_control', { volume: vol });
         }
 
         function setEmotion(emotion) {
-            if (socket) socket.emit('host_audio_control', { emotion: emotion });
+            socket.emit('host_audio_control', { emotion: emotion });
         }
 
         const sfxTaps = {};
@@ -664,7 +600,7 @@
                 }
                 if (counterEl) counterEl.innerText = '2/3';
             } else if (sfxTaps[sfxType] >= 3) {
-                if (socket) socket.emit('host_trigger_sfx', { sfx: sfxType });
+                socket.emit('host_trigger_sfx', { sfx: sfxType });
                 sfxTaps[sfxType] = 0;
                 if (btnEl) btnEl.classList.remove('tap-1', 'tap-2');
                 if (counterEl) counterEl.innerText = '0/3';
