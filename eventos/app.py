@@ -4,7 +4,8 @@ import random
 from flask import Flask, render_template, jsonify, send_from_directory, request
 from flask_socketio import SocketIO, emit
 
-app = Flask(__name__, template_folder='templates', static_folder='static')
+# template_folder='.' задает корень проекта для index.html
+app = Flask(__name__, template_folder='.', static_folder='static')
 app.config['SECRET_KEY'] = 'familystandard-os-secret-2026'
 
 socketio = SocketIO(
