@@ -1,10 +1,12 @@
+import gevent.monkey
+gevent.monkey.patch_all()
+
 import os
 import json
 from flask import Flask, render_template
 from flask_socketio import SocketIO, emit
 
 app = Flask(__name__, template_folder='.')
-# Явно разрешаем polling и websocket для любых источников
 socketio = SocketIO(app, cors_allowed_origins="*", async_mode='gevent', ping_timeout=20, ping_interval=10)
 
 CONFIG_FILE = 'event_data.json'
@@ -15,7 +17,7 @@ def load_event_config():
             with open(CONFIG_FILE, 'r', encoding='utf-8') as f:
                 return json.load(f)
         except Exception as e:
-            print(f"Ошибка JSON: {e}")
+            print(f"Ошибка чтения конфигурации: {e}")
     return {"event_title": "Свадебный Вечер", "host_pin": "111", "screen_pin": "222"}
 
 event_config = load_event_config()
