@@ -32,6 +32,7 @@ connected_guests = {}
 
 system_state = {
     "event_started": False,
+    "event_ended": False,
     "active_module": "LOBBY",
     "video_playing": False,
     "audio_volume": 0.4,
@@ -91,11 +92,23 @@ def handle_login(data):
 @socketio.on('host_official_start')
 def handle_official_start():
     system_state["event_started"] = True
+    system_state["event_ended"] = False
     system_state["active_module"] = "VIDEO_INTRO"
     system_state["screen_badge"] = "СОБЫТИЕ НАЧАТО"
     system_state["screen_text"] = "ДОБРО ПОЖАЛОВАТЬ!"
     system_state["video_playing"] = True
     socketio.emit('state_update', system_state)
+
+@socketio.on('host_end_event')
+def handle_end_event():
+    system_state["event_ended"] = True
+    system_state["active_module"] = "FINAL"
+    system_state["screen_badge"] = "ЗАВЕРШЕНИЕ"
+    system_state["screen_text"] = "СПАСИБО ЗА ВЕЧЕР!"
+    system_state["video_playing"] = False
+    system_state["timer"]["active"] = False
+    socketio.emit('state_update', system_state)
+    socketio.emit('trigger_fadeout_audio')
 
 @socketio.on('host_launch_module')
 def handle_launch_module(data):
@@ -130,6 +143,13 @@ def handle_stop_timer():
     system_state["timer"]["active"] = False
     socketio.emit('state_update', system_state)
 
+@socketio.on('timer_expired_auto')
+def handle_timer_expired():
+    if system_state["timer"]["active"]:
+        system_state["timer"]["active"] = False
+        socketio.emit('state_update', system_state)
+        socketio.emit('play_sfx_on_screen', {'sfx': 'fanfare', 'variation': 1})
+
 @socketio.on('host_audio_control')
 def handle_audio_control(data):
     if 'volume' in data:
@@ -141,7 +161,8 @@ def handle_audio_control(data):
 @socketio.on('host_trigger_sfx')
 def handle_trigger_sfx(data):
     sfx_type = data.get('sfx')
-    socketio.emit('play_sfx_on_screen', {'sfx': sfx_type})
+    variation = data.get('variation', 1)
+    socketio.emit('play_sfx_on_screen', {'sfx': sfx_type, 'variation': variation, 'volume': system_state['audio_volume']})
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 10000))
