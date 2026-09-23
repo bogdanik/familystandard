@@ -442,7 +442,10 @@
     </div>
 
     <script>
-        const socket = io({
+        // Жестко привязанный адрес твоего сервера на Render
+        const RENDER_SERVER_URL = "https://event-os-wqoa.onrender.com"; 
+
+        const socket = io(RENDER_SERVER_URL, {
             transports: ['polling', 'websocket'],
             reconnection: true,
             reconnectionAttempts: 10
@@ -455,7 +458,7 @@
         let isAdminMode = false;
         let loginTimeout = null;
 
-        // --- 5 ТАПОВ ПО ЛОГОТИПУ ПЕРЕКЛЮЧАЮТ РЕЖИМ ---
+        // Скрытое переключение режима управления по 5 тапам на логотип
         function handleLogoTap() {
             logoTapCount++;
             clearTimeout(logoTapTimer);
@@ -559,7 +562,6 @@
             }
         }
 
-        // --- МГНОВЕННЫЙ ОТВЕТ СЕРВЕРА И ПЕРЕКЛЮЧЕНИЕ ЭКРАНОВ ---
         socket.on('login_response', (data) => {
             clearTimeout(loginTimeout);
             const btn = document.getElementById('btn-submit');
