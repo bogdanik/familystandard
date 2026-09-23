@@ -9,7 +9,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet">
     
-    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+    <!-- Загружаем Socket.IO напрямую с нашего сервера без сторонних CDN -->
+    <script src="/socket.io/socket.io.js"></script>
 
     <style>
         :root {
@@ -21,6 +22,7 @@
             --glass-border: rgba(245, 158, 11, 0.3);
             --text-main: #f8fafc;
             --danger-red: #ef4444;
+            --success-green: #22c55e;
         }
 
         * {
@@ -42,7 +44,7 @@
             justify-content: center;
         }
 
-        /* SPLASH SCREEN */
+        /* --- SPLASH SCREEN --- */
         #view-splash {
             display: none;
             position: fixed;
@@ -80,7 +82,7 @@
             100% { opacity: 1; transform: scale(1.02); }
         }
 
-        /* FORM */
+        /* --- LOGIN FORM --- */
         #view-login {
             position: fixed;
             inset: 0;
@@ -211,7 +213,7 @@
 
         button.btn-primary:active { transform: scale(0.97); }
 
-        /* VIEWS */
+        /* --- VIEWS --- */
         #view-screen {
             display: none;
             position: fixed;
@@ -380,7 +382,7 @@
     <div id="view-login">
         <div class="login-card" id="login-card">
             <div class="server-status-dot" id="server-status">
-                <span id="status-icon">🔴</span> <span id="status-text">Проверка связи...</span>
+                <span id="status-icon">🔴</span> <span id="status-text">Соединение с сервером...</span>
             </div>
             
             <div id="admin-badge" class="admin-badge">Режим управления</div>
@@ -446,39 +448,89 @@
     </div>
 
     <script>
-        // Инициализация Socket.IO
-        const socket = io({
-            transports: ['polling', 'websocket'],
-            upgrade: true,
-            autoConnect: true
-        });
+        let socket = null;
 
-        let currentRole = null;
-
-        // Прямой HTTP-чек порта сервера
-        async function checkServerHealth() {
-            try {
-                const res = await fetch('/ping');
-                if (res.ok) {
-                    document.getElementById('status-icon').innerText = '🟢';
-                    document.getElementById('status-text').innerText = 'Сервер онлайн';
-                    document.getElementById('server-status').style.color = '#22c55e';
-                }
-            } catch (e) {
-                document.getElementById('status-icon').innerText = '🔴';
-                document.getElementById('status-text').innerText = 'Сервер просыпается...';
-                document.getElementById('server-status').style.color = '#ef4444';
+        function updateStatus(isOk, text) {
+            const icon = document.getElementById('status-icon');
+            const label = document.getElementById('status-text');
+            const container = document.getElementById('server-status');
+            if (icon && label && container) {
+                icon.innerText = isOk ? '🟢' : '🔴';
+                label.innerText = text;
+                container.style.color = isOk ? '#22c55e' : '#ef4444';
             }
         }
 
-        checkServerHealth();
-        setInterval(checkServerHealth, 5000);
+        try {
+            if (typeof io !== 'undefined') {
+                socket = io({
+                    transports: ['polling', 'websocket'],
+                    reconnection: true,
+                    reconnectionDelay: 1000
+                });
 
-        socket.on('connect', () => {
-            document.getElementById('status-icon').innerText = '🟢';
-            document.getElementById('status-text').innerText = 'Сервер онлайн';
-            document.getElementById('server-status').style.color = '#22c55e';
-        });
+                socket.on('connect', () => {
+                    updateStatus(true, 'Сервер онлайн');
+                });
+
+                socket.on('disconnect', () => {
+                    updateStatus(false, 'Переподключение...');
+                });
+
+                socket.on('connect_error', () => {
+                    updateStatus(false, 'Ошибка подключения к серверу');
+                });
+
+                socket.on('login_response', (data) => {
+                    if (data.success) {
+                        document.getElementById('view-login').style.display = 'none';
+                        const currentRole = data.role;
+
+                        const splash = document.getElementById('view-splash');
+                        const splashSub = document.getElementById('splash-sub');
+                        if (splash) splash.style.display = 'flex';
+
+                        setTimeout(() => {
+                            if (splashSub) splashSub.innerText = 'HELLO';
+                        }, 900);
+
+                        setTimeout(() => {
+                            if (splash) splash.style.display = 'none';
+
+                            if (currentRole === 'HOST') {
+                                document.getElementById('view-screen').style.display = 'flex';
+                                document.getElementById('view-host').style.display = 'block';
+                            } else if (currentRole === 'SCREEN') {
+                                document.getElementById('view-screen').style.display = 'flex';
+                            } else {
+                                document.getElementById('view-guest').style.display = 'block';
+                                if (data.name) {
+                                    document.getElementById('guest-welcome-msg').innerText = `Привет, ${data.name}! Вы в лобби вечера.`;
+                                }
+                            }
+                        }, 1800);
+
+                    } else {
+                        showError(data.message || 'Неверный код доступа');
+                    }
+                });
+
+                socket.on('state_update', (state) => {
+                    if (state.screen_text) document.getElementById('screen-title').innerText = state.screen_text;
+                    if (state.screen_badge) document.getElementById('screen-badge').innerText = state.screen_badge;
+                });
+
+                socket.on('play_sfx_on_screen', (data) => {
+                    console.log("🔊 SFX:", data.sfx);
+                });
+
+            } else {
+                updateStatus(false, 'Скрипт сокетов не загружен');
+            }
+        } catch (e) {
+            console.error("Socket error:", e);
+            updateStatus(false, 'Ошибка инициализации');
+        }
 
         const PROFANITY_REGEX = /хуй|пизд|еба|еб|бля|сук|чмо|говн|урод|шлюх|пидор|гандон|fuck|shit|bitch|asshole|cunt/i;
 
@@ -491,16 +543,16 @@
             clearTimeout(logoTapTimer);
 
             const logo = document.getElementById('brand-logo');
-            logo.style.transform = `scale(${1 + logoTapCount * 0.04})`;
+            if (logo) logo.style.transform = `scale(${1 + logoTapCount * 0.04})`;
 
             if (logoTapCount >= 5) {
                 toggleAdminMode();
                 logoTapCount = 0;
-                logo.style.transform = 'scale(1)';
+                if (logo) logo.style.transform = 'scale(1)';
             } else {
                 logoTapTimer = setTimeout(() => {
                     logoTapCount = 0;
-                    logo.style.transform = 'scale(1)';
+                    if (logo) logo.style.transform = 'scale(1)';
                 }, 1800);
             }
         }
@@ -512,21 +564,29 @@
             const adminBadge = document.getElementById('admin-badge');
             const errorToast = document.getElementById('error-toast');
 
-            errorToast.style.display = 'none';
-            mainInput.value = '';
+            if (errorToast) errorToast.style.display = 'none';
+            if (mainInput) mainInput.value = '';
 
             if (isAdminMode) {
-                adminBadge.style.display = 'inline-block';
-                cardSubtitle.innerText = 'Режим управления';
-                cardSubtitle.style.color = '#f59e0b';
-                mainInput.placeholder = 'Код доступа';
-                mainInput.type = 'password';
+                if (adminBadge) adminBadge.style.display = 'inline-block';
+                if (cardSubtitle) {
+                    cardSubtitle.innerText = 'Режим управления';
+                    cardSubtitle.style.color = '#f59e0b';
+                }
+                if (mainInput) {
+                    mainInput.placeholder = 'Код доступа';
+                    mainInput.type = 'password';
+                }
             } else {
-                adminBadge.style.display = 'none';
-                cardSubtitle.innerText = 'Введите имя для входа в лобби';
-                cardSubtitle.style.color = '#94a3b8';
-                mainInput.placeholder = 'Ваше имя';
-                mainInput.type = 'text';
+                if (adminBadge) adminBadge.style.display = 'none';
+                if (cardSubtitle) {
+                    cardSubtitle.innerText = 'Введите имя для входа в лобби';
+                    cardSubtitle.style.color = '#94a3b8';
+                }
+                if (mainInput) {
+                    mainInput.placeholder = 'Ваше имя';
+                    mainInput.type = 'text';
+                }
             }
         }
 
@@ -545,72 +605,44 @@
                 return;
             }
 
-            socket.emit('login', payload);
+            if (socket && socket.connected) {
+                socket.emit('login', payload);
+            } else if (socket) {
+                showError('Соединяемся с сервером... Попробуйте через секунду');
+                socket.connect();
+            } else {
+                showError('Сокет недоступен');
+            }
         }
 
         function showError(msg) {
             const errorToast = document.getElementById('error-toast');
             const loginCard = document.getElementById('login-card');
 
-            errorToast.innerText = msg;
-            errorToast.style.display = 'block';
-
-            loginCard.classList.remove('shake');
-            void loginCard.offsetWidth;
-            loginCard.classList.add('shake');
-
-            setTimeout(() => {
-                loginCard.classList.remove('shake');
-            }, 500);
-        }
-
-        socket.on('login_response', (data) => {
-            if (data.success) {
-                document.getElementById('view-login').style.display = 'none';
-                currentRole = data.role;
-
-                const splash = document.getElementById('view-splash');
-                const splashSub = document.getElementById('splash-sub');
-                splash.style.display = 'flex';
-
-                setTimeout(() => {
-                    splashSub.innerText = 'HELLO';
-                }, 900);
-
-                setTimeout(() => {
-                    splash.style.display = 'none';
-
-                    if (currentRole === 'HOST') {
-                        document.getElementById('view-screen').style.display = 'flex';
-                        document.getElementById('view-host').style.display = 'block';
-                    } else if (currentRole === 'SCREEN') {
-                        document.getElementById('view-screen').style.display = 'flex';
-                    } else {
-                        document.getElementById('view-guest').style.display = 'block';
-                        if (data.name) {
-                            document.getElementById('guest-welcome-msg').innerText = `Привет, ${data.name}! Вы в лобби вечера.`;
-                        }
-                    }
-                }, 1800);
-
-            } else {
-                showError(data.message || 'Неверный код доступа');
+            if (errorToast) {
+                errorToast.innerText = msg;
+                errorToast.style.display = 'block';
             }
-        });
 
-        socket.on('state_update', (state) => {
-            document.getElementById('screen-title').innerText = state.screen_text;
-            document.getElementById('screen-badge').innerText = state.screen_badge;
-        });
+            if (loginCard) {
+                loginCard.classList.remove('shake');
+                void loginCard.offsetWidth;
+                loginCard.classList.add('shake');
+
+                setTimeout(() => {
+                    loginCard.classList.remove('shake');
+                }, 500);
+            }
+        }
 
         function setVolume(vol, btn) {
             document.querySelectorAll('.btn-vol').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            socket.emit('host_audio_control', { volume: vol });
+            if (btn) btn.classList.add('active');
+            if (socket) socket.emit('host_audio_control', { volume: vol });
         }
 
         function setEmotion(emotion) {
-            socket.emit('host_audio_control', { emotion: emotion });
+            if (socket) socket.emit('host_audio_control', { emotion: emotion });
         }
 
         const sfxTaps = {};
@@ -619,36 +651,32 @@
         function handleSfxTap(sfxType, btnEl) {
             if (!sfxTaps[sfxType]) sfxTaps[sfxType] = 0;
             sfxTaps[sfxType]++;
-            const counterEl = btnEl.querySelector('.tap-counter');
+            const counterEl = btnEl ? btnEl.querySelector('.tap-counter') : null;
             clearTimeout(sfxTimers[sfxType]);
 
             if (sfxTaps[sfxType] === 1) {
-                btnEl.classList.add('tap-1');
-                counterEl.innerText = '1/3';
+                if (btnEl) btnEl.classList.add('tap-1');
+                if (counterEl) counterEl.innerText = '1/3';
             } else if (sfxTaps[sfxType] === 2) {
-                btnEl.classList.remove('tap-1');
-                btnEl.classList.add('tap-2');
-                counterEl.innerText = '2/3';
+                if (btnEl) {
+                    btnEl.classList.remove('tap-1');
+                    btnEl.classList.add('tap-2');
+                }
+                if (counterEl) counterEl.innerText = '2/3';
             } else if (sfxTaps[sfxType] >= 3) {
-                socket.emit('host_trigger_sfx', { sfx: sfxType });
+                if (socket) socket.emit('host_trigger_sfx', { sfx: sfxType });
                 sfxTaps[sfxType] = 0;
-                btnEl.classList.remove('tap-1', 'tap-2');
-                counterEl.innerText = '0/3';
+                if (btnEl) btnEl.classList.remove('tap-1', 'tap-2');
+                if (counterEl) counterEl.innerText = '0/3';
                 return;
             }
 
             sfxTimers[sfxType] = setTimeout(() => {
                 sfxTaps[sfxType] = 0;
-                btnEl.classList.remove('tap-1', 'tap-2');
-                counterEl.innerText = '0/3';
+                if (btnEl) btnEl.classList.remove('tap-1', 'tap-2');
+                if (counterEl) counterEl.innerText = '0/3';
             }, 1500);
         }
-
-        socket.on('play_sfx_on_screen', (data) => {
-            if (currentRole === 'SCREEN' || currentRole === 'HOST') {
-                console.log("🔊 Воспроизведение SFX:", data.sfx);
-            }
-        });
     </script>
 </body>
 </html>
