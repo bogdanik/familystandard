@@ -1,9 +1,8 @@
 import os
 import json
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 from flask_socketio import SocketIO, emit
 
-# template_folder='.' говорит Фласку искать HTML прямо в этой же папке
 app = Flask(__name__, template_folder='.')
 socketio = SocketIO(app, cors_allowed_origins="*")
 
@@ -11,8 +10,11 @@ CONFIG_FILE = 'event_data.json'
 
 def load_event_config():
     if os.path.exists(CONFIG_FILE):
-        with open(CONFIG_FILE, 'r', encoding='utf-8') as f:
-            return json.load(f)
+        try:
+            with open(CONFIG_FILE, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        except Exception as e:
+            print(f"Ошибка чтения {CONFIG_FILE}: {e}")
     return {"event_title": "Свадебный Вечер", "host_pin": "111", "screen_pin": "222"}
 
 event_config = load_event_config()
@@ -25,7 +27,6 @@ system_state = {
     "screen_badge": "ДО СТАРТА"
 }
 
-# Открывается СРАЗУ на главной странице /
 @app.route('/')
 def home():
     return render_template('index.html')
@@ -36,16 +37,22 @@ def handle_connect():
 
 @socketio.on('login')
 def handle_login(data):
-    pin = str(data.get('pin', '')).strip()
-    name = str(data.get('name', '')).strip()
+    if not isinstance(data, dict):
+        data = {}
+
+    pin = str(data.get('pin', '')).strip() if data.get('pin') else None
+    name = str(data.get('name', '')).strip() if data.get('name') else None
 
     host_pin = str(event_config.get('host_pin', '111'))
     screen_pin = str(event_config.get('screen_pin', '222'))
 
-    if pin == host_pin:
-        emit('login_response', {'success': True, 'role': 'HOST', 'config': event_config})
-    elif pin == screen_pin:
-        emit('login_response', {'success': True, 'role': 'SCREEN', 'config': event_config})
+    if pin is not None:
+        if pin == host_pin:
+            emit('login_response', {'success': True, 'role': 'HOST', 'config': event_config})
+        elif pin == screen_pin:
+            emit('login_response', {'success': True, 'role': 'SCREEN', 'config': event_config})
+        else:
+            emit('login_response', {'success': False, 'message': 'Неверный код доступа'})
     else:
         guest_name = name if name else 'Гость'
         emit('login_response', {'success': True, 'role': 'GUEST', 'name': guest_name})
