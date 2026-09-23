@@ -4,7 +4,6 @@ import random
 from flask import Flask, render_template, jsonify, send_from_directory, request
 from flask_socketio import SocketIO, emit
 
-# template_folder='.' ищет index.html в корне проекта
 app = Flask(__name__, template_folder='.', static_folder='static')
 app.config['SECRET_KEY'] = 'familystandard-os-secret-2026'
 
@@ -27,7 +26,8 @@ def load_config():
         "event_title": "Family Standard OS", 
         "host_name": "Богдан", 
         "host_pin": "111", 
-        "screen_pin": "222"
+        "screen_pin": "222",
+        "modules": []
     }
 
 config_data = load_config()
@@ -36,16 +36,15 @@ connected_users = {}
 system_state = {
     "active_module": "lobby/lobby.html",
     "host_name": config_data.get("host_name", "Богдан"),
-    "screen_title": config_data.get("event_title", "Family Standard OS"),
-    "screen_subtitle": "Ожидание участников",
-    "audio_volume": 0.4,
-    "current_emotion": "lounge",
-    "current_track": "/static/audio/music/lounge/lounge_1.mp3",
+    "event_title": config_data.get("event_title", "Family Standard OS"),
+    "audio_volume": 0.3,
+    "current_mood": "lounge",
+    "current_track": "/static/audio/music/lounge.mp3",
     "is_playing": False,
     "guest_count": 0
 }
 
-# --- МАРШРУТИЗАЦИЯ ---
+# --- РУТЫ ---
 
 @app.route('/')
 def index():
@@ -59,11 +58,12 @@ def ping():
 def serve_module(filename):
     return send_from_directory('modules', filename)
 
-# --- СОКЕТЫ (REAL-TIME) ---
+# --- СОКЕТЫ ---
 
 @socketio.on('connect')
 def handle_connect():
     emit('state_update', system_state, to=request.sid)
+    emit('modules_config_update', config_data.get('modules', []), to=request.sid)
     emit('users_list_update', get_guests_list(), to=request.sid)
 
 @socketio.on('disconnect')
@@ -109,23 +109,20 @@ def handle_switch_module(data):
 @socketio.on('host_audio_control')
 def handle_audio_control(data):
     if 'volume' in data:
-        system_state['audio_volume'] = data['volume']
-    if 'emotion' in data:
-        system_state['current_emotion'] = data['emotion']
-        track_num = random.randint(1, 3)
-        system_state['current_track'] = f"/static/audio/music/{data['emotion']}/{data['emotion']}_{track_num}.mp3"
+        system_state['audio_volume'] = float(data['volume'])
+    if 'mood' in data:
+        mood = data['mood']
+        system_state['current_mood'] = mood
+        system_state['current_track'] = f"/static/audio/music/{mood}.mp3"
         system_state['is_playing'] = True
-    if 'action' in data:
-        if data['action'] == 'toggle':
-            system_state['is_playing'] = not system_state['is_playing']
 
     socketio.emit('state_update', system_state)
 
 @socketio.on('host_trigger_sfx')
 def handle_trigger_sfx(data):
-    sfx_type = data.get('sfx')
-    var_id = random.randint(1, 5)
-    file_path = f"/static/audio/sfx/{sfx_type}/{sfx_type}_{var_id}.mp3"
+    sfx_type = data.get('sfx') # 'applause', 'correct', 'wrong'
+    var_id = random.randint(1, 3)
+    file_path = f"/static/audio/sfx/{sfx_type}_{var_id}.mp3"
     
     socketio.emit('play_sfx_stream', {
         'file': file_path,
