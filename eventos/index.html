@@ -2,15 +2,15 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Event OS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Event OS — Control Center</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet">
     
-    <!-- Рабочий и проверенный CDN Socket.IO -->
-    <script src="https://cdnjs.cloudflare.net/ajax/libs/socket.io/4.7.5/socket.io.min.js"></script>
+    <!-- Официальный клиент Socket.IO CDN -->
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
 
     <style>
         :root {
@@ -18,10 +18,11 @@
             --gold-light: #fff3a1;
             --gold-main: #f59e0b;
             --gold-dark: #b45309;
-            --glass-card: rgba(15, 23, 42, 0.85);
+            --glass-card: rgba(15, 23, 42, 0.88);
             --glass-border: rgba(245, 158, 11, 0.3);
             --text-main: #f8fafc;
             --danger-red: #ef4444;
+            --success-green: #22c55e;
         }
 
         * {
@@ -43,7 +44,7 @@
             justify-content: center;
         }
 
-        /* --- SPLASH SCREEN --- */
+        /* --- 1. АНИМАЦИЯ ПРИВЕТСТВИЯ (SPLASH SCREEN) --- */
         #view-splash {
             display: none;
             position: fixed;
@@ -81,7 +82,7 @@
             100% { opacity: 1; transform: scale(1.02); }
         }
 
-        /* --- LOGIN FORM --- */
+        /* --- 2. ФОРМА АВТОРИЗАЦИИ --- */
         #view-login {
             position: fixed;
             inset: 0;
@@ -197,11 +198,24 @@
             letter-spacing: 1px;
             cursor: pointer;
             box-shadow: 0 8px 20px rgba(245, 158, 11, 0.3);
+            transition: opacity 0.2s ease;
         }
 
-        button.btn-primary:active { transform: scale(0.97); }
+        button.btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
 
-        /* --- VIEWS --- */
+        .admin-toggle-link {
+            display: block;
+            margin-top: 18px;
+            font-size: 0.75rem;
+            color: #64748b;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+
+        /* --- 3. ЭКРАН ПРОЕКТОРА (ПИН 222) --- */
         #view-screen {
             display: none;
             position: fixed;
@@ -235,6 +249,7 @@
             text-shadow: 0 0 35px rgba(245, 158, 11, 0.6);
         }
 
+        /* --- 4. ПУЛЬТ ВЕДУЩЕГО (ПИН 111) --- */
         #view-host {
             display: none;
             position: fixed;
@@ -349,6 +364,7 @@
             gap: 10px;
         }
 
+        /* --- 5. ЭКРАН ГОСТЯ (ЛОББИ) --- */
         #view-guest {
             display: none;
             position: fixed;
@@ -362,11 +378,13 @@
 </head>
 <body>
 
+    <!-- 1. SPLASH SCREEN -->
     <div id="view-splash">
         <div class="splash-title">EVENT OS</div>
         <div class="splash-sub" id="splash-sub">ПРИВЕТСТВУЕТ ВАС</div>
     </div>
 
+    <!-- 2. LOGIN FORM -->
     <div id="view-login">
         <div class="login-card" id="login-card">
             <div id="admin-badge" class="admin-badge">Режим управления</div>
@@ -380,14 +398,17 @@
             <div id="error-toast" class="error-toast">Пожалуйста, используйте корректное имя</div>
 
             <button class="btn-primary" id="btn-submit" onclick="submitEntry()">ВОЙТИ</button>
+            <span class="admin-toggle-link" onclick="toggleAdminMode()">Переключить режим управления</span>
         </div>
     </div>
 
+    <!-- 3. SCREEN VIEW -->
     <div id="view-screen">
         <div class="screen-badge" id="screen-badge">Заставка</div>
         <div class="screen-title" id="screen-title">Загрузка...</div>
     </div>
 
+    <!-- 4. HOST CONTROL VIEW -->
     <div id="view-host">
         <div id="host-top-music" class="host-interactive">
             <div class="music-controls-row">
@@ -426,6 +447,7 @@
         <div id="host-modules-container" class="host-interactive"></div>
     </div>
 
+    <!-- 5. GUEST LOBBY VIEW -->
     <div id="view-guest">
         <h2 style="color: var(--gold-light); margin-top: 60px; font-family: 'Cinzel', serif; font-size: 2.2rem;">EVENT OS</h2>
         <p style="color: #94a3b8; margin-top: 15px; font-size: 1.1rem;" id="guest-welcome-msg">Ожидайте запуска интерактивов от Ведущего.</p>
@@ -433,7 +455,10 @@
 
     <script>
         const socket = io({
-            transports: ['polling', 'websocket']
+            transports: ['polling', 'websocket'],
+            reconnection: true,
+            reconnectionAttempts: 10,
+            timeout: 5000
         });
 
         const PROFANITY_REGEX = /хуй|пизд|еба|еб|бля|сук|чмо|говн|урод|шлюх|пидор|гандон|fuck|shit|bitch|asshole|cunt/i;
@@ -441,13 +466,14 @@
         let logoTapCount = 0;
         let logoTapTimer = null;
         let isAdminMode = false;
+        let loginTimeout = null;
 
         function handleLogoTap() {
             logoTapCount++;
             clearTimeout(logoTapTimer);
 
             const logo = document.getElementById('brand-logo');
-            if (logo) logo.style.transform = `scale(${1 + logoTapCount * 0.04})`;
+            if (logo) logo.style.transform = `scale(${1 + logoTapCount * 0.05})`;
 
             if (logoTapCount >= 5) {
                 toggleAdminMode();
@@ -457,59 +483,72 @@
                 logoTapTimer = setTimeout(() => {
                     logoTapCount = 0;
                     if (logo) logo.style.transform = 'scale(1)';
-                }, 1800);
+                }, 1500);
             }
         }
 
         function toggleAdminMode() {
             isAdminMode = !isAdminMode;
-            const cardSubtitle = document.getElementById('card-subtitle');
-            const mainInput = document.getElementById('main-input');
-            const adminBadge = document.getElementById('admin-badge');
-            const errorToast = document.getElementById('error-toast');
+            const badge = document.getElementById('admin-badge');
+            const subtitle = document.getElementById('card-subtitle');
+            const input = document.getElementById('main-input');
+            const toast = document.getElementById('error-toast');
 
-            if (errorToast) errorToast.style.display = 'none';
-            if (mainInput) mainInput.value = '';
+            if (toast) toast.style.display = 'none';
+            if (input) input.value = '';
 
             if (isAdminMode) {
-                if (adminBadge) adminBadge.style.display = 'inline-block';
-                if (cardSubtitle) {
-                    cardSubtitle.innerText = 'Режим управления';
-                    cardSubtitle.style.color = '#f59e0b';
+                if (badge) badge.style.display = 'inline-block';
+                if (subtitle) {
+                    subtitle.innerText = 'Ввод ПИН-кода управления';
+                    subtitle.style.color = '#f59e0b';
                 }
-                if (mainInput) {
-                    mainInput.placeholder = 'Код доступа';
-                    mainInput.type = 'password';
+                if (input) {
+                    input.placeholder = 'ПИН (111 — Ведущий / 222 — Экран)';
+                    input.type = 'password';
+                    input.focus();
                 }
             } else {
-                if (adminBadge) adminBadge.style.display = 'none';
-                if (cardSubtitle) {
-                    cardSubtitle.innerText = 'Введите имя для входа в лобби';
-                    cardSubtitle.style.color = '#94a3b8';
+                if (badge) badge.style.display = 'none';
+                if (subtitle) {
+                    subtitle.innerText = 'Введите имя для входа в лобби';
+                    subtitle.style.color = '#94a3b8';
                 }
-                if (mainInput) {
-                    mainInput.placeholder = 'Ваше имя';
-                    mainInput.type = 'text';
+                if (input) {
+                    input.placeholder = 'Ваше имя';
+                    input.type = 'text';
                 }
             }
         }
 
         function submitEntry() {
-            const inputVal = document.getElementById('main-input').value.trim();
+            const inputEl = document.getElementById('main-input');
+            const btn = document.getElementById('btn-submit');
+            const val = inputEl ? inputEl.value.trim() : '';
 
-            if (!inputVal) {
+            if (!val) {
                 showError('Поле не может быть пустым');
                 return;
             }
 
-            const payload = isAdminMode ? { pin: inputVal } : { name: inputVal };
-
-            if (!isAdminMode && PROFANITY_REGEX.test(inputVal)) {
+            if (!isAdminMode && PROFANITY_REGEX.test(val)) {
                 showError('Пожалуйста, используйте корректное имя');
                 return;
             }
 
+            btn.innerText = 'АВТОРИЗАЦИЯ...';
+            btn.disabled = true;
+
+            const payload = isAdminMode ? { pin: val } : { name: val };
+
             socket.emit('login', payload);
+
+            clearTimeout(loginTimeout);
+            loginTimeout = setTimeout(() => {
+                btn.innerText = 'ВОЙТИ';
+                btn.disabled = false;
+                showError('Сервер долго отвечает. Попробуйте ещё раз');
+            }, 4000);
         }
 
         function showError(msg) {
@@ -533,9 +572,15 @@
         }
 
         socket.on('login_response', (data) => {
+            clearTimeout(loginTimeout);
+            const btn = document.getElementById('btn-submit');
+            if (btn) {
+                btn.innerText = 'ВОЙТИ';
+                btn.disabled = false;
+            }
+
             if (data.success) {
                 document.getElementById('view-login').style.display = 'none';
-                const currentRole = data.role;
 
                 const splash = document.getElementById('view-splash');
                 const splashSub = document.getElementById('splash-sub');
@@ -543,15 +588,15 @@
 
                 setTimeout(() => {
                     if (splashSub) splashSub.innerText = 'HELLO';
-                }, 900);
+                }, 800);
 
                 setTimeout(() => {
                     if (splash) splash.style.display = 'none';
 
-                    if (currentRole === 'HOST') {
+                    if (data.role === 'HOST') {
                         document.getElementById('view-screen').style.display = 'flex';
                         document.getElementById('view-host').style.display = 'block';
-                    } else if (currentRole === 'SCREEN') {
+                    } else if (data.role === 'SCREEN') {
                         document.getElementById('view-screen').style.display = 'flex';
                     } else {
                         document.getElementById('view-guest').style.display = 'block';
@@ -559,7 +604,7 @@
                             document.getElementById('guest-welcome-msg').innerText = `Привет, ${data.name}! Вы в лобби вечера.`;
                         }
                     }
-                }, 1800);
+                }, 1600);
 
             } else {
                 showError(data.message || 'Неверный код доступа');
