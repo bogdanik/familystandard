@@ -12,159 +12,180 @@
 
     <style>
         :root {
-            --bg-black: #000000;
+            --bg-black: #030712;
             --gold-light: #fff3a1;
             --gold-main: #f59e0b;
             --gold-dark: #b45309;
             --glass-card: rgba(15, 23, 42, 0.88);
             --glass-border: rgba(245, 158, 11, 0.35);
+            --danger-red: #ef4444;
             --ios-font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Plus Jakarta Sans", sans-serif;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: var(--ios-font); }
-        body { background: var(--bg-black); color: #f8fafc; min-height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
+        body { background: var(--bg-black); color: #f8fafc; min-height: 100vh; overflow: hidden; display: flex; flex-direction: column; position: relative; }
 
-        /* BOOT ANIMATION */
+        /* 120 FPS PARTICLES CANVAS */
+        #particles-canvas {
+            position: fixed; inset: 0; z-index: 1; pointer-events: none;
+        }
+
+        /* RADIAL GLOW BACKGROUND */
+        .bg-glow {
+            position: fixed; inset: 0; z-index: 2;
+            background: radial-gradient(circle at 50% 50%, rgba(245, 158, 11, 0.15) 0%, rgba(3, 7, 18, 0.95) 70%, #000000 100%);
+            pointer-events: none;
+        }
+
+        /* BOOT ANIMATION SPLASH */
         #ios-boot-screen {
             position: fixed; inset: 0; z-index: 99999; background: #000000;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            opacity: 1; transition: opacity 1s ease;
+            opacity: 1; transition: opacity 0.8s ease;
         }
-        .ios-hello-text { 
-            font-family: 'Cinzel', serif;
-            font-size: 3.5rem; 
-            font-weight: 900; 
+        .ios-hello-text {
+            font-family: 'Cinzel', serif; font-size: 3.8rem; font-weight: 900;
             background: linear-gradient(135deg, #fff3a1 0%, #f59e0b 50%, #b45309 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 30px rgba(245, 158, 11, 0.5);
-            animation: iosFadeIn 2.5s ease forwards; 
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 35px rgba(245, 158, 11, 0.6);
+            animation: iosFadeIn 2.2s ease forwards;
         }
-        @keyframes iosFadeIn { 0% { opacity: 0; filter: blur(8px); } 50% { opacity: 1; filter: blur(0); } 100% { opacity: 0; } }
+        @keyframes iosFadeIn { 0% { opacity: 0; filter: blur(10px); } 50% { opacity: 1; filter: blur(0); } 100% { opacity: 0; } }
 
-        /* AUTH CARD WITH GOLDEN GLOW BACKGROUND */
-        #auth-overlay { 
-            position: fixed; 
-            inset: 0; 
-            z-index: 10000; 
-            background: radial-gradient(circle at 50% 45%, rgba(245, 158, 11, 0.18) 0%, rgba(15, 23, 42, 0.95) 50%, #000000 100%);
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            padding: 20px; 
+        /* FLASH EFFECT ON 5 TAPS */
+        #flash-overlay {
+            position: fixed; inset: 0; z-index: 99998; background: #ffffff;
+            opacity: 0; pointer-events: none; transition: opacity 0.4s ease;
         }
 
-        .auth-card { 
-            background: var(--glass-card); 
-            border: 1px solid var(--glass-border); 
-            padding: 40px 30px; 
-            border-radius: 28px; 
-            width: 100%; 
-            max-width: 370px; 
-            text-align: center;
-            box-shadow: 0 0 50px rgba(245, 158, 11, 0.2), 0 20px 40px rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(25px);
-            transition: transform 0.2s ease, border-color 0.2s ease;
+        /* AUTH CARD */
+        #auth-overlay {
+            position: fixed; inset: 0; z-index: 10000;
+            display: flex; align-items: center; justify-content: center; padding: 20px;
+        }
+        .auth-card {
+            background: var(--glass-card); border: 1px solid var(--glass-border); padding: 40px 30px;
+            border-radius: 28px; width: 100%; max-width: 370px; text-align: center;
+            box-shadow: 0 0 60px rgba(245, 158, 11, 0.25), 0 20px 40px rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(25px); transition: transform 0.2s ease;
+        }
+        .auth-card.shake {
+            animation: shake 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+            border-color: var(--danger-red);
+        }
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-3px, 0, 0); }
+            20%, 80% { transform: translate3d(5px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-7px, 0, 0); }
+            40%, 60% { transform: translate3d(7px, 0, 0); }
         }
 
-        /* BRAND LOGO WITH CLICK TAP ANIMATION */
-        .brand-header { 
-            font-family: 'Cinzel', serif; 
-            font-size: 2.6rem; 
-            font-weight: 900; 
-            letter-spacing: 2px;
+        .brand-header {
+            font-family: 'Cinzel', serif; font-size: 2.6rem; font-weight: 900; letter-spacing: 2px;
             background: linear-gradient(135deg, #fff3a1 0%, #f59e0b 50%, #d97706 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
             text-shadow: 0 0 25px rgba(245, 158, 11, 0.4);
-            cursor: pointer; 
-            user-select: none;
-            display: inline-block;
-            transition: transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275), text-shadow 0.2s ease;
+            cursor: pointer; user-select: none; display: inline-block;
+            transition: transform 0.15s ease;
         }
+        .brand-header:active { transform: scale(0.92); }
 
-        .brand-header:active {
-            transform: scale(0.92);
-        }
-
-        /* ADMIN MODE BADGE */
         .admin-badge {
-            display: none;
-            background: rgba(245, 158, 11, 0.15);
-            border: 1px solid var(--gold-main);
-            color: var(--gold-light);
-            padding: 4px 14px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 800;
-            letter-spacing: 1.5px;
-            margin-bottom: 12px;
-            text-transform: uppercase;
+            display: none; background: rgba(245, 158, 11, 0.15); border: 1px solid var(--gold-main);
+            color: var(--gold-light); padding: 4px 14px; border-radius: 20px; font-size: 0.75rem;
+            font-weight: 800; letter-spacing: 1.5px; margin-bottom: 12px; text-transform: uppercase;
         }
 
-        .auth-sub {
-            color: #94a3b8;
-            font-size: 0.9rem;
-            margin: 12px 0 22px;
-            transition: color 0.2s ease;
-        }
-
+        .auth-sub { color: #94a3b8; font-size: 0.9rem; margin: 12px 0 22px; }
         .auth-input {
-            width: 100%; 
-            padding: 16px; 
-            border-radius: 14px; 
-            border: 1px solid var(--glass-border); 
-            background: rgba(3, 7, 18, 0.7); 
-            color: #fff; 
-            text-align: center;
-            font-size: 1.05rem;
-            font-weight: 600;
-            outline: none;
-            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+            width: 100%; padding: 16px; border-radius: 14px; border: 1px solid var(--glass-border);
+            background: rgba(3, 7, 18, 0.8); color: #fff; text-align: center; font-size: 1.05rem;
+            font-weight: 600; outline: none;
         }
-
-        .auth-input:focus {
-            border-color: var(--gold-main);
-            box-shadow: 0 0 15px rgba(245, 158, 11, 0.3);
-        }
-
         .auth-btn {
-            width: 100%; 
-            margin-top: 16px; 
-            padding: 16px; 
-            border-radius: 14px; 
-            border: none; 
-            background: linear-gradient(135deg, var(--gold-light) 0%, var(--gold-main) 100%); 
-            color: #000;
-            font-weight: 800; 
-            font-size: 1rem;
-            cursor: pointer;
+            width: 100%; margin-top: 16px; padding: 16px; border-radius: 14px; border: none;
+            background: linear-gradient(135deg, var(--gold-light) 0%, var(--gold-main) 100%);
+            color: #000; font-weight: 800; font-size: 1rem; cursor: pointer;
             box-shadow: 0 4px 20px rgba(245, 158, 11, 0.3);
-            transition: transform 0.15s ease, box-shadow 0.15s ease;
         }
 
-        .auth-btn:active {
-            transform: scale(0.97);
+        /* HOST TOP BAR (MUSIC & VOLUME) */
+        #host-top-bar {
+            display: none; position: fixed; top: 0; left: 0; right: 0; z-index: 500;
+            background: rgba(15, 23, 42, 0.96); border-bottom: 1px solid var(--glass-border);
+            backdrop-filter: blur(20px); padding: 10px 14px; flex-direction: column; gap: 8px;
+        }
+        .control-row { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
+        .btn-control {
+            flex: 1; height: 38px; border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(30, 41, 59, 0.7); color: #ffffff; font-size: 0.75rem; font-weight: 800; cursor: pointer;
+        }
+        .btn-control.active { background: var(--gold-main); color: #000; border-color: var(--gold-light); }
+
+        /* HOST BOTTOM BAR (SFX) */
+        #host-bottom-bar {
+            display: none; position: fixed; bottom: 0; left: 0; right: 0; height: 65px; z-index: 500;
+            background: rgba(15, 23, 42, 0.98); border-top: 1px solid var(--glass-border);
+            backdrop-filter: blur(20px); padding: 8px 12px; align-items: center; justify-content: space-around; gap: 8px;
+        }
+        .sfx-btn {
+            flex: 1; height: 48px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.15);
+            background: rgba(30, 41, 59, 0.8); color: #fff; font-size: 0.75rem; font-weight: 800; cursor: pointer;
+        }
+
+        /* TOP RIGHT PLAY / LAUNCHER BUTTON */
+        #launch-btn-trigger {
+            display: none; position: fixed; top: 12px; right: 12px; z-index: 600;
+            width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--gold-main);
+            background: rgba(245, 158, 11, 0.2); color: var(--gold-light); font-size: 1.2rem;
+            align-items: center; justify-content: center; cursor: pointer; backdrop-filter: blur(10px);
+        }
+
+        /* MODAL LAUNCHER MENU */
+        #launcher-modal {
+            display: none; position: fixed; inset: 0; z-index: 20000;
+            background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(15px);
+            align-items: center; justify-content: center; padding: 20px;
+        }
+        .modal-card {
+            background: var(--glass-card); border: 1px solid var(--glass-border);
+            border-radius: 24px; padding: 25px; width: 100%; max-width: 380px; text-align: center;
+        }
+        .modules-grid { display: flex; flex-direction: column; gap: 10px; margin-top: 18px; }
+        .mod-btn {
+            padding: 16px; border-radius: 14px; border: 1px solid var(--glass-border);
+            background: rgba(30, 41, 59, 0.8); color: #fff; font-size: 0.95rem; font-weight: 800; cursor: pointer;
         }
 
         /* MAIN VIEWPORT */
-        #main-viewport { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; width: 100%; }
+        #main-viewport {
+            position: relative; z-index: 10; flex: 1; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; padding: 80px 20px 80px; width: 100%; overflow-y: auto;
+        }
 
-        /* HOST DOCK */
-        #host-dock { display: none; position: fixed; bottom: 12px; left: 12px; right: 12px; height: 60px; background: rgba(15, 23, 42, 0.95); border: 1px solid var(--glass-border); border-radius: 20px; z-index: 500; align-items: center; justify-content: space-around; }
-        .dock-btn { background: transparent; border: none; color: var(--gold-light); font-weight: 700; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; gap: 5px; }
-        .widget-panel { display: none; position: fixed; bottom: 80px; left: 12px; right: 12px; background: var(--glass-card); border: 1px solid var(--glass-border); border-radius: 20px; padding: 15px; z-index: 499; }
-        
-        /* LOBBY MODAL FOR HOST */
-        #host-lobby-modal { display: none; position: fixed; inset: 0; z-index: 20000; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); align-items: center; justify-content: center; padding: 20px; }
+        /* GUEST LOBBY VIEW */
+        #guest-lobby-view {
+            display: none; text-align: center; max-width: 450px; width: 100%;
+        }
+        .lobby-title {
+            font-family: 'Cinzel', serif; font-size: 2.5rem; color: #fff; text-shadow: 0 0 25px rgba(245, 158, 11, 0.5);
+        }
+        .lobby-status {
+            color: #94a3b8; font-size: 1rem; margin-top: 12px; letter-spacing: 1px;
+        }
     </style>
 </head>
 <body>
 
-    <!-- BOOT ANIMATION -->
-    <div id="ios-boot-screen"><div class="ios-hello-text">Hello</div></div>
+    <!-- PARTICLES & GLOW -->
+    <canvas id="particles-canvas"></canvas>
+    <div class="bg-glow"></div>
 
-    <!-- AUTHENTICATION -->
+    <!-- BOOT SPLASH ANIMATION -->
+    <div id="ios-boot-screen"><div class="ios-hello-text">Hello</div></div>
+    <div id="flash-overlay"></div>
+
+    <!-- AUTH CARD -->
     <div id="auth-overlay">
         <div class="auth-card" id="auth-card">
             <div class="admin-badge" id="admin-badge">Режим управления</div>
@@ -175,35 +196,55 @@
         </div>
     </div>
 
-    <!-- MAIN VIEWPORT -->
-    <div id="main-viewport"></div>
-
-    <!-- AUDIO PLAYER (АКТИВЕН ИСКЛЮЧИТЕЛЬНО ДЛЯ РОЛИ 'SCREEN') -->
-    <audio id="bg-audio-player" loop></audio>
-
-    <!-- SLIDING WIDGETS -->
-    <div class="widget-panel" id="panel-player"></div>
-    <div class="widget-panel" id="panel-sfx"></div>
-
-    <!-- HOST LOBBY CONTROL MODAL -->
-    <div id="host-lobby-modal">
-        <div class="auth-card" style="max-width: 400px;">
-            <h3 style="color: var(--gold-light); font-family: 'Cinzel', serif;">👥 Управление Лобби</h3>
-            <p style="color: #94a3b8; margin: 10px 0;">Сейчас подключено гостей: <b id="modal-guest-count" style="color: #fff;">0</b></p>
-            <button onclick="socket.emit('switch_module', { module: 'lobby/lobby.html' }); closeLobbyModal();" class="auth-btn" style="margin-top: 10px;">📺 Показать Лобби на Экран</button>
-            <button onclick="closeLobbyModal()" style="width: 100%; padding: 10px; border-radius: 12px; border: none; background: transparent; color: #94a3b8; margin-top: 5px; cursor: pointer;">Закрыть</button>
+    <!-- HOST TOP CONTROL BAR -->
+    <div id="host-top-bar">
+        <div class="control-row">
+            <span style="font-size: 0.75rem; color: var(--gold-light); font-weight: 800;">ГРОМКОСТЬ:</span>
+            <button class="btn-control" onclick="setVolume(0.1, this)">10%</button>
+            <button class="btn-control" onclick="setVolume(0.2, this)">20%</button>
+            <button class="btn-control active" onclick="setVolume(0.3, this)">30%</button>
+            <button class="btn-control" onclick="setVolume(0.6, this)">60%</button>
+            <button class="btn-control" onclick="setVolume(1.0, this)">100%</button>
+        </div>
+        <div class="control-row">
+            <button class="btn-control" onclick="setMood('lounge')">🍃 Лаундж</button>
+            <button class="btn-control" onclick="setMood('active')">🕺 Банкет</button>
+            <button class="btn-control" onclick="setMood('party')">🎉 Движ</button>
         </div>
     </div>
 
-    <!-- HOST DOCK -->
-    <nav id="host-dock">
-        <button class="dock-btn" onclick="openLobbyModal()">👥 Лобби (<span id="dock-guest-count">0</span>)</button>
-        <button class="dock-btn" onclick="toggleWidget('player')">🎵 Плеер</button>
-        <button class="dock-btn" onclick="toggleWidget('sfx')">🔊 Эффекты</button>
-    </nav>
+    <!-- TOP RIGHT LAUNCHER BUTTON FOR HOST -->
+    <button id="launch-btn-trigger" onclick="openLauncherModal()">▶</button>
+
+    <!-- MODAL LAUNCHER MENU -->
+    <div id="launcher-modal">
+        <div class="modal-card">
+            <h3 style="color: var(--gold-light); font-family: 'Cinzel', serif;">▶ Выбор интерактива</h3>
+            <div class="modules-grid" id="modules-list-box"></div>
+            <button onclick="closeLauncherModal()" style="width: 100%; padding: 12px; border-radius: 12px; border: none; background: transparent; color: #94a3b8; margin-top: 12px; cursor: pointer;">Закрыть</button>
+        </div>
+    </div>
+
+    <!-- MAIN VIEWPORT -->
+    <div id="main-viewport">
+        <div id="guest-lobby-view">
+            <h1 class="lobby-title">FAMILY STANDARD OS</h1>
+            <p class="lobby-status" id="guest-welcome-msg">Вы в лобби. Ожидайте запуска интерактива...</p>
+        </div>
+    </div>
+
+    <!-- HOST BOTTOM SFX BAR -->
+    <div id="host-bottom-bar">
+        <button class="sfx-btn" onclick="triggerSfx('applause')">👏 Аплодисменты</button>
+        <button class="sfx-btn" onclick="triggerSfx('correct')">✅ Тыдыщ!</button>
+        <button class="sfx-btn" onclick="triggerSfx('wrong')">❌ Ошибка</button>
+    </div>
+
+    <!-- AUDIO PLAYER (АКТИВЕН ИСКЛЮЧИТЕЛЬНО НА РОЛИ 'SCREEN') -->
+    <audio id="bg-audio-player" loop></audio>
 
     <script>
-        // ПРЯМАЯ ССЫЛКА НА RENDER СЕРВЕР
+        // 🚨 ПРЯМАЯ ССЫЛКА НА СЕРВЕР RENDER
         const RENDER_SERVER_URL = "https://event-os-wqoa.onrender.com";
 
         const socket = io(RENDER_SERVER_URL, { 
@@ -212,44 +253,104 @@
             reconnectionAttempts: 10
         });
 
+        const PROFANITY_REGEX = /хуй|пизд|еба|еб|бля|сук|чмо|говн|урод|шлюх|пидор|гандон|fuck|shit|bitch|asshole|cunt/i;
+
         let isAdmin = false, tapCount = 0, tapTimer = null;
         let myRole = 'GUEST';
         let currentLoadedModule = '';
+        let availableModules = [];
+
         const bgPlayer = document.getElementById('bg-audio-player');
 
+        // --- 1. 120 FPS PARTICLES CANVAS ---
+        const canvas = document.getElementById('particles-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class Particle {
+            constructor() {
+                this.reset();
+            }
+            reset() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2 + 0.5;
+                this.speedX = (Math.random() - 0.5) * 0.4;
+                this.speedY = (Math.random() - 0.5) * 0.4;
+                this.alpha = Math.random() * 0.6 + 0.1;
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                if (this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) {
+                    this.reset();
+                }
+            }
+            draw() {
+                ctx.fillStyle = `rgba(245, 158, 11, ${this.alpha})`;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        for (let i = 0; i < 45; i++) particles.push(new Particle());
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => { p.update(); p.draw(); });
+            requestAnimationFrame(animateParticles);
+        }
+        requestAnimationFrame(animateParticles);
+
+        // --- 2. BOOT ANIMATION SPLASH ---
         setTimeout(() => {
             const bootScreen = document.getElementById('ios-boot-screen');
             if (bootScreen) {
                 bootScreen.style.opacity = '0';
-                setTimeout(() => bootScreen.style.display = 'none', 1000);
+                setTimeout(() => bootScreen.style.display = 'none', 800);
             }
-        }, 2500);
+        }, 2200);
 
+        // --- 3. DYNAMIC SCRIPT INJECTION FOR MODULES ---
+        function injectHTMLWithScripts(container, html) {
+            container.innerHTML = html;
+            const scripts = container.querySelectorAll('script');
+            scripts.forEach(oldScript => {
+                const newScript = document.createElement('script');
+                if (oldScript.src) newScript.src = oldScript.src;
+                else newScript.textContent = oldScript.textContent;
+                document.body.appendChild(newScript);
+                document.body.removeChild(newScript);
+            });
+        }
+
+        // --- 4. 5 TAPS LOGO SECRET TOGGLE ---
         function handleLogoTap() {
-            tapCount++; 
-            clearTimeout(tapTimer);
-
+            tapCount++; clearTimeout(tapTimer);
             const logo = document.getElementById('brand-logo');
-            if (logo) {
-                logo.style.transform = `scale(${1 + tapCount * 0.05})`;
-                logo.style.textShadow = `0 0 ${25 + tapCount * 10}px rgba(245, 158, 11, 0.8)`;
-            }
+            if (logo) logo.style.transform = `scale(${1 + tapCount * 0.05})`;
 
             if (tapCount >= 5) {
+                // Вспышка
+                const flash = document.getElementById('flash-overlay');
+                if (flash) {
+                    flash.style.opacity = '0.8';
+                    setTimeout(() => flash.style.opacity = '0', 300);
+                }
+
                 toggleAdminMode();
                 tapCount = 0;
-                if (logo) {
-                    logo.style.transform = 'scale(1)';
-                    logo.style.textShadow = '0 0 25px rgba(245, 158, 11, 0.4)';
-                }
+                if (logo) logo.style.transform = 'scale(1)';
             } else { 
-                tapTimer = setTimeout(() => { 
-                    tapCount = 0; 
-                    if (logo) {
-                        logo.style.transform = 'scale(1)';
-                        logo.style.textShadow = '0 0 25px rgba(245, 158, 11, 0.4)';
-                    }
-                }, 1500); 
+                tapTimer = setTimeout(() => { tapCount = 0; if (logo) logo.style.transform = 'scale(1)'; }, 1500); 
             }
         }
 
@@ -277,54 +378,118 @@
             }
         }
 
+        function triggerErrorShake() {
+            const card = document.getElementById('auth-card');
+            if (card) {
+                card.classList.remove('shake');
+                void card.offsetWidth;
+                card.classList.add('shake');
+                setTimeout(() => card.classList.remove('shake'), 400);
+            }
+            if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+        }
+
         function submitAuth() {
-            const val = document.getElementById('auth-input').value.trim();
-            if (!val) return;
+            const input = document.getElementById('auth-input');
+            const val = input ? input.value.trim() : '';
+
+            if (!val) {
+                triggerErrorShake();
+                return;
+            }
+
+            if (!isAdmin && PROFANITY_REGEX.test(val)) {
+                triggerErrorShake();
+                alert('Пожалуйста, используйте корректное имя');
+                return;
+            }
+
             socket.emit('login', isAdmin ? { pin: val } : { name: val });
         }
 
+        // --- 5. SOCKET RESPONSES & STATE ---
         socket.on('login_response', (res) => {
             if (res.success) {
                 myRole = res.role;
                 document.getElementById('auth-overlay').style.display = 'none';
+
                 if (myRole === 'HOST') {
-                    document.getElementById('host-dock').style.display = 'flex';
-                    fetchWidget('player', '/modules/player/player.html');
-                    fetchWidget('sfx', '/modules/soundboard/soundboard.html');
+                    document.getElementById('host-top-bar').style.display = 'flex';
+                    document.getElementById('host-bottom-bar').style.display = 'flex';
+                    document.getElementById('launch-btn-trigger').style.display = 'flex';
+                } else if (myRole === 'GUEST') {
+                    document.getElementById('guest-lobby-view').style.display = 'block';
+                    if (res.name) {
+                        document.getElementById('guest-welcome-msg').innerText = `Привет, ${res.name}! Вы в лобби. Ожидайте интерактива...`;
+                    }
                 }
             } else {
-                alert(res.message || 'Ошибка входа');
+                triggerErrorShake();
+                alert(res.message || 'Ошибка доступа');
             }
         });
 
-        socket.on('state_update', (state) => {
-            if (state.guest_count !== undefined) {
-                const dockCount = document.getElementById('dock-guest-count');
-                const modalCount = document.getElementById('modal-guest-count');
-                if (dockCount) dockCount.innerText = state.guest_count;
-                if (modalCount) modalCount.innerText = state.guest_count;
-            }
+        socket.on('modules_config_update', (modules) => {
+            availableModules = modules;
+            renderModulesList();
+        });
 
+        function renderModulesList() {
+            const box = document.getElementById('modules-list-box');
+            if (!box) return;
+            box.innerHTML = '';
+            availableModules.forEach(m => {
+                const btn = document.createElement('button');
+                btn.className = 'mod-btn';
+                btn.innerText = m.name;
+                btn.onclick = () => {
+                    socket.emit('switch_module', { module: m.path });
+                    closeLauncherModal();
+                };
+                box.appendChild(btn);
+            });
+        }
+
+        socket.on('state_update', (state) => {
+            // Подгрузка активного модуля
             if (state.active_module && currentLoadedModule !== state.active_module) {
                 loadModuleContent(state.active_module);
             }
 
-            // ЗВУК ИГРАЕТ ТОЛЬКО НА РОЛИ SCREEN
+            // ⛔️ МУЗЫКА ИГРАЕТ ТОЛЬКО НА РОЛИ SCREEN
             if (myRole === 'SCREEN') {
-                if (bgPlayer.src !== RENDER_SERVER_URL + state.current_track) {
-                    bgPlayer.src = RENDER_SERVER_URL + state.current_track;
+                const trackUrl = RENDER_SERVER_URL + state.current_track;
+                if (bgPlayer.src !== trackUrl) {
+                    fadeChangeTrack(trackUrl);
                 }
                 bgPlayer.volume = state.audio_volume;
 
-                if (state.is_playing) {
+                if (state.is_playing && bgPlayer.paused) {
                     bgPlayer.play().catch(() => {});
-                } else {
+                } else if (!state.is_playing && !bgPlayer.paused) {
                     bgPlayer.pause();
                 }
             }
         });
 
-        // ЭФФЕКТЫ ИГРАЮТ ТОЛЬКО НА РОЛИ SCREEN
+        // ПЛАВНОЕ ЗАТУХАНИЕ И СМЕНА ТРЕКА СО СЛУЧАЙНОЙ ПОЗИЦИИ
+        function fadeChangeTrack(newSrc) {
+            let vol = bgPlayer.volume;
+            const fadeOut = setInterval(() => {
+                vol = Math.max(0, vol - 0.05);
+                bgPlayer.volume = vol;
+                if (vol <= 0) {
+                    clearInterval(fadeOut);
+                    bgPlayer.src = newSrc;
+                    bgPlayer.currentTime = Math.random() * 15; // Рандомное смещение
+                    bgPlayer.play().then(() => {
+                        bgPlayer.volume = 0.3;
+                    }).catch(() => {});
+                }
+            }, 50);
+        }
+
+        // ⛔️ ЭФФЕКТЫ ИГРАЮТ ТОЛЬКО НА РОЛИ SCREEN
         socket.on('play_sfx_stream', (data) => {
             if (myRole === 'SCREEN') {
                 const sfxAudio = new Audio(RENDER_SERVER_URL + data.file);
@@ -335,30 +500,35 @@
 
         async function loadModuleContent(modulePath) {
             currentLoadedModule = modulePath;
+            if (myRole === 'GUEST') {
+                document.getElementById('guest-lobby-view').style.display = 'none';
+            }
             try {
                 const res = await fetch(`/modules/${modulePath}`);
                 if (res.ok) {
-                    document.getElementById('main-viewport').innerHTML = await res.text();
+                    const html = await res.text();
+                    injectHTMLWithScripts(document.getElementById('main-viewport'), html);
                 }
             } catch(e) { console.error("Ошибка загрузки модуля:", e); }
         }
 
-        async function fetchWidget(id, url) {
-            try {
-                const res = await fetch(url);
-                if (res.ok) document.getElementById(`panel-${id}`).innerHTML = await res.text();
-            } catch(e) {}
+        // --- 6. HOST CONTROLS ---
+        function setVolume(vol, btn) {
+            document.querySelectorAll('#host-top-bar .btn-control').forEach(b => b.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+            socket.emit('host_audio_control', { volume: vol });
         }
 
-        function toggleWidget(id) {
-            const el = document.getElementById(`panel-${id}`);
-            const isVis = el.style.display === 'block';
-            document.querySelectorAll('.widget-panel').forEach(p => p.style.display = 'none');
-            if (!isVis) el.style.display = 'block';
+        function setMood(mood) {
+            socket.emit('host_audio_control', { mood: mood });
         }
 
-        function openLobbyModal() { document.getElementById('host-lobby-modal').style.display = 'flex'; }
-        function closeLobbyModal() { document.getElementById('host-lobby-modal').style.display = 'none'; }
+        function triggerSfx(sfxType) {
+            socket.emit('host_trigger_sfx', { sfx: sfxType });
+        }
+
+        function openLauncherModal() { document.getElementById('launcher-modal').style.display = 'flex'; }
+        function closeLauncherModal() { document.getElementById('launcher-modal').style.display = 'none'; }
     </script>
 </body>
 </html>
