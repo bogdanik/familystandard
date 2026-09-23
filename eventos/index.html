@@ -18,10 +18,11 @@
             --gold-main: #f59e0b;
             --gold-dark: #b45309;
             --glass-card: rgba(15, 23, 42, 0.92);
-            --glass-border: rgba(245, 158, 11, 0.3);
+            --glass-border: rgba(245, 158, 11, 0.25);
             --text-main: #f8fafc;
             --danger-red: #ef4444;
             --success-green: #22c55e;
+            --btn-radius: 14px;
         }
 
         * {
@@ -41,6 +42,40 @@
             display: flex;
             align-items: center;
             justify-content: center;
+        }
+
+        /* --- UNIFIED BUTTON STYLES --- */
+        .ui-btn {
+            height: 48px;
+            border-radius: var(--btn-radius);
+            border: 1px solid var(--glass-border);
+            background: rgba(30, 41, 59, 0.8);
+            color: #ffffff;
+            font-size: 0.85rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+            outline: none;
+        }
+
+        .ui-btn:active { transform: scale(0.96); }
+
+        .ui-btn-gold {
+            background: linear-gradient(135deg, var(--gold-light) 0%, var(--gold-main) 100%);
+            color: #030712;
+            border: none;
+            font-weight: 800;
+            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.25);
+        }
+
+        .ui-btn-danger {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: var(--danger-red);
+            color: #fca5a5;
         }
 
         /* --- SPLASH SCREEN --- */
@@ -104,7 +139,6 @@
             text-align: center;
             box-shadow: 0 25px 50px rgba(0, 0, 0, 0.9), 0 0 30px rgba(245, 158, 11, 0.15);
             backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
         }
 
         .login-card.shake {
@@ -132,10 +166,7 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             text-shadow: 0 0 20px rgba(245, 158, 11, 0.4);
-            transition: transform 0.15s ease;
         }
-
-        .brand-logo:active { transform: scale(0.92); }
 
         .card-subtitle {
             color: #94a3b8;
@@ -162,7 +193,7 @@
         input.input-field {
             width: 100%;
             padding: 18px 20px;
-            border-radius: 16px;
+            border-radius: var(--btn-radius);
             border: 1px solid var(--glass-border);
             background: rgba(3, 7, 18, 0.8);
             color: #ffffff;
@@ -172,37 +203,12 @@
             text-align: center;
         }
 
-        input.input-field:focus {
-            border-color: var(--gold-main);
-            box-shadow: 0 0 20px rgba(245, 158, 11, 0.3);
-        }
-
         .error-toast {
             color: var(--danger-red);
             font-size: 0.82rem;
             font-weight: 700;
             margin-bottom: 14px;
             display: none;
-        }
-
-        button.btn-primary {
-            width: 100%;
-            padding: 18px;
-            border-radius: 16px;
-            border: none;
-            background: linear-gradient(135deg, var(--gold-light) 0%, var(--gold-main) 100%);
-            color: #030712;
-            font-weight: 800;
-            font-size: 1.05rem;
-            letter-spacing: 1px;
-            cursor: pointer;
-            box-shadow: 0 8px 20px rgba(245, 158, 11, 0.3);
-            transition: opacity 0.2s ease;
-        }
-
-        button.btn-primary:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
         }
 
         /* --- SCREEN VIEW (ПРОЕКТОР) --- */
@@ -275,15 +281,33 @@
         #host-top-music {
             position: fixed;
             top: 0; left: 0; right: 0;
-            height: 90px;
-            background: rgba(15, 23, 42, 0.95);
+            background: rgba(15, 23, 42, 0.96);
             border-bottom: 1px solid var(--glass-border);
             backdrop-filter: blur(20px);
-            padding: 10px 14px;
+            padding: 12px 16px;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
+            gap: 14px; /* Увеличенное пространство */
             z-index: 110;
+        }
+
+        .top-row-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .guest-pill {
+            background: rgba(245, 158, 11, 0.15);
+            border: 1px solid var(--glass-border);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 800;
+            color: var(--gold-light);
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
 
         .music-controls-row {
@@ -295,7 +319,7 @@
 
         .btn-vol {
             flex: 1;
-            padding: 10px 2px;
+            height: 40px;
             border-radius: 10px;
             border: 1px solid rgba(255, 255, 255, 0.12);
             background: rgba(30, 41, 59, 0.7);
@@ -315,100 +339,112 @@
 
         .emotion-select {
             width: 100%;
-            padding: 8px 10px;
-            border-radius: 10px;
+            height: 42px;
+            padding: 0 12px;
+            border-radius: 12px;
             border: 1px solid var(--glass-border);
             background: rgba(15, 23, 42, 0.95);
             color: var(--gold-light);
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             font-weight: 700;
             outline: none;
         }
 
-        /* ЦЕНТРАЛЬНАЯ РАБОЧАЯ ЗОНА ВЕДУЩЕГО */
+        /* ЦЕНТРАЛЬНАЯ РАБОЧАЯ ЗОНА ВЕДУЩЕГО С ЖИВЫМ ЭКРАНОМ */
         #host-main-center {
             position: fixed;
-            top: 95px; left: 10px; right: 10px; bottom: 85px;
+            top: 145px; left: 12px; right: 12px; bottom: 80px;
             overflow-y: auto;
-            padding: 15px 5px;
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 16px;
+            transition: all 0.3s ease;
         }
 
-        .btn-official-start {
+        /* РЕПЛИКА ЭКРАНА ДЛЯ ВЕДУЩЕГО */
+        .live-screen-mirror {
             width: 100%;
-            max-width: 400px;
-            padding: 22px;
+            max-width: 440px;
+            height: 180px;
+            background: #000000;
+            border: 1px solid var(--glass-border);
             border-radius: 20px;
-            border: 2px solid var(--gold-light);
-            background: linear-gradient(135deg, var(--gold-light) 0%, var(--gold-main) 100%);
-            color: #030712;
-            font-family: 'Cinzel', serif;
-            font-size: 1.4rem;
-            font-weight: 900;
-            letter-spacing: 2px;
-            cursor: pointer;
-            box-shadow: 0 10px 30px rgba(245, 158, 11, 0.4);
-            transition: transform 0.15s ease;
-        }
-
-        .btn-official-start:active { transform: scale(0.96); }
-
-        .btn-add-launcher {
-            width: 100%;
-            max-width: 400px;
-            padding: 16px;
-            border-radius: 18px;
-            border: 1px dashed var(--gold-main);
-            background: rgba(245, 158, 11, 0.1);
-            color: var(--gold-light);
-            font-size: 1rem;
-            font-weight: 800;
-            cursor: pointer;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            text-align: center;
+            padding: 15px;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
         }
 
-        .status-box {
+        .mirror-tag {
+            position: absolute;
+            top: 10px; left: 12px;
+            font-size: 0.65rem;
+            font-weight: 800;
+            color: var(--gold-main);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        /* СВОРАЧИВАЕМАЯ ПАНЕЛЬ УПРАВЛЕНИЯ */
+        .host-control-card {
+            width: 100%;
+            max-width: 440px;
             background: var(--glass-card);
             border: 1px solid var(--glass-border);
-            padding: 16px 20px;
-            border-radius: 18px;
-            width: 100%;
-            max-width: 400px;
-            text-align: center;
+            border-radius: 22px;
+            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            transition: all 0.3s ease;
         }
 
-        /* НИЖНЯЯ ПАНЕЛЬ ЭФФЕКТОВ И ТАЙМЕРА (FIXED BOTTOM) */
+        .host-control-card.collapsed {
+            position: fixed;
+            top: 14px; right: 14px;
+            width: auto;
+            max-width: 200px;
+            padding: 8px 12px;
+            z-index: 120;
+            background: rgba(15, 23, 42, 0.98);
+            border-color: var(--gold-main);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.8);
+        }
+
+        .host-control-card.collapsed .hide-on-collapse {
+            display: none !important;
+        }
+
+        /* НИЖНЯЯ ПАНЕЛЬ (FIXED BOTTOM) */
         #host-bottom-soundboard {
             position: fixed;
             bottom: 0; left: 0; right: 0;
-            height: 75px;
+            height: 72px;
             background: rgba(15, 23, 42, 0.98);
             border-top: 1px solid var(--glass-border);
             backdrop-filter: blur(20px);
-            padding: 8px 10px;
+            padding: 8px 12px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 6px;
+            gap: 8px;
             z-index: 110;
         }
 
         .sfx-bottom-btn {
             flex: 1;
-            height: 56px;
-            border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.9));
+            height: 52px;
+            border-radius: var(--btn-radius);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(30, 41, 59, 0.8);
             color: #ffffff;
-            font-size: 0.7rem;
+            font-size: 0.72rem;
             font-weight: 800;
-            text-align: center;
             cursor: pointer;
             display: flex;
             flex-direction: column;
@@ -417,18 +453,7 @@
             gap: 2px;
         }
 
-        .sfx-bottom-btn .tap-counter {
-            font-size: 0.6rem;
-            padding: 1px 4px;
-            border-radius: 8px;
-            background: rgba(0, 0, 0, 0.6);
-            color: var(--gold-main);
-        }
-
-        .sfx-bottom-btn.tap-1 { border-color: #f59e0b; background: rgba(245, 158, 11, 0.3); }
-        .sfx-bottom-btn.tap-2 { border-color: #ef4444; background: rgba(239, 68, 68, 0.45); }
-
-        /* MODAL WINDOWS */
+        /* MODALS */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -458,18 +483,7 @@
             margin-top: 16px;
         }
 
-        .modal-btn {
-            padding: 14px;
-            border-radius: 14px;
-            border: 1px solid var(--glass-border);
-            background: rgba(30, 41, 59, 0.8);
-            color: #ffffff;
-            font-weight: 700;
-            font-size: 0.85rem;
-            cursor: pointer;
-        }
-
-        /* --- GUEST VIEW --- */
+        /* GUEST VIEW */
         #view-guest {
             display: none;
             position: fixed;
@@ -502,7 +516,7 @@
             
             <div id="error-toast" class="error-toast">Пожалуйста, используйте корректное имя</div>
 
-            <button class="btn-primary" id="btn-submit" onclick="submitEntry()">ВОЙТИ</button>
+            <button class="ui-btn ui-btn-gold" style="width: 100%; font-size: 1.05rem;" id="btn-submit" onclick="submitEntry()">ВОЙТИ</button>
         </div>
     </div>
 
@@ -518,14 +532,19 @@
     <div id="view-host">
         <!-- ВЕРХ ПАНЕЛЬ МУЗЫКИ -->
         <div id="host-top-music">
+            <div class="top-row-bar">
+                <div class="guest-pill">👥 ГОСТЕЙ В ЛОББИ: <span id="host-guest-counter">0</span></div>
+                <button class="ui-btn" style="height: 32px; font-size: 0.7rem; padding: 0 10px;" onclick="toggleCollapsePanel()">📌 Свернуть</button>
+            </div>
+            
             <div class="music-controls-row">
-                <span style="font-size: 0.75rem; color: var(--gold-light); font-weight: 800;">🔊 ГРОМКОСТЬ:</span>
                 <button class="btn-vol" onclick="setVolume(0, this)">0%</button>
                 <button class="btn-vol" onclick="setVolume(0.2, this)">20%</button>
                 <button class="btn-vol active" onclick="setVolume(0.4, this)">40%</button>
                 <button class="btn-vol" onclick="setVolume(0.7, this)">70%</button>
                 <button class="btn-vol" onclick="setVolume(1.0, this)">100%</button>
             </div>
+
             <select class="emotion-select" onchange="setEmotion(this.value)">
                 <option value="lounge">🍃 Настроение: Лаундж / Встреча</option>
                 <option value="dinner">🕺 Настроение: Повеселее / Банкет</option>
@@ -533,43 +552,39 @@
             </select>
         </div>
 
-        <!-- ЦЕНТР ЗОНА ВЕДУЩЕГО -->
+        <!-- ЦЕНТР ЗОНА ВЕДУЩЕГО С РЕПЛИКОЙ ЭКРАНА -->
         <div id="host-main-center">
-            <button class="btn-official-start" onclick="officialStart()">🚀 СТАРТ СОБЫТИЯ</button>
-            
-            <button class="btn-add-launcher" onclick="openLauncherModal()">
-                <span style="font-size: 1.4rem;">➕</span>
-                <span>Запустить модуль / Видео</span>
-            </button>
+            <!-- ДУБЛЬ ГЛАВНОГО ЭКРАНА -->
+            <div class="live-screen-mirror">
+                <span class="mirror-tag">📺 ЭКРАН В РЕАЛЕ</span>
+                <div style="font-size: 0.75rem; color: var(--gold-main); font-weight: 800; margin-bottom: 4px;" id="mirror-badge">ДО СТАРТА</div>
+                <div style="font-family: 'Cinzel', serif; font-size: 1.4rem; font-weight: 900; color: #fff;" id="mirror-title">Family Standard OS</div>
+                <div style="font-family: 'Cinzel', serif; font-size: 1.8rem; color: var(--gold-light); display: none; margin-top: 6px;" id="mirror-timer">00:00</div>
+            </div>
 
-            <div class="status-box">
-                <div style="font-size: 0.8rem; color: #94a3b8;">ПОДКЛЮЧЕНО ГОСТЕЙ В ЛОББИ:</div>
-                <div style="font-size: 2rem; font-weight: 900; color: var(--gold-light);" id="host-guest-counter">0</div>
+            <!-- СВОРАЧИВАЕМАЯ ПАНЕЛЬ КНОПОК -->
+            <div class="host-control-card" id="host-control-card">
+                <button class="ui-btn ui-btn-gold hide-on-collapse" style="height: 54px; font-size: 1.1rem; width: 100%;" onclick="officialStart()">🚀 СТАРТ СОБЫТИЯ</button>
+                
+                <button class="ui-btn hide-on-collapse" style="width: 100%; border-color: var(--gold-main);" onclick="openLauncherModal()">
+                    <span>➕ Запустить модуль / Видео</span>
+                </button>
             </div>
         </div>
 
         <!-- НИЗ ПАНЕЛЬ ЗВУКОВ И ТАЙМЕРА -->
         <div id="host-bottom-soundboard">
-            <div class="sfx-bottom-btn" onclick="handleSfxTap('applause', this)">
-                <span>👏 Аплодисменты</span>
-                <span class="tap-counter">0/3</span>
-            </div>
-            <div class="sfx-bottom-btn" onclick="handleSfxTap('fanfare', this)">
-                <span>🎉 Фанфары</span>
-                <span class="tap-counter">0/3</span>
-            </div>
-            <div class="sfx-bottom-btn" onclick="handleSfxTap('correct', this)">
-                <span>✅ Тыдыщ!</span>
-                <span class="tap-counter">0/3</span>
-            </div>
-            <div class="sfx-bottom-btn" onclick="handleSfxTap('wrong', this)">
-                <span>❌ Ошибка</span>
-                <span class="tap-counter">0/3</span>
-            </div>
-            <div class="sfx-bottom-btn" style="border-color: var(--gold-main);" onclick="openTimerModal()">
+            <button class="ui-btn ui-btn-danger" style="flex: 1.2; height: 52px; font-size: 0.72rem; padding: 2px;" onclick="endEvent()">🛑 Завершить</button>
+            
+            <button class="sfx-bottom-btn" onclick="triggerSfx('applause')">👏 Аплодисменты</button>
+            <button class="sfx-bottom-btn" onclick="triggerSfx('fanfare')">🎉 Фанфары</button>
+            <button class="sfx-bottom-btn" onclick="triggerSfx('correct')">✅ Тыдыщ!</button>
+            <button class="sfx-bottom-btn" onclick="triggerSfx('wrong')">❌ Ошибка</button>
+            
+            <button class="sfx-bottom-btn" style="border-color: var(--gold-main);" onclick="openTimerModal()">
                 <span>⏱️ Таймер</span>
-                <span class="tap-counter" id="timer-status-btn">Стоп</span>
-            </div>
+                <span style="font-size: 0.6rem; color: var(--gold-main);" id="timer-status-btn">Стоп</span>
+            </button>
         </div>
     </div>
 
@@ -578,13 +593,13 @@
         <div class="modal-content">
             <h3 style="color: var(--gold-light);">⏱️ Запуск Таймера</h3>
             <div class="modal-grid">
-                <button class="modal-btn" onclick="startTimer(30)">30 секунд</button>
-                <button class="modal-btn" onclick="startTimer(60)">1 минута</button>
-                <button class="modal-btn" onclick="startTimer(120)">2 минуты</button>
-                <button class="modal-btn" onclick="startTimer(300)">5 минут</button>
+                <button class="ui-btn" onclick="startTimer(30)">30 сек</button>
+                <button class="ui-btn" onclick="startTimer(60)">1 мин</button>
+                <button class="ui-btn" onclick="startTimer(120)">2 мин</button>
+                <button class="ui-btn" onclick="startTimer(300)">5 мин</button>
             </div>
-            <button class="modal-btn" style="width: 100%; margin-top: 12px; background: rgba(239, 68, 68, 0.3); border-color: var(--danger-red);" onclick="stopTimer()">Остановить таймер</button>
-            <button class="modal-btn" style="width: 100%; margin-top: 8px; background: transparent; border: none;" onclick="closeTimerModal()">Отмена</button>
+            <button class="ui-btn ui-btn-danger" style="width: 100%; margin-top: 14px;" onclick="stopTimer()">Остановить таймер</button>
+            <button class="ui-btn" style="width: 100%; margin-top: 8px; background: transparent; border: none;" onclick="closeTimerModal()">Отмена</button>
         </div>
     </div>
 
@@ -593,12 +608,12 @@
         <div class="modal-content">
             <h3 style="color: var(--gold-light);">➕ Выбор модуля</h3>
             <div class="modal-grid">
-                <button class="modal-btn" onclick="launchModule('VIDEO_INTRO')">🎬 Видео-Заставка</button>
-                <button class="modal-btn" onclick="launchModule('LOBBY')">🏠 Главный Экран</button>
-                <button class="modal-btn" onclick="launchModule('GAME')">🎮 Интерактив 1</button>
-                <button class="modal-btn" onclick="launchModule('GAME_2')">🎯 Викторина</button>
+                <button class="ui-btn" onclick="launchModule('VIDEO_INTRO')">🎬 Видео-Заставка</button>
+                <button class="ui-btn" onclick="launchModule('LOBBY')">🏠 Главный Экран</button>
+                <button class="ui-btn" onclick="launchModule('GAME')">🎮 Интерактив 1</button>
+                <button class="ui-btn" onclick="launchModule('GAME_2')">🎯 Викторина</button>
             </div>
-            <button class="modal-btn" style="width: 100%; margin-top: 14px; background: transparent; border: none;" onclick="closeLauncherModal()">Закрыть</button>
+            <button class="ui-btn" style="width: 100%; margin-top: 14px; background: transparent; border: none;" onclick="closeLauncherModal()">Закрыть</button>
         </div>
     </div>
 
@@ -623,8 +638,79 @@
         let logoTapTimer = null;
         let isAdminMode = false;
         let timerInterval = null;
+        let currentMasterVolume = 0.4;
 
-        // --- 1. АВТОСОХРАНЕНИЕ И ВОССТАНОВЛЕНИЕ СЕССИИ (LOCAL STORAGE) ---
+        // --- WEB AUDIO SYNTHESIZER FOR SFX & FADEOUT ---
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        let audioCtx = null;
+
+        function initAudio() {
+            if (!audioCtx) audioCtx = new AudioCtx();
+        }
+
+        function playSynthSfx(type, volume) {
+            initAudio();
+            if (!audioCtx) return;
+
+            const now = audioCtx.currentTime;
+            const masterGain = audioCtx.createGain();
+            masterGain.gain.setValueAtTime(volume, now);
+            masterGain.connect(audioCtx.destination);
+
+            if (type === 'applause') {
+                for (let i = 0; i < 8; i++) {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(150 + Math.random() * 300, now + i * 0.1);
+                    gain.gain.setValueAtTime(0.15, now + i * 0.1);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.1 + 0.3);
+                    osc.connect(gain);
+                    gain.connect(masterGain);
+                    osc.start(now + i * 0.1);
+                    osc.stop(now + i * 0.1 + 0.3);
+                }
+            } else if (type === 'fanfare') {
+                [523.25, 659.25, 783.99, 1046.50].forEach((freq, idx) => {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(freq, now + idx * 0.12);
+                    gain.gain.setValueAtTime(0.3, now + idx * 0.12);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.12 + 0.5);
+                    osc.connect(gain);
+                    gain.connect(masterGain);
+                    osc.start(now + idx * 0.12);
+                    osc.stop(now + idx * 0.12 + 0.5);
+                });
+            } else if (type === 'correct') {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(587.33, now);
+                osc.frequency.setValueAtTime(880, now + 0.1);
+                gain.gain.setValueAtTime(0.4, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+                osc.connect(gain);
+                gain.connect(masterGain);
+                osc.start(now);
+                osc.stop(now + 0.4);
+            } else if (type === 'wrong') {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(150, now);
+                osc.frequency.setValueAtTime(110, now + 0.15);
+                gain.gain.setValueAtTime(0.4, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+                osc.connect(gain);
+                gain.connect(masterGain);
+                osc.start(now);
+                osc.stop(now + 0.5);
+            }
+        }
+
+        // --- LOCAL STORAGE RECOVERY ---
         socket.on('connect', () => {
             const savedSession = localStorage.getItem('eventos_session');
             if (savedSession) {
@@ -705,10 +791,7 @@
             }
 
             const payload = isAdminMode ? { pin: val } : { name: val };
-            
-            // Сохраняем сессию в память устройства
             localStorage.setItem('eventos_session', JSON.stringify(payload));
-
             socket.emit('login', payload);
         }
 
@@ -767,11 +850,21 @@
         });
 
         socket.on('state_update', (state) => {
+            currentMasterVolume = state.audio_volume;
+
+            // ОБНОВЛЕНИЕ ГЛАВНОГО ЭКРАНА
             if (state.screen_text) document.getElementById('screen-title').innerText = state.screen_text;
             if (state.screen_badge) document.getElementById('screen-badge').innerText = state.screen_badge;
-            if (state.guest_count !== undefined) document.getElementById('host-guest-counter').innerText = state.guest_count;
 
-            // Обработка видео заставки на Экране
+            // ОБНОВЛЕНИЕ РЕПЛИКИ У ВЕДУЩЕГО
+            if (state.screen_text) document.getElementById('mirror-title').innerText = state.screen_text;
+            if (state.screen_badge) document.getElementById('mirror-badge').innerText = state.screen_badge;
+
+            if (state.guest_count !== undefined) {
+                document.getElementById('host-guest-counter').innerText = state.guest_count;
+            }
+
+            // Видео
             const videoEl = document.getElementById('screen-video-player');
             if (videoEl) {
                 if (state.video_playing) {
@@ -783,29 +876,73 @@
                 }
             }
 
-            // Обработка Таймера
+            // Таймер
             const timerDisplay = document.getElementById('screen-timer-display');
+            const mirrorTimer = document.getElementById('mirror-timer');
+
             if (state.timer && state.timer.active) {
-                timerDisplay.style.display = 'block';
+                if (timerDisplay) timerDisplay.style.display = 'block';
+                if (mirrorTimer) mirrorTimer.style.display = 'block';
+
                 clearInterval(timerInterval);
                 timerInterval = setInterval(() => {
                     const remaining = Math.max(0, Math.round(state.timer.end_time - (Date.now() / 1000)));
                     const mins = String(Math.floor(remaining / 60)).padStart(2, '0');
                     const secs = String(remaining % 60).padStart(2, '0');
-                    timerDisplay.innerText = `${mins}:${secs}`;
-                    document.getElementById('timer-status-btn').innerText = `${mins}:${secs}`;
-                    if (remaining <= 0) clearInterval(timerInterval);
+                    
+                    const timeStr = `${mins}:${secs}`;
+                    if (timerDisplay) timerDisplay.innerText = timeStr;
+                    if (mirrorTimer) mirrorTimer.innerText = timeStr;
+                    document.getElementById('timer-status-btn').innerText = timeStr;
+
+                    if (remaining <= 0) {
+                        clearInterval(timerInterval);
+                        socket.emit('timer_expired_auto');
+                    }
                 }, 1000);
             } else {
                 clearInterval(timerInterval);
                 if (timerDisplay) timerDisplay.style.display = 'none';
+                if (mirrorTimer) mirrorTimer.style.display = 'none';
                 document.getElementById('timer-status-btn').innerText = 'Стоп';
             }
         });
 
-        // --- УПРАВЛЕНИЕ ВЕДУЩЕГО ---
+        socket.on('play_sfx_on_screen', (data) => {
+            playSynthSfx(data.sfx, data.volume || currentMasterVolume);
+        });
+
+        socket.on('trigger_fadeout_audio', () => {
+            let vol = currentMasterVolume;
+            const fadeInterval = setInterval(() => {
+                vol -= 0.05;
+                if (vol <= 0) {
+                    vol = 0;
+                    clearInterval(fadeInterval);
+                }
+                socket.emit('host_audio_control', { volume: vol });
+            }, 300);
+        });
+
+        // --- ДЕЙСТВИЯ ВЕДУЩЕГО ---
         function officialStart() {
             socket.emit('host_official_start');
+            collapsePanel();
+        }
+
+        function endEvent() {
+            if (confirm("Завершить событие и затушить звук?")) {
+                socket.emit('host_end_event');
+            }
+        }
+
+        function toggleCollapsePanel() {
+            const card = document.getElementById('host-control-card');
+            card.classList.toggle('collapsed');
+        }
+
+        function collapsePanel() {
+            document.getElementById('host-control-card').classList.add('collapsed');
         }
 
         function setVolume(vol, btn) {
@@ -818,58 +955,31 @@
             socket.emit('host_audio_control', { emotion: emotion });
         }
 
-        // --- ТАЙМЕР МОДАЛКА ---
+        function triggerSfx(sfxType) {
+            const randomVar = Math.floor(Math.random() * 5) + 1;
+            socket.emit('host_trigger_sfx', { sfx: sfxType, variation: randomVar });
+        }
+
+        // ТАЙМЕР
         function openTimerModal() { document.getElementById('modal-timer').style.display = 'flex'; }
         function closeTimerModal() { document.getElementById('modal-timer').style.display = 'none'; }
         function startTimer(sec) {
             socket.emit('host_start_timer', { seconds: sec });
             closeTimerModal();
+            collapsePanel();
         }
         function stopTimer() {
             socket.emit('host_stop_timer');
             closeTimerModal();
         }
 
-        // --- ЛАУНЧЕР МОДУЛЕЙ МОДАЛКА ---
+        // ЛАУНЧЕР
         function openLauncherModal() { document.getElementById('modal-launcher').style.display = 'flex'; }
         function closeLauncherModal() { document.getElementById('modal-launcher').style.display = 'none'; }
         function launchModule(mod) {
             socket.emit('host_launch_module', { module: mod });
             closeLauncherModal();
-        }
-
-        // --- ЭФФЕКТЫ (ЗВУКИ) ---
-        const sfxTaps = {};
-        const sfxTimers = {};
-
-        function handleSfxTap(sfxType, btnEl) {
-            if (!sfxTaps[sfxType]) sfxTaps[sfxType] = 0;
-            sfxTaps[sfxType]++;
-            const counterEl = btnEl ? btnEl.querySelector('.tap-counter') : null;
-            clearTimeout(sfxTimers[sfxType]);
-
-            if (sfxTaps[sfxType] === 1) {
-                if (btnEl) btnEl.classList.add('tap-1');
-                if (counterEl) counterEl.innerText = '1/3';
-            } else if (sfxTaps[sfxType] === 2) {
-                if (btnEl) {
-                    btnEl.classList.remove('tap-1');
-                    btnEl.classList.add('tap-2');
-                }
-                if (counterEl) counterEl.innerText = '2/3';
-            } else if (sfxTaps[sfxType] >= 3) {
-                socket.emit('host_trigger_sfx', { sfx: sfxType });
-                sfxTaps[sfxType] = 0;
-                if (btnEl) btnEl.classList.remove('tap-1', 'tap-2');
-                if (counterEl) counterEl.innerText = '0/3';
-                return;
-            }
-
-            sfxTimers[sfxType] = setTimeout(() => {
-                sfxTaps[sfxType] = 0;
-                if (btnEl) btnEl.classList.remove('tap-1', 'tap-2');
-                if (counterEl) counterEl.innerText = '0/3';
-            }, 1500);
+            collapsePanel();
         }
     </script>
 </body>
