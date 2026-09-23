@@ -82,10 +82,10 @@ def handle_login(data):
     if pin == host_pin:
         user_name = f"{config_data.get('host_name', 'Богдан')} (Ведущий)"
         connected_users[request.sid] = {'name': user_name, 'role': 'HOST'}
-        emit('login_response', {'success': True, 'role': 'HOST', 'name': user_name, 'pin': pin}, to=request.sid)
+        emit('login_response', {'success': True, 'role': 'HOST', 'name': user_name}, to=request.sid)
     elif pin == screen_pin:
         connected_users[request.sid] = {'name': 'Проектор', 'role': 'SCREEN'}
-        emit('login_response', {'success': True, 'role': 'SCREEN', 'name': 'Проектор', 'pin': pin}, to=request.sid)
+        emit('login_response', {'success': True, 'role': 'SCREEN'}, to=request.sid)
     else:
         emit('login_response', {'success': False, 'message': 'Неверный PIN-код'}, to=request.sid)
 
