@@ -4,6 +4,7 @@ import random
 from flask import Flask, render_template, jsonify, send_from_directory, request
 from flask_socketio import SocketIO, emit
 
+# template_folder='.' ищет index.html в корне проекта
 app = Flask(__name__, template_folder='.', static_folder='static')
 app.config['SECRET_KEY'] = 'familystandard-os-secret-2026'
 
@@ -44,13 +45,21 @@ system_state = {
     "guest_count": 0
 }
 
+# --- МАРШРУТИЗАЦИЯ ---
+
 @app.route('/')
 def index():
     return render_template('index.html')
 
+@app.route('/ping')
+def ping():
+    return jsonify({"status": "ok", "system": "Event OS Core Active"}), 200
+
 @app.route('/modules/<path:filename>')
 def serve_module(filename):
     return send_from_directory('modules', filename)
+
+# --- СОКЕТЫ (REAL-TIME) ---
 
 @socketio.on('connect')
 def handle_connect():
