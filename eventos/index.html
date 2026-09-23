@@ -42,7 +42,7 @@
             justify-content: center;
         }
 
-        /* --- 1. АНИМАЦИЯ ПРИВЕТСТВИЯ (SPLASH SCREEN) --- */
+        /* SPLASH SCREEN */
         #view-splash {
             display: none;
             position: fixed;
@@ -80,7 +80,7 @@
             100% { opacity: 1; transform: scale(1.02); }
         }
 
-        /* --- 2. ФОРМА АВТОРИЗАЦИИ --- */
+        /* FORM */
         #view-login {
             position: fixed;
             inset: 0;
@@ -94,13 +94,14 @@
         }
 
         .server-status-dot {
-            font-size: 0.75rem;
-            color: #64748b;
-            margin-bottom: 15px;
+            font-size: 0.8rem;
+            color: #ef4444;
+            margin-bottom: 16px;
             display: flex;
             align-items: center;
             gap: 6px;
             justify-content: center;
+            font-weight: 700;
         }
 
         .login-card {
@@ -114,7 +115,6 @@
             box-shadow: 0 25px 50px rgba(0, 0, 0, 0.9), 0 0 30px rgba(245, 158, 11, 0.15);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            transition: transform 0.3s ease, border-color 0.3s ease;
         }
 
         .login-card.shake {
@@ -207,12 +207,11 @@
             letter-spacing: 1px;
             cursor: pointer;
             box-shadow: 0 8px 20px rgba(245, 158, 11, 0.3);
-            transition: transform 0.15s ease;
         }
 
         button.btn-primary:active { transform: scale(0.97); }
 
-        /* --- 3. ЭКРАН ПРОЕКТОРА (ПИН 222) --- */
+        /* VIEWS */
         #view-screen {
             display: none;
             position: fixed;
@@ -246,7 +245,6 @@
             text-shadow: 0 0 35px rgba(245, 158, 11, 0.6);
         }
 
-        /* --- 4. ПУЛЬТ ВЕДУЩЕГО (ПИН 111) --- */
         #view-host {
             display: none;
             position: fixed;
@@ -361,7 +359,6 @@
             gap: 10px;
         }
 
-        /* --- 5. РЕЖИМ ГОСТЯ (ЛОББИ) --- */
         #view-guest {
             display: none;
             position: fixed;
@@ -375,17 +372,15 @@
 </head>
 <body>
 
-    <!-- 1. SPLASH SCREEN (ПРИВЕТСТВИЕ OS) -->
     <div id="view-splash">
         <div class="splash-title" id="splash-title">EVENT OS</div>
         <div class="splash-sub" id="splash-sub">ПРИВЕТСТВУЕТ ВАС</div>
     </div>
 
-    <!-- 2. ФОРМА АВТОРИЗАЦИИ -->
     <div id="view-login">
         <div class="login-card" id="login-card">
             <div class="server-status-dot" id="server-status">
-                <span id="status-icon">🔴</span> <span id="status-text">Пробуждение сервера Render...</span>
+                <span id="status-icon">🔴</span> <span id="status-text">Проверка связи...</span>
             </div>
             
             <div id="admin-badge" class="admin-badge">Режим управления</div>
@@ -402,13 +397,11 @@
         </div>
     </div>
 
-    <!-- 3. ЭКРАН ПРОЕКТОРА (ПИН 222) -->
     <div id="view-screen">
         <div class="screen-badge" id="screen-badge">Заставка</div>
         <div class="screen-title" id="screen-title">Загрузка...</div>
     </div>
 
-    <!-- 4. ПУЛЬТ ВЕДУЩЕГО (ПИН 111) -->
     <div id="view-host">
         <div id="host-top-music" class="host-interactive">
             <div class="music-controls-row">
@@ -447,42 +440,48 @@
         <div id="host-modules-container" class="host-interactive"></div>
     </div>
 
-    <!-- 5. ЭКРАН ГОСТЯ (ЛОББИ) -->
     <div id="view-guest">
         <h2 style="color: var(--gold-light); margin-top: 60px; font-family: 'Cinzel', serif; font-size: 2.2rem;">EVENT OS</h2>
         <p style="color: #94a3b8; margin-top: 15px; font-size: 1.1rem;" id="guest-welcome-msg">Ожидайте запуска интерактивов от Ведущего.</p>
     </div>
 
     <script>
+        // Инициализация Socket.IO
         const socket = io({
             transports: ['polling', 'websocket'],
-            reconnection: true,
-            reconnectionDelay: 500
+            upgrade: true,
+            autoConnect: true
         });
 
         let currentRole = null;
-        let pendingPayload = null;
+
+        // Прямой HTTP-чек порта сервера
+        async function checkServerHealth() {
+            try {
+                const res = await fetch('/ping');
+                if (res.ok) {
+                    document.getElementById('status-icon').innerText = '🟢';
+                    document.getElementById('status-text').innerText = 'Сервер онлайн';
+                    document.getElementById('server-status').style.color = '#22c55e';
+                }
+            } catch (e) {
+                document.getElementById('status-icon').innerText = '🔴';
+                document.getElementById('status-text').innerText = 'Сервер просыпается...';
+                document.getElementById('server-status').style.color = '#ef4444';
+            }
+        }
+
+        checkServerHealth();
+        setInterval(checkServerHealth, 5000);
 
         socket.on('connect', () => {
             document.getElementById('status-icon').innerText = '🟢';
-            document.getElementById('status-text').innerText = 'Сервер готов';
+            document.getElementById('status-text').innerText = 'Сервер онлайн';
             document.getElementById('server-status').style.color = '#22c55e';
-            
-            if (pendingPayload) {
-                socket.emit('login', pendingPayload);
-                pendingPayload = null;
-            }
-        });
-
-        socket.on('disconnect', () => {
-            document.getElementById('status-icon').innerText = '🔴';
-            document.getElementById('status-text').innerText = 'Переподключение...';
-            document.getElementById('server-status').style.color = '#ef4444';
         });
 
         const PROFANITY_REGEX = /хуй|пизд|еба|еб|бля|сук|чмо|говн|урод|шлюх|пидор|гандон|fuck|shit|bitch|asshole|cunt/i;
 
-        // --- 5 ТАПОВ ПО ЛОГОТИПУ ---
         let logoTapCount = 0;
         let logoTapTimer = null;
         let isAdminMode = false;
@@ -546,13 +545,7 @@
                 return;
             }
 
-            if (socket.connected) {
-                socket.emit('login', payload);
-            } else {
-                pendingPayload = payload;
-                document.getElementById('status-text').innerText = 'Подключение к серверу...';
-                socket.connect();
-            }
+            socket.emit('login', payload);
         }
 
         function showError(msg) {
@@ -571,13 +564,11 @@
             }, 500);
         }
 
-        // --- ЗАПУСК СТАРТОВОЙ АНИМАЦИИ ПРИВЕТСТВИЯ OS ---
         socket.on('login_response', (data) => {
             if (data.success) {
                 document.getElementById('view-login').style.display = 'none';
                 currentRole = data.role;
 
-                // Включаем стартовую анимацию
                 const splash = document.getElementById('view-splash');
                 const splashSub = document.getElementById('splash-sub');
                 splash.style.display = 'flex';
