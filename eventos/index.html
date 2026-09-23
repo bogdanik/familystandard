@@ -16,8 +16,8 @@
             --gold-light: #fff3a1;
             --gold-main: #f59e0b;
             --gold-dark: #b45309;
-            --glass-card: rgba(15, 23, 42, 0.88);
-            --glass-border: rgba(245, 158, 11, 0.35);
+            --glass-card: rgba(15, 23, 42, 0.92);
+            --glass-border: rgba(245, 158, 11, 0.3);
             --danger-red: #ef4444;
             --ios-font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Plus Jakarta Sans", sans-serif;
         }
@@ -25,19 +25,11 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: var(--ios-font); }
         body { background: var(--bg-black); color: #f8fafc; min-height: 100vh; overflow: hidden; display: flex; flex-direction: column; position: relative; }
 
-        /* 120 FPS PARTICLES CANVAS */
-        #particles-canvas {
-            position: fixed; inset: 0; z-index: 1; pointer-events: none;
-        }
+        /* CANVAS PARTICLES (120 FPS) */
+        #particles-canvas { position: fixed; inset: 0; z-index: 1; pointer-events: none; }
+        .bg-glow { position: fixed; inset: 0; z-index: 2; background: radial-gradient(circle at 50% 50%, rgba(245, 158, 11, 0.12) 0%, rgba(3, 7, 18, 0.96) 75%, #000000 100%); pointer-events: none; }
 
-        /* RADIAL GLOW BACKGROUND */
-        .bg-glow {
-            position: fixed; inset: 0; z-index: 2;
-            background: radial-gradient(circle at 50% 50%, rgba(245, 158, 11, 0.15) 0%, rgba(3, 7, 18, 0.95) 70%, #000000 100%);
-            pointer-events: none;
-        }
-
-        /* BOOT ANIMATION SPLASH */
+        /* BOOT ANIMATION */
         #ios-boot-screen {
             position: fixed; inset: 0; z-index: 99999; background: #000000;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -53,26 +45,17 @@
         @keyframes iosFadeIn { 0% { opacity: 0; filter: blur(10px); } 50% { opacity: 1; filter: blur(0); } 100% { opacity: 0; } }
 
         /* FLASH EFFECT ON 5 TAPS */
-        #flash-overlay {
-            position: fixed; inset: 0; z-index: 99998; background: #ffffff;
-            opacity: 0; pointer-events: none; transition: opacity 0.4s ease;
-        }
+        #flash-overlay { position: fixed; inset: 0; z-index: 99998; background: #ffffff; opacity: 0; pointer-events: none; transition: opacity 0.4s ease; }
 
         /* AUTH CARD */
-        #auth-overlay {
-            position: fixed; inset: 0; z-index: 10000;
-            display: flex; align-items: center; justify-content: center; padding: 20px;
-        }
+        #auth-overlay { position: fixed; inset: 0; z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 20px; }
         .auth-card {
             background: var(--glass-card); border: 1px solid var(--glass-border); padding: 40px 30px;
             border-radius: 28px; width: 100%; max-width: 370px; text-align: center;
             box-shadow: 0 0 60px rgba(245, 158, 11, 0.25), 0 20px 40px rgba(0, 0, 0, 0.9);
             backdrop-filter: blur(25px); transition: transform 0.2s ease;
         }
-        .auth-card.shake {
-            animation: shake 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
-            border-color: var(--danger-red);
-        }
+        .auth-card.shake { animation: shake 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97) both; border-color: var(--danger-red); }
         @keyframes shake {
             10%, 90% { transform: translate3d(-3px, 0, 0); }
             20%, 80% { transform: translate3d(5px, 0, 0); }
@@ -85,8 +68,7 @@
             background: linear-gradient(135deg, #fff3a1 0%, #f59e0b 50%, #d97706 100%);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
             text-shadow: 0 0 25px rgba(245, 158, 11, 0.4);
-            cursor: pointer; user-select: none; display: inline-block;
-            transition: transform 0.15s ease;
+            cursor: pointer; user-select: none; display: inline-block; transition: transform 0.15s ease;
         }
         .brand-header:active { transform: scale(0.92); }
 
@@ -99,79 +81,102 @@
         .auth-sub { color: #94a3b8; font-size: 0.9rem; margin: 12px 0 22px; }
         .auth-input {
             width: 100%; padding: 16px; border-radius: 14px; border: 1px solid var(--glass-border);
-            background: rgba(3, 7, 18, 0.8); color: #fff; text-align: center; font-size: 1.05rem;
-            font-weight: 600; outline: none;
+            background: rgba(3, 7, 18, 0.8); color: #fff; text-align: center; font-size: 1.05rem; font-weight: 600; outline: none;
         }
-        .auth-btn {
-            width: 100%; margin-top: 16px; padding: 16px; border-radius: 14px; border: none;
+        .btn-gold {
+            width: 100%; padding: 16px; border-radius: 14px; border: none;
             background: linear-gradient(135deg, var(--gold-light) 0%, var(--gold-main) 100%);
             color: #000; font-weight: 800; font-size: 1rem; cursor: pointer;
-            box-shadow: 0 4px 20px rgba(245, 158, 11, 0.3);
+            box-shadow: 0 4px 20px rgba(245, 158, 11, 0.3); transition: transform 0.15s ease;
         }
+        .btn-gold:active { transform: scale(0.97); }
 
         /* HOST TOP BAR (MUSIC & VOLUME) */
         #host-top-bar {
             display: none; position: fixed; top: 0; left: 0; right: 0; z-index: 500;
             background: rgba(15, 23, 42, 0.96); border-bottom: 1px solid var(--glass-border);
-            backdrop-filter: blur(20px); padding: 10px 14px; flex-direction: column; gap: 8px;
+            backdrop-filter: blur(20px); padding: 12px 16px; flex-direction: column; gap: 10px;
         }
         .control-row { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
         .btn-control {
             flex: 1; height: 38px; border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.12);
-            background: rgba(30, 41, 59, 0.7); color: #ffffff; font-size: 0.75rem; font-weight: 800; cursor: pointer;
+            background: rgba(30, 41, 59, 0.7); color: #ffffff; font-size: 0.78rem; font-weight: 800; cursor: pointer;
+            transition: all 0.2s ease;
         }
-        .btn-control.active { background: var(--gold-main); color: #000; border-color: var(--gold-light); }
+        .btn-control:active { transform: scale(0.95); }
+        .btn-control.active { background: var(--gold-main); color: #000; border-color: var(--gold-light); box-shadow: 0 0 12px rgba(245, 158, 11, 0.4); }
 
-        /* HOST BOTTOM BAR (SFX) */
+        /* AUDIO EQUALIZER ANIMATION */
+        .eq-bar-container { display: flex; align-items: flex-end; gap: 3px; height: 16px; }
+        .eq-bar { width: 3px; background: var(--gold-main); border-radius: 2px; animation: eqAnim 1s ease-in-out infinite alternate; }
+        .eq-bar:nth-child(2) { animation-delay: 0.2s; }
+        .eq-bar:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes eqAnim { 0% { height: 4px; } 100% { height: 16px; } }
+
+        /* HOST BOTTOM BAR (SFX & LAUNCHER) */
         #host-bottom-bar {
-            display: none; position: fixed; bottom: 0; left: 0; right: 0; height: 65px; z-index: 500;
+            display: none; position: fixed; bottom: 0; left: 0; right: 0; height: 120px; z-index: 500;
             background: rgba(15, 23, 42, 0.98); border-top: 1px solid var(--glass-border);
-            backdrop-filter: blur(20px); padding: 8px 12px; align-items: center; justify-content: space-around; gap: 8px;
+            backdrop-filter: blur(20px); padding: 10px 14px; flex-direction: column; gap: 8px; justify-content: center;
         }
+        .sfx-grid { display: flex; gap: 8px; width: 100%; }
         .sfx-btn {
-            flex: 1; height: 48px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.15);
-            background: rgba(30, 41, 59, 0.8); color: #fff; font-size: 0.75rem; font-weight: 800; cursor: pointer;
+            flex: 1; height: 46px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.15);
+            background: rgba(30, 41, 59, 0.8); color: #fff; font-size: 0.78rem; font-weight: 800; cursor: pointer;
+            transition: transform 0.15s ease;
         }
+        .sfx-btn:active { transform: scale(0.95); }
 
-        /* TOP RIGHT PLAY / LAUNCHER BUTTON */
-        #launch-btn-trigger {
-            display: none; position: fixed; top: 12px; right: 12px; z-index: 600;
-            width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--gold-main);
-            background: rgba(245, 158, 11, 0.2); color: var(--gold-light); font-size: 1.2rem;
-            align-items: center; justify-content: center; cursor: pointer; backdrop-filter: blur(10px);
+        .btn-launch-trigger {
+            width: 100%; height: 46px; border-radius: 12px; border: 1px solid var(--gold-main);
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.25) 0%, rgba(180, 83, 9, 0.25) 100%);
+            color: var(--gold-light); font-weight: 800; font-size: 0.9rem; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
         }
 
         /* MODAL LAUNCHER MENU */
         #launcher-modal {
             display: none; position: fixed; inset: 0; z-index: 20000;
-            background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(15px);
+            background: rgba(0, 0, 0, 0.88); backdrop-filter: blur(20px);
             align-items: center; justify-content: center; padding: 20px;
         }
         .modal-card {
             background: var(--glass-card); border: 1px solid var(--glass-border);
-            border-radius: 24px; padding: 25px; width: 100%; max-width: 380px; text-align: center;
+            border-radius: 28px; padding: 28px; width: 100%; max-width: 400px; text-align: center;
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.9);
         }
-        .modules-grid { display: flex; flex-direction: column; gap: 10px; margin-top: 18px; }
+        .modules-grid { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
         .mod-btn {
             padding: 16px; border-radius: 14px; border: 1px solid var(--glass-border);
             background: rgba(30, 41, 59, 0.8); color: #fff; font-size: 0.95rem; font-weight: 800; cursor: pointer;
         }
 
-        /* MAIN VIEWPORT */
+        /* MAIN VIEWPORT (CONTAINS IFRAME OR TITLE) */
         #main-viewport {
-            position: relative; z-index: 10; flex: 1; display: flex; flex-direction: column;
-            align-items: center; justify-content: center; padding: 80px 20px 80px; width: 100%; overflow-y: auto;
+            position: relative; z-index: 10; flex: 1; width: 100%; height: 100vh;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
 
-        /* GUEST LOBBY VIEW */
-        #guest-lobby-view {
-            display: none; text-align: center; max-width: 450px; width: 100%;
+        /* FULLSCREEN IFRAME FOR MODULES */
+        #module-iframe {
+            display: none; position: absolute; inset: 0; width: 100%; height: 100%;
+            border: none; z-index: 15; background: transparent;
         }
-        .lobby-title {
-            font-family: 'Cinzel', serif; font-size: 2.5rem; color: #fff; text-shadow: 0 0 25px rgba(245, 158, 11, 0.5);
+
+        /* MAIN SCREEN DISPLAY CONTENT */
+        #main-display-content {
+            text-align: center; max-width: 600px; width: 100%; padding: 20px; z-index: 10;
         }
-        .lobby-status {
-            color: #94a3b8; font-size: 1rem; margin-top: 12px; letter-spacing: 1px;
+        .shimmer-title {
+            font-family: 'Cinzel', serif; font-size: 3.2rem; font-weight: 900;
+            background: linear-gradient(90deg, #fff3a1 0%, #f59e0b 30%, #ffffff 50%, #f59e0b 70%, #fff3a1 100%);
+            background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            animation: shine 4s linear infinite; text-shadow: 0 0 35px rgba(245, 158, 11, 0.4);
+        }
+        @keyframes shine { to { background-position: 200% center; } }
+
+        .subtitle-text {
+            color: #94a3b8; font-size: 1.15rem; font-weight: 600; margin-top: 14px; letter-spacing: 1px;
         }
     </style>
 </head>
@@ -192,14 +197,17 @@
             <div class="brand-header" id="brand-logo" onclick="handleLogoTap()">EVENT OS</div>
             <p class="auth-sub" id="auth-sub">Введите имя для входа в лобби</p>
             <input type="text" id="auth-input" class="auth-input" placeholder="Ваше имя" autocomplete="off" onkeydown="if(event.key==='Enter') submitAuth()">
-            <button onclick="submitAuth()" class="auth-btn">ВОЙТИ</button>
+            <button onclick="submitAuth()" class="btn-gold" style="margin-top: 16px;">ВОЙТИ</button>
         </div>
     </div>
 
     <!-- HOST TOP CONTROL BAR -->
     <div id="host-top-bar">
         <div class="control-row">
-            <span style="font-size: 0.75rem; color: var(--gold-light); font-weight: 800;">ГРОМКОСТЬ:</span>
+            <div class="eq-bar-container">
+                <div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div>
+            </div>
+            <span style="font-size: 0.75rem; color: var(--gold-light); font-weight: 800; margin-right: auto; margin-left: 8px;">ГРОМКОСТЬ:</span>
             <button class="btn-control" onclick="setVolume(0.1, this)">10%</button>
             <button class="btn-control" onclick="setVolume(0.2, this)">20%</button>
             <button class="btn-control active" onclick="setVolume(0.3, this)">30%</button>
@@ -213,35 +221,41 @@
         </div>
     </div>
 
-    <!-- TOP RIGHT LAUNCHER BUTTON FOR HOST -->
-    <button id="launch-btn-trigger" onclick="openLauncherModal()">▶</button>
+    <!-- MAIN VIEWPORT (MAIN DISPLAY OR IFRAME) -->
+    <div id="main-viewport">
+        <iframe id="module-iframe" src="about:blank"></iframe>
+        
+        <div id="main-display-content">
+            <h1 class="shimmer-title" id="display-title">FAMILY STANDARD OS</h1>
+            <p class="subtitle-text" id="display-subtitle">С праздником!</p>
+        </div>
+    </div>
 
     <!-- MODAL LAUNCHER MENU -->
     <div id="launcher-modal">
         <div class="modal-card">
-            <h3 style="color: var(--gold-light); font-family: 'Cinzel', serif;">▶ Выбор интерактива</h3>
+            <h3 style="color: var(--gold-light); font-family: 'Cinzel', serif; font-size: 1.4rem;">➕ Выбор интерактива</h3>
             <div class="modules-grid" id="modules-list-box"></div>
-            <button onclick="closeLauncherModal()" style="width: 100%; padding: 12px; border-radius: 12px; border: none; background: transparent; color: #94a3b8; margin-top: 12px; cursor: pointer;">Закрыть</button>
+            <button onclick="closeLauncherModal()" style="width: 100%; padding: 12px; border-radius: 12px; border: none; background: transparent; color: #94a3b8; margin-top: 14px; cursor: pointer; font-weight: 700;">Закрыть</button>
         </div>
     </div>
 
-    <!-- MAIN VIEWPORT -->
-    <div id="main-viewport">
-        <div id="guest-lobby-view">
-            <h1 class="lobby-title">FAMILY STANDARD OS</h1>
-            <p class="lobby-status" id="guest-welcome-msg">Вы в лобби. Ожидайте запуска интерактива...</p>
-        </div>
-    </div>
-
-    <!-- HOST BOTTOM SFX BAR -->
+    <!-- HOST BOTTOM BAR (SFX & LAUNCHER) -->
     <div id="host-bottom-bar">
-        <button class="sfx-btn" onclick="triggerSfx('applause')">👏 Аплодисменты</button>
-        <button class="sfx-btn" onclick="triggerSfx('correct')">✅ Тыдыщ!</button>
-        <button class="sfx-btn" onclick="triggerSfx('wrong')">❌ Ошибка</button>
+        <button class="btn-launch-trigger" onclick="openLauncherModal()">
+            <span>➕</span>
+            <span>ВЫБРАТЬ ИНТЕРАКТИВ</span>
+        </button>
+        <div class="sfx-grid">
+            <button class="sfx-btn" onclick="triggerSfx('applause')">👏 Аплодисменты</button>
+            <button class="sfx-btn" onclick="triggerSfx('correct')">✅ Тыдыщ!</button>
+            <button class="sfx-btn" onclick="triggerSfx('wrong')">❌ Ошибка</button>
+        </div>
     </div>
 
-    <!-- AUDIO PLAYER (АКТИВЕН ИСКЛЮЧИТЕЛЬНО НА РОЛИ 'SCREEN') -->
-    <audio id="bg-audio-player" loop></audio>
+    <!-- DUAL AUDIO PLAYERS FOR DYNAMIC CROSSFADE (ТОЛЬКО ДЛЯ РОЛИ 'SCREEN') -->
+    <audio id="audio-a" loop></audio>
+    <audio id="audio-b" loop></audio>
 
     <script>
         // 🚨 ПРЯМАЯ ССЫЛКА НА СЕРВЕР RENDER
@@ -260,7 +274,12 @@
         let currentLoadedModule = '';
         let availableModules = [];
 
-        const bgPlayer = document.getElementById('bg-audio-player');
+        // DUAL AUDIO CROSSFADE STATE
+        const audioA = document.getElementById('audio-a');
+        const audioB = document.getElementById('audio-b');
+        let activeAudio = audioA;
+        let inactiveAudio = audioB;
+        let masterVolume = 0.3;
 
         // --- 1. 120 FPS PARTICLES CANVAS ---
         const canvas = document.getElementById('particles-canvas');
@@ -275,9 +294,7 @@
         resizeCanvas();
 
         class Particle {
-            constructor() {
-                this.reset();
-            }
+            constructor() { this.reset(); }
             reset() {
                 this.x = Math.random() * canvas.width;
                 this.y = Math.random() * canvas.height;
@@ -289,9 +306,7 @@
             update() {
                 this.x += this.speedX;
                 this.y += this.speedY;
-                if (this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) {
-                    this.reset();
-                }
+                if (this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) this.reset();
             }
             draw() {
                 ctx.fillStyle = `rgba(245, 158, 11, ${this.alpha})`;
@@ -300,7 +315,6 @@
                 ctx.fill();
             }
         }
-
         for (let i = 0; i < 45; i++) particles.push(new Particle());
 
         function animateParticles() {
@@ -319,27 +333,13 @@
             }
         }, 2200);
 
-        // --- 3. DYNAMIC SCRIPT INJECTION FOR MODULES ---
-        function injectHTMLWithScripts(container, html) {
-            container.innerHTML = html;
-            const scripts = container.querySelectorAll('script');
-            scripts.forEach(oldScript => {
-                const newScript = document.createElement('script');
-                if (oldScript.src) newScript.src = oldScript.src;
-                else newScript.textContent = oldScript.textContent;
-                document.body.appendChild(newScript);
-                document.body.removeChild(newScript);
-            });
-        }
-
-        // --- 4. 5 TAPS LOGO SECRET TOGGLE ---
+        // --- 3. 5 TAPS LOGO SECRET TOGGLE ---
         function handleLogoTap() {
             tapCount++; clearTimeout(tapTimer);
             const logo = document.getElementById('brand-logo');
             if (logo) logo.style.transform = `scale(${1 + tapCount * 0.05})`;
 
             if (tapCount >= 5) {
-                // Вспышка
                 const flash = document.getElementById('flash-overlay');
                 if (flash) {
                     flash.style.opacity = '0.8';
@@ -407,7 +407,7 @@
             socket.emit('login', isAdmin ? { pin: val } : { name: val });
         }
 
-        // --- 5. SOCKET RESPONSES & STATE ---
+        // --- 4. SOCKET RESPONSES & STATE ---
         socket.on('login_response', (res) => {
             if (res.success) {
                 myRole = res.role;
@@ -416,12 +416,6 @@
                 if (myRole === 'HOST') {
                     document.getElementById('host-top-bar').style.display = 'flex';
                     document.getElementById('host-bottom-bar').style.display = 'flex';
-                    document.getElementById('launch-btn-trigger').style.display = 'flex';
-                } else if (myRole === 'GUEST') {
-                    document.getElementById('guest-lobby-view').style.display = 'block';
-                    if (res.name) {
-                        document.getElementById('guest-welcome-msg').innerText = `Привет, ${res.name}! Вы в лобби. Ожидайте интерактива...`;
-                    }
                 }
             } else {
                 triggerErrorShake();
@@ -451,42 +445,57 @@
         }
 
         socket.on('state_update', (state) => {
-            // Подгрузка активного модуля
+            // Обновление названий из JSON
+            if (state.event_title) document.getElementById('display-title').innerText = state.event_title;
+            if (state.event_subtitle) document.getElementById('display-subtitle').innerText = state.event_subtitle;
+
+            masterVolume = state.audio_volume;
+
+            // Подгрузка активного модуля в IFRAME
             if (state.active_module && currentLoadedModule !== state.active_module) {
-                loadModuleContent(state.active_module);
+                loadModuleIframe(state.active_module);
             }
 
-            // ⛔️ МУЗЫКА ИГРАЕТ ТОЛЬКО НА РОЛИ SCREEN
+            // ⛔️ ЗВУК ИГРАЕТ ТОЛЬКО НА РОЛИ SCREEN (ПРОЕКТОР)
             if (myRole === 'SCREEN') {
                 const trackUrl = RENDER_SERVER_URL + state.current_track;
-                if (bgPlayer.src !== trackUrl) {
-                    fadeChangeTrack(trackUrl);
-                }
-                bgPlayer.volume = state.audio_volume;
-
-                if (state.is_playing && bgPlayer.paused) {
-                    bgPlayer.play().catch(() => {});
-                } else if (!state.is_playing && !bgPlayer.paused) {
-                    bgPlayer.pause();
+                if (activeAudio.src !== trackUrl) {
+                    performAudioCrossfade(trackUrl);
+                } else {
+                    activeAudio.volume = masterVolume;
+                    if (state.is_playing && activeAudio.paused) activeAudio.play().catch(() => {});
                 }
             }
         });
 
-        // ПЛАВНОЕ ЗАТУХАНИЕ И СМЕНА ТРЕКА СО СЛУЧАЙНОЙ ПОЗИЦИИ
-        function fadeChangeTrack(newSrc) {
-            let vol = bgPlayer.volume;
-            const fadeOut = setInterval(() => {
-                vol = Math.max(0, vol - 0.05);
-                bgPlayer.volume = vol;
-                if (vol <= 0) {
-                    clearInterval(fadeOut);
-                    bgPlayer.src = newSrc;
-                    bgPlayer.currentTime = Math.random() * 15; // Рандомное смещение
-                    bgPlayer.play().then(() => {
-                        bgPlayer.volume = 0.3;
-                    }).catch(() => {});
-                }
-            }, 50);
+        // ДВУХКАНАЛЬНЫЙ ПЛАВНЫЙ КРОССФЕЙД (CROSSFADE)
+        function performAudioCrossfade(newTrackUrl) {
+            inactiveAudio.src = newTrackUrl;
+            inactiveAudio.volume = 0;
+            
+            // Начинаем проигрывать со случайного отрезка
+            inactiveAudio.currentTime = Math.random() * 12;
+            inactiveAudio.play().then(() => {
+                let step = 0;
+                const steps = 30; // 1.5 секунды
+                const crossfadeInterval = setInterval(() => {
+                    step++;
+                    const progress = step / steps;
+                    
+                    activeAudio.volume = Math.max(0, masterVolume * (1 - progress));
+                    inactiveAudio.volume = Math.min(masterVolume, masterVolume * progress);
+
+                    if (step >= steps) {
+                        clearInterval(crossfadeInterval);
+                        activeAudio.pause();
+                        
+                        // Смена активного плеера
+                        const temp = activeAudio;
+                        activeAudio = inactiveAudio;
+                        inactiveAudio = temp;
+                    }
+                }, 50);
+            }).catch(() => {});
         }
 
         // ⛔️ ЭФФЕКТЫ ИГРАЮТ ТОЛЬКО НА РОЛИ SCREEN
@@ -498,21 +507,24 @@
             }
         });
 
-        async function loadModuleContent(modulePath) {
+        // ПОДГРУЗКА ИНТЕРАКТИВА В IFRAME
+        function loadModuleIframe(modulePath) {
             currentLoadedModule = modulePath;
-            if (myRole === 'GUEST') {
-                document.getElementById('guest-lobby-view').style.display = 'none';
+            const iframe = document.getElementById('module-iframe');
+            const displayContent = document.getElementById('main-display-content');
+
+            if (modulePath && modulePath !== 'lobby/lobby.html') {
+                iframe.src = `/modules/${modulePath}`;
+                iframe.style.display = 'block';
+                displayContent.style.display = 'none';
+            } else {
+                iframe.style.display = 'none';
+                iframe.src = 'about:blank';
+                displayContent.style.display = 'block';
             }
-            try {
-                const res = await fetch(`/modules/${modulePath}`);
-                if (res.ok) {
-                    const html = await res.text();
-                    injectHTMLWithScripts(document.getElementById('main-viewport'), html);
-                }
-            } catch(e) { console.error("Ошибка загрузки модуля:", e); }
         }
 
-        // --- 6. HOST CONTROLS ---
+        // --- 5. HOST CONTROLS ---
         function setVolume(vol, btn) {
             document.querySelectorAll('#host-top-bar .btn-control').forEach(b => b.classList.remove('active'));
             if (btn) btn.classList.add('active');
