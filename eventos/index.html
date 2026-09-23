@@ -2,985 +2,193 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Event OS</title>
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Family Standard OS</title>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
 
     <style>
         :root {
-            --bg-black: #030712;
+            --bg-black: #000000;
             --gold-light: #fff3a1;
             --gold-main: #f59e0b;
-            --gold-dark: #b45309;
-            --glass-card: rgba(15, 23, 42, 0.92);
+            --glass-card: rgba(18, 24, 38, 0.88);
             --glass-border: rgba(245, 158, 11, 0.25);
-            --text-main: #f8fafc;
-            --danger-red: #ef4444;
-            --success-green: #22c55e;
-            --btn-radius: 14px;
+            --ios-font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Plus Jakarta Sans", sans-serif;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            -webkit-tap-highlight-color: transparent;
-            touch-action: manipulation;
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: var(--ios-font); }
+        body { background: var(--bg-black); color: #f8fafc; min-height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
+
+        /* BOOT ANIMATION */
+        #ios-boot-screen {
+            position: fixed; inset: 0; z-index: 99999; background: #000000;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            opacity: 1; transition: opacity 1s ease;
         }
+        .ios-hello-text { font-size: 3.5rem; font-weight: 300; color: #ffffff; animation: iosFadeIn 2.5s ease forwards; }
+        @keyframes iosFadeIn { 0% { opacity: 0; filter: blur(8px); } 50% { opacity: 1; filter: blur(0); } 100% { opacity: 0; } }
 
-        body {
-            background: var(--bg-black);
-            color: var(--text-main);
-            min-height: 100vh;
-            overflow-x: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+        /* AUTH CARD */
+        #auth-overlay { position: fixed; inset: 0; z-index: 10000; background: #000; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .auth-card { background: var(--glass-card); border: 1px solid var(--glass-border); padding: 35px; border-radius: 28px; width: 100%; max-width: 360px; text-align: center; }
+        .brand-header { font-family: 'Cinzel', serif; font-size: 2.2rem; font-weight: 900; color: var(--gold-main); cursor: pointer; user-select: none; }
 
-        /* --- UNIFIED BUTTON STYLES --- */
-        .ui-btn {
-            height: 48px;
-            border-radius: var(--btn-radius);
-            border: 1px solid var(--glass-border);
-            background: rgba(30, 41, 59, 0.8);
-            color: #ffffff;
-            font-size: 0.85rem;
-            font-weight: 700;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            transition: all 0.2s ease;
-            outline: none;
-        }
+        /* MAIN VIEWPORT */
+        #main-viewport { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; width: 100%; }
 
-        .ui-btn:active { transform: scale(0.96); }
-
-        .ui-btn-gold {
-            background: linear-gradient(135deg, var(--gold-light) 0%, var(--gold-main) 100%);
-            color: #030712;
-            border: none;
-            font-weight: 800;
-            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.25);
-        }
-
-        .ui-btn-danger {
-            background: rgba(239, 68, 68, 0.2);
-            border-color: var(--danger-red);
-            color: #fca5a5;
-        }
-
-        /* --- SPLASH SCREEN --- */
-        #view-splash {
-            display: none;
-            position: fixed;
-            inset: 0;
-            z-index: 10000;
-            background: #000000;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            padding: 20px;
-        }
-
-        .splash-title {
-            font-family: 'Cinzel', serif;
-            font-size: 3rem;
-            font-weight: 900;
-            background: linear-gradient(135deg, #fff3a1 0%, #f59e0b 50%, #d97706 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 30px rgba(245, 158, 11, 0.5);
-            animation: flicker 1.2s ease-in-out infinite alternate;
-        }
-
-        .splash-sub {
-            font-size: 1.2rem;
-            color: #94a3b8;
-            margin-top: 15px;
-            letter-spacing: 4px;
-            text-transform: uppercase;
-        }
-
-        @keyframes flicker {
-            0% { opacity: 0.8; transform: scale(0.98); }
-            100% { opacity: 1; transform: scale(1.02); }
-        }
-
-        /* --- LOGIN FORM --- */
-        #view-login {
-            position: fixed;
-            inset: 0;
-            z-index: 9999;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            background: radial-gradient(circle at center, #0f172a 0%, var(--bg-black) 100%);
-        }
-
-        .login-card {
-            background: var(--glass-card);
-            border: 1px solid var(--glass-border);
-            padding: 40px 28px;
-            border-radius: 28px;
-            width: 100%;
-            max-width: 390px;
-            text-align: center;
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.9), 0 0 30px rgba(245, 158, 11, 0.15);
-            backdrop-filter: blur(20px);
-        }
-
-        .login-card.shake {
-            animation: shake 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
-            border-color: var(--danger-red);
-        }
-
-        @keyframes shake {
-            10%, 90% { transform: translate3d(-2px, 0, 0); }
-            20%, 80% { transform: translate3d(4px, 0, 0); }
-            30%, 50%, 70% { transform: translate3d(-6px, 0, 0); }
-            40%, 60% { transform: translate3d(6px, 0, 0); }
-        }
-
-        .brand-logo {
-            font-family: 'Cinzel', serif;
-            font-size: 2.5rem;
-            font-weight: 900;
-            letter-spacing: 3px;
-            margin-bottom: 6px;
-            cursor: pointer;
-            user-select: none;
-            display: inline-block;
-            background: linear-gradient(135deg, #fff3a1 0%, #f59e0b 50%, #d97706 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 20px rgba(245, 158, 11, 0.4);
-        }
-
-        .card-subtitle {
-            color: #94a3b8;
-            font-size: 0.88rem;
-            margin-bottom: 26px;
-        }
-
-        .admin-badge {
-            display: none;
-            background: rgba(245, 158, 11, 0.2);
-            border: 1px solid var(--gold-main);
-            color: var(--gold-light);
-            padding: 4px 14px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 800;
-            letter-spacing: 1px;
-            margin-bottom: 12px;
-            text-transform: uppercase;
-        }
-
-        .input-group { margin-bottom: 16px; }
-
-        input.input-field {
-            width: 100%;
-            padding: 18px 20px;
-            border-radius: var(--btn-radius);
-            border: 1px solid var(--glass-border);
-            background: rgba(3, 7, 18, 0.8);
-            color: #ffffff;
-            font-size: 1.05rem;
-            font-weight: 600;
-            outline: none;
-            text-align: center;
-        }
-
-        .error-toast {
-            color: var(--danger-red);
-            font-size: 0.82rem;
-            font-weight: 700;
-            margin-bottom: 14px;
-            display: none;
-        }
-
-        /* --- SCREEN VIEW (ПРОЕКТОР) --- */
-        #view-screen {
-            display: none;
-            position: fixed;
-            inset: 0;
-            z-index: 10;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            background: #000000;
-            text-align: center;
-            padding: 40px;
-            overflow: hidden;
-        }
-
-        .screen-badge {
-            background: rgba(245, 158, 11, 0.15);
-            border: 1px solid var(--gold-main);
-            color: var(--gold-light);
-            padding: 8px 24px;
-            border-radius: 30px;
-            font-size: 0.95rem;
-            font-weight: 700;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            margin-bottom: 20px;
-            z-index: 2;
-        }
-
-        .screen-title {
-            font-family: 'Cinzel', serif;
-            font-size: 3.8rem;
-            color: #ffffff;
-            text-shadow: 0 0 35px rgba(245, 158, 11, 0.6);
-            z-index: 2;
-        }
-
-        #screen-timer-display {
-            display: none;
-            font-family: 'Cinzel', serif;
-            font-size: 5rem;
-            color: var(--gold-light);
-            margin-top: 20px;
-            text-shadow: 0 0 40px rgba(245, 158, 11, 0.8);
-            z-index: 2;
-        }
-
-        video#screen-video-player {
-            display: none;
-            position: absolute;
-            inset: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            z-index: 1;
-        }
-
-        /* --- HOST CONTROL VIEW (ПУЛЬТ ВЕДУЩЕГО) --- */
-        #view-host {
-            display: none;
-            position: fixed;
-            inset: 0;
-            z-index: 100;
-            background: var(--bg-black);
-        }
-
-        /* ВЕРХНЯЯ ПАНЕЛЬ МУЗЫКИ */
-        #host-top-music {
-            position: fixed;
-            top: 0; left: 0; right: 0;
-            background: rgba(15, 23, 42, 0.96);
-            border-bottom: 1px solid var(--glass-border);
-            backdrop-filter: blur(20px);
-            padding: 12px 16px;
-            display: flex;
-            flex-direction: column;
-            gap: 14px; /* Увеличенное пространство */
-            z-index: 110;
-        }
-
-        .top-row-bar {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .guest-pill {
-            background: rgba(245, 158, 11, 0.15);
-            border: 1px solid var(--glass-border);
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 800;
-            color: var(--gold-light);
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .music-controls-row {
-            display: flex;
-            gap: 6px;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .btn-vol {
-            flex: 1;
-            height: 40px;
-            border-radius: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            background: rgba(30, 41, 59, 0.7);
-            color: #ffffff;
-            font-size: 0.75rem;
-            font-weight: 800;
-            cursor: pointer;
-            text-align: center;
-        }
-
-        .btn-vol.active {
-            background: var(--gold-main);
-            color: #030712;
-            border-color: var(--gold-light);
-            box-shadow: 0 0 12px rgba(245, 158, 11, 0.4);
-        }
-
-        .emotion-select {
-            width: 100%;
-            height: 42px;
-            padding: 0 12px;
-            border-radius: 12px;
-            border: 1px solid var(--glass-border);
-            background: rgba(15, 23, 42, 0.95);
-            color: var(--gold-light);
-            font-size: 0.85rem;
-            font-weight: 700;
-            outline: none;
-        }
-
-        /* ЦЕНТРАЛЬНАЯ РАБОЧАЯ ЗОНА ВЕДУЩЕГО С ЖИВЫМ ЭКРАНОМ */
-        #host-main-center {
-            position: fixed;
-            top: 145px; left: 12px; right: 12px; bottom: 80px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 16px;
-            transition: all 0.3s ease;
-        }
-
-        /* РЕПЛИКА ЭКРАНА ДЛЯ ВЕДУЩЕГО */
-        .live-screen-mirror {
-            width: 100%;
-            max-width: 440px;
-            height: 180px;
-            background: #000000;
-            border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            padding: 15px;
-            position: relative;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-        }
-
-        .mirror-tag {
-            position: absolute;
-            top: 10px; left: 12px;
-            font-size: 0.65rem;
-            font-weight: 800;
-            color: var(--gold-main);
-            letter-spacing: 1px;
-            text-transform: uppercase;
-        }
-
-        /* СВОРАЧИВАЕМАЯ ПАНЕЛЬ УПРАВЛЕНИЯ */
-        .host-control-card {
-            width: 100%;
-            max-width: 440px;
-            background: var(--glass-card);
-            border: 1px solid var(--glass-border);
-            border-radius: 22px;
-            padding: 18px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            transition: all 0.3s ease;
-        }
-
-        .host-control-card.collapsed {
-            position: fixed;
-            top: 14px; right: 14px;
-            width: auto;
-            max-width: 200px;
-            padding: 8px 12px;
-            z-index: 120;
-            background: rgba(15, 23, 42, 0.98);
-            border-color: var(--gold-main);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.8);
-        }
-
-        .host-control-card.collapsed .hide-on-collapse {
-            display: none !important;
-        }
-
-        /* НИЖНЯЯ ПАНЕЛЬ (FIXED BOTTOM) */
-        #host-bottom-soundboard {
-            position: fixed;
-            bottom: 0; left: 0; right: 0;
-            height: 72px;
-            background: rgba(15, 23, 42, 0.98);
-            border-top: 1px solid var(--glass-border);
-            backdrop-filter: blur(20px);
-            padding: 8px 12px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 8px;
-            z-index: 110;
-        }
-
-        .sfx-bottom-btn {
-            flex: 1;
-            height: 52px;
-            border-radius: var(--btn-radius);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            background: rgba(30, 41, 59, 0.8);
-            color: #ffffff;
-            font-size: 0.72rem;
-            font-weight: 800;
-            cursor: pointer;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 2px;
-        }
-
-        /* MODALS */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            z-index: 99999;
-            background: rgba(0, 0, 0, 0.85);
-            backdrop-filter: blur(10px);
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-
-        .modal-content {
-            background: var(--glass-card);
-            border: 1px solid var(--glass-border);
-            border-radius: 24px;
-            padding: 24px;
-            width: 100%;
-            max-width: 360px;
-            text-align: center;
-        }
-
-        .modal-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            margin-top: 16px;
-        }
-
-        /* GUEST VIEW */
-        #view-guest {
-            display: none;
-            position: fixed;
-            inset: 0;
-            z-index: 50;
-            padding: 20px;
-            text-align: center;
-            background: radial-gradient(circle at center, #0f172a 0%, var(--bg-black) 100%);
-        }
+        /* HOST DOCK */
+        #host-dock { display: none; position: fixed; bottom: 12px; left: 12px; right: 12px; height: 60px; background: rgba(15, 23, 42, 0.95); border: 1px solid var(--glass-border); border-radius: 20px; z-index: 500; align-items: center; justify-content: space-around; }
+        .dock-btn { background: transparent; border: none; color: var(--gold-light); font-weight: 700; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; gap: 5px; }
+        .widget-panel { display: none; position: fixed; bottom: 80px; left: 12px; right: 12px; background: var(--glass-card); border: 1px solid var(--glass-border); border-radius: 20px; padding: 15px; z-index: 499; }
+        
+        /* LOBBY MODAL FOR HOST */
+        #host-lobby-modal { display: none; position: fixed; inset: 0; z-index: 20000; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); align-items: center; justify-content: center; padding: 20px; }
     </style>
 </head>
 <body>
 
-    <!-- 1. SPLASH SCREEN -->
-    <div id="view-splash">
-        <div class="splash-title">EVENT OS</div>
-        <div class="splash-sub" id="splash-sub">ПРИВЕТСТВУЕТ ВАС</div>
-    </div>
+    <!-- BOOT ANIMATION -->
+    <div id="ios-boot-screen"><div class="ios-hello-text">Hello</div></div>
 
-    <!-- 2. LOGIN FORM -->
-    <div id="view-login">
-        <div class="login-card" id="login-card">
-            <div id="admin-badge" class="admin-badge">Режим управления</div>
-            <div class="brand-logo" id="brand-logo" onclick="handleLogoTap()">EVENT OS</div>
-            <p class="card-subtitle" id="card-subtitle">Введите имя для входа в лобби</p>
-            
-            <div class="input-group">
-                <input type="text" id="main-input" class="input-field" placeholder="Ваше имя" autocomplete="off" maxlength="25" onkeydown="if(event.key==='Enter') submitEntry()">
-            </div>
-            
-            <div id="error-toast" class="error-toast">Пожалуйста, используйте корректное имя</div>
-
-            <button class="ui-btn ui-btn-gold" style="width: 100%; font-size: 1.05rem;" id="btn-submit" onclick="submitEntry()">ВОЙТИ</button>
+    <!-- AUTHENTICATION -->
+    <div id="auth-overlay">
+        <div class="auth-card">
+            <div class="brand-header" onclick="handleLogoTap()">EVENT OS</div>
+            <p style="color: #94a3b8; margin: 15px 0;" id="auth-sub">Введите имя для входа</p>
+            <input type="text" id="auth-input" style="width: 100%; padding: 14px; border-radius: 12px; border: 1px solid var(--glass-border); background: rgba(0,0,0,0.5); color: #fff; text-align: center;" placeholder="Ваше имя">
+            <button onclick="submitAuth()" style="width: 100%; margin-top: 15px; padding: 14px; border-radius: 12px; border: none; background: var(--gold-main); font-weight: 800; cursor: pointer;">ВОЙТИ</button>
         </div>
     </div>
 
-    <!-- 3. SCREEN VIEW (ПРОЕКТОР) -->
-    <div id="view-screen">
-        <video id="screen-video-player" src="intro.mp4" playsinline></video>
-        <div class="screen-badge" id="screen-badge">Заставка</div>
-        <div class="screen-title" id="screen-title">Загрузка...</div>
-        <div id="screen-timer-display">00:00</div>
-    </div>
+    <!-- MAIN VIEWPORT -->
+    <div id="main-viewport"></div>
 
-    <!-- 4. HOST CONTROL VIEW (ПУЛЬТ ВЕДУЩЕГО) -->
-    <div id="view-host">
-        <!-- ВЕРХ ПАНЕЛЬ МУЗЫКИ -->
-        <div id="host-top-music">
-            <div class="top-row-bar">
-                <div class="guest-pill">👥 ГОСТЕЙ В ЛОББИ: <span id="host-guest-counter">0</span></div>
-                <button class="ui-btn" style="height: 32px; font-size: 0.7rem; padding: 0 10px;" onclick="toggleCollapsePanel()">📌 Свернуть</button>
-            </div>
-            
-            <div class="music-controls-row">
-                <button class="btn-vol" onclick="setVolume(0, this)">0%</button>
-                <button class="btn-vol" onclick="setVolume(0.2, this)">20%</button>
-                <button class="btn-vol active" onclick="setVolume(0.4, this)">40%</button>
-                <button class="btn-vol" onclick="setVolume(0.7, this)">70%</button>
-                <button class="btn-vol" onclick="setVolume(1.0, this)">100%</button>
-            </div>
+    <!-- AUDIO PLAYER (АКТИВЕН ИСКЛЮЧИТЕЛЬНО ДЛЯ РОЛИ 'SCREEN') -->
+    <audio id="bg-audio-player" loop></audio>
 
-            <select class="emotion-select" onchange="setEmotion(this.value)">
-                <option value="lounge">🍃 Настроение: Лаундж / Встреча</option>
-                <option value="dinner">🕺 Настроение: Повеселее / Банкет</option>
-                <option value="party">🎉 Настроение: Движ / Конкурсы</option>
-            </select>
-        </div>
+    <!-- SLIDING WIDGETS -->
+    <div class="widget-panel" id="panel-player"></div>
+    <div class="widget-panel" id="panel-sfx"></div>
 
-        <!-- ЦЕНТР ЗОНА ВЕДУЩЕГО С РЕПЛИКОЙ ЭКРАНА -->
-        <div id="host-main-center">
-            <!-- ДУБЛЬ ГЛАВНОГО ЭКРАНА -->
-            <div class="live-screen-mirror">
-                <span class="mirror-tag">📺 ЭКРАН В РЕАЛЕ</span>
-                <div style="font-size: 0.75rem; color: var(--gold-main); font-weight: 800; margin-bottom: 4px;" id="mirror-badge">ДО СТАРТА</div>
-                <div style="font-family: 'Cinzel', serif; font-size: 1.4rem; font-weight: 900; color: #fff;" id="mirror-title">Family Standard OS</div>
-                <div style="font-family: 'Cinzel', serif; font-size: 1.8rem; color: var(--gold-light); display: none; margin-top: 6px;" id="mirror-timer">00:00</div>
-            </div>
-
-            <!-- СВОРАЧИВАЕМАЯ ПАНЕЛЬ КНОПОК -->
-            <div class="host-control-card" id="host-control-card">
-                <button class="ui-btn ui-btn-gold hide-on-collapse" style="height: 54px; font-size: 1.1rem; width: 100%;" onclick="officialStart()">🚀 СТАРТ СОБЫТИЯ</button>
-                
-                <button class="ui-btn hide-on-collapse" style="width: 100%; border-color: var(--gold-main);" onclick="openLauncherModal()">
-                    <span>➕ Запустить модуль / Видео</span>
-                </button>
-            </div>
-        </div>
-
-        <!-- НИЗ ПАНЕЛЬ ЗВУКОВ И ТАЙМЕРА -->
-        <div id="host-bottom-soundboard">
-            <button class="ui-btn ui-btn-danger" style="flex: 1.2; height: 52px; font-size: 0.72rem; padding: 2px;" onclick="endEvent()">🛑 Завершить</button>
-            
-            <button class="sfx-bottom-btn" onclick="triggerSfx('applause')">👏 Аплодисменты</button>
-            <button class="sfx-bottom-btn" onclick="triggerSfx('fanfare')">🎉 Фанфары</button>
-            <button class="sfx-bottom-btn" onclick="triggerSfx('correct')">✅ Тыдыщ!</button>
-            <button class="sfx-bottom-btn" onclick="triggerSfx('wrong')">❌ Ошибка</button>
-            
-            <button class="sfx-bottom-btn" style="border-color: var(--gold-main);" onclick="openTimerModal()">
-                <span>⏱️ Таймер</span>
-                <span style="font-size: 0.6rem; color: var(--gold-main);" id="timer-status-btn">Стоп</span>
-            </button>
+    <!-- HOST LOBBY CONTROL MODAL -->
+    <div id="host-lobby-modal">
+        <div class="auth-card" style="max-width: 400px;">
+            <h3 style="color: var(--gold-light); font-family: 'Cinzel', serif;">👥 Управление Лобби</h3>
+            <p style="color: #94a3b8; margin: 10px 0;">Сейчас подключено гостей: <b id="modal-guest-count" style="color: #fff;">0</b></p>
+            <button onclick="socket.emit('switch_module', { module: 'lobby/lobby.html' }); closeLobbyModal();" style="width: 100%; padding: 14px; border-radius: 12px; border: none; background: var(--gold-main); font-weight: 800; cursor: pointer; margin-top: 10px;">📺 Показать Лобби на Экран</button>
+            <button onclick="closeLobbyModal()" style="width: 100%; padding: 10px; border-radius: 12px; border: none; background: transparent; color: #94a3b8; margin-top: 5px; cursor: pointer;">Закрыть</button>
         </div>
     </div>
 
-    <!-- MODAL: ТАЙМЕР -->
-    <div class="modal-overlay" id="modal-timer">
-        <div class="modal-content">
-            <h3 style="color: var(--gold-light);">⏱️ Запуск Таймера</h3>
-            <div class="modal-grid">
-                <button class="ui-btn" onclick="startTimer(30)">30 сек</button>
-                <button class="ui-btn" onclick="startTimer(60)">1 мин</button>
-                <button class="ui-btn" onclick="startTimer(120)">2 мин</button>
-                <button class="ui-btn" onclick="startTimer(300)">5 мин</button>
-            </div>
-            <button class="ui-btn ui-btn-danger" style="width: 100%; margin-top: 14px;" onclick="stopTimer()">Остановить таймер</button>
-            <button class="ui-btn" style="width: 100%; margin-top: 8px; background: transparent; border: none;" onclick="closeTimerModal()">Отмена</button>
-        </div>
-    </div>
-
-    <!-- MODAL: ЛАУНЧЕР МОДУЛЕЙ (+) -->
-    <div class="modal-overlay" id="modal-launcher">
-        <div class="modal-content">
-            <h3 style="color: var(--gold-light);">➕ Выбор модуля</h3>
-            <div class="modal-grid">
-                <button class="ui-btn" onclick="launchModule('VIDEO_INTRO')">🎬 Видео-Заставка</button>
-                <button class="ui-btn" onclick="launchModule('LOBBY')">🏠 Главный Экран</button>
-                <button class="ui-btn" onclick="launchModule('GAME')">🎮 Интерактив 1</button>
-                <button class="ui-btn" onclick="launchModule('GAME_2')">🎯 Викторина</button>
-            </div>
-            <button class="ui-btn" style="width: 100%; margin-top: 14px; background: transparent; border: none;" onclick="closeLauncherModal()">Закрыть</button>
-        </div>
-    </div>
-
-    <!-- 5. GUEST VIEW -->
-    <div id="view-guest">
-        <h2 style="color: var(--gold-light); margin-top: 60px; font-family: 'Cinzel', serif; font-size: 2.2rem;">EVENT OS</h2>
-        <p style="color: #94a3b8; margin-top: 15px; font-size: 1.1rem;" id="guest-welcome-msg">Ожидайте запуска интерактивов от Ведущего.</p>
-    </div>
+    <!-- HOST DOCK -->
+    <nav id="host-dock">
+        <button class="dock-btn" onclick="openLobbyModal()">👥 Лобби (<span id="dock-guest-count">0</span>)</button>
+        <button class="dock-btn" onclick="toggleWidget('player')">🎵 Плеер</button>
+        <button class="dock-btn" onclick="toggleWidget('sfx')">🔊 Эффекты</button>
+    </nav>
 
     <script>
-        const RENDER_SERVER_URL = "https://event-os-wqoa.onrender.com"; 
+        // Автоматическое определение хоста Render
+        const socket = io(window.location.origin, { transports: ['polling', 'websocket'] });
+        let isAdmin = false, tapCount = 0, tapTimer = null;
+        let myRole = 'GUEST';
+        let currentLoadedModule = '';
+        const bgPlayer = document.getElementById('bg-audio-player');
 
-        const socket = io(RENDER_SERVER_URL, {
-            transports: ['polling', 'websocket'],
-            reconnection: true,
-            reconnectionAttempts: 10
-        });
-
-        const PROFANITY_REGEX = /хуй|пизд|еба|еб|бля|сук|чмо|говн|урод|шлюх|пидор|гандон|fuck|shit|bitch|asshole|cunt/i;
-
-        let logoTapCount = 0;
-        let logoTapTimer = null;
-        let isAdminMode = false;
-        let timerInterval = null;
-        let currentMasterVolume = 0.4;
-
-        // --- WEB AUDIO SYNTHESIZER FOR SFX & FADEOUT ---
-        const AudioCtx = window.AudioContext || window.webkitAudioContext;
-        let audioCtx = null;
-
-        function initAudio() {
-            if (!audioCtx) audioCtx = new AudioCtx();
-        }
-
-        function playSynthSfx(type, volume) {
-            initAudio();
-            if (!audioCtx) return;
-
-            const now = audioCtx.currentTime;
-            const masterGain = audioCtx.createGain();
-            masterGain.gain.setValueAtTime(volume, now);
-            masterGain.connect(audioCtx.destination);
-
-            if (type === 'applause') {
-                for (let i = 0; i < 8; i++) {
-                    const osc = audioCtx.createOscillator();
-                    const gain = audioCtx.createGain();
-                    osc.type = 'triangle';
-                    osc.frequency.setValueAtTime(150 + Math.random() * 300, now + i * 0.1);
-                    gain.gain.setValueAtTime(0.15, now + i * 0.1);
-                    gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.1 + 0.3);
-                    osc.connect(gain);
-                    gain.connect(masterGain);
-                    osc.start(now + i * 0.1);
-                    osc.stop(now + i * 0.1 + 0.3);
-                }
-            } else if (type === 'fanfare') {
-                [523.25, 659.25, 783.99, 1046.50].forEach((freq, idx) => {
-                    const osc = audioCtx.createOscillator();
-                    const gain = audioCtx.createGain();
-                    osc.type = 'sine';
-                    osc.frequency.setValueAtTime(freq, now + idx * 0.12);
-                    gain.gain.setValueAtTime(0.3, now + idx * 0.12);
-                    gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.12 + 0.5);
-                    osc.connect(gain);
-                    gain.connect(masterGain);
-                    osc.start(now + idx * 0.12);
-                    osc.stop(now + idx * 0.12 + 0.5);
-                });
-            } else if (type === 'correct') {
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(587.33, now);
-                osc.frequency.setValueAtTime(880, now + 0.1);
-                gain.gain.setValueAtTime(0.4, now);
-                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
-                osc.connect(gain);
-                gain.connect(masterGain);
-                osc.start(now);
-                osc.stop(now + 0.4);
-            } else if (type === 'wrong') {
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(150, now);
-                osc.frequency.setValueAtTime(110, now + 0.15);
-                gain.gain.setValueAtTime(0.4, now);
-                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
-                osc.connect(gain);
-                gain.connect(masterGain);
-                osc.start(now);
-                osc.stop(now + 0.5);
-            }
-        }
-
-        // --- LOCAL STORAGE RECOVERY ---
-        socket.on('connect', () => {
-            const savedSession = localStorage.getItem('eventos_session');
-            if (savedSession) {
-                try {
-                    const sessionData = JSON.parse(savedSession);
-                    socket.emit('login', sessionData);
-                } catch(e) {
-                    localStorage.removeItem('eventos_session');
-                }
-            }
-        });
+        setTimeout(() => {
+            document.getElementById('ios-boot-screen').style.opacity = '0';
+            setTimeout(() => document.getElementById('ios-boot-screen').style.display = 'none', 1000);
+        }, 2500);
 
         function handleLogoTap() {
-            logoTapCount++;
-            clearTimeout(logoTapTimer);
-
-            const logo = document.getElementById('brand-logo');
-            if (logo) logo.style.transform = `scale(${1 + logoTapCount * 0.05})`;
-
-            if (logoTapCount >= 5) {
-                toggleAdminMode();
-                logoTapCount = 0;
-                if (logo) logo.style.transform = 'scale(1)';
-            } else {
-                logoTapTimer = setTimeout(() => {
-                    logoTapCount = 0;
-                    if (logo) logo.style.transform = 'scale(1)';
-                }, 1500);
-            }
+            tapCount++; clearTimeout(tapTimer);
+            if (tapCount >= 5) {
+                isAdmin = !isAdmin;
+                document.getElementById('auth-sub').innerText = isAdmin ? "Режим управления (ПИН)" : "Введите имя";
+                document.getElementById('auth-input').type = isAdmin ? "password" : "text";
+                tapCount = 0;
+            } else { tapTimer = setTimeout(() => tapCount = 0, 1500); }
         }
 
-        function toggleAdminMode() {
-            isAdminMode = !isAdminMode;
-            const badge = document.getElementById('admin-badge');
-            const subtitle = document.getElementById('card-subtitle');
-            const input = document.getElementById('main-input');
-            const toast = document.getElementById('error-toast');
-
-            if (toast) toast.style.display = 'none';
-            if (input) input.value = '';
-
-            if (isAdminMode) {
-                if (badge) badge.style.display = 'inline-block';
-                if (subtitle) {
-                    subtitle.innerText = 'Режим управления';
-                    subtitle.style.color = '#f59e0b';
-                }
-                if (input) {
-                    input.placeholder = 'Код доступа';
-                    input.type = 'password';
-                    input.focus();
-                }
-            } else {
-                if (badge) badge.style.display = 'none';
-                if (subtitle) {
-                    subtitle.innerText = 'Введите имя для входа в лобби';
-                    subtitle.style.color = '#94a3b8';
-                }
-                if (input) {
-                    input.placeholder = 'Ваше имя';
-                    input.type = 'text';
-                }
-            }
+        function submitAuth() {
+            const val = document.getElementById('auth-input').value.trim();
+            if (val) socket.emit('login', isAdmin ? { pin: val } : { name: val });
         }
 
-        function submitEntry() {
-            const inputEl = document.getElementById('main-input');
-            const val = inputEl ? inputEl.value.trim() : '';
-
-            if (!val) {
-                showError('Поле не может быть пустым');
-                return;
-            }
-
-            if (!isAdminMode && PROFANITY_REGEX.test(val)) {
-                showError('Пожалуйста, используйте корректное имя');
-                return;
-            }
-
-            const payload = isAdminMode ? { pin: val } : { name: val };
-            localStorage.setItem('eventos_session', JSON.stringify(payload));
-            socket.emit('login', payload);
-        }
-
-        function showError(msg) {
-            const errorToast = document.getElementById('error-toast');
-            const loginCard = document.getElementById('login-card');
-
-            if (errorToast) {
-                errorToast.innerText = msg;
-                errorToast.style.display = 'block';
-            }
-
-            if (loginCard) {
-                loginCard.classList.remove('shake');
-                void loginCard.offsetWidth;
-                loginCard.classList.add('shake');
-
-                setTimeout(() => {
-                    loginCard.classList.remove('shake');
-                }, 500);
-            }
-        }
-
-        socket.on('login_response', (data) => {
-            if (data.success) {
-                document.getElementById('view-login').style.display = 'none';
-
-                const splash = document.getElementById('view-splash');
-                const splashSub = document.getElementById('splash-sub');
-                if (splash) splash.style.display = 'flex';
-
-                setTimeout(() => {
-                    if (splashSub) splashSub.innerText = 'HELLO';
-                }, 800);
-
-                setTimeout(() => {
-                    if (splash) splash.style.display = 'none';
-
-                    if (data.role === 'HOST') {
-                        document.getElementById('view-screen').style.display = 'flex';
-                        document.getElementById('view-host').style.display = 'block';
-                    } else if (data.role === 'SCREEN') {
-                        document.getElementById('view-screen').style.display = 'flex';
-                    } else {
-                        document.getElementById('view-guest').style.display = 'block';
-                        if (data.name) {
-                            document.getElementById('guest-welcome-msg').innerText = `Привет, ${data.name}! Вы в лобби вечера.`;
-                        }
-                    }
-                }, 1600);
-
-            } else {
-                localStorage.removeItem('eventos_session');
-                showError(data.message || 'Неверный код доступа');
+        socket.on('login_response', (res) => {
+            if (res.success) {
+                myRole = res.role;
+                document.getElementById('auth-overlay').style.display = 'none';
+                if (myRole === 'HOST') {
+                    document.getElementById('host-dock').style.display = 'flex';
+                    fetchWidget('player', '/modules/player/player.html');
+                    fetchWidget('sfx', '/modules/soundboard/soundboard.html');
+                }
             }
         });
 
         socket.on('state_update', (state) => {
-            currentMasterVolume = state.audio_volume;
-
-            // ОБНОВЛЕНИЕ ГЛАВНОГО ЭКРАНА
-            if (state.screen_text) document.getElementById('screen-title').innerText = state.screen_text;
-            if (state.screen_badge) document.getElementById('screen-badge').innerText = state.screen_badge;
-
-            // ОБНОВЛЕНИЕ РЕПЛИКИ У ВЕДУЩЕГО
-            if (state.screen_text) document.getElementById('mirror-title').innerText = state.screen_text;
-            if (state.screen_badge) document.getElementById('mirror-badge').innerText = state.screen_badge;
-
             if (state.guest_count !== undefined) {
-                document.getElementById('host-guest-counter').innerText = state.guest_count;
+                document.getElementById('dock-guest-count').innerText = state.guest_count;
+                document.getElementById('modal-guest-count').innerText = state.guest_count;
             }
 
-            // Видео
-            const videoEl = document.getElementById('screen-video-player');
-            if (videoEl) {
-                if (state.video_playing) {
-                    videoEl.style.display = 'block';
-                    videoEl.play().catch(() => {});
+            if (state.active_module && currentLoadedModule !== state.active_module) {
+                loadModuleContent(state.active_module);
+            }
+
+            // ЗВУК ИГРАЕТ ТОЛЬКО НА РОЛИ SCREEN
+            if (myRole === 'SCREEN') {
+                if (bgPlayer.src !== window.location.origin + state.current_track) {
+                    bgPlayer.src = state.current_track;
+                }
+                bgPlayer.volume = state.audio_volume;
+
+                if (state.is_playing) {
+                    bgPlayer.play().catch(() => {});
                 } else {
-                    videoEl.style.display = 'none';
-                    videoEl.pause();
+                    bgPlayer.pause();
                 }
             }
+        });
 
-            // Таймер
-            const timerDisplay = document.getElementById('screen-timer-display');
-            const mirrorTimer = document.getElementById('mirror-timer');
-
-            if (state.timer && state.timer.active) {
-                if (timerDisplay) timerDisplay.style.display = 'block';
-                if (mirrorTimer) mirrorTimer.style.display = 'block';
-
-                clearInterval(timerInterval);
-                timerInterval = setInterval(() => {
-                    const remaining = Math.max(0, Math.round(state.timer.end_time - (Date.now() / 1000)));
-                    const mins = String(Math.floor(remaining / 60)).padStart(2, '0');
-                    const secs = String(remaining % 60).padStart(2, '0');
-                    
-                    const timeStr = `${mins}:${secs}`;
-                    if (timerDisplay) timerDisplay.innerText = timeStr;
-                    if (mirrorTimer) mirrorTimer.innerText = timeStr;
-                    document.getElementById('timer-status-btn').innerText = timeStr;
-
-                    if (remaining <= 0) {
-                        clearInterval(timerInterval);
-                        socket.emit('timer_expired_auto');
-                    }
-                }, 1000);
-            } else {
-                clearInterval(timerInterval);
-                if (timerDisplay) timerDisplay.style.display = 'none';
-                if (mirrorTimer) mirrorTimer.style.display = 'none';
-                document.getElementById('timer-status-btn').innerText = 'Стоп';
+        // ЭФФЕКТЫ ИГРАЮТ ТОЛЬКО НА РОЛИ SCREEN
+        socket.on('play_sfx_stream', (data) => {
+            if (myRole === 'SCREEN') {
+                const sfxAudio = new Audio(data.file);
+                sfxAudio.volume = data.volume;
+                sfxAudio.play().catch(() => {});
             }
         });
 
-        socket.on('play_sfx_on_screen', (data) => {
-            playSynthSfx(data.sfx, data.volume || currentMasterVolume);
-        });
-
-        socket.on('trigger_fadeout_audio', () => {
-            let vol = currentMasterVolume;
-            const fadeInterval = setInterval(() => {
-                vol -= 0.05;
-                if (vol <= 0) {
-                    vol = 0;
-                    clearInterval(fadeInterval);
+        async function loadModuleContent(modulePath) {
+            currentLoadedModule = modulePath;
+            try {
+                const res = await fetch(`/modules/${modulePath}`);
+                if (res.ok) {
+                    document.getElementById('main-viewport').innerHTML = await res.text();
                 }
-                socket.emit('host_audio_control', { volume: vol });
-            }, 300);
-        });
-
-        // --- ДЕЙСТВИЯ ВЕДУЩЕГО ---
-        function officialStart() {
-            socket.emit('host_official_start');
-            collapsePanel();
+            } catch(e) { console.error("Ошибка загрузки модуля:", e); }
         }
 
-        function endEvent() {
-            if (confirm("Завершить событие и затушить звук?")) {
-                socket.emit('host_end_event');
-            }
+        async function fetchWidget(id, url) {
+            const res = await fetch(url);
+            if (res.ok) document.getElementById(`panel-${id}`).innerHTML = await res.text();
         }
 
-        function toggleCollapsePanel() {
-            const card = document.getElementById('host-control-card');
-            card.classList.toggle('collapsed');
+        function toggleWidget(id) {
+            const el = document.getElementById(`panel-${id}`);
+            const isVis = el.style.display === 'block';
+            document.querySelectorAll('.widget-panel').forEach(p => p.style.display = 'none');
+            if (!isVis) el.style.display = 'block';
         }
 
-        function collapsePanel() {
-            document.getElementById('host-control-card').classList.add('collapsed');
-        }
-
-        function setVolume(vol, btn) {
-            document.querySelectorAll('.btn-vol').forEach(b => b.classList.remove('active'));
-            if (btn) btn.classList.add('active');
-            socket.emit('host_audio_control', { volume: vol });
-        }
-
-        function setEmotion(emotion) {
-            socket.emit('host_audio_control', { emotion: emotion });
-        }
-
-        function triggerSfx(sfxType) {
-            const randomVar = Math.floor(Math.random() * 5) + 1;
-            socket.emit('host_trigger_sfx', { sfx: sfxType, variation: randomVar });
-        }
-
-        // ТАЙМЕР
-        function openTimerModal() { document.getElementById('modal-timer').style.display = 'flex'; }
-        function closeTimerModal() { document.getElementById('modal-timer').style.display = 'none'; }
-        function startTimer(sec) {
-            socket.emit('host_start_timer', { seconds: sec });
-            closeTimerModal();
-            collapsePanel();
-        }
-        function stopTimer() {
-            socket.emit('host_stop_timer');
-            closeTimerModal();
-        }
-
-        // ЛАУНЧЕР
-        function openLauncherModal() { document.getElementById('modal-launcher').style.display = 'flex'; }
-        function closeLauncherModal() { document.getElementById('modal-launcher').style.display = 'none'; }
-        function launchModule(mod) {
-            socket.emit('host_launch_module', { module: mod });
-            closeLauncherModal();
-            collapsePanel();
-        }
+        function openLobbyModal() { document.getElementById('host-lobby-modal').style.display = 'flex'; }
+        function closeLobbyModal() { document.getElementById('host-lobby-modal').style.display = 'none'; }
     </script>
 </body>
 </html>
