@@ -1,12 +1,12 @@
 import os
 import json
-from flask import Flask, render_template, send_from_directory, request
+from flask import Flask, render_template
 from flask_socketio import SocketIO, emit
 
-app = Flask(__name__)
+# template_folder='.' говорит Фласку искать HTML прямо в этой же папке
+app = Flask(__name__, template_folder='.')
 socketio = SocketIO(app, cors_allowed_origins="*")
 
-# Загрузка конфигурации ивента
 CONFIG_FILE = 'event_data.json'
 
 def load_event_config():
@@ -17,7 +17,6 @@ def load_event_config():
 
 event_config = load_event_config()
 
-# Глобальное состояние системы Event OS
 system_state = {
     "active_module": None,
     "audio_volume": 0.4,
@@ -26,15 +25,10 @@ system_state = {
     "screen_badge": "ДО СТАРТА"
 }
 
+# Открывается СРАЗУ на главной странице /
 @app.route('/')
 def home():
-    # Главная страница (по умолчанию можно отдавать тот же eventos или лендинг)
-    return render_template('eventos.html')
-
-@app.route('/eventos')
-def eventos():
-    # Скрытая страница Event OS
-    return render_template('eventos.html')
+    return render_template('index.html')
 
 @socketio.on('connect')
 def handle_connect():
