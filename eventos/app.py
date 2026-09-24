@@ -1,7 +1,7 @@
 import os
 import json
 import time
-from flask import Flask, render_template, send_from_directory, request
+from flask import Flask, render_template, send_from_directory, request, jsonify
 from flask_socketio import SocketIO, emit
 
 app = Flask(__name__, template_folder='.', static_folder='.')
@@ -42,6 +42,11 @@ def clean_timer_state():
 @app.route('/')
 def index():
     return render_template('index.html')
+
+# ВОТ ТОТ САМЫЙ МАРШРУТ, КОТОРЫЙ Я СЛУЧАЙНО УДАЛИЛ (Исправляет ошибку 404)
+@app.route('/ping')
+def ping():
+    return jsonify({"status": "ok", "system": "Event OS Core Active"}), 200
 
 @app.route('/<path:filename>')
 def serve_file(filename):
