@@ -17,9 +17,8 @@ def load_config():
         return {"cdn_base_url": "https://pub-372ba5f717cf4a8694558f47682d65d9.r2.dev/", "modules": []}
 
 config = load_config()
-
-# Очередь для эффектов (1 -> 2 -> 3)
 sfx_counters = {"fanfare": 0, "applause": 0, "correct": 0, "wrong": 0}
+track_positions = {"lounge.mp3": 0.0, "active.mp3": 0.0, "party.mp3": 0.0}
 
 system_state = {
     "active_module": "",
@@ -34,6 +33,12 @@ system_state = {
     "timer": {"active": False, "end_time": 0}
 }
 
+# АБСОЛЮТНАЯ ЗАЧИСТКА МЕРТВОГО ТАЙМЕРА (чтобы не всплывал)
+def clean_timer_state():
+    if system_state['timer']['active'] and system_state['timer']['end_time'] <= time.time():
+        system_state['timer']['active'] = False
+        system_state['timer']['end_time'] = 0
+
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -44,6 +49,7 @@ def serve_file(filename):
 
 @socketio.on('connect')
 def handle_connect():
+    clean_timer_state()
     emit('state_update', system_state)
     emit('modules_config_update', config.get('modules', []))
 
@@ -59,6 +65,7 @@ def handle_login(data):
 
 @socketio.on('switch_module')
 def switch_module(data):
+    clean_timer_state()
     system_state['active_module'] = data.get('module', '')
     socketio.emit('state_update', system_state)
 
@@ -72,32 +79,49 @@ def add_timer():
         system_state['timer']['end_time'] = now + 10
     socketio.emit('state_update', system_state)
 
-# Получили сигнал от экрана, что таймер кончился — вырубаем его у всех
 @socketio.on('timer_done')
 def timer_done():
     system_state['timer']['active'] = False
+    system_state['timer']['end_time'] = 0
     socketio.emit('state_update', system_state)
 
 @socketio.on('host_audio_control')
 def audio_control(data):
+    clean_timer_state()
+    curr_track = system_state['current_track']
+
     if 'volume' in data:
         system_state['audio_volume'] = float(data['volume'])
-    if 'seek' in data:
-        system_state['seek_position'] = float(data['seek'])
+    
+    # Относительная перемотка (+30 сек или -30 сек)
+    if 'seek_relative' in data:
+        new_seek = system_state['seek_position'] + float(data['seek_relative'])
+        if new_seek < 0: new_seek = 0
+        if system_state['track_duration'] > 0 and new_seek > system_state['track_duration']:
+            new_seek = system_state['track_duration'] - 5
+        system_state['seek_position'] = new_seek
+        track_positions[curr_track] = new_seek
+
     if 'toggle_play' in data:
         system_state['is_playing'] = not system_state['is_playing']
+
     if 'mood' in data:
         system_state['current_mood'] = data['mood']
         system_state['current_track'] = f"{data['mood']}.mp3"
         system_state['is_playing'] = True
-        system_state['seek_position'] = 0.0
+        system_state['seek_position'] = track_positions.get(f"{data['mood']}.mp3", 0.0)
+
     socketio.emit('state_update', system_state)
 
-# Экран скидывает длину трека при загрузке
 @socketio.on('sync_duration')
 def sync_duration(data):
     system_state['track_duration'] = float(data['duration'])
-    socketio.emit('state_update', system_state)
+
+@socketio.on('screen_sync_time')
+def screen_sync_time(data):
+    if system_state['is_playing']:
+        system_state['seek_position'] = float(data['current_time'])
+        track_positions[system_state['current_track']] = float(data['current_time'])
 
 @socketio.on('host_trigger_sfx')
 def trigger_sfx(data):
@@ -107,9 +131,7 @@ def trigger_sfx(data):
         var_id = sfx_counters[sfx]
     else:
         var_id = 1
-    
-    file_name = f"{sfx}_{var_id}.mp3"
-    socketio.emit('play_sfx_stream', {'file': file_name})
+    socketio.emit('play_sfx_stream', {'file': f"{sfx}_{var_id}.mp3"})
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 10000))
