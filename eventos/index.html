@@ -23,7 +23,7 @@
             --glass-border: rgba(229, 231, 235, 0.25);
             --danger-red: #ef4444;
             --ios-font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Plus Jakarta Sans", sans-serif;
-            --top-height: 110px;
+            --top-height: 125px;
             --bottom-height: 110px;
         }
 
@@ -38,7 +38,7 @@
         #particles-canvas { position: fixed; inset: 0; z-index: 1; pointer-events: none; }
         .bg-glow { position: fixed; inset: 0; z-index: 2; background: radial-gradient(circle at 50% 50%, rgba(245, 158, 11, 0.1) 0%, rgba(3, 7, 18, 0.96) 75%, #000000 100%); pointer-events: none; }
 
-        /* HELLO OVERLAY */
+        /* HELLO OVERLAY (ПОКАЗЫВАЕТСЯ ТОЛЬКО ПОСЛЕ ВХОДА) */
         #hello-overlay {
             display: none; position: fixed; inset: 0; z-index: 99999; background: #000000;
             align-items: center; justify-content: center; opacity: 1; transition: opacity 0.6s ease;
@@ -52,8 +52,11 @@
         }
         @keyframes helloPulse { 0% { opacity: 0; transform: scale(0.8); } 50% { opacity: 1; transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
 
-        /* AUTH CARD (ПРОСТОЙ ВХОД НА ПК И ТЕЛЕФОНЕ) */
-        #auth-overlay { position: fixed; inset: 0; z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        /* AUTH CARD (ВСЕГДА ВИДНА ДО ВХОДА) */
+        #auth-overlay { 
+            position: fixed; inset: 0; z-index: 10000; 
+            display: flex; align-items: center; justify-content: center; padding: 20px; 
+        }
         .auth-card {
             background: var(--glass-card); border: 1px solid var(--glass-border); padding: 36px 28px;
             border-radius: 28px; width: 100%; max-width: 360px; text-align: center;
@@ -91,7 +94,7 @@
         }
         .btn-gold:active { transform: scale(0.97); }
 
-        /* HOST TOP BAR */
+        /* HOST TOP BAR (AUDIO CONTROL + TRACK SOUNDBAR) */
         #host-top-bar {
             display: none; position: fixed; top: 0; left: 0; right: 0; height: var(--top-height); z-index: 500;
             background: rgba(15, 23, 42, 0.96); border-bottom: 1px solid var(--glass-border);
@@ -109,6 +112,13 @@
             border-color: #ffffff; box-shadow: 0 0 15px var(--gold-glow); 
         }
 
+        /* SOUNDBAR TRACK DISPLAY */
+        .track-info-bar {
+            display: flex; align-items: center; justify-content: space-between;
+            background: rgba(3, 7, 18, 0.6); border: 1px solid rgba(245, 158, 11, 0.2);
+            border-radius: 8px; padding: 4px 10px; font-size: 0.75rem; color: var(--gold-light); font-weight: 700;
+        }
+
         .seek-container { display: flex; align-items: center; gap: 8px; width: 100%; margin: 1px 0; }
         .btn-play-pause {
             width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--glass-border);
@@ -124,11 +134,11 @@
             background: var(--gold-main); cursor: pointer; box-shadow: 0 0 10px var(--gold-main);
         }
 
-        .eq-bar-container { display: flex; align-items: flex-end; gap: 3px; height: 14px; }
+        .eq-bar-container { display: flex; align-items: flex-end; gap: 3px; height: 12px; }
         .eq-bar { width: 3px; background: var(--gold-main); border-radius: 2px; animation: eqAnim 1s ease-in-out infinite alternate; }
         .eq-bar:nth-child(2) { animation-delay: 0.2s; }
         .eq-bar:nth-child(3) { animation-delay: 0.4s; }
-        @keyframes eqAnim { 0% { height: 3px; } 100% { height: 14px; } }
+        @keyframes eqAnim { 0% { height: 3px; } 100% { height: 12px; } }
 
         /* HOST BOTTOM BAR */
         #host-bottom-bar {
@@ -213,7 +223,7 @@
 
         /* MAIN DISPLAY COUNTDOWN TIMER BADGE */
         #main-timer-badge {
-            display: none; position: fixed; top: 125px; z-index: 100;
+            display: none; position: fixed; top: 135px; z-index: 100;
             background: rgba(15, 23, 42, 0.92); border: 2px solid var(--gold-main);
             color: var(--gold-light); padding: 12px 28px; border-radius: 20px;
             font-family: 'Cinzel', serif; font-size: 2rem; font-weight: 900;
@@ -229,10 +239,10 @@
     <canvas id="particles-canvas"></canvas>
     <div class="bg-glow"></div>
 
-    <!-- HELLO OVERLAY -->
+    <!-- HELLO OVERLAY (ПОКАЗЫВАЕТСЯ ТОЛЬКО ПОСЛЕ УСПЕШНОГО ВХОДА) -->
     <div id="hello-overlay"><div class="hello-title">Hello</div></div>
 
-    <!-- AUTH CARD -->
+    <!-- AUTH CARD (ВСЕГДА ВИДНА ДО ВХОДА) -->
     <div id="auth-overlay">
         <div class="auth-card" id="auth-card">
             <div class="brand-header">EVENT OS</div>
@@ -245,23 +255,28 @@
 
     <!-- HOST TOP CONTROL BAR -->
     <div id="host-top-bar">
-        <div class="control-row">
-            <div class="eq-bar-container">
-                <div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div>
+        <div class="track-info-bar">
+            <div style="display: flex; align-items: center; gap: 6px;">
+                <div class="eq-bar-container">
+                    <div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div>
+                </div>
+                <span id="host-track-name">🍃 Лаундж (lounge.mp3)</span>
             </div>
-            
-            <span style="font-size: 0.72rem; color: var(--gold-light); font-weight: 800; margin-left: auto;">ГРОМКОСТЬ:</span>
+            <span id="host-time-display">00:00 / 00:00</span>
+        </div>
+
+        <div class="seek-container">
+            <button class="btn-play-pause" id="btn-play-toggle" onclick="togglePlayPause()">⏸</button>
+            <input type="range" id="host-seek-bar" class="seek-bar" min="0" max="100" value="0" oninput="isUserSeeking=true" onchange="seekAudioTrack(this.value)">
+        </div>
+
+        <div class="control-row">
+            <span style="font-size: 0.7rem; color: var(--gold-light); font-weight: 800; margin-right: 4px;">ГРОМКОСТЬ:</span>
             <button class="btn-control" onclick="setVolumeSmooth(0.1, this)">10%</button>
             <button class="btn-control" onclick="setVolumeSmooth(0.2, this)">20%</button>
             <button class="btn-control active" onclick="setVolumeSmooth(0.3, this)">30%</button>
             <button class="btn-control" onclick="setVolumeSmooth(0.6, this)">60%</button>
             <button class="btn-control" onclick="setVolumeSmooth(1.0, this)">100%</button>
-        </div>
-
-        <div class="seek-container">
-            <button class="btn-play-pause" id="btn-play-toggle" onclick="togglePlayPause()">⏸</button>
-            <span style="font-size: 0.68rem; color: #94a3b8; font-weight: 700;">ПЕРЕМОТКА:</span>
-            <input type="range" id="host-seek-bar" class="seek-bar" min="0" max="180" value="0" onchange="seekAudioTrack(this.value)">
         </div>
 
         <div class="control-row">
@@ -293,7 +308,7 @@
         </div>
     </div>
 
-    <!-- END EVENT CONFIRM MODAL (ОТКРЫВАЕТСЯ ПО ТРОЙНОМУ КЛИКУ НА ЗАКРЫТЬ) -->
+    <!-- END EVENT CONFIRM MODAL -->
     <div class="modal-overlay" id="end-event-modal">
         <div class="modal-card">
             <h3 style="color: var(--gold-light); font-family: 'Cinzel', serif; font-size: 1.2rem;">🏁 Завершить весь праздник?</h3>
@@ -343,11 +358,11 @@
         let myRole = 'GUEST';
         let currentLoadedModule = '';
         let availableModules = [];
-        let activePin = '';
         let timerInterval = null;
 
         let closeClickCount = 0;
         let closeClickTimer = null;
+        let isUserSeeking = false;
 
         const audioA = document.getElementById('audio-a');
         const audioB = document.getElementById('audio-b');
@@ -394,19 +409,16 @@
         }
         requestAnimationFrame(animateParticles);
 
-        // --- 2. AUTO SESSION RESTORE ---
-        socket.on('connect', () => {
-            const savedSession = localStorage.getItem('eventos_active_session');
-            if (savedSession) {
-                try {
-                    const sessData = JSON.parse(savedSession);
-                    if (sessData.pin) {
-                        activePin = sessData.pin;
-                        socket.emit('login', { pin: sessData.pin });
-                    }
-                } catch(e) {}
-            }
-        });
+        // --- 2. МГНОВЕННОЕ СКАТИВАНИЕ (КЭШИРОВАНИЕ) ВСЕХ ТРЕКОВ НА ЭКРАНЕ ПРОЕКТОРА ---
+        function preloadAllTracks() {
+            const tracks = ['lounge.mp3', 'active.mp3', 'party.mp3'];
+            tracks.forEach(track => {
+                const a = new Audio();
+                a.src = CDN_BASE_URL + track;
+                a.preload = 'auto';
+                a.crossOrigin = 'anonymous';
+            });
+        }
 
         function triggerErrorShake() {
             const card = document.getElementById('auth-card');
@@ -428,21 +440,20 @@
                 return;
             }
 
-            activePin = val;
             socket.emit('login', { pin: val });
         }
 
-        // --- 3. SOCKET RESPONSES & HELLO SPLASH ---
+        // --- 3. SOCKET RESPONSES & HELLO OVERLAY ---
         socket.on('login_response', (res) => {
             if (res.success) {
                 myRole = res.role;
-                
-                localStorage.setItem('eventos_active_session', JSON.stringify({
-                    role: myRole,
-                    pin: activePin
-                }));
 
-                // ЭФФЕКТ HELLO
+                // СКАТИВАЕМ МУЗЫКУ ДЛЯ ЭКРАНА
+                if (myRole === 'SCREEN') {
+                    preloadAllTracks();
+                }
+
+                // ПОКАЗЫВАЕМ ПЛАВНЫЙ ЭКРАН "HELLO"
                 const hello = document.getElementById('hello-overlay');
                 document.getElementById('auth-overlay').style.display = 'none';
                 hello.style.display = 'flex';
@@ -457,6 +468,7 @@
                             document.body.classList.add('is-host');
                             document.getElementById('host-top-bar').style.display = 'flex';
                             document.getElementById('host-bottom-bar').style.display = 'flex';
+                            startHostAudioTimer();
                         } else if (myRole === 'SCREEN') {
                             document.body.classList.add('is-screen');
                         }
@@ -464,9 +476,8 @@
                 }, 1000);
 
             } else {
-                localStorage.removeItem('eventos_active_session');
                 triggerErrorShake();
-                alert(res.message || 'Ошибка доступа');
+                alert(res.message || 'Неверный PIN-код');
             }
         });
 
@@ -491,6 +502,29 @@
             });
         }
 
+        function formatTime(secs) {
+            if (isNaN(secs) || secs < 0) return "00:00";
+            const m = Math.floor(secs / 60);
+            const s = Math.floor(secs % 60);
+            return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+        }
+
+        function startHostAudioTimer() {
+            setInterval(() => {
+                if (myRole === 'HOST' && activeAudio) {
+                    const cur = activeAudio.currentTime || 0;
+                    const dur = activeAudio.duration || 180;
+                    document.getElementById('host-time-display').innerText = `${formatTime(cur)} / ${formatTime(dur)}`;
+                    
+                    if (!isUserSeeking) {
+                        const seekBar = document.getElementById('host-seek-bar');
+                        seekBar.max = Math.floor(dur);
+                        seekBar.value = Math.floor(cur);
+                    }
+                }
+            }, 500);
+        }
+
         socket.on('state_update', (state) => {
             if (state.event_title) document.getElementById('display-title').innerText = state.event_title;
             if (state.event_subtitle) document.getElementById('display-subtitle').innerText = state.event_subtitle;
@@ -503,16 +537,19 @@
                 loadModuleIframe(state.active_module);
             }
 
-            // ОБРАБОТКА ТАЙМЕРА (ОТОБРАЖАЕТСЯ НА ГЛАВНОМ ЭКРАНЕ)
+            // ОБНОВЛЕНИЕ ИНФОРМАЦИИ О ТРЕКЕ У ВЕДУЩЕГО
+            const trackTitles = { "lounge.mp3": "🍃 Лаундж", "active.mp3": "🕺 Банкет", "party.mp3": "🎉 Движ" };
+            const titleEl = document.getElementById('host-track-name');
+            if (titleEl) titleEl.innerText = `${trackTitles[state.current_track] || 'Музыка'} (${state.current_track})`;
+
+            // ОБРАБОТКА ТАЙМЕРА НА ГЛАВНОМ ЭКРАНЕ
             const timerBadge = document.getElementById('main-timer-badge');
             if (state.timer && state.timer.active) {
                 timerBadge.style.display = 'block';
                 clearInterval(timerInterval);
                 timerInterval = setInterval(() => {
                     const remaining = Math.max(0, Math.round(state.timer.end_time - (Date.now() / 1000)));
-                    const mins = String(Math.floor(remaining / 60)).padStart(2, '0');
-                    const secs = String(remaining % 60).padStart(2, '0');
-                    document.getElementById('timer-val').innerText = `${mins}:${secs}`;
+                    document.getElementById('timer-val').innerText = formatTime(remaining);
                     if (remaining <= 0) {
                         clearInterval(timerInterval);
                         if (myRole === 'SCREEN') triggerSfx('fanfare');
@@ -524,7 +561,7 @@
                 document.getElementById('timer-val').innerText = '00:10';
             }
 
-            // ЗВУК И КРОССФЕЙД МУЗЫКИ НА ЭКРАНЕ ПРОЕКТОРА
+            // ЗВУК И ПЕРЕМОТКА НА ЭКРАНЕ
             if (myRole === 'SCREEN') {
                 const trackUrl = CDN_BASE_URL + state.current_track;
                 const targetTime = state.seek_position || 0;
@@ -532,19 +569,18 @@
                 const btnPlay = document.getElementById('btn-play-toggle');
                 if (btnPlay) btnPlay.innerText = state.is_playing ? '⏸' : '▶';
 
-                if (activeAudio.src !== trackUrl || Math.abs(activeAudio.currentTime - targetTime) > 3) {
+                if (activeAudio.src !== trackUrl) {
                     performAudioCrossfade(trackUrl, targetTime);
                 } else {
-                    if (state.is_playing && activeAudio.paused) {
-                        smoothFadePlay();
-                    } else if (!state.is_playing && !activeAudio.paused) {
-                        smoothFadePause();
+                    if (Math.abs(activeAudio.currentTime - targetTime) > 2) {
+                        activeAudio.currentTime = targetTime;
                     }
+                    if (state.is_playing && activeAudio.paused) smoothFadePlay();
+                    else if (!state.is_playing && !activeAudio.paused) smoothFadePause();
                 }
             }
         });
 
-        // ПЛАВНАЯ СМЕНА РЕЖИМОВ МУЗЫКИ С СОХРАНЕНИЕМ ПОЗИЦИИ
         function setMood(mood) {
             socket.emit('host_audio_control', {
                 mood: mood,
@@ -552,7 +588,11 @@
             });
         }
 
-        // ПЛАВНАЯ ПЕРЕМОТКА И КРОССФЕЙД (БЕЗ СБРОСА ОБЛАЧНОГО ТРЕКА)
+        function seekAudioTrack(val) {
+            isUserSeeking = false;
+            socket.emit('host_audio_control', { seek: parseFloat(val) });
+        }
+
         function performAudioCrossfade(newTrackUrl, targetTime) {
             inactiveAudio.src = newTrackUrl;
             inactiveAudio.crossOrigin = "anonymous";
@@ -564,8 +604,7 @@
                     inactiveAudio.currentTime = targetTime;
                 }
                 inactiveAudio.play().then(() => {
-                    let step = 0;
-                    const steps = 20;
+                    let step = 0; const steps = 20;
                     const crossfadeInterval = setInterval(() => {
                         step++;
                         const progress = step / steps;
@@ -663,7 +702,6 @@
             }
         }
 
-        // --- 4. ЗАКРЫТИЕ И ТРОЙНОЙ КЛИК НА ЗАКРЫТЬ ---
         function handleCloseInteractiveClick() {
             socket.emit('switch_module', { module: '' });
 
@@ -684,7 +722,6 @@
             socket.emit('host_audio_control', { volume: vol });
         }
 
-        function seekAudioTrack(seekTimeSeconds) { socket.emit('host_audio_control', { seek: seekTimeSeconds }); }
         function togglePlayPause() { socket.emit('host_audio_control', { toggle_play: true }); }
         function triggerSfx(sfxType) { socket.emit('host_trigger_sfx', { sfx: sfxType }); }
         function addTimer10s() { socket.emit('add_timer_10s'); }
@@ -698,7 +735,6 @@
         function confirmEndEvent() {
             socket.emit('switch_module', { module: '' });
             socket.emit('host_audio_control', { volume: 0 });
-            localStorage.removeItem('eventos_active_session');
             location.reload();
         }
     </script>
