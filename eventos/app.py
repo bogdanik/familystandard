@@ -1,5 +1,6 @@
 import os
 import json
+import time
 import random
 from flask import Flask, render_template, jsonify, send_from_directory, request
 from flask_socketio import SocketIO, emit
@@ -28,6 +29,7 @@ def load_config():
         "host_name": "Богдан", 
         "host_pin": "111", 
         "screen_pin": "222",
+        "cdn_base_url": "https://pub-372ba5f717cf4a8694558f47682d65d9.r2.dev/",
         "modules": []
     }
 
@@ -41,12 +43,11 @@ system_state = {
     "event_subtitle": config_data.get("event_subtitle", "С праздником!"),
     "audio_volume": 0.3,
     "current_mood": "lounge",
-    "current_track": "/lounge.mp3",
-    "is_playing": False,
-    "seek_position": 0
+    "current_track": "lounge.mp3",
+    "is_playing": True,
+    "seek_position": 0,
+    "timer": {"active": False, "end_time": 0}
 }
-
-# --- МАРШРУТИЗАЦИЯ ---
 
 @app.route('/')
 def index():
@@ -97,6 +98,23 @@ def handle_switch_module(data):
     system_state['active_module'] = module_path
     socketio.emit('state_update', system_state)
 
+# ИНКРЕМЕНТАЛЬНЫЙ ТАЙМЕР +10 СЕКУНД
+@socketio.on('add_timer_10s')
+def handle_add_timer_10s():
+    now = time.time()
+    if system_state['timer']['active'] and system_state['timer']['end_time'] > now:
+        system_state['timer']['end_time'] += 10
+    else:
+        system_state['timer']['active'] = True
+        system_state['timer']['end_time'] = now + 10
+
+    socketio.emit('state_update', system_state)
+
+@socketio.on('stop_timer')
+def handle_stop_timer():
+    system_state['timer']['active'] = False
+    socketio.emit('state_update', system_state)
+
 @socketio.on('host_audio_control')
 def handle_audio_control(data):
     if 'volume' in data:
@@ -104,23 +122,25 @@ def handle_audio_control(data):
     if 'mood' in data:
         mood = data['mood']
         system_state['current_mood'] = mood
-        system_state['current_track'] = f"/{mood}.mp3"
+        system_state['current_track'] = f"{mood}.mp3"
         system_state['is_playing'] = True
         system_state['seek_position'] = random.randint(5, 20)
     if 'seek' in data:
         system_state['seek_position'] = float(data['seek'])
+    if 'toggle_play' in data:
+        system_state['is_playing'] = not system_state['is_playing']
 
     socketio.emit('state_update', system_state)
 
 @socketio.on('host_trigger_sfx')
 def handle_trigger_sfx(data):
-    sfx_type = data.get('sfx')
+    sfx_type = data.get('sfx') # applause, fanfare, correct, wrong
     var_id = random.randint(1, 3)
-    file_path = f"/{sfx_type}_{var_id}.mp3"
+    file_name = f"{sfx_type}_{var_id}.mp3"
     
     socketio.emit('play_sfx_stream', {
-        'file': file_path,
-        'volume': system_state['audio_volume']
+        'file': file_name,
+        'volume': 0.6  # ЗВУКИ ВСЕГДА НА 60%
     })
 
 if __name__ == '__main__':
