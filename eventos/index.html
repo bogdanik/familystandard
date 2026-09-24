@@ -32,23 +32,22 @@
         .auth-input { width: 100%; padding: 15px; border-radius: 12px; border: 1px solid var(--glass-border); background: rgba(3, 7, 18, 0.85); color: #fff; text-align: center; font-size: 1.2rem; font-weight: 800; margin: 15px 0; outline: none; letter-spacing: 6px; user-select: text; }
         .btn-gold { width: 100%; padding: 15px; border-radius: 12px; border: none; background: linear-gradient(135deg, #ffffff 0%, var(--gold-light) 40%, var(--gold-main) 100%); color: #000; font-weight: 800; cursor: pointer; }
 
-        /* ВЕРХНЯЯ ПАНЕЛЬ ПУЛЬТА */
+        /* ПУЛЬТ: ВЕРХ */
         #host-top-bar { display: none; position: fixed; top: 0; left: 0; right: 0; height: var(--top-bar-height); z-index: 500; background: rgba(15, 23, 42, 0.97); border-bottom: 1px solid var(--glass-border); padding: 12px; flex-direction: column; gap: 10px; justify-content: center; }
         .control-row { display: flex; justify-content: space-between; gap: 8px; align-items: center; }
         .btn-control { flex: 1; height: 36px; border-radius: 8px; border: 1px solid rgba(229, 231, 235, 0.18); background: rgba(30, 41, 59, 0.7); color: #ffffff; font-size: 0.85rem; font-weight: 800; cursor: pointer; }
         .btn-control.active { background: linear-gradient(135deg, #ffffff 0%, var(--gold-main) 100%); color: #000; border-color: #ffffff; }
         
-        /* КНОПКИ ПЕРЕМОТКИ (БЕЗ ПОЛЗУНКА) */
         .seek-btn { flex: 1; height: 42px; border-radius: 10px; background: rgba(30, 41, 59, 0.85); color: #fff; font-size: 1.4rem; border: 1px solid var(--glass-border); display: flex; align-items: center; justify-content: center; cursor: pointer; }
         .play-btn { flex: 1.5; background: rgba(245, 158, 11, 0.2); color: var(--gold-light); border-color: var(--gold-main); }
 
-        /* НИЖНЯЯ ПАНЕЛЬ ПУЛЬТА */
+        /* ПУЛЬТ: НИЗ */
         #host-bottom-bar { display: none; position: fixed; bottom: 0; left: 0; right: 0; height: var(--bottom-bar-height); z-index: 500; background: rgba(15, 23, 42, 0.98); border-top: 1px solid var(--glass-border); padding: 8px 12px; flex-direction: column; gap: 8px; justify-content: center; }
         .btn-action { flex: 1; height: 36px; border-radius: 8px; border: 1px solid var(--glass-border); font-weight: 800; font-size: 0.78rem; cursor: pointer; }
         .btn-action.gold { background: rgba(245, 158, 11, 0.2); color: var(--gold-light); border-color: var(--gold-main); }
         .btn-action.red { background: rgba(239, 68, 68, 0.2); color: #fca5a5; border-color: var(--danger-red); }
 
-        /* ЭКРАН (SCREEN) */
+        /* ЭКРАН */
         #main-viewport { display: none; position: fixed; inset: 0; z-index: 10; flex-direction: column; align-items: center; justify-content: center; }
         body.is-host #module-iframe { top: var(--top-bar-height) !important; bottom: var(--bottom-bar-height) !important; height: calc(100vh - var(--top-bar-height) - var(--bottom-bar-height)) !important; }
         #module-iframe { display: none; position: fixed; inset: 0; width: 100vw; height: 100vh; border: none; z-index: 15; background: #000; }
@@ -58,8 +57,8 @@
         @keyframes shine { to { background-position: 200% center; } }
         .subtitle-text { color: #94a3b8; font-size: 1.15rem; font-weight: 600; margin-top: 10px; }
 
-        /* ПЛАВНЫЙ ТАЙМЕР */
-        #full-screen-timer { display: none; position: fixed; inset: 0; z-index: 900; align-items: center; justify-content: center; transition: opacity 1.5s ease; opacity: 1; }
+        /* ТАЙМЕР */
+        #full-screen-timer { display: none; position: fixed; inset: 0; z-index: 900; align-items: center; justify-content: center; transition: opacity 1s ease-in-out; opacity: 0; }
         .timer-huge-text { font-family: 'Cinzel', serif; font-size: 22vw; font-weight: 900; color: #ffffff; text-shadow: 0 0 40px var(--gold-glow); }
 
         /* ЭКВАЛАЙЗЕР */
@@ -86,7 +85,6 @@
 
     <!-- ПУЛЬТ ВЕДУЩЕГО -->
     <div id="host-top-bar">
-        <!-- ГРОМКОСТЬ (Без текста, 5 кнопок) -->
         <div class="control-row">
             <button class="btn-control" onclick="setVol(0, this)">0%</button>
             <button class="btn-control" onclick="setVol(0.1, this)">10%</button>
@@ -95,18 +93,17 @@
             <button class="btn-control" onclick="setVol(1.0, this)">100%</button>
         </div>
         
-        <!-- НАСТРОЕНИЕ -->
         <div class="control-row">
             <button class="btn-control" onclick="setMood('lounge')">🍃 Лаундж</button>
             <button class="btn-control" onclick="setMood('active')">🕺 Банкет</button>
             <button class="btn-control" onclick="setMood('party')">🎉 Движ</button>
         </div>
 
-        <!-- УПРАВЛЕНИЕ ТРЕКОМ (Кнопки +/- 30 сек) -->
         <div class="control-row">
-            <div class="seek-btn" onclick="seekRelative(-30)">⏪</div>
+            <!-- ПЕРЕМОТКА 60 секунд -->
+            <div class="seek-btn" onclick="seekRelative(-60)">⏪</div>
             <div class="seek-btn play-btn" id="btn-play-toggle" onclick="togglePlay()">⏯</div>
-            <div class="seek-btn" onclick="seekRelative(30)">⏩</div>
+            <div class="seek-btn" onclick="seekRelative(60)">⏩</div>
         </div>
     </div>
 
@@ -163,23 +160,24 @@
         const CDN = "https://pub-372ba5f717cf4a8694558f47682d65d9.r2.dev/";
 
         let myRole = 'GUEST';
-        let availableModules = [];
         let timerInterval = null;
-        let isTimerFading = false;
+        let timerDelayTimeout = null;
+        let overlayState = 'TITLE'; // 'TITLE', 'WAITING_3S', 'TIMER', 'FADING_TIMER', 'MODULE'
         
         let closeClickCount = 0;
         let closeClickTimer = null;
 
-        // Плавная громкость
-        let targetVolume = 0.3;
-        let volFadeInterval = null;
+        // Плавный Аудио-движок
         const bgAudio = document.getElementById('bg-audio');
-
-        // Данные для эквалайзера
+        let targetVolume = 0.3;      // Глобальная цель
+        let actualVolumeTarget = 0;  // Локальная цель для фейдера (используется при паузе/перемотке)
+        let isFadingToSeek = false;
+        let pendingSeekTime = 0;
+        
         let eqIsPlaying = false;
         let eqVolume = 0.3;
 
-        // --- 1. АНИМАЦИЯ ЗОЛОТЫХ ЧАСТИЦ ---
+        // --- ЧАСТИЦЫ ---
         const pCanvas = document.getElementById('particles-canvas');
         const pCtx = pCanvas.getContext('2d');
         let particles = [];
@@ -188,49 +186,27 @@
         resizePCanvas();
         class Particle {
             constructor() { this.reset(); }
-            reset() {
-                this.x = Math.random() * pCanvas.width;
-                this.y = Math.random() * pCanvas.height;
-                this.size = Math.random() * 2 + 0.5;
-                this.speedX = (Math.random() - 0.5) * 0.4;
-                this.speedY = (Math.random() - 0.5) * 0.4;
-                this.alpha = Math.random() * 0.6 + 0.1;
-            }
-            update() {
-                this.x += this.speedX; this.y += this.speedY;
-                if (this.x < 0 || this.x > pCanvas.width || this.y < 0 || this.y > pCanvas.height) this.reset();
-            }
-            draw() {
-                pCtx.fillStyle = `rgba(245, 158, 11, ${this.alpha})`;
-                pCtx.beginPath(); pCtx.arc(this.x, this.y, this.size, 0, Math.PI * 2); pCtx.fill();
-            }
+            reset() { this.x = Math.random() * pCanvas.width; this.y = Math.random() * pCanvas.height; this.size = Math.random() * 2 + 0.5; this.speedX = (Math.random() - 0.5) * 0.4; this.speedY = (Math.random() - 0.5) * 0.4; this.alpha = Math.random() * 0.6 + 0.1; }
+            update() { this.x += this.speedX; this.y += this.speedY; if (this.x < 0 || this.x > pCanvas.width || this.y < 0 || this.y > pCanvas.height) this.reset(); }
+            draw() { pCtx.fillStyle = `rgba(245, 158, 11, ${this.alpha})`; pCtx.beginPath(); pCtx.arc(this.x, this.y, this.size, 0, Math.PI * 2); pCtx.fill(); }
         }
         for (let i = 0; i < 45; i++) particles.push(new Particle());
-        function animateParticles() {
-            pCtx.clearRect(0, 0, pCanvas.width, pCanvas.height);
-            particles.forEach(p => { p.update(); p.draw(); });
-            requestAnimationFrame(animateParticles);
-        }
+        function animateParticles() { pCtx.clearRect(0, 0, pCanvas.width, pCanvas.height); particles.forEach(p => { p.update(); p.draw(); }); requestAnimationFrame(animateParticles); }
         requestAnimationFrame(animateParticles);
 
-        // --- 2. АНИМАЦИЯ ЭКВАЛАЙЗЕРА (САУНДБАР) ---
+        // --- ЭКВАЛАЙЗЕР ---
         const eqCanvas = document.getElementById('eq-canvas');
         const eqCtx = eqCanvas.getContext('2d');
         function resizeEqCanvas() { eqCanvas.width = window.innerWidth; }
         window.addEventListener('resize', resizeEqCanvas);
         resizeEqCanvas();
         let eqBars = Array.from({length: 60}, () => Math.random());
-        
         function drawEq() {
             eqCtx.clearRect(0, 0, eqCanvas.width, eqCanvas.height);
             const barWidth = eqCanvas.width / eqBars.length;
-            
             for(let i = 0; i < eqBars.length; i++) {
-                // Если играет - прыгаем, если нет - опускаемся в линию
                 let targetH = eqIsPlaying ? (Math.random() * 100 * (eqVolume + 0.1)) : 2;
-                // Плавное движение столбиков
                 eqBars[i] += (targetH - eqBars[i]) * 0.2; 
-                
                 let h = eqBars[i];
                 eqCtx.fillStyle = 'rgba(245, 158, 11, 0.4)';
                 eqCtx.fillRect(i * barWidth + 2, eqCanvas.height - h, barWidth - 4, h);
@@ -239,7 +215,7 @@
         }
         drawEq();
 
-        // --- 3. АВТОРИЗАЦИЯ И ЛОГИКА ---
+        // --- АВТОРИЗАЦИЯ ---
         function submitAuth() {
             const val = document.getElementById('auth-input').value.trim();
             if(!val) return;
@@ -258,11 +234,10 @@
                     document.body.classList.add('is-host');
                     document.getElementById('host-top-bar').style.display = 'flex';
                     document.getElementById('host-bottom-bar').style.display = 'flex';
-                    bgAudio.remove(); // Отключаем динамик у ведущего
+                    bgAudio.remove(); 
                 } else if (myRole === 'SCREEN') {
                     document.body.classList.add('is-screen');
                     bgAudio.onloadedmetadata = () => socket.emit('sync_duration', { duration: bgAudio.duration });
-                    // Каждую секунду синхроним позицию (чтобы ведущий мог мотать)
                     setInterval(() => {
                         if(!bgAudio.paused) socket.emit('screen_sync_time', { current_time: bgAudio.currentTime });
                     }, 1000);
@@ -273,7 +248,6 @@
         });
 
         socket.on('modules_config_update', (modules) => {
-            availableModules = modules;
             const box = document.getElementById('modules-list-box');
             box.innerHTML = '';
             modules.forEach(m => {
@@ -291,120 +265,170 @@
             return `${String(m).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
         }
 
-        // Алгоритмическая плавная громкость
-        function updateSmoothVolume() {
-            if (!bgAudio) return;
-            clearInterval(volFadeInterval);
-            volFadeInterval = setInterval(() => {
-                let curr = bgAudio.volume;
-                if (Math.abs(curr - targetVolume) < 0.05) {
-                    bgAudio.volume = targetVolume;
-                    clearInterval(volFadeInterval);
-                } else {
-                    bgAudio.volume += (curr < targetVolume) ? 0.05 : -0.05;
+        // --- АУДИО МЕНЕДЖЕР (ТОЛЬКО SCREEN) ---
+        // Запускаем единый быстрый цикл для управления плавностью звука (фейды, кроссфейды)
+        setInterval(() => {
+            if (!bgAudio || myRole !== 'SCREEN') return;
+
+            let curr = bgAudio.volume;
+            let diff = actualVolumeTarget - curr;
+
+            if (Math.abs(diff) > 0.05) {
+                // Плавное изменение громкости (шаг 0.05 каждые 40мс)
+                bgAudio.volume += Math.sign(diff) * 0.05;
+            } else {
+                bgAudio.volume = actualVolumeTarget;
+
+                // Если достигли нуля - проверяем, зачем мы это сделали (Пауза или Перемотка)
+                if (actualVolumeTarget === 0) {
+                    if (isFadingToSeek) {
+                        bgAudio.currentTime = pendingSeekTime; // Делаем скачок
+                        isFadingToSeek = false;
+                        actualVolumeTarget = targetVolume;     // Плавно возвращаем громкость обратно
+                    } else if (!eqIsPlaying && !bgAudio.paused) {
+                        bgAudio.pause(); // Ставим реальную паузу
+                    }
                 }
-            }, 50);
+            }
+        }, 40);
+
+        function applyAudioState(state) {
+            if (!bgAudio) return;
+            let desiredVolume = state.is_playing ? targetVolume : 0;
+            let needsSeek = Math.abs(bgAudio.currentTime - state.seek_position) > 2.5;
+
+            // Если трек играет и пришел приказ на перемотку
+            if (needsSeek && state.is_playing) {
+                isFadingToSeek = true;
+                pendingSeekTime = state.seek_position;
+                actualVolumeTarget = 0; // Инициируем фейд в ноль
+            } else if (!isFadingToSeek) {
+                actualVolumeTarget = desiredVolume;
+                
+                // Если был на паузе, а пришел плей
+                if (state.is_playing && bgAudio.paused) {
+                    bgAudio.volume = 0; 
+                    bgAudio.play().catch(()=>{});
+                }
+            }
         }
 
         socket.on('state_update', (state) => {
             document.getElementById('display-title').innerText = state.event_title;
             document.getElementById('display-subtitle').innerText = state.event_subtitle;
-
-            // Обновляем данные для визуализатора
             eqIsPlaying = state.is_playing;
-            eqVolume = state.audio_volume;
+            targetVolume = state.audio_volume;
 
             const isModule = state.active_module && state.active_module !== '';
             const isTimer = state.timer && state.timer.active;
-            
-            // Плавное исчезновение/появление заголовка
-            const displayContent = document.getElementById('main-display-content');
-            if (!isModule && (!isTimer || isTimerFading)) {
-                displayContent.style.display = 'block';
-                setTimeout(() => displayContent.style.opacity = '1', 50);
-            } else {
-                displayContent.style.opacity = '0';
-                setTimeout(() => displayContent.style.display = 'none', 500);
-            }
-
-            // IFRAME
+            const remain = isTimer ? (state.timer.end_time - (Date.now() / 1000)) : 0;
+            const dContent = document.getElementById('main-display-content');
+            const tContainer = document.getElementById('full-screen-timer');
             const iframe = document.getElementById('module-iframe');
+
+            // --- УПРАВЛЕНИЕ ВИЗУАЛОМ (Состояния) ---
             if (isModule) {
+                overlayState = 'MODULE';
+                clearTimeout(timerDelayTimeout);
+                dContent.style.opacity = '0';
+                setTimeout(() => dContent.style.display = 'none', 1000);
+                tContainer.style.opacity = '0';
+                tContainer.style.display = 'none';
+
                 if(!iframe.src.includes(state.active_module)) {
                     iframe.src = state.active_module.startsWith('http') ? state.active_module : `/${state.active_module}`;
                 }
                 iframe.style.display = 'block';
-            } else {
-                iframe.style.display = 'none';
-                iframe.src = 'about:blank';
-            }
 
-            // ЛОГИКА ПЛАВНОГО ТАЙМЕРА
-            const tContainer = document.getElementById('full-screen-timer');
-            if (isTimer && !isTimerFading) {
-                tContainer.style.display = 'flex';
-                tContainer.style.opacity = '1';
-                
-                if (!timerInterval) {
-                    timerInterval = setInterval(() => {
-                        const remain = state.timer.end_time - (Date.now() / 1000);
-                        if (remain <= 0 && !isTimerFading) {
-                            // ВРЕМЯ ВЫШЛО - ПЛАВНО РАСТВОРЯЕМ
-                            isTimerFading = true;
-                            tContainer.style.opacity = '0';
+            } else if (isTimer && remain > 0) {
+                iframe.style.display = 'none';
+
+                if (overlayState === 'TITLE') {
+                    // ФАЗА 1: Убираем заголовок и ждем 3 секунды
+                    overlayState = 'WAITING_3S';
+                    dContent.style.opacity = '0'; // Заголовок растворяется
+                    
+                    timerDelayTimeout = setTimeout(() => {
+                        if (overlayState === 'WAITING_3S') {
+                            dContent.style.display = 'none';
+                            overlayState = 'TIMER';
+                            tContainer.style.display = 'flex';
+                            void tContainer.offsetWidth; // Force Reflow
+                            tContainer.style.opacity = '1'; // Таймер плавно появляется
+                        }
+                    }, 3000); // 3 СЕКУНДЫ В ТЕМНОТЕ
+                }
+
+                // ОБНОВЛЕНИЕ ЦИФР ТАЙМЕРА
+                if (overlayState === 'TIMER' || overlayState === 'WAITING_3S') {
+                    if (!timerInterval) {
+                        timerInterval = setInterval(() => {
+                            const currentRemain = state.timer.end_time - (Date.now() / 1000);
                             
-                            setTimeout(() => {
+                            if (currentRemain <= 0 && overlayState === 'TIMER') {
+                                // ТАЙМЕР ЗАВЕРШЕН - Плавный уход
+                                overlayState = 'FADING_TIMER';
                                 clearInterval(timerInterval);
                                 timerInterval = null;
-                                tContainer.style.display = 'none';
-                                isTimerFading = false;
                                 
-                                if (myRole === 'SCREEN') {
-                                    socket.emit('timer_done'); // Окончательно стираем на сервере
-                                }
-                            }, 1500); // 1.5 секунды на растворение
-                        } else if (remain > 0) {
-                            document.getElementById('timer-val').innerText = formatTime(remain);
-                        }
-                    }, 500);
+                                tContainer.style.opacity = '0';
+                                
+                                setTimeout(() => {
+                                    tContainer.style.display = 'none';
+                                    overlayState = 'TITLE';
+                                    dContent.style.display = 'block';
+                                    void dContent.offsetWidth;
+                                    dContent.style.opacity = '1'; // Появление заголовка
+                                    
+                                    if (myRole === 'SCREEN') {
+                                        socket.emit('host_trigger_sfx', { sfx: 'fanfare' });
+                                        socket.emit('timer_done');
+                                    }
+                                }, 1500); // Ждем пока таймер растворится
+                            } else if (currentRemain > 0) {
+                                document.getElementById('timer-val').innerText = formatTime(currentRemain);
+                            }
+                        }, 100);
+                    }
                 }
-            } else if (!isTimer && !isTimerFading) {
-                if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
-                tContainer.style.display = 'none';
-                tContainer.style.opacity = '1';
-                document.getElementById('timer-val').innerText = '00:00';
+            } else {
+                // ВОЗВРАТ НА ГЛАВНУЮ
+                iframe.style.display = 'none';
+                clearTimeout(timerDelayTimeout);
+                
+                if (overlayState !== 'TITLE' && overlayState !== 'FADING_TIMER') {
+                    overlayState = 'TITLE';
+                    if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+                    tContainer.style.display = 'none';
+                    tContainer.style.opacity = '0';
+                    
+                    dContent.style.display = 'block';
+                    void dContent.offsetWidth;
+                    dContent.style.opacity = '1';
+                }
             }
 
-            // ЛОГИКА HOST UI
+            // --- ОБНОВЛЕНИЕ ПУЛЬТА ВЕДУЩЕГО ---
             if (myRole === 'HOST') {
                 document.getElementById('btn-play-toggle').innerText = state.is_playing ? '⏸' : '⏯';
             }
 
-            // ЛОГИКА SCREEN (Музыка)
+            // --- ОБНОВЛЕНИЕ АУДИО НА ЭКРАНЕ ---
             if (myRole === 'SCREEN' && bgAudio) {
-                // Задаём цель для плавного фейдера громкости
-                if (targetVolume !== state.audio_volume) {
-                    targetVolume = state.audio_volume;
-                    updateSmoothVolume();
-                }
-                
                 const trackUrl = CDN + state.current_track;
-
-                if (bgAudio.src !== trackUrl) {
+                if (!bgAudio.src.endsWith(state.current_track)) {
                     bgAudio.src = trackUrl;
                     bgAudio.currentTime = state.seek_position;
-                    if (state.is_playing) bgAudio.play().catch(()=>{});
-                } else {
-                    if (Math.abs(bgAudio.currentTime - state.seek_position) > 3) {
-                        bgAudio.currentTime = state.seek_position;
+                    if (state.is_playing) {
+                        bgAudio.volume = 0;
+                        bgAudio.play().catch(()=>{});
                     }
-                    if (state.is_playing && bgAudio.paused) bgAudio.play().catch(()=>{});
-                    else if (!state.is_playing && !bgAudio.paused) bgAudio.pause();
+                } else {
+                    applyAudioState(state); // Вызываем наш умный аудио-менеджер
                 }
             }
         });
 
-        // ВОСПРОИЗВЕДЕНИЕ SFX
         socket.on('play_sfx_stream', (data) => {
             if (myRole === 'SCREEN') {
                 const s = new Audio(CDN + data.file);
@@ -421,31 +445,20 @@
         }
         function setMood(m) { socket.emit('host_audio_control', { mood: m }); }
         function togglePlay() { socket.emit('host_audio_control', { toggle_play: true }); }
-        
-        // Относительная перемотка (+30 или -30)
-        function seekRelative(sec) { socket.emit('host_audio_control', { seek_relative: sec }); }
+        function seekRelative(sec) { socket.emit('host_audio_control', { seek_relative: sec }); } // Шаг 60 сек
         function triggerSfx(type) { socket.emit('host_trigger_sfx', { sfx: type }); }
 
         function handleCloseClick() {
             socket.emit('switch_module', { module: '' });
             closeClickCount++;
             clearTimeout(closeClickTimer);
-            if (closeClickCount >= 3) {
-                openModal('end-event-modal');
-                closeClickCount = 0;
-            } else {
-                closeClickTimer = setTimeout(() => { closeClickCount = 0; }, 1200);
-            }
+            if (closeClickCount >= 3) { openModal('end-event-modal'); closeClickCount = 0; }
+            else { closeClickTimer = setTimeout(() => { closeClickCount = 0; }, 1200); }
         }
 
         function openModal(id) { document.getElementById(id).style.display = 'flex'; }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-        
-        function confirmEnd() {
-            socket.emit('switch_module', { module: '' });
-            socket.emit('host_audio_control', { toggle_play: true });
-            location.reload();
-        }
+        function confirmEnd() { socket.emit('switch_module', { module: '' }); socket.emit('host_audio_control', { toggle_play: true }); location.reload(); }
     </script>
 </body>
 </html>
