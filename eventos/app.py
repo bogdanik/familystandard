@@ -18,7 +18,6 @@ def load_config():
 
 config = load_config()
 
-# Счетчики для SFX. Джинглов - 4, остальных - 3.
 sfx_counters = {"jingle": 0, "fanfare": 0, "applause": 0, "correct": 0, "wrong": 0}
 sfx_max = {"jingle": 4, "fanfare": 3, "applause": 3, "correct": 3, "wrong": 3}
 
@@ -44,16 +43,13 @@ def clean_timer_state():
         system_state['timer']['end_time'] = 0
 
 @app.route('/')
-def index():
-    return render_template('index.html')
+def index(): return render_template('index.html')
 
 @app.route('/ping')
-def ping():
-    return jsonify({"status": "ok", "system": "Event OS Core Active"}), 200
+def ping(): return jsonify({"status": "ok", "system": "Event OS Core Active"}), 200
 
 @app.route('/<path:filename>')
-def serve_file(filename):
-    return send_from_directory('.', filename)
+def serve_file(filename): return send_from_directory('.', filename)
 
 @socketio.on('connect')
 def handle_connect():
@@ -69,7 +65,7 @@ def handle_login(data):
     elif pin == str(config.get('screen_pin', '222')):
         emit('login_response', {'success': True, 'role': 'SCREEN'})
     else:
-        emit('login_response', {'success': False, 'message': 'Неверный КОД'})
+        emit('login_response', {'success': False, 'message': 'Неверный КОД ДОСТУПА'})
 
 @socketio.on('switch_module')
 def switch_module(data):
@@ -99,9 +95,9 @@ def audio_control(data):
     clean_timer_state()
     curr_track = system_state['current_track']
 
-    if 'volume' in data:
-        system_state['audio_volume'] = float(data['volume'])
+    if 'volume' in data: system_state['audio_volume'] = float(data['volume'])
     
+    # ПЕРЕМОТКА 60 СЕКУНД (1 минута)
     if 'seek_relative' in data:
         new_seek = system_state['seek_position'] + float(data['seek_relative'])
         if new_seek < 0: new_seek = 0
@@ -110,8 +106,7 @@ def audio_control(data):
         system_state['seek_position'] = new_seek
         track_positions[curr_track] = new_seek
 
-    if 'toggle_play' in data:
-        system_state['is_playing'] = not system_state['is_playing']
+    if 'toggle_play' in data: system_state['is_playing'] = not system_state['is_playing']
 
     if 'mood' in data:
         system_state['current_mood'] = data['mood']
@@ -124,6 +119,7 @@ def audio_control(data):
 @socketio.on('sync_duration')
 def sync_duration(data):
     system_state['track_duration'] = float(data['duration'])
+    socketio.emit('state_update', system_state)
 
 @socketio.on('screen_sync_time')
 def screen_sync_time(data):
@@ -131,22 +127,17 @@ def screen_sync_time(data):
         system_state['seek_position'] = float(data['current_time'])
         track_positions[system_state['current_track']] = float(data['current_time'])
 
-# --- УМНАЯ ЛОГИКА ДЖИНГЛОВ (PLAY / STOP / NEXT) ---
 @socketio.on('host_toggle_jingle')
 def host_toggle_jingle():
     if system_state.get('jingle_playing', False):
-        # Если играет - плавно останавливаем
         system_state['jingle_playing'] = False
         socketio.emit('stop_sfx')
     else:
-        # Если не играет - включаем следующий трек
         system_state['jingle_playing'] = True
         sfx_counters['jingle'] = (sfx_counters['jingle'] % sfx_max['jingle']) + 1
         socketio.emit('play_sfx_stream', {'file': f"jingle_{sfx_counters['jingle']}.mp3"})
-    
     socketio.emit('state_update', system_state)
 
-# Когда экран сообщает, что SFX физически закончился
 @socketio.on('sfx_ended')
 def sfx_ended():
     system_state['jingle_playing'] = False
