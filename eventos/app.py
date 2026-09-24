@@ -36,7 +36,6 @@ def load_config():
 config_data = load_config()
 connected_users = {}
 
-# Память позиций воспроизведения для каждого трека
 track_positions = {
     "lounge.mp3": 0.0,
     "active.mp3": 0.0,
@@ -116,11 +115,6 @@ def handle_add_timer_10s():
 
     socketio.emit('state_update', system_state)
 
-@socketio.on('stop_timer')
-def handle_stop_timer():
-    system_state['timer']['active'] = False
-    socketio.emit('state_update', system_state)
-
 @socketio.on('host_audio_control')
 def handle_audio_control(data):
     curr_track = system_state['current_track']
@@ -142,7 +136,6 @@ def handle_audio_control(data):
         system_state['current_mood'] = mood
         system_state['current_track'] = new_track
         system_state['is_playing'] = True
-        # Восстановление сохраненной позиции для нового режима
         system_state['seek_position'] = track_positions.get(new_track, 0.0)
 
     if 'toggle_play' in data:
