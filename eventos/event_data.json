@@ -4,6 +4,7 @@
   "host_name": "Богдан",
   "host_pin": "111",
   "screen_pin": "222",
+  "cdn_base_url": "https://pub-372ba5f717cf4a8694558f47682d65d9.r2.dev/",
   "modules": [
     {"id": "google", "name": "🌐 Внешний Сайт (Google)", "path": "https://www.google.com/search?igu=1"},
     {"id": "quiz", "name": "🎮 Квиз Интерактив", "path": "quiz.html"},
