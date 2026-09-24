@@ -21,17 +21,24 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: var(--ios-font); user-select: none; }
         body { background: var(--bg-black); color: #f8fafc; min-height: 100vh; overflow: hidden; position: relative; }
 
-        /* ФОН, ЦЕНТРАЛЬНОЕ СВЕЧЕНИЕ И ЧАСТИЦЫ */
+        /* ПУЛЬСИРУЮЩЕЕ СВЕЧЕНИЕ И ФОН */
         .bg-glow { position: fixed; inset: 0; z-index: 1; background: #000000; pointer-events: none; }
+        
+        @keyframes pulseGlow {
+            0% { transform: translate(-50%, -50%) scale(1); opacity: 0.8; }
+            50% { transform: translate(-50%, -50%) scale(1.05); opacity: 0.4; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 0.8; }
+        }
         .center-glow { 
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
             width: 80vw; height: 80vw; 
             background: radial-gradient(circle, rgba(245, 158, 11, 0.35) 0%, rgba(245, 158, 11, 0.08) 40%, transparent 70%); 
             pointer-events: none; z-index: 2; 
+            animation: pulseGlow 5s ease-in-out infinite;
         }
         #particles-canvas { position: fixed; inset: 0; z-index: 3; pointer-events: none; }
 
-        /* FOOTER BRANDING */
+        /* БРЕНДИНГ */
         .footer-logo { position: fixed; bottom: 12px; width: 100%; text-align: center; color: rgba(255,255,255,0.25); font-size: 0.7rem; font-weight: 800; letter-spacing: 3px; z-index: 100; pointer-events: none; }
 
         /* АВТОРИЗАЦИЯ */
@@ -48,20 +55,26 @@
         .btn-control { flex: 1; height: 36px; border-radius: 8px; border: 1px solid rgba(229, 231, 235, 0.18); background: rgba(30, 41, 59, 0.7); color: #ffffff; font-size: 0.85rem; font-weight: 800; cursor: pointer; transition: all 0.2s; }
         .btn-control.active { background: linear-gradient(135deg, #ffffff 0%, var(--gold-main) 100%); color: #000; border-color: #ffffff; }
         
-        .seek-btn { flex: 1; height: 42px; border-radius: 10px; background: rgba(30, 41, 59, 0.85); color: #fff; font-size: 1.4rem; border: 1px solid var(--glass-border); display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .seek-btn { flex: 1; height: 44px; border-radius: 10px; background: rgba(30, 41, 59, 0.85); color: #fff; font-size: 1.4rem; border: 1px solid var(--glass-border); display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; }
         .play-btn { flex: 1.5; background: rgba(245, 158, 11, 0.2); color: var(--gold-light); border-color: var(--gold-main); }
+        .play-time { font-size: 0.65rem; font-weight: 800; opacity: 0.8; margin-top: 2px; letter-spacing: 0.5px; font-family: var(--ios-font); }
 
         /* ПУЛЬТ: НИЗ */
         #host-bottom-bar { display: none; position: fixed; bottom: 0; left: 0; right: 0; height: var(--bottom-bar-height); z-index: 500; background: rgba(15, 23, 42, 0.98); border-top: 1px solid var(--glass-border); padding: 8px 12px; flex-direction: column; gap: 8px; justify-content: center; }
         .btn-action { flex: 1; height: 36px; border-radius: 8px; border: 1px solid var(--glass-border); font-weight: 800; font-size: 0.78rem; cursor: pointer; }
         .btn-action.gold { background: rgba(245, 158, 11, 0.2); color: var(--gold-light); border-color: var(--gold-main); }
         .btn-action.red { background: rgba(239, 68, 68, 0.2); color: #fca5a5; border-color: var(--danger-red); }
-        .sfx-active { background: rgba(245, 158, 11, 0.3) !important; border-color: var(--gold-main) !important; box-shadow: 0 0 15px var(--gold-glow); }
+        .sfx-active { background: rgba(245, 158, 11, 0.4) !important; border-color: var(--gold-main) !important; box-shadow: 0 0 15px var(--gold-glow); }
 
-        /* ЭКРАН ПРОЕКТОРА */
+        /* ЭКРАН (IFRAME ОГРАНИЧЕН МЕЖДУ ПАНЕЛЯМИ) */
         #main-viewport { display: none; position: fixed; inset: 0; z-index: 10; flex-direction: column; align-items: center; justify-content: center; }
         
-        body.is-host #module-iframe { top: var(--top-bar-height) !important; bottom: var(--bottom-bar-height) !important; height: calc(100vh - var(--top-bar-height) - var(--bottom-bar-height)) !important; }
+        body.is-host #module-iframe { 
+            top: var(--top-bar-height) !important; 
+            height: calc(100vh - var(--top-bar-height) - var(--bottom-bar-height)) !important; 
+            bottom: auto !important; 
+        }
+        
         #module-iframe { display: none; position: fixed; inset: 0; width: 100vw; height: 100vh; border: none; z-index: 15; background: #000; opacity: 0; transition: opacity 1s ease-in-out; }
         
         #main-display-content { text-align: center; z-index: 10; transition: opacity 1s ease-in-out; opacity: 1; }
@@ -74,7 +87,7 @@
         .timer-huge-text { font-family: 'Cinzel', serif; font-size: 22vw; font-weight: 900; color: #ffffff; text-shadow: 0 0 40px var(--gold-glow); }
 
         /* ЭКВАЛАЙЗЕР */
-        #eq-canvas { position: absolute; bottom: 0; left: 0; width: 100%; height: 180px; z-index: 5; pointer-events: none; opacity: 0.8; }
+        #eq-canvas { position: absolute; bottom: 0; left: 0; width: 100%; height: 180px; z-index: 5; pointer-events: none; opacity: 0.8; transition: opacity 0.5s; }
 
         /* МОДАЛКИ */
         .modal-overlay { display: none; position: fixed; inset: 0; z-index: 20000; background: rgba(0,0,0,0.85); align-items: center; justify-content: center; padding: 20px; }
@@ -114,9 +127,11 @@
         </div>
 
         <div class="control-row">
-            <!-- ПЕРЕМОТКА 60 секунд -->
             <div class="seek-btn" onclick="seekRelative(-60)">⏪</div>
-            <div class="seek-btn play-btn" id="btn-play-toggle" onclick="togglePlay()">⏯</div>
+            <div class="seek-btn play-btn" id="btn-play-toggle" onclick="togglePlay()">
+                <span id="play-icon" style="font-size: 1.1rem; line-height: 1;">⏯</span>
+                <span class="play-time" id="play-time">00:00 / 00:00</span>
+            </div>
             <div class="seek-btn" onclick="seekRelative(60)">⏩</div>
         </div>
     </div>
@@ -133,7 +148,6 @@
             <p class="subtitle-text" id="display-subtitle">С праздником!</p>
         </div>
         
-        <!-- Фирменный логотип -->
         <div class="footer-logo">FAMILY STANDARD OS 2026</div>
     </div>
 
@@ -145,7 +159,6 @@
             <button class="btn-action gold" onclick="socket.emit('add_timer_15s')" style="flex: 0.6;">+15 СЕК</button>
         </div>
         <div class="control-row">
-            <!-- Кнопка Джингла (Подарок) - 4 трека -->
             <button class="seek-btn" id="btn-jingle" onclick="socket.emit('host_toggle_jingle')" style="font-size:1.2rem">🎁</button>
             <button class="seek-btn" onclick="triggerSfx('applause')" style="font-size:1.2rem">👏</button>
             <button class="seek-btn" onclick="triggerSfx('correct')" style="font-size:1.2rem">✅</button>
@@ -172,7 +185,7 @@
         </div>
     </div>
 
-    <!-- ДВА АУДИО ИСТОЧНИКА НА ЭКРАНЕ (Фон и SFX) -->
+    <!-- АУДИО -->
     <audio id="bg-audio" loop></audio>
     <audio id="sfx-audio"></audio>
 
@@ -188,7 +201,9 @@
         let closeClickCount = 0;
         let closeClickTimer = null;
 
-        // --- УМНЫЙ АУДИО-МЕНЕДЖЕР (С DUCKING'ОМ) ---
+        let fanfareFiredForTimer = false; // Блокировка мультизапуска фанфар
+
+        // --- УМНЫЙ АУДИО-МЕНЕДЖЕР ---
         const bgAudio = document.getElementById('bg-audio');
         const sfxAudio = document.getElementById('sfx-audio');
         
@@ -197,11 +212,16 @@
         let isFadingToSeek = false;
         let pendingSeekTime = 0;
         
-        let isSfxActive = false; // Флаг, что SFX сейчас звучит
+        let isSfxActive = false; 
         let sfxTargetVol = 0;
 
         let eqIsPlaying = false;
         let eqVolume = 0.3;
+
+        // Локальное время трека для ведущего
+        let localHostSeekTime = 0;
+        let hostTrackDuration = 0;
+        let state_is_playing = false;
 
         // --- ЧАСТИЦЫ ---
         const pCanvas = document.getElementById('particles-canvas');
@@ -267,11 +287,14 @@
                     document.body.classList.add('is-screen');
                     bgAudio.onloadedmetadata = () => socket.emit('sync_duration', { duration: bgAudio.duration });
                     setInterval(() => {
-                        if(!bgAudio.paused) socket.emit('screen_sync_time', { current_time: bgAudio.currentTime });
+                        // ИСПРАВЛЕНИЕ: Экран скидывает время ТОЛЬКО когда трек нормально играет, чтобы не ломать перемотку
+                        if(!bgAudio.paused && !isFadingToSeek) {
+                            socket.emit('screen_sync_time', { current_time: bgAudio.currentTime });
+                        }
                     }, 1000);
                 }
             } else {
-                alert('Неверный КОД');
+                alert('Неверный КОД ДОСТУПА');
             }
         });
 
@@ -288,38 +311,50 @@
         });
 
         function formatTime(s) {
+            if (!s || s < 0) return "00:00";
             const m = Math.floor(s / 60);
             const sec = Math.floor(s % 60);
             return `${String(m).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
         }
 
-        // --- АУДИО МЕНЕДЖЕР C DUCKING'ОМ (Фоновая логика) ---
-        // Когда SFX заканчивается сам
+        // Таймер для ползунка на кнопке Play у Ведущего
+        setInterval(() => {
+            if (myRole === 'HOST' && state_is_playing) {
+                localHostSeekTime += 1;
+                if (localHostSeekTime > hostTrackDuration) localHostSeekTime = hostTrackDuration;
+                document.getElementById('play-time').innerText = formatTime(localHostSeekTime) + ' / ' + formatTime(hostTrackDuration);
+            }
+        }, 1000);
+
+        // --- УМНЫЙ АУДИО-МЕНЕДЖЕР (DUCKING + SEEK FADE) ---
         if (sfxAudio) {
             sfxAudio.onended = () => {
                 isSfxActive = false;
                 sfxTargetVol = 0;
-                socket.emit('sfx_ended'); // Говорим серверу, что джингл/звук окончен
+                socket.emit('sfx_ended'); 
             };
         }
 
         setInterval(() => {
             if (!bgAudio || !sfxAudio || myRole !== 'SCREEN') return;
 
-            // 1. УПРАВЛЕНИЕ ФОНОМ (DUCKING)
+            // 1. УПРАВЛЕНИЕ ФОНОМ (DUCKING & SEEK)
             let desiredBgVol = state_is_playing ? targetVolume : 0;
-            // Если играет SFX (и звук SFX больше 5%), уводим фон в 3% (0.03). Иначе - нормальная громкость.
+            // Плавное приглушение до 3% если играет SFX
             let bgVolTarget = (isSfxActive || sfxAudio.volume > 0.05) && state_is_playing ? 0.03 : desiredBgVol;
+            
+            // Если идет перемотка, жестко принуждаем громкость к 0
+            if (isFadingToSeek) bgVolTarget = 0;
 
             let diffBg = bgVolTarget - bgAudio.volume;
-            if (Math.abs(diffBg) > 0.015) {
-                bgAudio.volume += Math.sign(diffBg) * 0.015; // Плавное изменение фона
+            if (Math.abs(diffBg) > 0.02) {
+                bgAudio.volume += Math.sign(diffBg) * 0.02; 
             } else {
                 bgAudio.volume = bgVolTarget;
                 if (bgVolTarget === 0) {
                     if (isFadingToSeek) {
                         bgAudio.currentTime = pendingSeekTime; 
-                        isFadingToSeek = false;
+                        isFadingToSeek = false; // Скачок сделан, возвращаем громкость
                     } else if (!eqIsPlaying && !bgAudio.paused) {
                         bgAudio.pause();
                     }
@@ -329,7 +364,7 @@
             // 2. УПРАВЛЕНИЕ SFX
             let diffSfx = sfxTargetVol - sfxAudio.volume;
             if (Math.abs(diffSfx) > 0.03) {
-                sfxAudio.volume += Math.sign(diffSfx) * 0.03; // Быстрый фейд SFX
+                sfxAudio.volume += Math.sign(diffSfx) * 0.03; 
             } else {
                 sfxAudio.volume = sfxTargetVol;
                 if (sfxTargetVol === 0 && !sfxAudio.paused) {
@@ -339,8 +374,6 @@
             }
         }, 25);
 
-        let state_is_playing = false;
-
         function applyAudioState(state) {
             if (!bgAudio) return;
             state_is_playing = state.is_playing;
@@ -349,29 +382,26 @@
             if (needsSeek && state.is_playing) {
                 isFadingToSeek = true;
                 pendingSeekTime = state.seek_position;
-                // Фон сам упадет в 0
             } else if (state.is_playing && bgAudio.paused) {
                 bgAudio.volume = 0; 
                 bgAudio.play().catch(()=>{});
             }
         }
 
-        // ПРИНЯТИЕ И ЗАПУСК SFX ОТБИВОК
         socket.on('play_sfx_stream', (data) => {
             if (myRole === 'SCREEN') {
                 sfxAudio.src = CDN + data.file;
                 sfxAudio.volume = 0; 
                 sfxAudio.play().catch(()=>{});
                 isSfxActive = true;
-                sfxTargetVol = 0.6; // Звучит на 60% громкости
+                sfxTargetVol = 0.6; 
             }
         });
 
-        // КОМАНДА НА ОСТАНОВКУ ДЖИНГЛА
         socket.on('stop_sfx', () => {
             if (myRole === 'SCREEN') {
                 isSfxActive = false;
-                sfxTargetVol = 0; // Запускает плавный фейд в ноль
+                sfxTargetVol = 0; 
             }
         });
 
@@ -382,11 +412,17 @@
             state_is_playing = state.is_playing;
             targetVolume = state.audio_volume;
 
-            // Визуал кнопки Джингла у Ведущего
+            // Синхронизация времени для пульта
             if (myRole === 'HOST') {
+                localHostSeekTime = state.seek_position;
+                hostTrackDuration = state.track_duration;
+                document.getElementById('play-time').innerText = formatTime(localHostSeekTime) + ' / ' + formatTime(hostTrackDuration);
+                
                 const jBtn = document.getElementById('btn-jingle');
                 if (state.jingle_playing) jBtn.classList.add('sfx-active');
                 else jBtn.classList.remove('sfx-active');
+
+                document.getElementById('play-icon').innerText = state.is_playing ? '⏸' : '⏯';
             }
 
             eqIsPlaying = state.is_playing || state.jingle_playing;
@@ -395,11 +431,18 @@
             const isModule = state.active_module && state.active_module !== '';
             const isTimer = state.timer && state.timer.active;
             const remain = isTimer ? (state.timer.end_time - (Date.now() / 1000)) : 0;
+            
             const dContent = document.getElementById('main-display-content');
             const tContainer = document.getElementById('full-screen-timer');
             const iframe = document.getElementById('module-iframe');
 
-            // --- ПЛАВНЫЕ ИНТЕРАКТИВЫ И ТАЙМЕРЫ ---
+            // Скрываем эквалайзер на экране, если открыт интерактив
+            if (isModule && myRole === 'SCREEN') {
+                document.getElementById('eq-canvas').style.opacity = '0';
+            } else if (myRole === 'SCREEN') {
+                document.getElementById('eq-canvas').style.opacity = '0.8';
+            }
+
             if (isModule) {
                 overlayState = 'MODULE';
                 clearTimeout(timerDelayTimeout);
@@ -417,7 +460,6 @@
                     void iframe.offsetWidth;
                     iframe.style.opacity = '1';
                 }
-
             } else if (isTimer && remain > 0) {
                 if (iframe.style.opacity === '1') {
                     iframe.style.opacity = '0';
@@ -425,6 +467,7 @@
                 }
 
                 if (overlayState === 'TITLE') {
+                    fanfareFiredForTimer = false; // Сброс блокировки фанфар
                     overlayState = 'WAITING_3S';
                     dContent.style.opacity = '0'; 
                     
@@ -444,6 +487,14 @@
                         timerInterval = setInterval(() => {
                             const currentRemain = state.timer.end_time - (Date.now() / 1000);
                             
+                            // СИНХРОННЫЕ ФАНФАРЫ ЗА 2 СЕК ДО КОНЦА ТАЙМЕРА
+                            if (currentRemain <= 2.2 && !fanfareFiredForTimer && overlayState === 'TIMER') {
+                                fanfareFiredForTimer = true;
+                                if (myRole === 'SCREEN') {
+                                    socket.emit('host_trigger_sfx', { sfx: 'fanfare' });
+                                }
+                            }
+                            
                             if (currentRemain <= 0 && overlayState === 'TIMER') {
                                 overlayState = 'FADING_TIMER';
                                 clearInterval(timerInterval);
@@ -457,10 +508,7 @@
                                     void dContent.offsetWidth;
                                     dContent.style.opacity = '1'; 
                                     
-                                    if (myRole === 'SCREEN') {
-                                        socket.emit('host_trigger_sfx', { sfx: 'fanfare' });
-                                        socket.emit('timer_done');
-                                    }
+                                    if (myRole === 'SCREEN') socket.emit('timer_done');
                                 }, 1500); 
                             } else if (currentRemain > 0) {
                                 document.getElementById('timer-val').innerText = formatTime(currentRemain);
@@ -486,10 +534,6 @@
                     void dContent.offsetWidth;
                     dContent.style.opacity = '1';
                 }
-            }
-
-            if (myRole === 'HOST') {
-                document.getElementById('btn-play-toggle').innerText = state.is_playing ? '⏸' : '⏯';
             }
 
             if (myRole === 'SCREEN' && bgAudio) {
