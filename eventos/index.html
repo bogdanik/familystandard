@@ -15,14 +15,15 @@
             --gold-glow: rgba(245, 158, 11, 0.4); --glass-card: rgba(15, 23, 42, 0.95);
             --glass-border: rgba(229, 231, 235, 0.2); --danger-red: #ef4444;
             --ios-font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Plus Jakarta Sans", sans-serif;
-            --top-bar-height: 105px; --bottom-bar-height: 95px;
+            --top-bar-height: 145px; --bottom-bar-height: 95px;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: var(--ios-font); user-select: none; }
         body { background: var(--bg-black); color: #f8fafc; min-height: 100vh; overflow: hidden; position: relative; }
 
-        .bg-glow { position: fixed; inset: 0; z-index: 1; background: radial-gradient(circle at 50% 50%, rgba(245, 158, 11, 0.08) 0%, #000000 100%); pointer-events: none; }
-        #flash-overlay { position: fixed; inset: 0; z-index: 99998; background: #ffffff; opacity: 0; pointer-events: none; transition: opacity 0.2s ease; }
+        /* ЧАСТИЦЫ И ФОН */
+        #particles-canvas { position: fixed; inset: 0; z-index: 1; pointer-events: none; }
+        .bg-glow { position: fixed; inset: 0; z-index: 2; background: radial-gradient(circle at 50% 50%, rgba(245, 158, 11, 0.12) 0%, #000000 90%); pointer-events: none; }
 
         /* АВТОРИЗАЦИЯ */
         #auth-overlay { position: fixed; inset: 0; z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 20px; }
@@ -31,35 +32,38 @@
         .auth-input { width: 100%; padding: 15px; border-radius: 12px; border: 1px solid var(--glass-border); background: rgba(3, 7, 18, 0.85); color: #fff; text-align: center; font-size: 1.2rem; font-weight: 800; margin: 15px 0; outline: none; letter-spacing: 6px; user-select: text; }
         .btn-gold { width: 100%; padding: 15px; border-radius: 12px; border: none; background: linear-gradient(135deg, #ffffff 0%, var(--gold-light) 40%, var(--gold-main) 100%); color: #000; font-weight: 800; cursor: pointer; }
 
-        /* ПАНЕЛИ ВЕДУЩЕГО (HOST) */
-        #host-top-bar { display: none; position: fixed; top: 0; left: 0; right: 0; height: var(--top-bar-height); z-index: 500; background: rgba(15, 23, 42, 0.97); border-bottom: 1px solid var(--glass-border); padding: 8px 12px; flex-direction: column; gap: 8px; justify-content: center; }
-        .control-row { display: flex; justify-content: space-between; gap: 6px; align-items: center; }
-        .btn-control { flex: 1; height: 32px; border-radius: 8px; border: 1px solid rgba(229, 231, 235, 0.18); background: rgba(30, 41, 59, 0.7); color: #ffffff; font-size: 0.76rem; font-weight: 800; cursor: pointer; }
+        /* ВЕРХНЯЯ ПАНЕЛЬ ПУЛЬТА */
+        #host-top-bar { display: none; position: fixed; top: 0; left: 0; right: 0; height: var(--top-bar-height); z-index: 500; background: rgba(15, 23, 42, 0.97); border-bottom: 1px solid var(--glass-border); padding: 12px; flex-direction: column; gap: 10px; justify-content: center; }
+        .control-row { display: flex; justify-content: space-between; gap: 8px; align-items: center; }
+        .btn-control { flex: 1; height: 36px; border-radius: 8px; border: 1px solid rgba(229, 231, 235, 0.18); background: rgba(30, 41, 59, 0.7); color: #ffffff; font-size: 0.85rem; font-weight: 800; cursor: pointer; }
         .btn-control.active { background: linear-gradient(135deg, #ffffff 0%, var(--gold-main) 100%); color: #000; border-color: #ffffff; }
         
-        .seek-container { display: flex; align-items: center; gap: 8px; width: 100%; }
-        .btn-play-pause { width: 32px; height: 32px; border-radius: 8px; background: rgba(245, 158, 11, 0.2); color: var(--gold-light); font-size: 0.85rem; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 1px solid var(--glass-border); }
-        .seek-bar { flex: 1; -webkit-appearance: none; height: 5px; border-radius: 3px; background: rgba(255, 255, 255, 0.15); outline: none; }
-        .seek-bar::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%; background: var(--gold-main); }
+        /* КНОПКИ ПЕРЕМОТКИ (БЕЗ ПОЛЗУНКА) */
+        .seek-btn { flex: 1; height: 42px; border-radius: 10px; background: rgba(30, 41, 59, 0.85); color: #fff; font-size: 1.4rem; border: 1px solid var(--glass-border); display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .play-btn { flex: 1.5; background: rgba(245, 158, 11, 0.2); color: var(--gold-light); border-color: var(--gold-main); }
 
+        /* НИЖНЯЯ ПАНЕЛЬ ПУЛЬТА */
         #host-bottom-bar { display: none; position: fixed; bottom: 0; left: 0; right: 0; height: var(--bottom-bar-height); z-index: 500; background: rgba(15, 23, 42, 0.98); border-top: 1px solid var(--glass-border); padding: 8px 12px; flex-direction: column; gap: 8px; justify-content: center; }
         .btn-action { flex: 1; height: 36px; border-radius: 8px; border: 1px solid var(--glass-border); font-weight: 800; font-size: 0.78rem; cursor: pointer; }
         .btn-action.gold { background: rgba(245, 158, 11, 0.2); color: var(--gold-light); border-color: var(--gold-main); }
         .btn-action.red { background: rgba(239, 68, 68, 0.2); color: #fca5a5; border-color: var(--danger-red); }
-        .sfx-btn { flex: 1; height: 36px; border-radius: 8px; background: rgba(30, 41, 59, 0.85); color: #fff; font-size: 1.1rem; border: 1px solid var(--glass-border); cursor: pointer; }
 
         /* ЭКРАН (SCREEN) */
         #main-viewport { display: none; position: fixed; inset: 0; z-index: 10; flex-direction: column; align-items: center; justify-content: center; }
         body.is-host #module-iframe { top: var(--top-bar-height) !important; bottom: var(--bottom-bar-height) !important; height: calc(100vh - var(--top-bar-height) - var(--bottom-bar-height)) !important; }
         #module-iframe { display: none; position: fixed; inset: 0; width: 100vw; height: 100vh; border: none; z-index: 15; background: #000; }
         
-        #main-display-content { text-align: center; z-index: 10; transition: opacity 0.3s; }
+        #main-display-content { text-align: center; z-index: 10; transition: opacity 1s ease-in-out; opacity: 1; }
         .shimmer-title { font-family: 'Cinzel', serif; font-size: 3.2rem; font-weight: 900; background: linear-gradient(90deg, #ffffff 0%, #fffbeb 25%, #f59e0b 50%, #e5e7eb 75%, #ffffff 100%); background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: shine 4s linear infinite; }
         @keyframes shine { to { background-position: 200% center; } }
         .subtitle-text { color: #94a3b8; font-size: 1.15rem; font-weight: 600; margin-top: 10px; }
 
-        #full-screen-timer { display: none; position: fixed; inset: 0; z-index: 900; align-items: center; justify-content: center; }
+        /* ПЛАВНЫЙ ТАЙМЕР */
+        #full-screen-timer { display: none; position: fixed; inset: 0; z-index: 900; align-items: center; justify-content: center; transition: opacity 1.5s ease; opacity: 1; }
         .timer-huge-text { font-family: 'Cinzel', serif; font-size: 22vw; font-weight: 900; color: #ffffff; text-shadow: 0 0 40px var(--gold-glow); }
+
+        /* ЭКВАЛАЙЗЕР */
+        #eq-canvas { position: absolute; bottom: 0; left: 0; width: 100%; height: 120px; z-index: 5; pointer-events: none; opacity: 0.6; }
 
         /* МОДАЛКИ */
         .modal-overlay { display: none; position: fixed; inset: 0; z-index: 20000; background: rgba(0,0,0,0.85); align-items: center; justify-content: center; padding: 20px; }
@@ -69,8 +73,8 @@
 </head>
 <body>
 
+    <canvas id="particles-canvas"></canvas>
     <div class="bg-glow"></div>
-    <div id="flash-overlay"></div>
 
     <div id="auth-overlay">
         <div class="auth-card" id="auth-card">
@@ -82,26 +86,33 @@
 
     <!-- ПУЛЬТ ВЕДУЩЕГО -->
     <div id="host-top-bar">
+        <!-- ГРОМКОСТЬ (Без текста, 5 кнопок) -->
         <div class="control-row">
-            <span style="font-size: 0.65rem; color: var(--gold-light); font-weight: 800;">ГРОМКОСТЬ:</span>
+            <button class="btn-control" onclick="setVol(0, this)">0%</button>
             <button class="btn-control" onclick="setVol(0.1, this)">10%</button>
             <button class="btn-control active" onclick="setVol(0.3, this)">30%</button>
             <button class="btn-control" onclick="setVol(0.6, this)">60%</button>
             <button class="btn-control" onclick="setVol(1.0, this)">100%</button>
         </div>
-        <div class="seek-container">
-            <button class="btn-play-pause" id="btn-play-toggle" onclick="togglePlay()">▶</button>
-            <input type="range" id="host-seek-bar" class="seek-bar" min="0" max="100" value="0" oninput="isSeeking=true" onchange="seekAudio(this.value)">
-        </div>
+        
+        <!-- НАСТРОЕНИЕ -->
         <div class="control-row">
             <button class="btn-control" onclick="setMood('lounge')">🍃 Лаундж</button>
             <button class="btn-control" onclick="setMood('active')">🕺 Банкет</button>
             <button class="btn-control" onclick="setMood('party')">🎉 Движ</button>
         </div>
+
+        <!-- УПРАВЛЕНИЕ ТРЕКОМ (Кнопки +/- 30 сек) -->
+        <div class="control-row">
+            <div class="seek-btn" onclick="seekRelative(-30)">⏪</div>
+            <div class="seek-btn play-btn" id="btn-play-toggle" onclick="togglePlay()">⏯</div>
+            <div class="seek-btn" onclick="seekRelative(30)">⏩</div>
+        </div>
     </div>
 
     <!-- ЭКРАН ПРОЕКТОРА -->
     <div id="main-viewport">
+        <canvas id="eq-canvas"></canvas>
         <div id="full-screen-timer"><div class="timer-huge-text" id="timer-val">00:00</div></div>
         <iframe id="module-iframe" src="about:blank"></iframe>
         
@@ -119,10 +130,10 @@
             <button class="btn-action gold" onclick="socket.emit('add_timer_10s')" style="flex: 0.6;">+10 СЕК</button>
         </div>
         <div class="control-row">
-            <button class="sfx-btn" onclick="triggerSfx('fanfare')">🎉</button>
-            <button class="sfx-btn" onclick="triggerSfx('applause')">👏</button>
-            <button class="sfx-btn" onclick="triggerSfx('correct')">✅</button>
-            <button class="sfx-btn" onclick="triggerSfx('wrong')">❌</button>
+            <button class="seek-btn" onclick="triggerSfx('fanfare')" style="font-size:1.1rem">🎉</button>
+            <button class="seek-btn" onclick="triggerSfx('applause')" style="font-size:1.1rem">👏</button>
+            <button class="seek-btn" onclick="triggerSfx('correct')" style="font-size:1.1rem">✅</button>
+            <button class="seek-btn" onclick="triggerSfx('wrong')" style="font-size:1.1rem">❌</button>
         </div>
     </div>
 
@@ -145,7 +156,6 @@
         </div>
     </div>
 
-    <!-- АУДИО (ТОЛЬКО ДЛЯ ПРОЕКТОРОВ) -->
     <audio id="bg-audio" loop></audio>
 
     <script>
@@ -155,22 +165,86 @@
         let myRole = 'GUEST';
         let availableModules = [];
         let timerInterval = null;
-        let localPlayTimer = null; // Локальный таймер для движения ползунка у хоста
+        let isTimerFading = false;
         
         let closeClickCount = 0;
         let closeClickTimer = null;
-        let isSeeking = false;
 
+        // Плавная громкость
+        let targetVolume = 0.3;
+        let volFadeInterval = null;
         const bgAudio = document.getElementById('bg-audio');
 
+        // Данные для эквалайзера
+        let eqIsPlaying = false;
+        let eqVolume = 0.3;
+
+        // --- 1. АНИМАЦИЯ ЗОЛОТЫХ ЧАСТИЦ ---
+        const pCanvas = document.getElementById('particles-canvas');
+        const pCtx = pCanvas.getContext('2d');
+        let particles = [];
+        function resizePCanvas() { pCanvas.width = window.innerWidth; pCanvas.height = window.innerHeight; }
+        window.addEventListener('resize', resizePCanvas);
+        resizePCanvas();
+        class Particle {
+            constructor() { this.reset(); }
+            reset() {
+                this.x = Math.random() * pCanvas.width;
+                this.y = Math.random() * pCanvas.height;
+                this.size = Math.random() * 2 + 0.5;
+                this.speedX = (Math.random() - 0.5) * 0.4;
+                this.speedY = (Math.random() - 0.5) * 0.4;
+                this.alpha = Math.random() * 0.6 + 0.1;
+            }
+            update() {
+                this.x += this.speedX; this.y += this.speedY;
+                if (this.x < 0 || this.x > pCanvas.width || this.y < 0 || this.y > pCanvas.height) this.reset();
+            }
+            draw() {
+                pCtx.fillStyle = `rgba(245, 158, 11, ${this.alpha})`;
+                pCtx.beginPath(); pCtx.arc(this.x, this.y, this.size, 0, Math.PI * 2); pCtx.fill();
+            }
+        }
+        for (let i = 0; i < 45; i++) particles.push(new Particle());
+        function animateParticles() {
+            pCtx.clearRect(0, 0, pCanvas.width, pCanvas.height);
+            particles.forEach(p => { p.update(); p.draw(); });
+            requestAnimationFrame(animateParticles);
+        }
+        requestAnimationFrame(animateParticles);
+
+        // --- 2. АНИМАЦИЯ ЭКВАЛАЙЗЕРА (САУНДБАР) ---
+        const eqCanvas = document.getElementById('eq-canvas');
+        const eqCtx = eqCanvas.getContext('2d');
+        function resizeEqCanvas() { eqCanvas.width = window.innerWidth; }
+        window.addEventListener('resize', resizeEqCanvas);
+        resizeEqCanvas();
+        let eqBars = Array.from({length: 60}, () => Math.random());
+        
+        function drawEq() {
+            eqCtx.clearRect(0, 0, eqCanvas.width, eqCanvas.height);
+            const barWidth = eqCanvas.width / eqBars.length;
+            
+            for(let i = 0; i < eqBars.length; i++) {
+                // Если играет - прыгаем, если нет - опускаемся в линию
+                let targetH = eqIsPlaying ? (Math.random() * 100 * (eqVolume + 0.1)) : 2;
+                // Плавное движение столбиков
+                eqBars[i] += (targetH - eqBars[i]) * 0.2; 
+                
+                let h = eqBars[i];
+                eqCtx.fillStyle = 'rgba(245, 158, 11, 0.4)';
+                eqCtx.fillRect(i * barWidth + 2, eqCanvas.height - h, barWidth - 4, h);
+            }
+            setTimeout(() => requestAnimationFrame(drawEq), 50);
+        }
+        drawEq();
+
+        // --- 3. АВТОРИЗАЦИЯ И ЛОГИКА ---
         function submitAuth() {
             const val = document.getElementById('auth-input').value.trim();
             if(!val) return;
-
-            // Разблокируем звук по клику (нужно только проектору, но делаем для всех)
             bgAudio.load();
             bgAudio.play().then(()=>bgAudio.pause()).catch(()=>{});
-
             socket.emit('login', { pin: val });
         }
 
@@ -184,15 +258,14 @@
                     document.body.classList.add('is-host');
                     document.getElementById('host-top-bar').style.display = 'flex';
                     document.getElementById('host-bottom-bar').style.display = 'flex';
-                    // Удаляем сам тег аудио, чтобы телефон ведущего ТОЧНО молчал
-                    bgAudio.remove();
+                    bgAudio.remove(); // Отключаем динамик у ведущего
                 } else if (myRole === 'SCREEN') {
                     document.body.classList.add('is-screen');
-                    
-                    // Когда трек загружается, экран сообщает всем его длину
-                    bgAudio.onloadedmetadata = () => {
-                        socket.emit('sync_duration', { duration: bgAudio.duration });
-                    };
+                    bgAudio.onloadedmetadata = () => socket.emit('sync_duration', { duration: bgAudio.duration });
+                    // Каждую секунду синхроним позицию (чтобы ведущий мог мотать)
+                    setInterval(() => {
+                        if(!bgAudio.paused) socket.emit('screen_sync_time', { current_time: bgAudio.currentTime });
+                    }, 1000);
                 }
             } else {
                 alert('Неверный PIN-код');
@@ -218,20 +291,46 @@
             return `${String(m).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
         }
 
+        // Алгоритмическая плавная громкость
+        function updateSmoothVolume() {
+            if (!bgAudio) return;
+            clearInterval(volFadeInterval);
+            volFadeInterval = setInterval(() => {
+                let curr = bgAudio.volume;
+                if (Math.abs(curr - targetVolume) < 0.05) {
+                    bgAudio.volume = targetVolume;
+                    clearInterval(volFadeInterval);
+                } else {
+                    bgAudio.volume += (curr < targetVolume) ? 0.05 : -0.05;
+                }
+            }, 50);
+        }
+
         socket.on('state_update', (state) => {
             document.getElementById('display-title').innerText = state.event_title;
             document.getElementById('display-subtitle').innerText = state.event_subtitle;
 
+            // Обновляем данные для визуализатора
+            eqIsPlaying = state.is_playing;
+            eqVolume = state.audio_volume;
+
             const isModule = state.active_module && state.active_module !== '';
             const isTimer = state.timer && state.timer.active;
             
-            // ЛОГИКА ИСЧЕЗНОВЕНИЯ ЗАГОЛОВКА
-            document.getElementById('main-display-content').style.display = (isModule || isTimer) ? 'none' : 'block';
+            // Плавное исчезновение/появление заголовка
+            const displayContent = document.getElementById('main-display-content');
+            if (!isModule && (!isTimer || isTimerFading)) {
+                displayContent.style.display = 'block';
+                setTimeout(() => displayContent.style.opacity = '1', 50);
+            } else {
+                displayContent.style.opacity = '0';
+                setTimeout(() => displayContent.style.display = 'none', 500);
+            }
 
             // IFRAME
             const iframe = document.getElementById('module-iframe');
             if (isModule) {
-                if(iframe.src !== state.active_module && !iframe.src.endsWith(state.active_module)) {
+                if(!iframe.src.includes(state.active_module)) {
                     iframe.src = state.active_module.startsWith('http') ? state.active_module : `/${state.active_module}`;
                 }
                 iframe.style.display = 'block';
@@ -240,59 +339,55 @@
                 iframe.src = 'about:blank';
             }
 
-            // ЛОГИКА ТАЙМЕРА
+            // ЛОГИКА ПЛАВНОГО ТАЙМЕРА
             const tContainer = document.getElementById('full-screen-timer');
-            if (isTimer) {
+            if (isTimer && !isTimerFading) {
                 tContainer.style.display = 'flex';
+                tContainer.style.opacity = '1';
+                
                 if (!timerInterval) {
                     timerInterval = setInterval(() => {
                         const remain = state.timer.end_time - (Date.now() / 1000);
-                        if (remain <= 0) {
-                            clearInterval(timerInterval);
-                            timerInterval = null;
-                            tContainer.style.display = 'none';
+                        if (remain <= 0 && !isTimerFading) {
+                            // ВРЕМЯ ВЫШЛО - ПЛАВНО РАСТВОРЯЕМ
+                            isTimerFading = true;
+                            tContainer.style.opacity = '0';
                             
-                            // ТОЛЬКО ЭКРАН ВЫЗЫВАЕТ ОКОНЧАНИЕ, ЧТОБЫ НЕ БЫЛО ДУБЛЕЙ
-                            if (myRole === 'SCREEN') {
-                                document.getElementById('flash-overlay').style.opacity = '1';
-                                setTimeout(() => document.getElementById('flash-overlay').style.opacity = '0', 200);
-                                socket.emit('host_trigger_sfx', { sfx: 'fanfare' });
-                                socket.emit('timer_done'); // Глобально вырубаем таймер на сервере
-                            }
-                        } else {
+                            setTimeout(() => {
+                                clearInterval(timerInterval);
+                                timerInterval = null;
+                                tContainer.style.display = 'none';
+                                isTimerFading = false;
+                                
+                                if (myRole === 'SCREEN') {
+                                    socket.emit('timer_done'); // Окончательно стираем на сервере
+                                }
+                            }, 1500); // 1.5 секунды на растворение
+                        } else if (remain > 0) {
                             document.getElementById('timer-val').innerText = formatTime(remain);
                         }
                     }, 500);
                 }
-            } else {
+            } else if (!isTimer && !isTimerFading) {
                 if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
                 tContainer.style.display = 'none';
+                tContainer.style.opacity = '1';
                 document.getElementById('timer-val').innerText = '00:00';
             }
 
-            // ЛОГИКА HOST UI (Ползунок)
+            // ЛОГИКА HOST UI
             if (myRole === 'HOST') {
-                document.getElementById('btn-play-toggle').innerText = state.is_playing ? '⏸' : '▶';
-                
-                if (!isSeeking && state.track_duration > 0) {
-                    const slider = document.getElementById('host-seek-bar');
-                    slider.max = Math.floor(state.track_duration);
-                    slider.value = Math.floor(state.seek_position);
-                }
-
-                // Локальное движение ползунка у ведущего (чтобы не спамить сеть)
-                clearInterval(localPlayTimer);
-                if (state.is_playing && !isSeeking) {
-                    localPlayTimer = setInterval(() => {
-                        const slider = document.getElementById('host-seek-bar');
-                        if(slider.value < slider.max) slider.value = parseInt(slider.value) + 1;
-                    }, 1000);
-                }
+                document.getElementById('btn-play-toggle').innerText = state.is_playing ? '⏸' : '⏯';
             }
 
             // ЛОГИКА SCREEN (Музыка)
             if (myRole === 'SCREEN' && bgAudio) {
-                bgAudio.volume = state.audio_volume;
+                // Задаём цель для плавного фейдера громкости
+                if (targetVolume !== state.audio_volume) {
+                    targetVolume = state.audio_volume;
+                    updateSmoothVolume();
+                }
+                
                 const trackUrl = CDN + state.current_track;
 
                 if (bgAudio.src !== trackUrl) {
@@ -300,7 +395,7 @@
                     bgAudio.currentTime = state.seek_position;
                     if (state.is_playing) bgAudio.play().catch(()=>{});
                 } else {
-                    if (Math.abs(bgAudio.currentTime - state.seek_position) > 2.5) {
+                    if (Math.abs(bgAudio.currentTime - state.seek_position) > 3) {
                         bgAudio.currentTime = state.seek_position;
                     }
                     if (state.is_playing && bgAudio.paused) bgAudio.play().catch(()=>{});
@@ -320,13 +415,15 @@
 
         // УПРАВЛЕНИЕ ВЕДУЩЕГО
         function setVol(v, btn) {
-            document.querySelectorAll('.btn-control').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.control-row:first-child .btn-control').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             socket.emit('host_audio_control', { volume: v });
         }
         function setMood(m) { socket.emit('host_audio_control', { mood: m }); }
         function togglePlay() { socket.emit('host_audio_control', { toggle_play: true }); }
-        function seekAudio(val) { isSeeking = false; socket.emit('host_audio_control', { seek: val }); }
+        
+        // Относительная перемотка (+30 или -30)
+        function seekRelative(sec) { socket.emit('host_audio_control', { seek_relative: sec }); }
         function triggerSfx(type) { socket.emit('host_trigger_sfx', { sfx: type }); }
 
         function handleCloseClick() {
@@ -346,7 +443,7 @@
         
         function confirmEnd() {
             socket.emit('switch_module', { module: '' });
-            socket.emit('host_audio_control', { toggle_play: true }); // pause
+            socket.emit('host_audio_control', { toggle_play: true });
             location.reload();
         }
     </script>
