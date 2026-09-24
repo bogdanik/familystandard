@@ -13,14 +13,17 @@
     <style>
         :root {
             --bg-black: #030712;
-            --gold-light: #fff3a1;
+            --silver-light: #f3f4f6;
+            --silver-main: #e5e7eb;
+            --gold-light: #fffbeb;
             --gold-main: #f59e0b;
-            --gold-dark: #b45309;
+            --gold-glow: rgba(245, 158, 11, 0.4);
+            --silver-glow: rgba(229, 231, 235, 0.35);
             --glass-card: rgba(15, 23, 42, 0.94);
-            --glass-border: rgba(245, 158, 11, 0.35);
+            --glass-border: rgba(229, 231, 235, 0.25);
             --danger-red: #ef4444;
             --ios-font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Plus Jakarta Sans", sans-serif;
-            --top-height: 110px;
+            --top-height: 115px;
             --bottom-height: 115px;
         }
 
@@ -33,7 +36,7 @@
 
         /* CANVAS PARTICLES (120 FPS) */
         #particles-canvas { position: fixed; inset: 0; z-index: 1; pointer-events: none; }
-        .bg-glow { position: fixed; inset: 0; z-index: 2; background: radial-gradient(circle at 50% 50%, rgba(245, 158, 11, 0.12) 0%, rgba(3, 7, 18, 0.96) 75%, #000000 100%); pointer-events: none; }
+        .bg-glow { position: fixed; inset: 0; z-index: 2; background: radial-gradient(circle at 50% 50%, rgba(245, 158, 11, 0.1) 0%, rgba(3, 7, 18, 0.96) 75%, #000000 100%); pointer-events: none; }
 
         /* FLASH EFFECT */
         #flash-overlay { position: fixed; inset: 0; z-index: 99998; background: #ffffff; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
@@ -43,8 +46,8 @@
         .auth-card {
             background: var(--glass-card); border: 1px solid var(--glass-border); padding: 36px 28px;
             border-radius: 28px; width: 100%; max-width: 360px; text-align: center;
-            box-shadow: 0 0 60px rgba(245, 158, 11, 0.25), 0 20px 40px rgba(0, 0, 0, 0.9);
-            backdrop-filter: blur(25px); transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 0 50px var(--gold-glow), 0 0 30px var(--silver-glow);
+            backdrop-filter: blur(25px); transition: all 0.3s ease;
         }
         .auth-card.shake { animation: shake 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97) both; border-color: var(--danger-red); }
         @keyframes shake {
@@ -54,14 +57,21 @@
             40%, 60% { transform: translate3d(7px, 0, 0); }
         }
 
+        /* GENTLE SWAY ANIMATION ON 3 TAPS (WITHOUT RESIZING) */
         .brand-header {
-            font-family: 'Cinzel', serif; font-size: 2.2rem; font-weight: 900; letter-spacing: 2px;
-            background: linear-gradient(135deg, #fff3a1 0%, #f59e0b 50%, #d97706 100%);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 25px rgba(245, 158, 11, 0.4);
-            cursor: pointer; display: inline-block; transition: transform 0.2s ease, opacity 0.3s ease;
+            font-family: 'Cinzel', serif; font-size: 2.1rem; font-weight: 900; letter-spacing: 2px;
+            background: linear-gradient(135deg, #ffffff 0%, #fffbeb 30%, #e5e7eb 65%, #f59e0b 100%);
+            background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 25px var(--gold-glow), 0 0 35px var(--silver-glow);
+            cursor: pointer; display: inline-block; transition: opacity 0.3s ease;
         }
-        .brand-header:active { transform: scale(0.92); }
+        .brand-header.sway { animation: gentleSway 0.35s ease-in-out; }
+        @keyframes gentleSway {
+            0% { transform: rotate(0deg); }
+            25% { transform: rotate(-4deg); }
+            75% { transform: rotate(4deg); }
+            100% { transform: rotate(0deg); }
+        }
 
         .auth-sub { color: #94a3b8; font-size: 0.85rem; margin: 12px 0 0; }
         
@@ -78,9 +88,9 @@
         }
         .btn-gold {
             width: 100%; padding: 16px; border-radius: 14px; border: none;
-            background: linear-gradient(135deg, var(--gold-light) 0%, var(--gold-main) 100%);
+            background: linear-gradient(135deg, #ffffff 0%, var(--gold-light) 40%, var(--gold-main) 100%);
             color: #000; font-weight: 800; font-size: 0.95rem; cursor: pointer; margin-top: 12px;
-            box-shadow: 0 4px 20px rgba(245, 158, 11, 0.3); transition: transform 0.15s ease;
+            box-shadow: 0 0 20px var(--gold-glow), 0 0 15px var(--silver-glow); transition: transform 0.15s ease, box-shadow 0.2s ease;
             display: inline-flex; align-items: center; justify-content: center; gap: 8px;
         }
         .btn-gold:active { transform: scale(0.97); }
@@ -90,24 +100,40 @@
             display: none; position: fixed; top: 0; left: 0; right: 0; height: var(--top-height); z-index: 500;
             background: rgba(15, 23, 42, 0.96); border-bottom: 1px solid var(--glass-border);
             backdrop-filter: blur(20px); padding: 8px 14px; flex-direction: column; gap: 6px; justify-content: center;
+            box-shadow: 0 4px 25px rgba(0, 0, 0, 0.5);
         }
         .control-row { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
         .btn-control {
-            flex: 1; height: 36px; border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.12);
+            flex: 1; height: 36px; border-radius: 10px; border: 1px solid rgba(229, 231, 235, 0.18);
             background: rgba(30, 41, 59, 0.7); color: #ffffff; font-size: 0.78rem; font-weight: 800; cursor: pointer;
             transition: all 0.2s ease; display: inline-flex; align-items: center; justify-content: center;
         }
         .btn-control:active { transform: scale(0.95); }
-        .btn-control.active { background: var(--gold-main); color: #000; border-color: var(--gold-light); box-shadow: 0 0 12px rgba(245, 158, 11, 0.4); }
+        .btn-control.active { 
+            background: linear-gradient(135deg, #ffffff 0%, var(--gold-main) 100%); color: #000; 
+            border-color: #ffffff; box-shadow: 0 0 15px var(--gold-glow), 0 0 10px var(--silver-glow); 
+        }
 
+        /* TIMER & SEEKBAR */
         .seek-container { display: flex; align-items: center; gap: 8px; width: 100%; margin: 1px 0; }
+        .btn-play-pause {
+            width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--glass-border);
+            background: rgba(245, 158, 11, 0.2); color: var(--gold-light); font-size: 0.9rem;
+            display: inline-flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0;
+        }
         .seek-bar {
             flex: 1; -webkit-appearance: none; height: 5px; border-radius: 3px;
             background: rgba(255, 255, 255, 0.15); outline: none; cursor: pointer;
         }
         .seek-bar::-webkit-slider-thumb {
             -webkit-appearance: none; width: 15px; height: 15px; border-radius: 50%;
-            background: var(--gold-main); cursor: pointer; box-shadow: 0 0 8px var(--gold-main);
+            background: var(--gold-main); cursor: pointer; box-shadow: 0 0 10px var(--gold-main);
+        }
+
+        .timer-badge {
+            background: rgba(245, 158, 11, 0.18); border: 1px solid var(--gold-main); color: var(--gold-light);
+            padding: 4px 10px; border-radius: 8px; font-weight: 800; font-size: 0.75rem; cursor: pointer; flex-shrink: 0;
+            display: inline-flex; align-items: center; gap: 4px; box-shadow: 0 0 10px var(--gold-glow);
         }
 
         .eq-bar-container { display: flex; align-items: flex-end; gap: 3px; height: 14px; }
@@ -121,13 +147,15 @@
             display: none; position: fixed; bottom: 0; left: 0; right: 0; height: var(--bottom-height); z-index: 500;
             background: rgba(15, 23, 42, 0.98); border-top: 1px solid var(--glass-border);
             backdrop-filter: blur(20px); padding: 8px 14px; flex-direction: column; gap: 6px; justify-content: center;
+            box-shadow: 0 -4px 25px rgba(0, 0, 0, 0.5);
         }
         .launcher-row { display: flex; gap: 6px; width: 100%; }
         .btn-launch-trigger {
             flex: 1; height: 42px; border-radius: 12px; border: 1px solid var(--gold-main);
-            background: linear-gradient(135deg, rgba(245, 158, 11, 0.25) 0%, rgba(180, 83, 9, 0.25) 100%);
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.25) 0%, rgba(229, 231, 235, 0.15) 100%);
             color: var(--gold-light); font-weight: 800; font-size: 0.85rem; cursor: pointer;
             display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+            box-shadow: 0 0 15px rgba(245, 158, 11, 0.2);
         }
         .btn-close-interactive {
             display: inline-flex; flex: 1; height: 42px; border-radius: 12px; border: 1px solid var(--danger-red);
@@ -135,18 +163,21 @@
             align-items: center; justify-content: center; gap: 6px;
         }
 
+        /* SFX VECTOR ICON BUTTONS */
         .sfx-grid { display: flex; gap: 6px; width: 100%; }
         .sfx-btn {
-            flex: 1; height: 42px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.15);
-            background: rgba(30, 41, 59, 0.8); color: #fff; font-size: 0.78rem; font-weight: 800; cursor: pointer;
-            display: inline-flex; align-items: center; justify-content: center; gap: 4px;
-            transition: transform 0.15s ease;
+            flex: 1; height: 42px; border-radius: 12px; border: 1px solid rgba(229, 231, 235, 0.2);
+            background: rgba(30, 41, 59, 0.85); color: #fff; font-size: 1.3rem; cursor: pointer;
+            display: inline-flex; align-items: center; justify-content: center;
+            transition: all 0.2s ease; box-shadow: 0 0 10px rgba(0,0,0,0.3);
         }
-        .sfx-btn:active { transform: scale(0.95); }
-        .btn-logout {
-            width: 42px; height: 42px; border-radius: 12px; border: 1px solid rgba(239, 68, 68, 0.4);
-            background: rgba(239, 68, 68, 0.15); color: #fca5a5; font-size: 1rem; cursor: pointer;
-            display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
+        .sfx-btn:hover { border-color: var(--gold-main); box-shadow: 0 0 15px var(--gold-glow); transform: translateY(-1px); }
+        .sfx-btn:active { transform: scale(0.92); }
+
+        .btn-end-event {
+            padding: 0 14px; height: 42px; border-radius: 12px; border: 1px solid rgba(239, 68, 68, 0.5);
+            background: rgba(239, 68, 68, 0.2); color: #fca5a5; font-size: 0.8rem; font-weight: 800; cursor: pointer;
+            display: inline-flex; align-items: center; justify-content: center; gap: 6px; flex-shrink: 0;
         }
 
         /* MODALS */
@@ -158,7 +189,7 @@
         .modal-card {
             background: var(--glass-card); border: 1px solid var(--glass-border);
             border-radius: 28px; padding: 26px; width: 100%; max-width: 380px; text-align: center;
-            box-shadow: 0 0 50px rgba(0, 0, 0, 0.9);
+            box-shadow: 0 0 50px var(--gold-glow), 0 0 30px var(--silver-glow);
         }
         .modules-grid { display: flex; flex-direction: column; gap: 10px; margin-top: 18px; }
         .mod-btn {
@@ -167,13 +198,12 @@
             display: inline-flex; align-items: center; justify-content: center; gap: 8px;
         }
 
-        /* MAIN VIEWPORT (FULLSCREEN GEOMETRY) */
+        /* MAIN VIEWPORT */
         #main-viewport {
             position: fixed; inset: 0; z-index: 10; width: 100vw; height: 100vh;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
 
-        /* HOST SPECIFIC IFRAME GEOMETRY */
         body.is-host #module-iframe {
             position: fixed;
             top: var(--top-height) !important;
@@ -192,9 +222,9 @@
         }
         .shimmer-title {
             font-family: 'Cinzel', serif; font-size: 3.2rem; font-weight: 900;
-            background: linear-gradient(90deg, #fff3a1 0%, #f59e0b 30%, #ffffff 50%, #f59e0b 70%, #fff3a1 100%);
+            background: linear-gradient(90deg, #ffffff 0%, #fffbeb 25%, #f59e0b 50%, #e5e7eb 75%, #ffffff 100%);
             background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            animation: shine 4s linear infinite; text-shadow: 0 0 35px rgba(245, 158, 11, 0.4);
+            animation: shine 4s linear infinite; text-shadow: 0 0 35px var(--gold-glow), 0 0 45px var(--silver-glow);
         }
         @keyframes shine { to { background-position: 200% center; } }
 
@@ -227,7 +257,9 @@
             <div class="eq-bar-container">
                 <div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div>
             </div>
-            <span style="font-size: 0.72rem; color: var(--gold-light); font-weight: 800; margin-right: auto; margin-left: 6px;">ГРОМКОСТЬ:</span>
+            <button class="timer-badge" onclick="addTimer10s()">⏱️ +10 сек (<span id="timer-val">00:00</span>)</button>
+            
+            <span style="font-size: 0.72rem; color: var(--gold-light); font-weight: 800; margin-left: auto;">МУЗЫКА:</span>
             <button class="btn-control" onclick="setVolumeSmooth(0.1, this)">10%</button>
             <button class="btn-control" onclick="setVolumeSmooth(0.2, this)">20%</button>
             <button class="btn-control active" onclick="setVolumeSmooth(0.3, this)">30%</button>
@@ -236,6 +268,7 @@
         </div>
 
         <div class="seek-container">
+            <button class="btn-play-pause" id="btn-play-toggle" onclick="togglePlayPause()">⏸</button>
             <span style="font-size: 0.68rem; color: #94a3b8; font-weight: 700;">ПЕРЕМОТКА:</span>
             <input type="range" id="host-seek-bar" class="seek-bar" min="0" max="180" value="0" onchange="seekAudioTrack(this.value)">
         </div>
@@ -266,14 +299,14 @@
         </div>
     </div>
 
-    <!-- LOGOUT CONFIRM MODAL -->
-    <div class="modal-overlay" id="logout-modal">
+    <!-- END EVENT CONFIRM MODAL -->
+    <div class="modal-overlay" id="end-event-modal">
         <div class="modal-card">
-            <h3 style="color: var(--gold-light); font-family: 'Cinzel', serif; font-size: 1.2rem;">🚪 Завершение сессии</h3>
-            <p style="color: #94a3b8; font-size: 0.9rem; margin-top: 10px;">Завершить рабочую сессию и выйти из пульта управления?</p>
+            <h3 style="color: var(--gold-light); font-family: 'Cinzel', serif; font-size: 1.2rem;">🏁 Завершение праздника</h3>
+            <p style="color: #94a3b8; font-size: 0.9rem; margin-top: 10px;">Завершить мероприятие, закрыть все интерактивы и выйти из управления?</p>
             <div style="display: flex; gap: 10px; margin-top: 20px;">
-                <button onclick="confirmLogout()" class="btn-gold" style="margin: 0; background: var(--danger-red); color: #fff;">Завершить</button>
-                <button onclick="closeLogoutModal()" style="flex: 1; padding: 14px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.1); background: transparent; color: #fff; font-weight: 700; cursor: pointer;">Отмена</button>
+                <button onclick="confirmEndEvent()" class="btn-gold" style="margin: 0; background: var(--danger-red); color: #fff;">Завершить</button>
+                <button onclick="closeEndEventModal()" style="flex: 1; padding: 14px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.1); background: transparent; color: #fff; font-weight: 700; cursor: pointer;">Отмена</button>
             </div>
         </div>
     </div>
@@ -289,10 +322,11 @@
             </button>
         </div>
         <div class="sfx-grid">
-            <button class="sfx-btn" onclick="triggerSfx('applause')"><span>👏</span><span>Аплодисменты</span></button>
-            <button class="sfx-btn" onclick="triggerSfx('correct')"><span>✅</span><span>Тыдыщ!</span></button>
-            <button class="sfx-btn" onclick="triggerSfx('wrong')"><span>❌</span><span>Ошибка</span></button>
-            <button class="btn-logout" onclick="openLogoutModal()" title="Завершить сессию">🚪</button>
+            <button class="sfx-btn" onclick="triggerSfx('applause')" title="Аплодисменты">👏</button>
+            <button class="sfx-btn" onclick="triggerSfx('fanfare')" title="Фанфары">🎉</button>
+            <button class="sfx-btn" onclick="triggerSfx('correct')" title="Тыдыщ / Правильно">✅</button>
+            <button class="sfx-btn" onclick="triggerSfx('wrong')" title="Ошибка / Неправильно">❌</button>
+            <button class="btn-end-event" onclick="openEndEventModal()">🏁 ЗАВЕРШИТЬ</button>
         </div>
     </div>
 
@@ -302,6 +336,7 @@
 
     <script>
         const RENDER_SERVER_URL = "https://event-os-wqoa.onrender.com";
+        const CDN_BASE_URL = "https://pub-372ba5f717cf4a8694558f47682d65d9.r2.dev/";
 
         const socket = io(RENDER_SERVER_URL, { 
             transports: ['polling', 'websocket'],
@@ -314,13 +349,15 @@
         let currentLoadedModule = '';
         let availableModules = [];
         let activePin = '';
+        let timerInterval = null;
 
         const audioA = document.getElementById('audio-a');
         const audioB = document.getElementById('audio-b');
         let activeAudio = audioA;
         let inactiveAudio = audioB;
-        let masterVolume = 0.3;
+        let musicVolume = 0.3;
         let volumeFadeInterval = null;
+        let playPauseFadeInterval = null;
 
         // --- 1. PARTICLES (120 FPS) ---
         const canvas = document.getElementById('particles-canvas');
@@ -373,12 +410,16 @@
             }
         });
 
-        // --- 3. 3 TAPS BURST & LOGIC ---
+        // --- 3. 3 TAPS SWAY ANIMATION ---
         function handleLogoTap() {
             tapCount++; clearTimeout(tapTimer);
             const logo = document.getElementById('brand-logo');
             
-            if (logo) logo.style.transform = `scale(${1 + tapCount * 0.08})`;
+            if (logo) {
+                logo.classList.remove('sway');
+                void logo.offsetWidth;
+                logo.classList.add('sway');
+            }
 
             if (tapCount >= 3) {
                 const flash = document.getElementById('flash-overlay');
@@ -399,10 +440,7 @@
 
                 tapCount = 0;
             } else { 
-                tapTimer = setTimeout(() => { 
-                    tapCount = 0; 
-                    if (logo) logo.style.transform = 'scale(1)';
-                }, 1200); 
+                tapTimer = setTimeout(() => { tapCount = 0; }, 1200); 
             }
         }
 
@@ -430,7 +468,7 @@
             socket.emit('login', { pin: val });
         }
 
-        // --- 4. SOCKET RESPONSES & SESSION SAVE ---
+        // --- 4. SOCKET RESPONSES & STATE ---
         socket.on('login_response', (res) => {
             if (res.success) {
                 myRole = res.role;
@@ -481,7 +519,7 @@
             if (state.event_title) document.getElementById('display-title').innerText = state.event_title;
             if (state.event_subtitle) document.getElementById('display-subtitle').innerText = state.event_subtitle;
 
-            if (masterVolume !== state.audio_volume) {
+            if (musicVolume !== state.audio_volume) {
                 applySmoothVolumeTransition(state.audio_volume);
             }
 
@@ -489,20 +527,76 @@
                 loadModuleIframe(state.active_module);
             }
 
+            // ОБРАБОТКА ТАЙМЕРА
+            if (state.timer && state.timer.active) {
+                clearInterval(timerInterval);
+                timerInterval = setInterval(() => {
+                    const remaining = Math.max(0, Math.round(state.timer.end_time - (Date.now() / 1000)));
+                    const mins = String(Math.floor(remaining / 60)).padStart(2, '0');
+                    const secs = String(remaining % 60).padStart(2, '0');
+                    document.getElementById('timer-val').innerText = `${mins}:${secs}`;
+                    if (remaining <= 0) {
+                        clearInterval(timerInterval);
+                        if (myRole === 'SCREEN') triggerSfx('fanfare');
+                    }
+                }, 1000);
+            } else {
+                clearInterval(timerInterval);
+                document.getElementById('timer-val').innerText = '00:00';
+            }
+
+            // ЗВУК И КРОССФЕЙД МУЗЫКИ НА ЭКРАНЕ ПРОЕКТОРА
             if (myRole === 'SCREEN') {
-                const trackUrl = RENDER_SERVER_URL + state.current_track;
+                const trackUrl = CDN_BASE_URL + state.current_track;
                 const targetTime = state.seek_position || 0;
+
+                const btnPlay = document.getElementById('btn-play-toggle');
+                if (btnPlay) btnPlay.innerText = state.is_playing ? '⏸' : '▶';
 
                 if (activeAudio.src !== trackUrl || Math.abs(activeAudio.currentTime - targetTime) > 3) {
                     performAudioCrossfade(trackUrl, targetTime);
                 } else {
-                    if (state.is_playing && activeAudio.paused) activeAudio.play().catch(() => {});
+                    if (state.is_playing && activeAudio.paused) {
+                        smoothFadePlay();
+                    } else if (!state.is_playing && !activeAudio.paused) {
+                        smoothFadePause();
+                    }
                 }
             }
         });
 
+        // ПЛАВНОЕ ЗАТУХАНИЕ / ПОДЪЕМ МУЗЫКИ
+        function smoothFadePlay() {
+            clearInterval(playPauseFadeInterval);
+            activeAudio.volume = 0;
+            activeAudio.play().then(() => {
+                let step = 0;
+                const steps = 20;
+                playPauseFadeInterval = setInterval(() => {
+                    step++;
+                    activeAudio.volume = Math.min(musicVolume, musicVolume * (step / steps));
+                    if (step >= steps) clearInterval(playPauseFadeInterval);
+                }, 40);
+            }).catch(() => {});
+        }
+
+        function smoothFadePause() {
+            clearInterval(playPauseFadeInterval);
+            let step = 0;
+            const steps = 20;
+            const startVol = activeAudio.volume;
+            playPauseFadeInterval = setInterval(() => {
+                step++;
+                activeAudio.volume = Math.max(0, startVol * (1 - step / steps));
+                if (step >= steps) {
+                    clearInterval(playPauseFadeInterval);
+                    activeAudio.pause();
+                }
+            }, 40);
+        }
+
         function applySmoothVolumeTransition(targetVol) {
-            masterVolume = targetVol;
+            musicVolume = targetVol;
             if (myRole !== 'SCREEN') return;
 
             clearInterval(volumeFadeInterval);
@@ -513,9 +607,7 @@
 
             volumeFadeInterval = setInterval(() => {
                 step++;
-                const currentStepVol = Math.max(0, Math.min(1, startVol + (diff * (step / steps))));
-                activeAudio.volume = currentStepVol;
-
+                activeAudio.volume = Math.max(0, Math.min(1, startVol + (diff * (step / steps))));
                 if (step >= steps) {
                     clearInterval(volumeFadeInterval);
                     activeAudio.volume = targetVol;
@@ -535,8 +627,8 @@
                     step++;
                     const progress = step / steps;
                     
-                    activeAudio.volume = Math.max(0, masterVolume * (1 - progress));
-                    inactiveAudio.volume = Math.min(masterVolume, masterVolume * progress);
+                    activeAudio.volume = Math.max(0, musicVolume * (1 - progress));
+                    inactiveAudio.volume = Math.min(musicVolume, musicVolume * progress);
 
                     if (step >= steps) {
                         clearInterval(crossfadeInterval);
@@ -550,10 +642,11 @@
             }).catch(() => {});
         }
 
+        // SFX ИГРАЮТ ВСЕГДА НА ГРОМКОСТИ 60% (0.6)
         socket.on('play_sfx_stream', (data) => {
             if (myRole === 'SCREEN') {
-                const sfxAudio = new Audio(RENDER_SERVER_URL + data.file);
-                sfxAudio.volume = data.volume;
+                const sfxAudio = new Audio(CDN_BASE_URL + data.file);
+                sfxAudio.volume = 0.6; // ЗАФИКСИРОВАНО НА 60%
                 sfxAudio.play().catch(() => {});
             }
         });
@@ -574,7 +667,7 @@
             }
         }
 
-        // --- 5. HOST CONTROLS & LOGOUT ---
+        // --- 5. HOST CONTROLS & END EVENT ---
         function setVolumeSmooth(vol, btn) {
             document.querySelectorAll('#host-top-bar .btn-control').forEach(b => b.classList.remove('active'));
             if (btn) btn.classList.add('active');
@@ -583,16 +676,20 @@
 
         function setMood(mood) { socket.emit('host_audio_control', { mood: mood }); }
         function seekAudioTrack(seekTimeSeconds) { socket.emit('host_audio_control', { seek: seekTimeSeconds }); }
+        function togglePlayPause() { socket.emit('host_audio_control', { toggle_play: true }); }
         function triggerSfx(sfxType) { socket.emit('host_trigger_sfx', { sfx: sfxType }); }
+        function addTimer10s() { socket.emit('add_timer_10s'); }
         function closeActiveInteractive() { socket.emit('switch_module', { module: '' }); }
 
         function openLauncherModal() { document.getElementById('launcher-modal').style.display = 'flex'; }
         function closeLauncherModal() { document.getElementById('launcher-modal').style.display = 'none'; }
         
-        function openLogoutModal() { document.getElementById('logout-modal').style.display = 'flex'; }
-        function closeLogoutModal() { document.getElementById('logout-modal').style.display = 'none'; }
+        function openEndEventModal() { document.getElementById('end-event-modal').style.display = 'flex'; }
+        function closeEndEventModal() { document.getElementById('end-event-modal').style.display = 'none'; }
         
-        function confirmLogout() {
+        function confirmEndEvent() {
+            socket.emit('switch_module', { module: '' });
+            socket.emit('host_audio_control', { volume: 0 });
             localStorage.removeItem('eventos_active_session');
             location.reload();
         }
