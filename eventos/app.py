@@ -36,6 +36,7 @@ def load_config():
 config_data = load_config()
 connected_users = {}
 
+# Хранение текущего времени воспроизведения для каждого трека
 track_positions = {
     "lounge.mp3": 0.0,
     "active.mp3": 0.0,
@@ -52,6 +53,7 @@ system_state = {
     "current_track": "lounge.mp3",
     "is_playing": True,
     "seek_position": 0.0,
+    "track_duration": 0.0,
     "timer": {"active": False, "end_time": 0}
 }
 
@@ -118,6 +120,9 @@ def handle_add_timer_10s():
 @socketio.on('host_audio_control')
 def handle_audio_control(data):
     curr_track = system_state['current_track']
+
+    if 'duration' in data:
+        system_state['track_duration'] = float(data['duration'])
 
     if 'seek' in data:
         seek_val = float(data['seek'])
