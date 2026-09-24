@@ -23,8 +23,8 @@
             --glass-border: rgba(229, 231, 235, 0.25);
             --danger-red: #ef4444;
             --ios-font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Plus Jakarta Sans", sans-serif;
-            --top-height: 115px;
-            --bottom-height: 115px;
+            --top-height: 110px;
+            --bottom-height: 110px;
         }
 
         * { 
@@ -34,20 +34,31 @@
 
         body { background: var(--bg-black); color: #f8fafc; min-height: 100vh; overflow: hidden; position: relative; }
 
-        /* CANVAS PARTICLES (120 FPS) */
+        /* PARTICLES & GLOW */
         #particles-canvas { position: fixed; inset: 0; z-index: 1; pointer-events: none; }
         .bg-glow { position: fixed; inset: 0; z-index: 2; background: radial-gradient(circle at 50% 50%, rgba(245, 158, 11, 0.1) 0%, rgba(3, 7, 18, 0.96) 75%, #000000 100%); pointer-events: none; }
 
-        /* FLASH EFFECT */
-        #flash-overlay { position: fixed; inset: 0; z-index: 99998; background: #ffffff; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
+        /* HELLO OVERLAY */
+        #hello-overlay {
+            display: none; position: fixed; inset: 0; z-index: 99999; background: #000000;
+            align-items: center; justify-content: center; opacity: 1; transition: opacity 0.6s ease;
+        }
+        .hello-title {
+            font-family: 'Cinzel', serif; font-size: 4rem; font-weight: 900;
+            background: linear-gradient(135deg, #ffffff 0%, #fffbeb 40%, #f59e0b 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 40px var(--gold-glow), 0 0 20px var(--silver-glow);
+            animation: helloPulse 1.2s ease forwards;
+        }
+        @keyframes helloPulse { 0% { opacity: 0; transform: scale(0.8); } 50% { opacity: 1; transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
 
-        /* AUTH CARD */
+        /* AUTH CARD (ПРОСТОЙ ВХОД НА ПК И ТЕЛЕФОНЕ) */
         #auth-overlay { position: fixed; inset: 0; z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 20px; }
         .auth-card {
             background: var(--glass-card); border: 1px solid var(--glass-border); padding: 36px 28px;
             border-radius: 28px; width: 100%; max-width: 360px; text-align: center;
             box-shadow: 0 0 50px var(--gold-glow), 0 0 30px var(--silver-glow);
-            backdrop-filter: blur(25px); transition: all 0.3s ease;
+            backdrop-filter: blur(25px);
         }
         .auth-card.shake { animation: shake 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97) both; border-color: var(--danger-red); }
         @keyframes shake {
@@ -57,64 +68,47 @@
             40%, 60% { transform: translate3d(7px, 0, 0); }
         }
 
-        /* GENTLE SWAY ANIMATION ON 3 TAPS (WITHOUT RESIZING) */
         .brand-header {
-            font-family: 'Cinzel', serif; font-size: 2.1rem; font-weight: 900; letter-spacing: 2px;
+            font-family: 'Cinzel', serif; font-size: 2.3rem; font-weight: 900; letter-spacing: 2px;
             background: linear-gradient(135deg, #ffffff 0%, #fffbeb 30%, #e5e7eb 65%, #f59e0b 100%);
-            background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 25px var(--gold-glow), 0 0 35px var(--silver-glow);
-            cursor: pointer; display: inline-block; transition: opacity 0.3s ease;
-        }
-        .brand-header.sway { animation: gentleSway 0.35s ease-in-out; }
-        @keyframes gentleSway {
-            0% { transform: rotate(0deg); }
-            25% { transform: rotate(-4deg); }
-            75% { transform: rotate(4deg); }
-            100% { transform: rotate(0deg); }
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 25px var(--gold-glow);
         }
 
-        .auth-sub { color: #94a3b8; font-size: 0.85rem; margin: 12px 0 0; }
-        
-        #pin-container { 
-            max-height: 0; opacity: 0; overflow: hidden; 
-            transition: max-height 0.4s ease, opacity 0.4s ease, margin-top 0.4s ease; 
-        }
-        #pin-container.active { max-height: 200px; opacity: 1; margin-top: 20px; }
+        .auth-sub { color: #94a3b8; font-size: 0.88rem; margin: 10px 0 20px; }
 
         .auth-input {
             width: 100%; padding: 16px; border-radius: 14px; border: 1px solid var(--glass-border);
-            background: rgba(3, 7, 18, 0.8); color: #fff; text-align: center; font-size: 1.2rem; font-weight: 800; outline: none; letter-spacing: 6px;
+            background: rgba(3, 7, 18, 0.85); color: #fff; text-align: center; font-size: 1.25rem; font-weight: 800; outline: none; letter-spacing: 6px;
             user-select: text; -webkit-user-select: text;
         }
         .btn-gold {
             width: 100%; padding: 16px; border-radius: 14px; border: none;
             background: linear-gradient(135deg, #ffffff 0%, var(--gold-light) 40%, var(--gold-main) 100%);
-            color: #000; font-weight: 800; font-size: 0.95rem; cursor: pointer; margin-top: 12px;
-            box-shadow: 0 0 20px var(--gold-glow), 0 0 15px var(--silver-glow); transition: transform 0.15s ease, box-shadow 0.2s ease;
+            color: #000; font-weight: 800; font-size: 0.95rem; cursor: pointer; margin-top: 14px;
+            box-shadow: 0 0 20px var(--gold-glow); transition: transform 0.15s ease;
             display: inline-flex; align-items: center; justify-content: center; gap: 8px;
         }
         .btn-gold:active { transform: scale(0.97); }
 
-        /* HOST TOP CONTROL BAR */
+        /* HOST TOP BAR */
         #host-top-bar {
             display: none; position: fixed; top: 0; left: 0; right: 0; height: var(--top-height); z-index: 500;
             background: rgba(15, 23, 42, 0.96); border-bottom: 1px solid var(--glass-border);
             backdrop-filter: blur(20px); padding: 8px 14px; flex-direction: column; gap: 6px; justify-content: center;
-            box-shadow: 0 4px 25px rgba(0, 0, 0, 0.5);
         }
         .control-row { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
         .btn-control {
-            flex: 1; height: 36px; border-radius: 10px; border: 1px solid rgba(229, 231, 235, 0.18);
+            flex: 1; height: 34px; border-radius: 10px; border: 1px solid rgba(229, 231, 235, 0.18);
             background: rgba(30, 41, 59, 0.7); color: #ffffff; font-size: 0.78rem; font-weight: 800; cursor: pointer;
             transition: all 0.2s ease; display: inline-flex; align-items: center; justify-content: center;
         }
         .btn-control:active { transform: scale(0.95); }
         .btn-control.active { 
             background: linear-gradient(135deg, #ffffff 0%, var(--gold-main) 100%); color: #000; 
-            border-color: #ffffff; box-shadow: 0 0 15px var(--gold-glow), 0 0 10px var(--silver-glow); 
+            border-color: #ffffff; box-shadow: 0 0 15px var(--gold-glow); 
         }
 
-        /* TIMER & SEEKBAR */
         .seek-container { display: flex; align-items: center; gap: 8px; width: 100%; margin: 1px 0; }
         .btn-play-pause {
             width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--glass-border);
@@ -130,12 +124,6 @@
             background: var(--gold-main); cursor: pointer; box-shadow: 0 0 10px var(--gold-main);
         }
 
-        .timer-badge {
-            background: rgba(245, 158, 11, 0.18); border: 1px solid var(--gold-main); color: var(--gold-light);
-            padding: 4px 10px; border-radius: 8px; font-weight: 800; font-size: 0.75rem; cursor: pointer; flex-shrink: 0;
-            display: inline-flex; align-items: center; gap: 4px; box-shadow: 0 0 10px var(--gold-glow);
-        }
-
         .eq-bar-container { display: flex; align-items: flex-end; gap: 3px; height: 14px; }
         .eq-bar { width: 3px; background: var(--gold-main); border-radius: 2px; animation: eqAnim 1s ease-in-out infinite alternate; }
         .eq-bar:nth-child(2) { animation-delay: 0.2s; }
@@ -147,38 +135,32 @@
             display: none; position: fixed; bottom: 0; left: 0; right: 0; height: var(--bottom-height); z-index: 500;
             background: rgba(15, 23, 42, 0.98); border-top: 1px solid var(--glass-border);
             backdrop-filter: blur(20px); padding: 8px 14px; flex-direction: column; gap: 6px; justify-content: center;
-            box-shadow: 0 -4px 25px rgba(0, 0, 0, 0.5);
         }
         .launcher-row { display: flex; gap: 6px; width: 100%; }
         .btn-launch-trigger {
-            flex: 1; height: 42px; border-radius: 12px; border: 1px solid var(--gold-main);
+            flex: 1; height: 40px; border-radius: 12px; border: 1px solid var(--gold-main);
             background: linear-gradient(135deg, rgba(245, 158, 11, 0.25) 0%, rgba(229, 231, 235, 0.15) 100%);
-            color: var(--gold-light); font-weight: 800; font-size: 0.85rem; cursor: pointer;
+            color: var(--gold-light); font-weight: 800; font-size: 0.82rem; cursor: pointer;
             display: inline-flex; align-items: center; justify-content: center; gap: 6px;
-            box-shadow: 0 0 15px rgba(245, 158, 11, 0.2);
         }
         .btn-close-interactive {
-            display: inline-flex; flex: 1; height: 42px; border-radius: 12px; border: 1px solid var(--danger-red);
-            background: rgba(239, 68, 68, 0.2); color: #fca5a5; font-weight: 800; font-size: 0.85rem; cursor: pointer;
+            display: inline-flex; flex: 1; height: 40px; border-radius: 12px; border: 1px solid var(--danger-red);
+            background: rgba(239, 68, 68, 0.2); color: #fca5a5; font-weight: 800; font-size: 0.82rem; cursor: pointer;
             align-items: center; justify-content: center; gap: 6px;
         }
+        .btn-timer-add {
+            padding: 0 12px; height: 40px; border-radius: 12px; border: 1px solid var(--gold-main);
+            background: rgba(245, 158, 11, 0.2); color: var(--gold-light); font-weight: 800; font-size: 0.82rem; cursor: pointer;
+            display: inline-flex; align-items: center; justify-content: center; gap: 4px; flex-shrink: 0;
+        }
 
-        /* SFX VECTOR ICON BUTTONS */
         .sfx-grid { display: flex; gap: 6px; width: 100%; }
         .sfx-btn {
-            flex: 1; height: 42px; border-radius: 12px; border: 1px solid rgba(229, 231, 235, 0.2);
-            background: rgba(30, 41, 59, 0.85); color: #fff; font-size: 1.3rem; cursor: pointer;
-            display: inline-flex; align-items: center; justify-content: center;
-            transition: all 0.2s ease; box-shadow: 0 0 10px rgba(0,0,0,0.3);
+            flex: 1; height: 38px; border-radius: 12px; border: 1px solid rgba(229, 231, 235, 0.2);
+            background: rgba(30, 41, 59, 0.85); color: #fff; font-size: 1.2rem; cursor: pointer;
+            display: inline-flex; align-items: center; justify-content: center; transition: all 0.2s ease;
         }
-        .sfx-btn:hover { border-color: var(--gold-main); box-shadow: 0 0 15px var(--gold-glow); transform: translateY(-1px); }
         .sfx-btn:active { transform: scale(0.92); }
-
-        .btn-end-event {
-            padding: 0 14px; height: 42px; border-radius: 12px; border: 1px solid rgba(239, 68, 68, 0.5);
-            background: rgba(239, 68, 68, 0.2); color: #fca5a5; font-size: 0.8rem; font-weight: 800; cursor: pointer;
-            display: inline-flex; align-items: center; justify-content: center; gap: 6px; flex-shrink: 0;
-        }
 
         /* MODALS */
         .modal-overlay {
@@ -189,19 +171,18 @@
         .modal-card {
             background: var(--glass-card); border: 1px solid var(--glass-border);
             border-radius: 28px; padding: 26px; width: 100%; max-width: 380px; text-align: center;
-            box-shadow: 0 0 50px var(--gold-glow), 0 0 30px var(--silver-glow);
+            box-shadow: 0 0 50px var(--gold-glow);
         }
         .modules-grid { display: flex; flex-direction: column; gap: 10px; margin-top: 18px; }
         .mod-btn {
             padding: 15px; border-radius: 14px; border: 1px solid var(--glass-border);
             background: rgba(30, 41, 59, 0.8); color: #fff; font-size: 0.92rem; font-weight: 800; cursor: pointer;
-            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
         }
 
         /* MAIN VIEWPORT */
         #main-viewport {
-            position: fixed; inset: 0; z-index: 10; width: 100vw; height: 100vh;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            display: none; position: fixed; inset: 0; z-index: 10; width: 100vw; height: 100vh;
+            flex-direction: column; align-items: center; justify-content: center;
         }
 
         body.is-host #module-iframe {
@@ -224,11 +205,22 @@
             font-family: 'Cinzel', serif; font-size: 3.2rem; font-weight: 900;
             background: linear-gradient(90deg, #ffffff 0%, #fffbeb 25%, #f59e0b 50%, #e5e7eb 75%, #ffffff 100%);
             background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            animation: shine 4s linear infinite; text-shadow: 0 0 35px var(--gold-glow), 0 0 45px var(--silver-glow);
+            animation: shine 4s linear infinite; text-shadow: 0 0 35px var(--gold-glow);
         }
         @keyframes shine { to { background-position: 200% center; } }
 
         .subtitle-text { color: #94a3b8; font-size: 1.15rem; font-weight: 600; margin-top: 14px; letter-spacing: 1px; }
+
+        /* MAIN DISPLAY COUNTDOWN TIMER BADGE */
+        #main-timer-badge {
+            display: none; position: fixed; top: 125px; z-index: 100;
+            background: rgba(15, 23, 42, 0.92); border: 2px solid var(--gold-main);
+            color: var(--gold-light); padding: 12px 28px; border-radius: 20px;
+            font-family: 'Cinzel', serif; font-size: 2rem; font-weight: 900;
+            box-shadow: 0 0 35px var(--gold-glow); backdrop-filter: blur(15px);
+            animation: timerGlow 1s ease-in-out infinite alternate;
+        }
+        @keyframes timerGlow { 0% { box-shadow: 0 0 15px var(--gold-glow); } 100% { box-shadow: 0 0 35px var(--gold-glow); } }
     </style>
 </head>
 <body>
@@ -236,18 +228,18 @@
     <!-- PARTICLES & GLOW -->
     <canvas id="particles-canvas"></canvas>
     <div class="bg-glow"></div>
-    <div id="flash-overlay"></div>
+
+    <!-- HELLO OVERLAY -->
+    <div id="hello-overlay"><div class="hello-title">Hello</div></div>
 
     <!-- AUTH CARD -->
     <div id="auth-overlay">
         <div class="auth-card" id="auth-card">
-            <div class="brand-header" id="brand-logo" onclick="handleLogoTap()">FAMILY STANDARD</div>
-            <p class="auth-sub" id="auth-sub">Нажмите 3 раза для активации OS</p>
+            <div class="brand-header">EVENT OS</div>
+            <p class="auth-sub">Введите PIN-код для входа</p>
 
-            <div id="pin-container">
-                <input type="password" id="auth-input" class="auth-input" placeholder="ПИН-КОД" maxlength="6" autocomplete="off" onkeydown="if(event.key==='Enter') submitAuth()">
-                <button onclick="submitAuth()" class="btn-gold">ВОЙТИ В УПРАВЛЕНИЕ</button>
-            </div>
+            <input type="password" id="auth-input" class="auth-input" placeholder="ПИН-КОД" maxlength="6" autocomplete="off" onkeydown="if(event.key==='Enter') submitAuth()">
+            <button onclick="submitAuth()" class="btn-gold">ВОЙТИ В УПРАВЛЕНИЕ</button>
         </div>
     </div>
 
@@ -257,9 +249,8 @@
             <div class="eq-bar-container">
                 <div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div>
             </div>
-            <button class="timer-badge" onclick="addTimer10s()">⏱️ +10 сек (<span id="timer-val">00:00</span>)</button>
             
-            <span style="font-size: 0.72rem; color: var(--gold-light); font-weight: 800; margin-left: auto;">МУЗЫКА:</span>
+            <span style="font-size: 0.72rem; color: var(--gold-light); font-weight: 800; margin-left: auto;">ГРОМКОСТЬ:</span>
             <button class="btn-control" onclick="setVolumeSmooth(0.1, this)">10%</button>
             <button class="btn-control" onclick="setVolumeSmooth(0.2, this)">20%</button>
             <button class="btn-control active" onclick="setVolumeSmooth(0.3, this)">30%</button>
@@ -282,6 +273,9 @@
 
     <!-- MAIN VIEWPORT -->
     <div id="main-viewport">
+        <!-- COUNTDOWN TIMER BADGE ON MAIN DISPLAY -->
+        <div id="main-timer-badge">⏱️ <span id="timer-val">00:10</span></div>
+
         <iframe id="module-iframe" src="about:blank"></iframe>
         
         <div id="main-display-content">
@@ -299,11 +293,11 @@
         </div>
     </div>
 
-    <!-- END EVENT CONFIRM MODAL -->
+    <!-- END EVENT CONFIRM MODAL (ОТКРЫВАЕТСЯ ПО ТРОЙНОМУ КЛИКУ НА ЗАКРЫТЬ) -->
     <div class="modal-overlay" id="end-event-modal">
         <div class="modal-card">
-            <h3 style="color: var(--gold-light); font-family: 'Cinzel', serif; font-size: 1.2rem;">🏁 Завершение праздника</h3>
-            <p style="color: #94a3b8; font-size: 0.9rem; margin-top: 10px;">Завершить мероприятие, закрыть все интерактивы и выйти из управления?</p>
+            <h3 style="color: var(--gold-light); font-family: 'Cinzel', serif; font-size: 1.2rem;">🏁 Завершить весь праздник?</h3>
+            <p style="color: #94a3b8; font-size: 0.9rem; margin-top: 10px;">Сбросить управление, закрыть интерактивы и выйти?</p>
             <div style="display: flex; gap: 10px; margin-top: 20px;">
                 <button onclick="confirmEndEvent()" class="btn-gold" style="margin: 0; background: var(--danger-red); color: #fff;">Завершить</button>
                 <button onclick="closeEndEventModal()" style="flex: 1; padding: 14px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.1); background: transparent; color: #fff; font-weight: 700; cursor: pointer;">Отмена</button>
@@ -315,10 +309,13 @@
     <div id="host-bottom-bar">
         <div class="launcher-row">
             <button class="btn-launch-trigger" onclick="openLauncherModal()">
-                <span>➕</span><span>ВЫБРАТЬ ИНТЕРАКТИВ</span>
+                <span>➕</span><span>ИНТЕРАКТИВ</span>
             </button>
-            <button class="btn-close-interactive" onclick="closeActiveInteractive()">
-                <span>❌</span><span>ЗАКРЫТЬ ИНТЕРАКТИВ</span>
+            <button class="btn-close-interactive" onclick="handleCloseInteractiveClick()">
+                <span>❌</span><span>ЗАКРЫТЬ</span>
+            </button>
+            <button class="btn-timer-add" onclick="addTimer10s()">
+                <span>⏱️</span><span>+10 СЕК</span>
             </button>
         </div>
         <div class="sfx-grid">
@@ -326,11 +323,10 @@
             <button class="sfx-btn" onclick="triggerSfx('fanfare')" title="Фанфары">🎉</button>
             <button class="sfx-btn" onclick="triggerSfx('correct')" title="Тыдыщ / Правильно">✅</button>
             <button class="sfx-btn" onclick="triggerSfx('wrong')" title="Ошибка / Неправильно">❌</button>
-            <button class="btn-end-event" onclick="openEndEventModal()">🏁 ЗАВЕРШИТЬ</button>
         </div>
     </div>
 
-    <!-- DUAL AUDIO PLAYERS -->
+    <!-- DUAL AUDIO PLAYERS FOR CROSSFADE -->
     <audio id="audio-a" loop></audio>
     <audio id="audio-b" loop></audio>
 
@@ -344,12 +340,14 @@
             reconnectionAttempts: 10
         });
 
-        let tapCount = 0, tapTimer = null;
         let myRole = 'GUEST';
         let currentLoadedModule = '';
         let availableModules = [];
         let activePin = '';
         let timerInterval = null;
+
+        let closeClickCount = 0;
+        let closeClickTimer = null;
 
         const audioA = document.getElementById('audio-a');
         const audioB = document.getElementById('audio-b');
@@ -410,40 +408,6 @@
             }
         });
 
-        // --- 3. 3 TAPS SWAY ANIMATION ---
-        function handleLogoTap() {
-            tapCount++; clearTimeout(tapTimer);
-            const logo = document.getElementById('brand-logo');
-            
-            if (logo) {
-                logo.classList.remove('sway');
-                void logo.offsetWidth;
-                logo.classList.add('sway');
-            }
-
-            if (tapCount >= 3) {
-                const flash = document.getElementById('flash-overlay');
-                if (flash) {
-                    flash.style.opacity = '0.9';
-                    setTimeout(() => flash.style.opacity = '0', 300);
-                }
-                
-                logo.style.opacity = '0';
-                setTimeout(() => {
-                    logo.innerText = 'EVENT OS';
-                    logo.style.opacity = '1';
-                }, 150);
-
-                document.getElementById('auth-sub').innerText = 'Введите PIN-код для входа';
-                document.getElementById('pin-container').classList.add('active');
-                document.getElementById('auth-input').focus();
-
-                tapCount = 0;
-            } else { 
-                tapTimer = setTimeout(() => { tapCount = 0; }, 1200); 
-            }
-        }
-
         function triggerErrorShake() {
             const card = document.getElementById('auth-card');
             if (card) {
@@ -468,7 +432,7 @@
             socket.emit('login', { pin: val });
         }
 
-        // --- 4. SOCKET RESPONSES & STATE ---
+        // --- 3. SOCKET RESPONSES & HELLO SPLASH ---
         socket.on('login_response', (res) => {
             if (res.success) {
                 myRole = res.role;
@@ -478,15 +442,27 @@
                     pin: activePin
                 }));
 
+                // ЭФФЕКТ HELLO
+                const hello = document.getElementById('hello-overlay');
                 document.getElementById('auth-overlay').style.display = 'none';
+                hello.style.display = 'flex';
 
-                if (myRole === 'HOST') {
-                    document.body.classList.add('is-host');
-                    document.getElementById('host-top-bar').style.display = 'flex';
-                    document.getElementById('host-bottom-bar').style.display = 'flex';
-                } else if (myRole === 'SCREEN') {
-                    document.body.classList.add('is-screen');
-                }
+                setTimeout(() => {
+                    hello.style.opacity = '0';
+                    setTimeout(() => {
+                        hello.style.display = 'none';
+                        document.getElementById('main-viewport').style.display = 'flex';
+
+                        if (myRole === 'HOST') {
+                            document.body.classList.add('is-host');
+                            document.getElementById('host-top-bar').style.display = 'flex';
+                            document.getElementById('host-bottom-bar').style.display = 'flex';
+                        } else if (myRole === 'SCREEN') {
+                            document.body.classList.add('is-screen');
+                        }
+                    }, 500);
+                }, 1000);
+
             } else {
                 localStorage.removeItem('eventos_active_session');
                 triggerErrorShake();
@@ -527,8 +503,10 @@
                 loadModuleIframe(state.active_module);
             }
 
-            // ОБРАБОТКА ТАЙМЕРА
+            // ОБРАБОТКА ТАЙМЕРА (ОТОБРАЖАЕТСЯ НА ГЛАВНОМ ЭКРАНЕ)
+            const timerBadge = document.getElementById('main-timer-badge');
             if (state.timer && state.timer.active) {
+                timerBadge.style.display = 'block';
                 clearInterval(timerInterval);
                 timerInterval = setInterval(() => {
                     const remaining = Math.max(0, Math.round(state.timer.end_time - (Date.now() / 1000)));
@@ -542,7 +520,8 @@
                 }, 1000);
             } else {
                 clearInterval(timerInterval);
-                document.getElementById('timer-val').innerText = '00:00';
+                timerBadge.style.display = 'none';
+                document.getElementById('timer-val').innerText = '00:10';
             }
 
             // ЗВУК И КРОССФЕЙД МУЗЫКИ НА ЭКРАНЕ ПРОЕКТОРА
@@ -565,13 +544,60 @@
             }
         });
 
-        // ПЛАВНОЕ ЗАТУХАНИЕ / ПОДЪЕМ МУЗЫКИ
+        // ПЛАВНАЯ СМЕНА РЕЖИМОВ МУЗЫКИ С СОХРАНЕНИЕМ ПОЗИЦИИ
+        function setMood(mood) {
+            socket.emit('host_audio_control', {
+                mood: mood,
+                current_time: activeAudio.currentTime || 0
+            });
+        }
+
+        // ПЛАВНАЯ ПЕРЕМОТКА И КРОССФЕЙД (БЕЗ СБРОСА ОБЛАЧНОГО ТРЕКА)
+        function performAudioCrossfade(newTrackUrl, targetTime) {
+            inactiveAudio.src = newTrackUrl;
+            inactiveAudio.crossOrigin = "anonymous";
+            inactiveAudio.preload = "auto";
+            inactiveAudio.volume = 0;
+
+            const startPlayback = () => {
+                if (targetTime > 0 && inactiveAudio.duration && targetTime < inactiveAudio.duration) {
+                    inactiveAudio.currentTime = targetTime;
+                }
+                inactiveAudio.play().then(() => {
+                    let step = 0;
+                    const steps = 20;
+                    const crossfadeInterval = setInterval(() => {
+                        step++;
+                        const progress = step / steps;
+                        activeAudio.volume = Math.max(0, musicVolume * (1 - progress));
+                        inactiveAudio.volume = Math.min(musicVolume, musicVolume * progress);
+
+                        if (step >= steps) {
+                            clearInterval(crossfadeInterval);
+                            activeAudio.pause();
+                            const temp = activeAudio;
+                            activeAudio = inactiveAudio;
+                            inactiveAudio = temp;
+                        }
+                    }, 40);
+                }).catch(() => {});
+            };
+
+            if (inactiveAudio.readyState >= 1) {
+                startPlayback();
+            } else {
+                inactiveAudio.onloadedmetadata = () => {
+                    startPlayback();
+                    inactiveAudio.onloadedmetadata = null;
+                };
+            }
+        }
+
         function smoothFadePlay() {
             clearInterval(playPauseFadeInterval);
             activeAudio.volume = 0;
             activeAudio.play().then(() => {
-                let step = 0;
-                const steps = 20;
+                let step = 0; const steps = 20;
                 playPauseFadeInterval = setInterval(() => {
                     step++;
                     activeAudio.volume = Math.min(musicVolume, musicVolume * (step / steps));
@@ -582,8 +608,7 @@
 
         function smoothFadePause() {
             clearInterval(playPauseFadeInterval);
-            let step = 0;
-            const steps = 20;
+            let step = 0; const steps = 20;
             const startVol = activeAudio.volume;
             playPauseFadeInterval = setInterval(() => {
                 step++;
@@ -602,8 +627,7 @@
             clearInterval(volumeFadeInterval);
             const startVol = activeAudio.volume;
             const diff = targetVol - startVol;
-            let step = 0;
-            const steps = 20;
+            let step = 0; const steps = 20;
 
             volumeFadeInterval = setInterval(() => {
                 step++;
@@ -615,38 +639,10 @@
             }, 25);
         }
 
-        function performAudioCrossfade(newTrackUrl, targetTime) {
-            inactiveAudio.src = newTrackUrl;
-            inactiveAudio.volume = 0;
-            inactiveAudio.currentTime = targetTime;
-
-            inactiveAudio.play().then(() => {
-                let step = 0;
-                const steps = 24;
-                const crossfadeInterval = setInterval(() => {
-                    step++;
-                    const progress = step / steps;
-                    
-                    activeAudio.volume = Math.max(0, musicVolume * (1 - progress));
-                    inactiveAudio.volume = Math.min(musicVolume, musicVolume * progress);
-
-                    if (step >= steps) {
-                        clearInterval(crossfadeInterval);
-                        activeAudio.pause();
-                        
-                        const temp = activeAudio;
-                        activeAudio = inactiveAudio;
-                        inactiveAudio = temp;
-                    }
-                }, 50);
-            }).catch(() => {});
-        }
-
-        // SFX ИГРАЮТ ВСЕГДА НА ГРОМКОСТИ 60% (0.6)
         socket.on('play_sfx_stream', (data) => {
             if (myRole === 'SCREEN') {
                 const sfxAudio = new Audio(CDN_BASE_URL + data.file);
-                sfxAudio.volume = 0.6; // ЗАФИКСИРОВАНО НА 60%
+                sfxAudio.volume = 0.6;
                 sfxAudio.play().catch(() => {});
             }
         });
@@ -667,19 +663,31 @@
             }
         }
 
-        // --- 5. HOST CONTROLS & END EVENT ---
+        // --- 4. ЗАКРЫТИЕ И ТРОЙНОЙ КЛИК НА ЗАКРЫТЬ ---
+        function handleCloseInteractiveClick() {
+            socket.emit('switch_module', { module: '' });
+
+            closeClickCount++;
+            clearTimeout(closeClickTimer);
+
+            if (closeClickCount >= 3) {
+                openEndEventModal();
+                closeClickCount = 0;
+            } else {
+                closeClickTimer = setTimeout(() => { closeClickCount = 0; }, 1500);
+            }
+        }
+
         function setVolumeSmooth(vol, btn) {
             document.querySelectorAll('#host-top-bar .btn-control').forEach(b => b.classList.remove('active'));
             if (btn) btn.classList.add('active');
             socket.emit('host_audio_control', { volume: vol });
         }
 
-        function setMood(mood) { socket.emit('host_audio_control', { mood: mood }); }
         function seekAudioTrack(seekTimeSeconds) { socket.emit('host_audio_control', { seek: seekTimeSeconds }); }
         function togglePlayPause() { socket.emit('host_audio_control', { toggle_play: true }); }
         function triggerSfx(sfxType) { socket.emit('host_trigger_sfx', { sfx: sfxType }); }
         function addTimer10s() { socket.emit('add_timer_10s'); }
-        function closeActiveInteractive() { socket.emit('switch_module', { module: '' }); }
 
         function openLauncherModal() { document.getElementById('launcher-modal').style.display = 'flex'; }
         function closeLauncherModal() { document.getElementById('launcher-modal').style.display = 'none'; }
