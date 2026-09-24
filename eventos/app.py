@@ -17,26 +17,12 @@ socketio = SocketIO(
 CONFIG_FILE = 'event_data.json'
 
 def load_config():
-    if os.path.exists(CONFIG_FILE):
-        try:
-            with open(CONFIG_FILE, 'r', encoding='utf-8') as f:
-                return json.load(f)
-        except Exception:
-            pass
-    return {
-        "event_title": "FAMILY STANDARD OS", 
-        "event_subtitle": "С праздником!",
-        "host_name": "Богдан", 
-        "host_pin": "111", 
-        "screen_pin": "222",
-        "cdn_base_url": "https://pub-372ba5f717cf4a8694558f47682d65d9.r2.dev/",
-        "modules": []
-    }
+    with open(CONFIG_FILE, 'r', encoding='utf-8') as f:
+        return json.load(f)
 
 config_data = load_config()
 connected_users = {}
 
-# Хранение текущего времени воспроизведения для каждого трека
 track_positions = {
     "lounge.mp3": 0.0,
     "active.mp3": 0.0,
@@ -51,7 +37,7 @@ system_state = {
     "audio_volume": 0.3,
     "current_mood": "lounge",
     "current_track": "lounge.mp3",
-    "is_playing": True,
+    "is_playing": False,
     "seek_position": 0.0,
     "track_duration": 0.0,
     "timer": {"active": False, "end_time": 0}
