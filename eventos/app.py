@@ -36,6 +36,13 @@ def load_config():
 config_data = load_config()
 connected_users = {}
 
+# Память позиций воспроизведения для каждого трека
+track_positions = {
+    "lounge.mp3": 0.0,
+    "active.mp3": 0.0,
+    "party.mp3": 0.0
+}
+
 system_state = {
     "active_module": "",
     "host_name": config_data.get("host_name", "Богдан"),
@@ -45,7 +52,7 @@ system_state = {
     "current_mood": "lounge",
     "current_track": "lounge.mp3",
     "is_playing": True,
-    "seek_position": 0,
+    "seek_position": 0.0,
     "timer": {"active": False, "end_time": 0}
 }
 
@@ -98,7 +105,6 @@ def handle_switch_module(data):
     system_state['active_module'] = module_path
     socketio.emit('state_update', system_state)
 
-# ИНКРЕМЕНТАЛЬНЫЙ ТАЙМЕР +10 СЕКУНД
 @socketio.on('add_timer_10s')
 def handle_add_timer_10s():
     now = time.time()
@@ -117,16 +123,28 @@ def handle_stop_timer():
 
 @socketio.on('host_audio_control')
 def handle_audio_control(data):
+    curr_track = system_state['current_track']
+
+    if 'seek' in data:
+        seek_val = float(data['seek'])
+        system_state['seek_position'] = seek_val
+        track_positions[curr_track] = seek_val
+
     if 'volume' in data:
         system_state['audio_volume'] = float(data['volume'])
+
     if 'mood' in data:
+        if 'current_time' in data:
+            track_positions[curr_track] = float(data['current_time'])
+        
         mood = data['mood']
+        new_track = f"{mood}.mp3"
         system_state['current_mood'] = mood
-        system_state['current_track'] = f"{mood}.mp3"
+        system_state['current_track'] = new_track
         system_state['is_playing'] = True
-        system_state['seek_position'] = random.randint(5, 20)
-    if 'seek' in data:
-        system_state['seek_position'] = float(data['seek'])
+        # Восстановление сохраненной позиции для нового режима
+        system_state['seek_position'] = track_positions.get(new_track, 0.0)
+
     if 'toggle_play' in data:
         system_state['is_playing'] = not system_state['is_playing']
 
@@ -134,13 +152,13 @@ def handle_audio_control(data):
 
 @socketio.on('host_trigger_sfx')
 def handle_trigger_sfx(data):
-    sfx_type = data.get('sfx') # applause, fanfare, correct, wrong
+    sfx_type = data.get('sfx')
     var_id = random.randint(1, 3)
     file_name = f"{sfx_type}_{var_id}.mp3"
     
     socketio.emit('play_sfx_stream', {
         'file': file_name,
-        'volume': 0.6  # ЗВУКИ ВСЕГДА НА 60%
+        'volume': 0.6
     })
 
 if __name__ == '__main__':
