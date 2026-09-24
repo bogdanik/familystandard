@@ -17,7 +17,9 @@ def load_config():
         return {"cdn_base_url": "https://pub-372ba5f717cf4a8694558f47682d65d9.r2.dev/", "modules": []}
 
 config = load_config()
-sfx_counters = {"fanfare": 0, "applause": 0, "correct": 0, "wrong": 0}
+
+# Заменили fanfare на jingle (проигрывки/подарки)
+sfx_counters = {"jingle": 0, "applause": 0, "correct": 0, "wrong": 0}
 track_positions = {"lounge.mp3": 0.0, "active.mp3": 0.0, "party.mp3": 0.0}
 
 system_state = {
@@ -75,7 +77,6 @@ def switch_module(data):
 @socketio.on('add_timer_10s')
 def add_timer():
     now = time.time()
-    # Жесткая проверка: если таймер жив, просто прибавляем 10 секунд
     if system_state['timer']['active'] and system_state['timer']['end_time'] > now:
         system_state['timer']['end_time'] += 10
     else:
@@ -85,7 +86,6 @@ def add_timer():
 
 @socketio.on('timer_done')
 def timer_done():
-    # Защита от случайных срабатываний: принимаем только если время РЕАЛЬНО вышло
     if system_state['timer']['end_time'] <= time.time() + 1:
         system_state['timer']['active'] = False
         system_state['timer']['end_time'] = 0
@@ -99,7 +99,7 @@ def audio_control(data):
     if 'volume' in data:
         system_state['audio_volume'] = float(data['volume'])
     
-    # Перемотка на 1 МИНУТУ (60 секунд)
+    # Перемотка на 1 минуту (60 сек)
     if 'seek_relative' in data:
         new_seek = system_state['seek_position'] + float(data['seek_relative'])
         if new_seek < 0: new_seek = 0
