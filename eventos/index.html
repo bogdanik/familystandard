@@ -22,7 +22,7 @@
             --glass-border: rgba(229, 231, 235, 0.2);
             --danger-red: #ef4444;
             --ios-font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Plus Jakarta Sans", sans-serif;
-            --top-bar-height: 110px;
+            --top-bar-height: 105px;
             --bottom-bar-height: 95px;
         }
 
@@ -115,7 +115,7 @@
 
         .seek-container { display: flex; align-items: center; gap: 8px; width: 100%; }
         .btn-play-pause {
-            width: 30px; height: 30px; border-radius: 8px; border: 1px solid var(--glass-border);
+            width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--glass-border);
             background: rgba(245, 158, 11, 0.2); color: var(--gold-light); font-size: 0.85rem;
             display: inline-flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0;
         }
@@ -189,6 +189,7 @@
 
         #main-display-content {
             text-align: center; max-width: 600px; width: 100%; padding: 20px; z-index: 10;
+            transition: opacity 0.3s ease;
         }
         .shimmer-title {
             font-family: 'Cinzel', serif; font-size: 3.2rem; font-weight: 900;
@@ -200,14 +201,14 @@
 
         .subtitle-text { color: #94a3b8; font-size: 1.15rem; font-weight: 600; margin-top: 14px; letter-spacing: 1px; }
 
-        /* FULLSCREEN TIMER OVERLAY (ЧИСТЫЙ ТЕКСТ БЕЗ ОБВОДОК) */
+        /* FULLSCREEN TIMER (ЧИСТЫЙ ТЕКСТ БЕЗ ОБВОДОК) */
         #full-screen-timer {
             display: none; position: fixed; inset: 0; z-index: 900;
             align-items: center; justify-content: center; pointer-events: none;
         }
         .timer-huge-text {
-            font-family: 'Cinzel', serif; font-size: 22vw; font-weight: 900; color: #ffffff;
-            text-shadow: 0 0 40px var(--gold-glow), 0 0 80px rgba(245, 158, 11, 0.6);
+            font-family: 'Cinzel', serif; font-size: 20vw; font-weight: 900; color: #ffffff;
+            text-shadow: 0 0 40px var(--gold-glow), 0 0 80px rgba(245, 158, 11, 0.5);
             letter-spacing: 2px;
         }
     </style>
@@ -235,16 +236,6 @@
 
     <!-- HOST TOP CONTROL BAR -->
     <div id="host-top-bar">
-        <div style="display: flex; justify-content: space-between; font-size: 0.72rem; color: var(--gold-light); font-weight: 800; padding: 0 2px;">
-            <span id="host-track-name">🍃 Лаундж</span>
-            <span id="host-time-display">00:00 / 00:00</span>
-        </div>
-
-        <div class="seek-container">
-            <button class="btn-play-pause" id="btn-play-toggle" onclick="togglePlayPause()">⏸</button>
-            <input type="range" id="host-seek-bar" class="seek-bar" min="0" max="100" value="0" oninput="isUserSeeking=true" onchange="seekAudioTrack(this.value)">
-        </div>
-
         <div class="control-row">
             <span style="font-size: 0.68rem; color: var(--gold-light); font-weight: 800;">ГРОМКОСТЬ:</span>
             <button class="btn-control" onclick="setVolumeSmooth(0.1, this)">10%</button>
@@ -252,6 +243,11 @@
             <button class="btn-control active" onclick="setVolumeSmooth(0.3, this)">30%</button>
             <button class="btn-control" onclick="setVolumeSmooth(0.6, this)">60%</button>
             <button class="btn-control" onclick="setVolumeSmooth(1.0, this)">100%</button>
+        </div>
+
+        <div class="seek-container">
+            <button class="btn-play-pause" id="btn-play-toggle" onclick="togglePlayPause()">⏸</button>
+            <input type="range" id="host-seek-bar" class="seek-bar" min="0" max="100" value="0" oninput="isUserSeeking=true" onchange="seekAudioTrack(this.value)">
         </div>
 
         <div class="control-row">
@@ -335,7 +331,6 @@
         let isUserSeeking = false;
 
         const bgAudio = document.getElementById('bg-audio');
-        bgAudio.crossOrigin = "anonymous";
         let musicVolume = 0.3;
 
         // --- PARTICLES ---
@@ -386,6 +381,7 @@
             if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
         }
 
+        // РАЗБЛОКИРОВКА АУДИОДВИЖКА В БРАУЗЕРЕ ПРИ ВХОДЕ
         function unlockAudioEngine() {
             bgAudio.play().then(() => {
                 bgAudio.pause();
@@ -405,7 +401,7 @@
             socket.emit('login', { pin: val });
         }
 
-        // --- SOCKET RESPONSES ---
+        // --- СОКЕТЫ И РЕАКЦИЯ ---
         socket.on('login_response', (res) => {
             if (res.success) {
                 myRole = res.role;
@@ -474,7 +470,6 @@
                 if (myRole === 'HOST') {
                     const cur = bgAudio.currentTime || 0;
                     const dur = bgAudio.duration || 0;
-                    document.getElementById('host-time-display').innerText = `${formatTime(cur)} / ${formatTime(dur)}`;
                     
                     if (!isUserSeeking && dur > 0) {
                         const seekBar = document.getElementById('host-seek-bar');
@@ -485,29 +480,30 @@
             }, 500);
         }
 
-        bgAudio.onloadedmetadata = () => {
-            if (myRole === 'SCREEN') {
-                socket.emit('host_audio_control', { duration: bgAudio.duration });
-            }
-        };
-
         socket.on('state_update', (state) => {
             if (state.event_title) document.getElementById('display-title').innerText = state.event_title;
             if (state.event_subtitle) document.getElementById('display-subtitle').innerText = state.event_subtitle;
 
             musicVolume = state.audio_volume;
 
+            const displayContent = document.getElementById('main-display-content');
+            const isTimerActive = state.timer && state.timer.active;
+            const isModuleActive = state.active_module && state.active_module.length > 0;
+
+            // СКРЫВАЕМ «FAMILY STANDARD OS», ЕСЛИ АКТИВЕН ТАЙМЕР ИЛИ ИНТЕРАКТИВ
+            if (isTimerActive || isModuleActive) {
+                displayContent.style.display = 'none';
+            } else {
+                displayContent.style.display = 'block';
+            }
+
             if (state.active_module !== undefined && currentLoadedModule !== state.active_module) {
                 loadModuleIframe(state.active_module);
             }
 
-            const trackTitles = { "lounge.mp3": "🍃 Лаундж", "active.mp3": "🕺 Банкет", "party.mp3": "🎉 Движ" };
-            const titleEl = document.getElementById('host-track-name');
-            if (titleEl) titleEl.innerText = `${trackTitles[state.current_track] || 'Музыка'}`;
-
             // ПОЛНОЭКРАННЫЙ ТАЙМЕР
             const timerContainer = document.getElementById('full-screen-timer');
-            if (state.timer && state.timer.active) {
+            if (isTimerActive) {
                 timerContainer.style.display = 'flex';
                 clearInterval(timerInterval);
                 timerInterval = setInterval(() => {
@@ -518,6 +514,7 @@
                         clearInterval(timerInterval);
                         timerContainer.style.display = 'none';
                         
+                        // ВСПЫШКА
                         const flash = document.getElementById('flash-overlay');
                         if (flash) {
                             flash.style.opacity = '1';
@@ -532,7 +529,7 @@
                 document.getElementById('timer-val').innerText = '00:10';
             }
 
-            // УПРАВЛЕНИЕ АУДИО ПЛЕЕРОМ
+            // ВОСПРОИЗВЕДЕНИЕ МУЗЫКИ НА ЭКРАНЕ
             if (myRole === 'SCREEN') {
                 const trackUrl = CDN_BASE_URL + state.current_track;
                 bgAudio.volume = musicVolume;
@@ -545,7 +542,7 @@
                     if (state.seek_position > 0) bgAudio.currentTime = state.seek_position;
                     if (state.is_playing) bgAudio.play().catch(() => {});
                 } else {
-                    if (Math.abs(bgAudio.currentTime - state.seek_position) > 2) {
+                    if (Math.abs(bgAudio.currentTime - state.seek_position) > 2.5) {
                         bgAudio.currentTime = state.seek_position;
                     }
                     if (state.is_playing && bgAudio.paused) bgAudio.play().catch(() => {});
@@ -572,6 +569,7 @@
             socket.emit('host_audio_control', { volume: vol });
         }
 
+        // SFX ЭФФЕКТЫ
         socket.on('play_sfx_stream', (data) => {
             if (myRole === 'SCREEN') {
                 const sfxAudio = new Audio(CDN_BASE_URL + data.file);
@@ -583,19 +581,17 @@
         function loadModuleIframe(modulePath) {
             currentLoadedModule = modulePath;
             const iframe = document.getElementById('module-iframe');
-            const displayContent = document.getElementById('main-display-content');
 
             if (modulePath && modulePath.length > 0) {
                 iframe.src = modulePath.startsWith('http') ? modulePath : `/${modulePath}`;
                 iframe.style.display = 'block';
-                displayContent.style.display = 'none';
             } else {
                 iframe.style.display = 'none';
                 iframe.src = 'about:blank';
-                displayContent.style.display = 'block';
             }
         }
 
+        // ЗАКРЫТИЕ ИНТЕРАКТИВА И ТРОЙНОЙ КЛИК
         function handleCloseInteractiveClick() {
             socket.emit('switch_module', { module: '' });
 
