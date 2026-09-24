@@ -25,18 +25,22 @@
         .bg-glow { position: fixed; inset: 0; z-index: 1; background: #000000; pointer-events: none; }
         .center-glow { 
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 70vw; height: 70vw; 
-            background: radial-gradient(circle, rgba(245, 158, 11, 0.25) 0%, rgba(245, 158, 11, 0.05) 40%, transparent 70%); 
+            width: 80vw; height: 80vw; 
+            background: radial-gradient(circle, rgba(245, 158, 11, 0.35) 0%, rgba(245, 158, 11, 0.08) 40%, transparent 70%); 
             pointer-events: none; z-index: 2; 
         }
         #particles-canvas { position: fixed; inset: 0; z-index: 3; pointer-events: none; }
 
+        /* FOOTER BRANDING */
+        .footer-logo { position: fixed; bottom: 12px; width: 100%; text-align: center; color: rgba(255,255,255,0.25); font-size: 0.7rem; font-weight: 800; letter-spacing: 3px; z-index: 100; pointer-events: none; }
+
         /* АВТОРИЗАЦИЯ */
         #auth-overlay { position: fixed; inset: 0; z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 20px; }
-        .auth-card { background: var(--glass-card); border: 1px solid var(--glass-border); padding: 32px 26px; border-radius: 24px; width: 100%; max-width: 350px; text-align: center; box-shadow: 0 0 40px var(--gold-glow); z-index: 10001; }
+        .auth-card { background: var(--glass-card); border: 1px solid var(--glass-border); padding: 36px 26px; border-radius: 24px; width: 100%; max-width: 360px; text-align: center; box-shadow: 0 0 50px var(--gold-glow); z-index: 10001; }
         .brand-header { font-family: 'Cinzel', serif; font-size: 2.2rem; font-weight: 900; background: linear-gradient(135deg, #ffffff 0%, #fffbeb 30%, #e5e7eb 65%, #f59e0b 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .auth-input { width: 100%; padding: 15px; border-radius: 12px; border: 1px solid var(--glass-border); background: rgba(3, 7, 18, 0.85); color: #fff; text-align: center; font-size: 1.2rem; font-weight: 800; margin: 15px 0; outline: none; letter-spacing: 6px; user-select: text; }
-        .btn-gold { width: 100%; padding: 15px; border-radius: 12px; border: none; background: linear-gradient(135deg, #ffffff 0%, var(--gold-light) 40%, var(--gold-main) 100%); color: #000; font-weight: 800; cursor: pointer; }
+        .auth-sub { color: #94a3b8; font-size: 0.8rem; font-weight: 600; margin: 8px 0 20px; letter-spacing: 1px; }
+        .auth-input { width: 100%; padding: 16px; border-radius: 12px; border: 1px solid var(--glass-border); background: rgba(3, 7, 18, 0.85); color: #fff; text-align: center; font-size: 1.2rem; font-weight: 800; outline: none; letter-spacing: 6px; user-select: text; }
+        .btn-gold { width: 100%; padding: 16px; border-radius: 12px; border: none; background: linear-gradient(135deg, #ffffff 0%, var(--gold-light) 40%, var(--gold-main) 100%); color: #000; font-weight: 800; cursor: pointer; margin-top: 15px; }
 
         /* ПУЛЬТ: ВЕРХ */
         #host-top-bar { display: none; position: fixed; top: 0; left: 0; right: 0; height: var(--top-bar-height); z-index: 500; background: rgba(15, 23, 42, 0.97); border-bottom: 1px solid var(--glass-border); padding: 12px; flex-direction: column; gap: 10px; justify-content: center; }
@@ -52,11 +56,11 @@
         .btn-action { flex: 1; height: 36px; border-radius: 8px; border: 1px solid var(--glass-border); font-weight: 800; font-size: 0.78rem; cursor: pointer; }
         .btn-action.gold { background: rgba(245, 158, 11, 0.2); color: var(--gold-light); border-color: var(--gold-main); }
         .btn-action.red { background: rgba(239, 68, 68, 0.2); color: #fca5a5; border-color: var(--danger-red); }
+        .sfx-active { background: rgba(245, 158, 11, 0.3) !important; border-color: var(--gold-main) !important; box-shadow: 0 0 15px var(--gold-glow); }
 
         /* ЭКРАН ПРОЕКТОРА */
         #main-viewport { display: none; position: fixed; inset: 0; z-index: 10; flex-direction: column; align-items: center; justify-content: center; }
         
-        /* Плавное исчезновение/появление Iframe */
         body.is-host #module-iframe { top: var(--top-bar-height) !important; bottom: var(--bottom-bar-height) !important; height: calc(100vh - var(--top-bar-height) - var(--bottom-bar-height)) !important; }
         #module-iframe { display: none; position: fixed; inset: 0; width: 100vw; height: 100vh; border: none; z-index: 15; background: #000; opacity: 0; transition: opacity 1s ease-in-out; }
         
@@ -70,7 +74,7 @@
         .timer-huge-text { font-family: 'Cinzel', serif; font-size: 22vw; font-weight: 900; color: #ffffff; text-shadow: 0 0 40px var(--gold-glow); }
 
         /* ЭКВАЛАЙЗЕР */
-        #eq-canvas { position: absolute; bottom: 0; left: 0; width: 100%; height: 160px; z-index: 5; pointer-events: none; opacity: 0.7; }
+        #eq-canvas { position: absolute; bottom: 0; left: 0; width: 100%; height: 180px; z-index: 5; pointer-events: none; opacity: 0.8; }
 
         /* МОДАЛКИ */
         .modal-overlay { display: none; position: fixed; inset: 0; z-index: 20000; background: rgba(0,0,0,0.85); align-items: center; justify-content: center; padding: 20px; }
@@ -87,7 +91,8 @@
     <div id="auth-overlay">
         <div class="auth-card" id="auth-card">
             <div class="brand-header">EVENT OS</div>
-            <input type="password" id="auth-input" class="auth-input" placeholder="ПИН-КОД">
+            <p class="auth-sub">СИСТЕМА УПРАВЛЕНИЯ</p>
+            <input type="password" id="auth-input" class="auth-input" placeholder="КОД ДОСТУПА" autocomplete="off" onkeydown="if(event.key==='Enter') submitAuth()">
             <button onclick="submitAuth()" class="btn-gold">ВОЙТИ</button>
         </div>
     </div>
@@ -95,7 +100,6 @@
     <!-- ПУЛЬТ ВЕДУЩЕГО -->
     <div id="host-top-bar">
         <div class="control-row">
-            <!-- Изменено 0% на 3% -->
             <button class="btn-control" onclick="setVol(0.03, this)">3%</button>
             <button class="btn-control" onclick="setVol(0.1, this)">10%</button>
             <button class="btn-control active" onclick="setVol(0.3, this)">30%</button>
@@ -110,6 +114,7 @@
         </div>
 
         <div class="control-row">
+            <!-- ПЕРЕМОТКА 60 секунд -->
             <div class="seek-btn" onclick="seekRelative(-60)">⏪</div>
             <div class="seek-btn play-btn" id="btn-play-toggle" onclick="togglePlay()">⏯</div>
             <div class="seek-btn" onclick="seekRelative(60)">⏩</div>
@@ -121,13 +126,15 @@
         <canvas id="eq-canvas"></canvas>
         <div id="full-screen-timer"><div class="timer-huge-text" id="timer-val">00:00</div></div>
         
-        <!-- Iframe для интерактивов с opacity -->
         <iframe id="module-iframe" src="about:blank"></iframe>
         
         <div id="main-display-content">
             <h1 class="shimmer-title" id="display-title">FAMILY STANDARD OS</h1>
             <p class="subtitle-text" id="display-subtitle">С праздником!</p>
         </div>
+        
+        <!-- Фирменный логотип -->
+        <div class="footer-logo">FAMILY STANDARD OS 2026</div>
     </div>
 
     <!-- НИЖНЯЯ ПАНЕЛЬ -->
@@ -135,11 +142,11 @@
         <div class="control-row">
             <button class="btn-action gold" onclick="openModal('launcher-modal')">ИНТЕРАКТИВ</button>
             <button class="btn-action red" onclick="handleCloseClick()">ЗАКРЫТЬ</button>
-            <button class="btn-action gold" onclick="socket.emit('add_timer_10s')" style="flex: 0.6;">+10 СЕК</button>
+            <button class="btn-action gold" onclick="socket.emit('add_timer_15s')" style="flex: 0.6;">+15 СЕК</button>
         </div>
         <div class="control-row">
-            <!-- Заменили fanfare на Джингл (Подарки) 🎁 -->
-            <button class="seek-btn" onclick="triggerSfx('jingle')" style="font-size:1.2rem">🎁</button>
+            <!-- Кнопка Джингла (Подарок) - 4 трека -->
+            <button class="seek-btn" id="btn-jingle" onclick="socket.emit('host_toggle_jingle')" style="font-size:1.2rem">🎁</button>
             <button class="seek-btn" onclick="triggerSfx('applause')" style="font-size:1.2rem">👏</button>
             <button class="seek-btn" onclick="triggerSfx('correct')" style="font-size:1.2rem">✅</button>
             <button class="seek-btn" onclick="triggerSfx('wrong')" style="font-size:1.2rem">❌</button>
@@ -165,7 +172,9 @@
         </div>
     </div>
 
+    <!-- ДВА АУДИО ИСТОЧНИКА НА ЭКРАНЕ (Фон и SFX) -->
     <audio id="bg-audio" loop></audio>
+    <audio id="sfx-audio"></audio>
 
     <script>
         const socket = io("https://event-os-wqoa.onrender.com", { transports: ['websocket', 'polling'] });
@@ -174,22 +183,27 @@
         let myRole = 'GUEST';
         let timerInterval = null;
         let timerDelayTimeout = null;
-        let overlayState = 'TITLE'; // 'TITLE', 'WAITING_3S', 'TIMER', 'FADING_TIMER', 'MODULE'
+        let overlayState = 'TITLE'; 
         
         let closeClickCount = 0;
         let closeClickTimer = null;
 
-        // --- Улучшенный Плавный Аудио-движок ---
+        // --- УМНЫЙ АУДИО-МЕНЕДЖЕР (С DUCKING'ОМ) ---
         const bgAudio = document.getElementById('bg-audio');
+        const sfxAudio = document.getElementById('sfx-audio');
+        
         let targetVolume = 0.3;      
         let actualVolumeTarget = 0;  
         let isFadingToSeek = false;
         let pendingSeekTime = 0;
         
+        let isSfxActive = false; // Флаг, что SFX сейчас звучит
+        let sfxTargetVol = 0;
+
         let eqIsPlaying = false;
         let eqVolume = 0.3;
 
-        // --- ЧАСТИЦЫ (Увеличено до 100) ---
+        // --- ЧАСТИЦЫ ---
         const pCanvas = document.getElementById('particles-canvas');
         const pCtx = pCanvas.getContext('2d');
         let particles = [];
@@ -202,23 +216,22 @@
             update() { this.x += this.speedX; this.y += this.speedY; if (this.x < 0 || this.x > pCanvas.width || this.y < 0 || this.y > pCanvas.height) this.reset(); }
             draw() { pCtx.fillStyle = `rgba(245, 158, 11, ${this.alpha})`; pCtx.beginPath(); pCtx.arc(this.x, this.y, this.size, 0, Math.PI * 2); pCtx.fill(); }
         }
-        for (let i = 0; i < 100; i++) particles.push(new Particle());
+        for (let i = 0; i < 110; i++) particles.push(new Particle());
         function animateParticles() { pCtx.clearRect(0, 0, pCanvas.width, pCanvas.height); particles.forEach(p => { p.update(); p.draw(); }); requestAnimationFrame(animateParticles); }
         requestAnimationFrame(animateParticles);
 
-        // --- ЭКВАЛАЙЗЕР (Выше и чувствительнее) ---
+        // --- ЭКВАЛАЙЗЕР ---
         const eqCanvas = document.getElementById('eq-canvas');
         const eqCtx = eqCanvas.getContext('2d');
         function resizeEqCanvas() { eqCanvas.width = window.innerWidth; }
         window.addEventListener('resize', resizeEqCanvas);
         resizeEqCanvas();
-        let eqBars = Array.from({length: 70}, () => Math.random());
+        let eqBars = Array.from({length: 80}, () => Math.random());
         function drawEq() {
             eqCtx.clearRect(0, 0, eqCanvas.width, eqCanvas.height);
             const barWidth = eqCanvas.width / eqBars.length;
             for(let i = 0; i < eqBars.length; i++) {
-                // Более чувствительная реакция: умножаем на 200 и добавляем 0.2 к громкости базы
-                let targetH = eqIsPlaying ? (Math.random() * 220 * (eqVolume + 0.15)) : 2;
+                let targetH = eqIsPlaying ? (Math.random() * 250 * (eqVolume + 0.2)) : 2;
                 eqBars[i] += (targetH - eqBars[i]) * 0.2; 
                 let h = eqBars[i];
                 eqCtx.fillStyle = 'rgba(245, 158, 11, 0.4)';
@@ -233,7 +246,9 @@
             const val = document.getElementById('auth-input').value.trim();
             if(!val) return;
             bgAudio.load();
+            sfxAudio.load();
             bgAudio.play().then(()=>bgAudio.pause()).catch(()=>{});
+            sfxAudio.play().then(()=>sfxAudio.pause()).catch(()=>{});
             socket.emit('login', { pin: val });
         }
 
@@ -247,7 +262,7 @@
                     document.body.classList.add('is-host');
                     document.getElementById('host-top-bar').style.display = 'flex';
                     document.getElementById('host-bottom-bar').style.display = 'flex';
-                    bgAudio.remove(); 
+                    bgAudio.remove(); sfxAudio.remove(); 
                 } else if (myRole === 'SCREEN') {
                     document.body.classList.add('is-screen');
                     bgAudio.onloadedmetadata = () => socket.emit('sync_duration', { duration: bgAudio.duration });
@@ -256,7 +271,7 @@
                     }, 1000);
                 }
             } else {
-                alert('Неверный PIN-код');
+                alert('Неверный КОД');
             }
         });
 
@@ -278,54 +293,104 @@
             return `${String(m).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
         }
 
-        // --- СВЕРХПЛАВНЫЙ АУДИО-ДВИЖОК (25ms цикл, шаг 0.02) ---
+        // --- АУДИО МЕНЕДЖЕР C DUCKING'ОМ (Фоновая логика) ---
+        // Когда SFX заканчивается сам
+        if (sfxAudio) {
+            sfxAudio.onended = () => {
+                isSfxActive = false;
+                sfxTargetVol = 0;
+                socket.emit('sfx_ended'); // Говорим серверу, что джингл/звук окончен
+            };
+        }
+
         setInterval(() => {
-            if (!bgAudio || myRole !== 'SCREEN') return;
+            if (!bgAudio || !sfxAudio || myRole !== 'SCREEN') return;
 
-            let curr = bgAudio.volume;
-            let diff = actualVolumeTarget - curr;
+            // 1. УПРАВЛЕНИЕ ФОНОМ (DUCKING)
+            let desiredBgVol = state_is_playing ? targetVolume : 0;
+            // Если играет SFX (и звук SFX больше 5%), уводим фон в 3% (0.03). Иначе - нормальная громкость.
+            let bgVolTarget = (isSfxActive || sfxAudio.volume > 0.05) && state_is_playing ? 0.03 : desiredBgVol;
 
-            if (Math.abs(diff) > 0.02) {
-                bgAudio.volume += Math.sign(diff) * 0.02;
+            let diffBg = bgVolTarget - bgAudio.volume;
+            if (Math.abs(diffBg) > 0.015) {
+                bgAudio.volume += Math.sign(diffBg) * 0.015; // Плавное изменение фона
             } else {
-                bgAudio.volume = actualVolumeTarget;
-
-                if (actualVolumeTarget === 0) {
+                bgAudio.volume = bgVolTarget;
+                if (bgVolTarget === 0) {
                     if (isFadingToSeek) {
                         bgAudio.currentTime = pendingSeekTime; 
                         isFadingToSeek = false;
-                        actualVolumeTarget = targetVolume; // Плавно нарастает обратно
                     } else if (!eqIsPlaying && !bgAudio.paused) {
-                        bgAudio.pause(); // Ставим паузу только когда звук полностью затух
+                        bgAudio.pause();
                     }
+                }
+            }
+
+            // 2. УПРАВЛЕНИЕ SFX
+            let diffSfx = sfxTargetVol - sfxAudio.volume;
+            if (Math.abs(diffSfx) > 0.03) {
+                sfxAudio.volume += Math.sign(diffSfx) * 0.03; // Быстрый фейд SFX
+            } else {
+                sfxAudio.volume = sfxTargetVol;
+                if (sfxTargetVol === 0 && !sfxAudio.paused) {
+                    sfxAudio.pause();
+                    socket.emit('sfx_ended');
                 }
             }
         }, 25);
 
+        let state_is_playing = false;
+
         function applyAudioState(state) {
             if (!bgAudio) return;
-            let desiredVolume = state.is_playing ? targetVolume : 0;
+            state_is_playing = state.is_playing;
             let needsSeek = Math.abs(bgAudio.currentTime - state.seek_position) > 2.5;
 
             if (needsSeek && state.is_playing) {
                 isFadingToSeek = true;
                 pendingSeekTime = state.seek_position;
-                actualVolumeTarget = 0; // Начинаем фейд вниз
-            } else if (!isFadingToSeek) {
-                actualVolumeTarget = desiredVolume;
-                
-                if (state.is_playing && bgAudio.paused) {
-                    bgAudio.volume = 0; 
-                    bgAudio.play().catch(()=>{});
-                }
+                // Фон сам упадет в 0
+            } else if (state.is_playing && bgAudio.paused) {
+                bgAudio.volume = 0; 
+                bgAudio.play().catch(()=>{});
             }
         }
+
+        // ПРИНЯТИЕ И ЗАПУСК SFX ОТБИВОК
+        socket.on('play_sfx_stream', (data) => {
+            if (myRole === 'SCREEN') {
+                sfxAudio.src = CDN + data.file;
+                sfxAudio.volume = 0; 
+                sfxAudio.play().catch(()=>{});
+                isSfxActive = true;
+                sfxTargetVol = 0.6; // Звучит на 60% громкости
+            }
+        });
+
+        // КОМАНДА НА ОСТАНОВКУ ДЖИНГЛА
+        socket.on('stop_sfx', () => {
+            if (myRole === 'SCREEN') {
+                isSfxActive = false;
+                sfxTargetVol = 0; // Запускает плавный фейд в ноль
+            }
+        });
 
         socket.on('state_update', (state) => {
             document.getElementById('display-title').innerText = state.event_title;
             document.getElementById('display-subtitle').innerText = state.event_subtitle;
-            eqIsPlaying = state.is_playing;
+            
+            state_is_playing = state.is_playing;
             targetVolume = state.audio_volume;
+
+            // Визуал кнопки Джингла у Ведущего
+            if (myRole === 'HOST') {
+                const jBtn = document.getElementById('btn-jingle');
+                if (state.jingle_playing) jBtn.classList.add('sfx-active');
+                else jBtn.classList.remove('sfx-active');
+            }
+
+            eqIsPlaying = state.is_playing || state.jingle_playing;
+            eqVolume = state.audio_volume;
 
             const isModule = state.active_module && state.active_module !== '';
             const isTimer = state.timer && state.timer.active;
@@ -339,26 +404,21 @@
                 overlayState = 'MODULE';
                 clearTimeout(timerDelayTimeout);
                 
-                // Плавно гасим заголовок
                 dContent.style.opacity = '0';
                 setTimeout(() => dContent.style.display = 'none', 1000);
-                
                 tContainer.style.opacity = '0';
                 setTimeout(() => tContainer.style.display = 'none', 1000);
 
-                // Загружаем и плавно показываем iframe
                 if(!iframe.src.includes(state.active_module)) {
                     iframe.src = state.active_module.startsWith('http') ? state.active_module : `/${state.active_module}`;
                 }
-                
                 if (iframe.style.display !== 'block') {
                     iframe.style.display = 'block';
-                    void iframe.offsetWidth; // Reflow
+                    void iframe.offsetWidth;
                     iframe.style.opacity = '1';
                 }
 
             } else if (isTimer && remain > 0) {
-                // Если был открыт модуль - гасим его
                 if (iframe.style.opacity === '1') {
                     iframe.style.opacity = '0';
                     setTimeout(() => { iframe.style.display = 'none'; iframe.src = 'about:blank'; }, 1000);
@@ -388,7 +448,6 @@
                                 overlayState = 'FADING_TIMER';
                                 clearInterval(timerInterval);
                                 timerInterval = null;
-                                
                                 tContainer.style.opacity = '0';
                                 
                                 setTimeout(() => {
@@ -399,7 +458,7 @@
                                     dContent.style.opacity = '1'; 
                                     
                                     if (myRole === 'SCREEN') {
-                                        socket.emit('host_trigger_sfx', { sfx: 'jingle' });
+                                        socket.emit('host_trigger_sfx', { sfx: 'fanfare' });
                                         socket.emit('timer_done');
                                     }
                                 }, 1500); 
@@ -410,7 +469,6 @@
                     }
                 }
             } else {
-                // ВОЗВРАТ НА ГЛАВНУЮ ЭКРАН (Все закрыто)
                 if (iframe.style.opacity === '1') {
                     iframe.style.opacity = '0';
                     setTimeout(() => { iframe.style.display = 'none'; iframe.src = 'about:blank'; }, 1000);
@@ -430,12 +488,10 @@
                 }
             }
 
-            // --- ОБНОВЛЕНИЕ ПУЛЬТА ---
             if (myRole === 'HOST') {
                 document.getElementById('btn-play-toggle').innerText = state.is_playing ? '⏸' : '⏯';
             }
 
-            // --- ОБНОВЛЕНИЕ МУЗЫКИ НА ЭКРАНЕ ---
             if (myRole === 'SCREEN' && bgAudio) {
                 const trackUrl = CDN + state.current_track;
                 if (!bgAudio.src.endsWith(state.current_track)) {
@@ -451,17 +507,7 @@
             }
         });
 
-        // --- ВОСПРОИЗВЕДЕНИЕ SFX С ДИНАМИЧЕСКОЙ ГРОМКОСТЬЮ ---
-        socket.on('play_sfx_stream', (data) => {
-            if (myRole === 'SCREEN') {
-                const s = new Audio(CDN + data.file);
-                // Громкость джингла берется прямо с индикатора! 
-                // Но если громкость 3%, делаем чуть громче, чтобы было слышно.
-                s.volume = targetVolume > 0.1 ? targetVolume : 0.6;
-                s.play().catch(()=>{});
-            }
-        });
-
+        // УПРАВЛЕНИЕ ВЕДУЩЕГО
         function setVol(v, btn) {
             document.querySelectorAll('.control-row:first-child .btn-control').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
