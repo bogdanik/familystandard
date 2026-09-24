@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Family Standard OS</title>
-
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
@@ -12,244 +11,88 @@
 
     <style>
         :root {
-            --bg-black: #030712;
-            --silver-light: #f3f4f6;
-            --silver-main: #e5e7eb;
-            --gold-light: #fffbeb;
-            --gold-main: #f59e0b;
-            --gold-glow: rgba(245, 158, 11, 0.4);
-            --glass-card: rgba(15, 23, 42, 0.95);
-            --glass-border: rgba(229, 231, 235, 0.2);
-            --danger-red: #ef4444;
+            --bg-black: #030712; --gold-light: #fffbeb; --gold-main: #f59e0b;
+            --gold-glow: rgba(245, 158, 11, 0.4); --glass-card: rgba(15, 23, 42, 0.95);
+            --glass-border: rgba(229, 231, 235, 0.2); --danger-red: #ef4444;
             --ios-font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Plus Jakarta Sans", sans-serif;
-            --top-bar-height: 105px;
-            --bottom-bar-height: 95px;
+            --top-bar-height: 105px; --bottom-bar-height: 95px;
         }
 
-        * { 
-            box-sizing: border-box; margin: 0; padding: 0; font-family: var(--ios-font);
-            user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
-        }
-
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: var(--ios-font); user-select: none; }
         body { background: var(--bg-black); color: #f8fafc; min-height: 100vh; overflow: hidden; position: relative; }
 
-        /* PARTICLES */
-        #particles-canvas { position: fixed; inset: 0; z-index: 1; pointer-events: none; }
-        .bg-glow { position: fixed; inset: 0; z-index: 2; background: radial-gradient(circle at 50% 50%, rgba(245, 158, 11, 0.08) 0%, rgba(3, 7, 18, 0.98) 75%, #000000 100%); pointer-events: none; }
-
-        /* FLASH EFFECT */
+        .bg-glow { position: fixed; inset: 0; z-index: 1; background: radial-gradient(circle at 50% 50%, rgba(245, 158, 11, 0.08) 0%, #000000 100%); pointer-events: none; }
         #flash-overlay { position: fixed; inset: 0; z-index: 99998; background: #ffffff; opacity: 0; pointer-events: none; transition: opacity 0.2s ease; }
 
-        /* HELLO OVERLAY */
-        #hello-overlay {
-            display: none; position: fixed; inset: 0; z-index: 99999; background: #000000;
-            align-items: center; justify-content: center; opacity: 1; transition: opacity 0.5s ease;
-        }
-        .hello-title {
-            font-family: 'Cinzel', serif; font-size: 3.8rem; font-weight: 900;
-            background: linear-gradient(135deg, #ffffff 0%, #fffbeb 40%, #f59e0b 100%);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 35px var(--gold-glow);
-            animation: helloPulse 1s ease forwards;
-        }
-        @keyframes helloPulse { 0% { opacity: 0; transform: scale(0.85); } 50% { opacity: 1; transform: scale(1.03); } 100% { opacity: 1; transform: scale(1); } }
+        /* АВТОРИЗАЦИЯ */
+        #auth-overlay { position: fixed; inset: 0; z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .auth-card { background: var(--glass-card); border: 1px solid var(--glass-border); padding: 32px 26px; border-radius: 24px; width: 100%; max-width: 350px; text-align: center; box-shadow: 0 0 40px var(--gold-glow); }
+        .brand-header { font-family: 'Cinzel', serif; font-size: 2.2rem; font-weight: 900; background: linear-gradient(135deg, #ffffff 0%, #fffbeb 30%, #e5e7eb 65%, #f59e0b 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .auth-input { width: 100%; padding: 15px; border-radius: 12px; border: 1px solid var(--glass-border); background: rgba(3, 7, 18, 0.85); color: #fff; text-align: center; font-size: 1.2rem; font-weight: 800; margin: 15px 0; outline: none; letter-spacing: 6px; user-select: text; }
+        .btn-gold { width: 100%; padding: 15px; border-radius: 12px; border: none; background: linear-gradient(135deg, #ffffff 0%, var(--gold-light) 40%, var(--gold-main) 100%); color: #000; font-weight: 800; cursor: pointer; }
 
-        /* AUTH CARD */
-        #auth-overlay { 
-            position: fixed; inset: 0; z-index: 10000; 
-            display: flex; align-items: center; justify-content: center; padding: 20px; 
-        }
-        .auth-card {
-            background: var(--glass-card); border: 1px solid var(--glass-border); padding: 32px 26px;
-            border-radius: 24px; width: 100%; max-width: 350px; text-align: center;
-            box-shadow: 0 0 40px var(--gold-glow); backdrop-filter: blur(25px);
-        }
-        .auth-card.shake { animation: shake 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97) both; border-color: var(--danger-red); }
-        @keyframes shake {
-            10%, 90% { transform: translate3d(-3px, 0, 0); }
-            20%, 80% { transform: translate3d(5px, 0, 0); }
-            30%, 50%, 70% { transform: translate3d(-7px, 0, 0); }
-            40%, 60% { transform: translate3d(7px, 0, 0); }
-        }
-
-        .brand-header {
-            font-family: 'Cinzel', serif; font-size: 2.2rem; font-weight: 900; letter-spacing: 2px;
-            background: linear-gradient(135deg, #ffffff 0%, #fffbeb 30%, #e5e7eb 65%, #f59e0b 100%);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 20px var(--gold-glow);
-        }
-
-        .auth-sub { color: #94a3b8; font-size: 0.85rem; margin: 8px 0 18px; }
-
-        .auth-input {
-            width: 100%; padding: 15px; border-radius: 12px; border: 1px solid var(--glass-border);
-            background: rgba(3, 7, 18, 0.85); color: #fff; text-align: center; font-size: 1.2rem; font-weight: 800; outline: none; letter-spacing: 6px;
-            user-select: text; -webkit-user-select: text;
-        }
-        .btn-gold {
-            width: 100%; padding: 15px; border-radius: 12px; border: none;
-            background: linear-gradient(135deg, #ffffff 0%, var(--gold-light) 40%, var(--gold-main) 100%);
-            color: #000; font-weight: 800; font-size: 0.92rem; cursor: pointer; margin-top: 12px;
-            box-shadow: 0 0 18px var(--gold-glow); transition: transform 0.15s ease;
-        }
-        .btn-gold:active { transform: scale(0.97); }
-
-        /* HOST TOP CONTROL BAR */
-        #host-top-bar {
-            display: none; position: fixed; top: 0; left: 0; right: 0; height: var(--top-bar-height); z-index: 500;
-            background: rgba(15, 23, 42, 0.97); border-bottom: 1px solid var(--glass-border);
-            backdrop-filter: blur(20px); padding: 8px 12px; flex-direction: column; gap: 6px; justify-content: center;
-        }
-
-        .control-row { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
-        .btn-control {
-            flex: 1; height: 32px; border-radius: 8px; border: 1px solid rgba(229, 231, 235, 0.18);
-            background: rgba(30, 41, 59, 0.7); color: #ffffff; font-size: 0.76rem; font-weight: 800; cursor: pointer;
-            transition: all 0.2s ease; display: inline-flex; align-items: center; justify-content: center;
-        }
-        .btn-control:active { transform: scale(0.95); }
-        .btn-control.active { 
-            background: linear-gradient(135deg, #ffffff 0%, var(--gold-main) 100%); color: #000; 
-            border-color: #ffffff; box-shadow: 0 0 12px var(--gold-glow); 
-        }
-
+        /* ПАНЕЛИ ВЕДУЩЕГО (HOST) */
+        #host-top-bar { display: none; position: fixed; top: 0; left: 0; right: 0; height: var(--top-bar-height); z-index: 500; background: rgba(15, 23, 42, 0.97); border-bottom: 1px solid var(--glass-border); padding: 8px 12px; flex-direction: column; gap: 8px; justify-content: center; }
+        .control-row { display: flex; justify-content: space-between; gap: 6px; align-items: center; }
+        .btn-control { flex: 1; height: 32px; border-radius: 8px; border: 1px solid rgba(229, 231, 235, 0.18); background: rgba(30, 41, 59, 0.7); color: #ffffff; font-size: 0.76rem; font-weight: 800; cursor: pointer; }
+        .btn-control.active { background: linear-gradient(135deg, #ffffff 0%, var(--gold-main) 100%); color: #000; border-color: #ffffff; }
+        
         .seek-container { display: flex; align-items: center; gap: 8px; width: 100%; }
-        .btn-play-pause {
-            width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--glass-border);
-            background: rgba(245, 158, 11, 0.2); color: var(--gold-light); font-size: 0.85rem;
-            display: inline-flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0;
-        }
-        .seek-bar {
-            flex: 1; -webkit-appearance: none; height: 5px; border-radius: 3px;
-            background: rgba(255, 255, 255, 0.15); outline: none; cursor: pointer;
-        }
-        .seek-bar::-webkit-slider-thumb {
-            -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%;
-            background: var(--gold-main); cursor: pointer; box-shadow: 0 0 8px var(--gold-main);
-        }
+        .btn-play-pause { width: 32px; height: 32px; border-radius: 8px; background: rgba(245, 158, 11, 0.2); color: var(--gold-light); font-size: 0.85rem; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 1px solid var(--glass-border); }
+        .seek-bar { flex: 1; -webkit-appearance: none; height: 5px; border-radius: 3px; background: rgba(255, 255, 255, 0.15); outline: none; }
+        .seek-bar::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%; background: var(--gold-main); }
 
-        /* HOST BOTTOM BAR */
-        #host-bottom-bar {
-            display: none; position: fixed; bottom: 0; left: 0; right: 0; height: var(--bottom-bar-height); z-index: 500;
-            background: rgba(15, 23, 42, 0.98); border-top: 1px solid var(--glass-border);
-            backdrop-filter: blur(20px); padding: 8px 12px; flex-direction: column; gap: 6px; justify-content: center;
-        }
-        .launcher-row { display: flex; gap: 6px; width: 100%; }
-        .btn-action {
-            flex: 1; height: 36px; border-radius: 8px; border: 1px solid var(--glass-border);
-            background: rgba(30, 41, 59, 0.8); color: #fff; font-size: 0.78rem; font-weight: 800; cursor: pointer;
-            display: inline-flex; align-items: center; justify-content: center;
-        }
-        .btn-action.gold { border-color: var(--gold-main); background: rgba(245, 158, 11, 0.2); color: var(--gold-light); }
-        .btn-action.red { border-color: var(--danger-red); background: rgba(239, 68, 68, 0.2); color: #fca5a5; }
+        #host-bottom-bar { display: none; position: fixed; bottom: 0; left: 0; right: 0; height: var(--bottom-bar-height); z-index: 500; background: rgba(15, 23, 42, 0.98); border-top: 1px solid var(--glass-border); padding: 8px 12px; flex-direction: column; gap: 8px; justify-content: center; }
+        .btn-action { flex: 1; height: 36px; border-radius: 8px; border: 1px solid var(--glass-border); font-weight: 800; font-size: 0.78rem; cursor: pointer; }
+        .btn-action.gold { background: rgba(245, 158, 11, 0.2); color: var(--gold-light); border-color: var(--gold-main); }
+        .btn-action.red { background: rgba(239, 68, 68, 0.2); color: #fca5a5; border-color: var(--danger-red); }
+        .sfx-btn { flex: 1; height: 36px; border-radius: 8px; background: rgba(30, 41, 59, 0.85); color: #fff; font-size: 1.1rem; border: 1px solid var(--glass-border); cursor: pointer; }
 
-        .sfx-grid { display: flex; gap: 6px; width: 100%; }
-        .sfx-btn {
-            flex: 1; height: 36px; border-radius: 8px; border: 1px solid rgba(229, 231, 235, 0.15);
-            background: rgba(30, 41, 59, 0.85); color: #fff; font-size: 1.1rem; cursor: pointer;
-            display: inline-flex; align-items: center; justify-content: center; transition: transform 0.15s ease;
-        }
-        .sfx-btn:active { transform: scale(0.95); }
-
-        /* MODALS */
-        .modal-overlay {
-            display: none; position: fixed; inset: 0; z-index: 20000;
-            background: rgba(0, 0, 0, 0.88); backdrop-filter: blur(20px);
-            align-items: center; justify-content: center; padding: 20px;
-        }
-        .modal-card {
-            background: var(--glass-card); border: 1px solid var(--glass-border);
-            border-radius: 24px; padding: 24px; width: 100%; max-width: 360px; text-align: center;
-            box-shadow: 0 0 40px var(--gold-glow);
-        }
-        .modules-grid { display: flex; flex-direction: column; gap: 8px; margin-top: 16px; }
-        .mod-btn {
-            padding: 14px; border-radius: 12px; border: 1px solid var(--glass-border);
-            background: rgba(30, 41, 59, 0.8); color: #fff; font-size: 0.9rem; font-weight: 800; cursor: pointer;
-        }
-
-        /* MAIN VIEWPORT */
-        #main-viewport {
-            display: none; position: fixed; inset: 0; z-index: 10; width: 100vw; height: 100vh;
-            flex-direction: column; align-items: center; justify-content: center;
-        }
-
-        body.is-host #module-iframe {
-            position: fixed;
-            top: var(--top-bar-height) !important;
-            bottom: var(--bottom-bar-height) !important;
-            left: 0 !important; right: 0 !important;
-            width: 100vw !important;
-            height: calc(100vh - var(--top-bar-height) - var(--bottom-bar-height)) !important;
-        }
-
-        #module-iframe {
-            display: none; position: fixed; inset: 0; width: 100vw; height: 100vh; border: none; z-index: 15; background: #000;
-        }
-
-        #main-display-content {
-            text-align: center; max-width: 600px; width: 100%; padding: 20px; z-index: 10;
-            transition: opacity 0.3s ease;
-        }
-        .shimmer-title {
-            font-family: 'Cinzel', serif; font-size: 3.2rem; font-weight: 900;
-            background: linear-gradient(90deg, #ffffff 0%, #fffbeb 25%, #f59e0b 50%, #e5e7eb 75%, #ffffff 100%);
-            background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            animation: shine 4s linear infinite; text-shadow: 0 0 35px var(--gold-glow);
-        }
+        /* ЭКРАН (SCREEN) */
+        #main-viewport { display: none; position: fixed; inset: 0; z-index: 10; flex-direction: column; align-items: center; justify-content: center; }
+        body.is-host #module-iframe { top: var(--top-bar-height) !important; bottom: var(--bottom-bar-height) !important; height: calc(100vh - var(--top-bar-height) - var(--bottom-bar-height)) !important; }
+        #module-iframe { display: none; position: fixed; inset: 0; width: 100vw; height: 100vh; border: none; z-index: 15; background: #000; }
+        
+        #main-display-content { text-align: center; z-index: 10; transition: opacity 0.3s; }
+        .shimmer-title { font-family: 'Cinzel', serif; font-size: 3.2rem; font-weight: 900; background: linear-gradient(90deg, #ffffff 0%, #fffbeb 25%, #f59e0b 50%, #e5e7eb 75%, #ffffff 100%); background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: shine 4s linear infinite; }
         @keyframes shine { to { background-position: 200% center; } }
+        .subtitle-text { color: #94a3b8; font-size: 1.15rem; font-weight: 600; margin-top: 10px; }
 
-        .subtitle-text { color: #94a3b8; font-size: 1.15rem; font-weight: 600; margin-top: 14px; letter-spacing: 1px; }
+        #full-screen-timer { display: none; position: fixed; inset: 0; z-index: 900; align-items: center; justify-content: center; }
+        .timer-huge-text { font-family: 'Cinzel', serif; font-size: 22vw; font-weight: 900; color: #ffffff; text-shadow: 0 0 40px var(--gold-glow); }
 
-        /* FULLSCREEN TIMER (ЧИСТЫЙ ТЕКСТ БЕЗ ОБВОДОК) */
-        #full-screen-timer {
-            display: none; position: fixed; inset: 0; z-index: 900;
-            align-items: center; justify-content: center; pointer-events: none;
-        }
-        .timer-huge-text {
-            font-family: 'Cinzel', serif; font-size: 20vw; font-weight: 900; color: #ffffff;
-            text-shadow: 0 0 40px var(--gold-glow), 0 0 80px rgba(245, 158, 11, 0.5);
-            letter-spacing: 2px;
-        }
+        /* МОДАЛКИ */
+        .modal-overlay { display: none; position: fixed; inset: 0; z-index: 20000; background: rgba(0,0,0,0.85); align-items: center; justify-content: center; padding: 20px; }
+        .modal-card { background: var(--glass-card); padding: 24px; border-radius: 20px; width: 100%; max-width: 360px; border: 1px solid var(--glass-border); text-align: center; }
+        .mod-btn { width: 100%; padding: 14px; border-radius: 12px; border: 1px solid var(--glass-border); background: rgba(30, 41, 59, 0.8); color: #fff; font-weight: 800; margin-top: 8px; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <!-- PARTICLES & GLOW -->
-    <canvas id="particles-canvas"></canvas>
     <div class="bg-glow"></div>
     <div id="flash-overlay"></div>
 
-    <!-- HELLO OVERLAY -->
-    <div id="hello-overlay"><div class="hello-title">Hello</div></div>
-
-    <!-- AUTH CARD -->
     <div id="auth-overlay">
         <div class="auth-card" id="auth-card">
             <div class="brand-header">EVENT OS</div>
-            <p class="auth-sub">Введите PIN-код для входа</p>
-
-            <input type="password" id="auth-input" class="auth-input" placeholder="ПИН-КОД" maxlength="6" autocomplete="off" onkeydown="if(event.key==='Enter') submitAuth()">
-            <button onclick="submitAuth()" class="btn-gold">ВОЙТИ В УПРАВЛЕНИЕ</button>
+            <input type="password" id="auth-input" class="auth-input" placeholder="ПИН-КОД">
+            <button onclick="submitAuth()" class="btn-gold">ВОЙТИ</button>
         </div>
     </div>
 
-    <!-- HOST TOP CONTROL BAR -->
+    <!-- ПУЛЬТ ВЕДУЩЕГО -->
     <div id="host-top-bar">
         <div class="control-row">
-            <span style="font-size: 0.68rem; color: var(--gold-light); font-weight: 800;">ГРОМКОСТЬ:</span>
-            <button class="btn-control" onclick="setVolumeSmooth(0.1, this)">10%</button>
-            <button class="btn-control" onclick="setVolumeSmooth(0.2, this)">20%</button>
-            <button class="btn-control active" onclick="setVolumeSmooth(0.3, this)">30%</button>
-            <button class="btn-control" onclick="setVolumeSmooth(0.6, this)">60%</button>
-            <button class="btn-control" onclick="setVolumeSmooth(1.0, this)">100%</button>
+            <span style="font-size: 0.65rem; color: var(--gold-light); font-weight: 800;">ГРОМКОСТЬ:</span>
+            <button class="btn-control" onclick="setVol(0.1, this)">10%</button>
+            <button class="btn-control active" onclick="setVol(0.3, this)">30%</button>
+            <button class="btn-control" onclick="setVol(0.6, this)">60%</button>
+            <button class="btn-control" onclick="setVol(1.0, this)">100%</button>
         </div>
-
         <div class="seek-container">
-            <button class="btn-play-pause" id="btn-play-toggle" onclick="togglePlayPause()">⏸</button>
-            <input type="range" id="host-seek-bar" class="seek-bar" min="0" max="100" value="0" oninput="isUserSeeking=true" onchange="seekAudioTrack(this.value)">
+            <button class="btn-play-pause" id="btn-play-toggle" onclick="togglePlay()">▶</button>
+            <input type="range" id="host-seek-bar" class="seek-bar" min="0" max="100" value="0" oninput="isSeeking=true" onchange="seekAudio(this.value)">
         </div>
-
         <div class="control-row">
             <button class="btn-control" onclick="setMood('lounge')">🍃 Лаундж</button>
             <button class="btn-control" onclick="setMood('active')">🕺 Банкет</button>
@@ -257,13 +100,9 @@
         </div>
     </div>
 
-    <!-- MAIN VIEWPORT -->
+    <!-- ЭКРАН ПРОЕКТОРА -->
     <div id="main-viewport">
-        <!-- FULLSCREEN TIMER -->
-        <div id="full-screen-timer">
-            <div class="timer-huge-text" id="timer-val">00:10</div>
-        </div>
-
+        <div id="full-screen-timer"><div class="timer-huge-text" id="timer-val">00:00</div></div>
         <iframe id="module-iframe" src="about:blank"></iframe>
         
         <div id="main-display-content">
@@ -272,353 +111,242 @@
         </div>
     </div>
 
-    <!-- LAUNCHER MODAL -->
-    <div class="modal-overlay" id="launcher-modal">
-        <div class="modal-card">
-            <h3 style="color: var(--gold-light); font-family: 'Cinzel', serif; font-size: 1.2rem;">Выбор интерактива</h3>
-            <div class="modules-grid" id="modules-list-box"></div>
-            <button onclick="closeLauncherModal()" style="width: 100%; padding: 12px; border-radius: 12px; border: none; background: transparent; color: #94a3b8; margin-top: 14px; cursor: pointer; font-weight: 700;">Закрыть</button>
+    <!-- НИЖНЯЯ ПАНЕЛЬ -->
+    <div id="host-bottom-bar">
+        <div class="control-row">
+            <button class="btn-action gold" onclick="openModal('launcher-modal')">ИНТЕРАКТИВ</button>
+            <button class="btn-action red" onclick="handleCloseClick()">ЗАКРЫТЬ</button>
+            <button class="btn-action gold" onclick="socket.emit('add_timer_10s')" style="flex: 0.6;">+10 СЕК</button>
+        </div>
+        <div class="control-row">
+            <button class="sfx-btn" onclick="triggerSfx('fanfare')">🎉</button>
+            <button class="sfx-btn" onclick="triggerSfx('applause')">👏</button>
+            <button class="sfx-btn" onclick="triggerSfx('correct')">✅</button>
+            <button class="sfx-btn" onclick="triggerSfx('wrong')">❌</button>
         </div>
     </div>
 
-    <!-- END EVENT CONFIRM MODAL -->
+    <!-- МОДАЛКИ -->
+    <div class="modal-overlay" id="launcher-modal">
+        <div class="modal-card">
+            <h3 style="color: var(--gold-light);">Интерактивы</h3>
+            <div id="modules-list-box"></div>
+            <button onclick="closeModal('launcher-modal')" style="background: transparent; color: #94a3b8; border: none; margin-top: 15px; font-weight: bold; cursor: pointer;">Отмена</button>
+        </div>
+    </div>
+
     <div class="modal-overlay" id="end-event-modal">
         <div class="modal-card">
-            <h3 style="color: var(--gold-light); font-family: 'Cinzel', serif; font-size: 1.1rem;">Завершить весь праздник?</h3>
-            <p style="color: #94a3b8; font-size: 0.85rem; margin-top: 8px;">Сбросить сессию и выйти?</p>
-            <div style="display: flex; gap: 10px; margin-top: 18px;">
-                <button onclick="confirmEndEvent()" class="btn-gold" style="margin: 0; background: var(--danger-red); color: #fff;">Завершить</button>
-                <button onclick="closeEndEventModal()" style="flex: 1; padding: 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); background: transparent; color: #fff; font-weight: 700; cursor: pointer;">Отмена</button>
+            <h3 style="color: var(--gold-light);">Завершить праздник?</h3>
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button onclick="confirmEnd()" class="btn-gold" style="margin: 0; background: var(--danger-red); color: #fff;">Завершить</button>
+                <button onclick="closeModal('end-event-modal')" style="flex: 1; border: 1px solid rgba(255,255,255,0.2); background: transparent; color: #fff; border-radius: 12px;">Отмена</button>
             </div>
         </div>
     </div>
 
-    <!-- HOST BOTTOM BAR -->
-    <div id="host-bottom-bar">
-        <div class="launcher-row">
-            <button class="btn-action gold" onclick="openLauncherModal()">ИНТЕРАКТИВ</button>
-            <button class="btn-action red" onclick="handleCloseInteractiveClick()">ЗАКРЫТЬ</button>
-            <button class="btn-action gold" onclick="addTimer10s()" style="flex: 0.6;">+10 СЕК</button>
-        </div>
-        <div class="sfx-grid">
-            <button class="sfx-btn" onclick="triggerSfx('fanfare')" title="Фанфары">🎉</button>
-            <button class="sfx-btn" onclick="triggerSfx('applause')" title="Аплодисменты">👏</button>
-            <button class="sfx-btn" onclick="triggerSfx('correct')" title="Правильно">✅</button>
-            <button class="sfx-btn" onclick="triggerSfx('wrong')" title="Ошибка">❌</button>
-        </div>
-    </div>
-
-    <!-- AUDIO PLAYER -->
+    <!-- АУДИО (ТОЛЬКО ДЛЯ ПРОЕКТОРОВ) -->
     <audio id="bg-audio" loop></audio>
 
     <script>
-        const RENDER_SERVER_URL = "https://event-os-wqoa.onrender.com";
-        const CDN_BASE_URL = "https://pub-372ba5f717cf4a8694558f47682d65d9.r2.dev/";
-
-        const socket = io(RENDER_SERVER_URL, { 
-            transports: ['polling', 'websocket'],
-            reconnection: true,
-            reconnectionAttempts: 10
-        });
+        const socket = io("https://event-os-wqoa.onrender.com", { transports: ['websocket', 'polling'] });
+        const CDN = "https://pub-372ba5f717cf4a8694558f47682d65d9.r2.dev/";
 
         let myRole = 'GUEST';
-        let currentLoadedModule = '';
         let availableModules = [];
         let timerInterval = null;
-
+        let localPlayTimer = null; // Локальный таймер для движения ползунка у хоста
+        
         let closeClickCount = 0;
         let closeClickTimer = null;
-        let isUserSeeking = false;
+        let isSeeking = false;
 
         const bgAudio = document.getElementById('bg-audio');
-        let musicVolume = 0.3;
-
-        // --- PARTICLES ---
-        const canvas = document.getElementById('particles-canvas');
-        const ctx = canvas.getContext('2d');
-        let particles = [];
-
-        function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
-
-        class Particle {
-            constructor() { this.reset(); }
-            reset() {
-                this.x = Math.random() * canvas.width;
-                this.y = Math.random() * canvas.height;
-                this.size = Math.random() * 2 + 0.5;
-                this.speedX = (Math.random() - 0.5) * 0.4;
-                this.speedY = (Math.random() - 0.5) * 0.4;
-                this.alpha = Math.random() * 0.6 + 0.1;
-            }
-            update() {
-                this.x += this.speedX; this.y += this.speedY;
-                if (this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) this.reset();
-            }
-            draw() {
-                ctx.fillStyle = `rgba(245, 158, 11, ${this.alpha})`;
-                ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill();
-            }
-        }
-        for (let i = 0; i < 45; i++) particles.push(new Particle());
-
-        function animateParticles() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            particles.forEach(p => { p.update(); p.draw(); });
-            requestAnimationFrame(animateParticles);
-        }
-        requestAnimationFrame(animateParticles);
-
-        function triggerErrorShake() {
-            const card = document.getElementById('auth-card');
-            if (card) {
-                card.classList.remove('shake');
-                void card.offsetWidth;
-                card.classList.add('shake');
-                setTimeout(() => card.classList.remove('shake'), 400);
-            }
-            if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
-        }
-
-        // РАЗБЛОКИРОВКА АУДИОДВИЖКА В БРАУЗЕРЕ ПРИ ВХОДЕ
-        function unlockAudioEngine() {
-            bgAudio.play().then(() => {
-                bgAudio.pause();
-            }).catch(() => {});
-        }
 
         function submitAuth() {
-            const input = document.getElementById('auth-input');
-            const val = input ? input.value.trim() : '';
+            const val = document.getElementById('auth-input').value.trim();
+            if(!val) return;
 
-            if (!val) {
-                triggerErrorShake();
-                return;
-            }
+            // Разблокируем звук по клику (нужно только проектору, но делаем для всех)
+            bgAudio.load();
+            bgAudio.play().then(()=>bgAudio.pause()).catch(()=>{});
 
-            unlockAudioEngine();
             socket.emit('login', { pin: val });
         }
 
-        // --- СОКЕТЫ И РЕАКЦИЯ ---
         socket.on('login_response', (res) => {
             if (res.success) {
                 myRole = res.role;
-
-                const hello = document.getElementById('hello-overlay');
                 document.getElementById('auth-overlay').style.display = 'none';
-                hello.style.display = 'flex';
+                document.getElementById('main-viewport').style.display = 'flex';
 
-                setTimeout(() => {
-                    hello.style.opacity = '0';
-                    setTimeout(() => {
-                        hello.style.display = 'none';
-                        document.getElementById('main-viewport').style.display = 'flex';
-
-                        if (myRole === 'HOST') {
-                            document.body.classList.add('is-host');
-                            document.getElementById('host-top-bar').style.display = 'flex';
-                            document.getElementById('host-bottom-bar').style.display = 'flex';
-                            startHostAudioTimer();
-                        } else if (myRole === 'SCREEN') {
-                            document.body.classList.add('is-screen');
-                        }
-                    }, 500);
-                }, 1000);
-
+                if (myRole === 'HOST') {
+                    document.body.classList.add('is-host');
+                    document.getElementById('host-top-bar').style.display = 'flex';
+                    document.getElementById('host-bottom-bar').style.display = 'flex';
+                    // Удаляем сам тег аудио, чтобы телефон ведущего ТОЧНО молчал
+                    bgAudio.remove();
+                } else if (myRole === 'SCREEN') {
+                    document.body.classList.add('is-screen');
+                    
+                    // Когда трек загружается, экран сообщает всем его длину
+                    bgAudio.onloadedmetadata = () => {
+                        socket.emit('sync_duration', { duration: bgAudio.duration });
+                    };
+                }
             } else {
-                triggerErrorShake();
-                alert(res.message || 'Неверный PIN-код');
+                alert('Неверный PIN-код');
             }
         });
 
         socket.on('modules_config_update', (modules) => {
             availableModules = modules;
-            renderModulesList();
-        });
-
-        function renderModulesList() {
             const box = document.getElementById('modules-list-box');
-            if (!box) return;
             box.innerHTML = '';
-            availableModules.forEach(m => {
+            modules.forEach(m => {
                 const btn = document.createElement('button');
                 btn.className = 'mod-btn';
                 btn.innerText = m.name;
-                btn.onclick = () => {
-                    socket.emit('switch_module', { module: m.path });
-                    closeLauncherModal();
-                };
+                btn.onclick = () => { socket.emit('switch_module', { module: m.path }); closeModal('launcher-modal'); };
                 box.appendChild(btn);
             });
-        }
+        });
 
-        function formatTime(secs) {
-            if (isNaN(secs) || secs < 0) return "00:00";
-            const h = Math.floor(secs / 3600);
-            const m = Math.floor((secs % 3600) / 60);
-            const s = Math.floor(secs % 60);
-            if (h > 0) {
-                return `${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
-            }
-            return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
-        }
-
-        function startHostAudioTimer() {
-            setInterval(() => {
-                if (myRole === 'HOST') {
-                    const cur = bgAudio.currentTime || 0;
-                    const dur = bgAudio.duration || 0;
-                    
-                    if (!isUserSeeking && dur > 0) {
-                        const seekBar = document.getElementById('host-seek-bar');
-                        seekBar.max = Math.floor(dur);
-                        seekBar.value = Math.floor(cur);
-                    }
-                }
-            }, 500);
+        function formatTime(s) {
+            const m = Math.floor(s / 60);
+            const sec = Math.floor(s % 60);
+            return `${String(m).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
         }
 
         socket.on('state_update', (state) => {
-            if (state.event_title) document.getElementById('display-title').innerText = state.event_title;
-            if (state.event_subtitle) document.getElementById('display-subtitle').innerText = state.event_subtitle;
+            document.getElementById('display-title').innerText = state.event_title;
+            document.getElementById('display-subtitle').innerText = state.event_subtitle;
 
-            musicVolume = state.audio_volume;
+            const isModule = state.active_module && state.active_module !== '';
+            const isTimer = state.timer && state.timer.active;
+            
+            // ЛОГИКА ИСЧЕЗНОВЕНИЯ ЗАГОЛОВКА
+            document.getElementById('main-display-content').style.display = (isModule || isTimer) ? 'none' : 'block';
 
-            const displayContent = document.getElementById('main-display-content');
-            const isTimerActive = state.timer && state.timer.active;
-            const isModuleActive = state.active_module && state.active_module.length > 0;
-
-            // СКРЫВАЕМ «FAMILY STANDARD OS», ЕСЛИ АКТИВЕН ТАЙМЕР ИЛИ ИНТЕРАКТИВ
-            if (isTimerActive || isModuleActive) {
-                displayContent.style.display = 'none';
-            } else {
-                displayContent.style.display = 'block';
-            }
-
-            if (state.active_module !== undefined && currentLoadedModule !== state.active_module) {
-                loadModuleIframe(state.active_module);
-            }
-
-            // ПОЛНОЭКРАННЫЙ ТАЙМЕР
-            const timerContainer = document.getElementById('full-screen-timer');
-            if (isTimerActive) {
-                timerContainer.style.display = 'flex';
-                clearInterval(timerInterval);
-                timerInterval = setInterval(() => {
-                    const remaining = Math.max(0, Math.round(state.timer.end_time - (Date.now() / 1000)));
-                    document.getElementById('timer-val').innerText = formatTime(remaining);
-                    
-                    if (remaining <= 0) {
-                        clearInterval(timerInterval);
-                        timerContainer.style.display = 'none';
-                        
-                        // ВСПЫШКА
-                        const flash = document.getElementById('flash-overlay');
-                        if (flash) {
-                            flash.style.opacity = '1';
-                            setTimeout(() => flash.style.opacity = '0', 200);
-                        }
-                        if (myRole === 'SCREEN') triggerSfx('fanfare');
-                    }
-                }, 1000);
-            } else {
-                clearInterval(timerInterval);
-                timerContainer.style.display = 'none';
-                document.getElementById('timer-val').innerText = '00:10';
-            }
-
-            // ВОСПРОИЗВЕДЕНИЕ МУЗЫКИ НА ЭКРАНЕ
-            if (myRole === 'SCREEN') {
-                const trackUrl = CDN_BASE_URL + state.current_track;
-                bgAudio.volume = musicVolume;
-
-                const btnPlay = document.getElementById('btn-play-toggle');
-                if (btnPlay) btnPlay.innerText = state.is_playing ? '⏸' : '▶';
-
-                if (bgAudio.src !== trackUrl) {
-                    bgAudio.src = trackUrl;
-                    if (state.seek_position > 0) bgAudio.currentTime = state.seek_position;
-                    if (state.is_playing) bgAudio.play().catch(() => {});
-                } else {
-                    if (Math.abs(bgAudio.currentTime - state.seek_position) > 2.5) {
-                        bgAudio.currentTime = state.seek_position;
-                    }
-                    if (state.is_playing && bgAudio.paused) bgAudio.play().catch(() => {});
-                    else if (!state.is_playing && !bgAudio.paused) bgAudio.pause();
-                }
-            }
-        });
-
-        function setMood(mood) {
-            socket.emit('host_audio_control', {
-                mood: mood,
-                current_time: bgAudio.currentTime || 0
-            });
-        }
-
-        function seekAudioTrack(val) {
-            isUserSeeking = false;
-            socket.emit('host_audio_control', { seek: parseFloat(val) });
-        }
-
-        function setVolumeSmooth(vol, btn) {
-            document.querySelectorAll('#host-top-bar .btn-control').forEach(b => b.classList.remove('active'));
-            if (btn) btn.classList.add('active');
-            socket.emit('host_audio_control', { volume: vol });
-        }
-
-        // SFX ЭФФЕКТЫ
-        socket.on('play_sfx_stream', (data) => {
-            if (myRole === 'SCREEN') {
-                const sfxAudio = new Audio(CDN_BASE_URL + data.file);
-                sfxAudio.volume = 0.6;
-                sfxAudio.play().catch(() => {});
-            }
-        });
-
-        function loadModuleIframe(modulePath) {
-            currentLoadedModule = modulePath;
+            // IFRAME
             const iframe = document.getElementById('module-iframe');
-
-            if (modulePath && modulePath.length > 0) {
-                iframe.src = modulePath.startsWith('http') ? modulePath : `/${modulePath}`;
+            if (isModule) {
+                if(iframe.src !== state.active_module && !iframe.src.endsWith(state.active_module)) {
+                    iframe.src = state.active_module.startsWith('http') ? state.active_module : `/${state.active_module}`;
+                }
                 iframe.style.display = 'block';
             } else {
                 iframe.style.display = 'none';
                 iframe.src = 'about:blank';
             }
+
+            // ЛОГИКА ТАЙМЕРА
+            const tContainer = document.getElementById('full-screen-timer');
+            if (isTimer) {
+                tContainer.style.display = 'flex';
+                if (!timerInterval) {
+                    timerInterval = setInterval(() => {
+                        const remain = state.timer.end_time - (Date.now() / 1000);
+                        if (remain <= 0) {
+                            clearInterval(timerInterval);
+                            timerInterval = null;
+                            tContainer.style.display = 'none';
+                            
+                            // ТОЛЬКО ЭКРАН ВЫЗЫВАЕТ ОКОНЧАНИЕ, ЧТОБЫ НЕ БЫЛО ДУБЛЕЙ
+                            if (myRole === 'SCREEN') {
+                                document.getElementById('flash-overlay').style.opacity = '1';
+                                setTimeout(() => document.getElementById('flash-overlay').style.opacity = '0', 200);
+                                socket.emit('host_trigger_sfx', { sfx: 'fanfare' });
+                                socket.emit('timer_done'); // Глобально вырубаем таймер на сервере
+                            }
+                        } else {
+                            document.getElementById('timer-val').innerText = formatTime(remain);
+                        }
+                    }, 500);
+                }
+            } else {
+                if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+                tContainer.style.display = 'none';
+                document.getElementById('timer-val').innerText = '00:00';
+            }
+
+            // ЛОГИКА HOST UI (Ползунок)
+            if (myRole === 'HOST') {
+                document.getElementById('btn-play-toggle').innerText = state.is_playing ? '⏸' : '▶';
+                
+                if (!isSeeking && state.track_duration > 0) {
+                    const slider = document.getElementById('host-seek-bar');
+                    slider.max = Math.floor(state.track_duration);
+                    slider.value = Math.floor(state.seek_position);
+                }
+
+                // Локальное движение ползунка у ведущего (чтобы не спамить сеть)
+                clearInterval(localPlayTimer);
+                if (state.is_playing && !isSeeking) {
+                    localPlayTimer = setInterval(() => {
+                        const slider = document.getElementById('host-seek-bar');
+                        if(slider.value < slider.max) slider.value = parseInt(slider.value) + 1;
+                    }, 1000);
+                }
+            }
+
+            // ЛОГИКА SCREEN (Музыка)
+            if (myRole === 'SCREEN' && bgAudio) {
+                bgAudio.volume = state.audio_volume;
+                const trackUrl = CDN + state.current_track;
+
+                if (bgAudio.src !== trackUrl) {
+                    bgAudio.src = trackUrl;
+                    bgAudio.currentTime = state.seek_position;
+                    if (state.is_playing) bgAudio.play().catch(()=>{});
+                } else {
+                    if (Math.abs(bgAudio.currentTime - state.seek_position) > 2.5) {
+                        bgAudio.currentTime = state.seek_position;
+                    }
+                    if (state.is_playing && bgAudio.paused) bgAudio.play().catch(()=>{});
+                    else if (!state.is_playing && !bgAudio.paused) bgAudio.pause();
+                }
+            }
+        });
+
+        // ВОСПРОИЗВЕДЕНИЕ SFX
+        socket.on('play_sfx_stream', (data) => {
+            if (myRole === 'SCREEN') {
+                const s = new Audio(CDN + data.file);
+                s.volume = 0.8;
+                s.play().catch(()=>{});
+            }
+        });
+
+        // УПРАВЛЕНИЕ ВЕДУЩЕГО
+        function setVol(v, btn) {
+            document.querySelectorAll('.btn-control').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            socket.emit('host_audio_control', { volume: v });
         }
+        function setMood(m) { socket.emit('host_audio_control', { mood: m }); }
+        function togglePlay() { socket.emit('host_audio_control', { toggle_play: true }); }
+        function seekAudio(val) { isSeeking = false; socket.emit('host_audio_control', { seek: val }); }
+        function triggerSfx(type) { socket.emit('host_trigger_sfx', { sfx: type }); }
 
-        // ЗАКРЫТИЕ ИНТЕРАКТИВА И ТРОЙНОЙ КЛИК
-        function handleCloseInteractiveClick() {
+        function handleCloseClick() {
             socket.emit('switch_module', { module: '' });
-
             closeClickCount++;
             clearTimeout(closeClickTimer);
-
             if (closeClickCount >= 3) {
-                openEndEventModal();
+                openModal('end-event-modal');
                 closeClickCount = 0;
             } else {
                 closeClickTimer = setTimeout(() => { closeClickCount = 0; }, 1200);
             }
         }
 
-        function togglePlayPause() { socket.emit('host_audio_control', { toggle_play: true }); }
-        function triggerSfx(sfxType) { socket.emit('host_trigger_sfx', { sfx: sfxType }); }
-        function addTimer10s() { socket.emit('add_timer_10s'); }
-
-        function openLauncherModal() { document.getElementById('launcher-modal').style.display = 'flex'; }
-        function closeLauncherModal() { document.getElementById('launcher-modal').style.display = 'none'; }
+        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
         
-        function openEndEventModal() { document.getElementById('end-event-modal').style.display = 'flex'; }
-        function closeEndEventModal() { document.getElementById('end-event-modal').style.display = 'none'; }
-        
-        function confirmEndEvent() {
+        function confirmEnd() {
             socket.emit('switch_module', { module: '' });
-            socket.emit('host_audio_control', { volume: 0 });
+            socket.emit('host_audio_control', { toggle_play: true }); // pause
             location.reload();
         }
     </script>
