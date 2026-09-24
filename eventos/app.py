@@ -1,7 +1,6 @@
 import os
 import json
 import time
-import random
 from flask import Flask, render_template, jsonify, send_from_directory, request
 from flask_socketio import SocketIO, emit
 
@@ -23,6 +22,14 @@ def load_config():
 config_data = load_config()
 connected_users = {}
 
+# Последовательные счётчики для каждого типа звука (1 -> 2 -> 3 -> 1)
+sfx_counters = {
+    "fanfare": 0,
+    "applause": 0,
+    "correct": 0,
+    "wrong": 0
+}
+
 track_positions = {
     "lounge.mp3": 0.0,
     "active.mp3": 0.0,
@@ -39,7 +46,6 @@ system_state = {
     "current_track": "lounge.mp3",
     "is_playing": False,
     "seek_position": 0.0,
-    "track_duration": 0.0,
     "timer": {"active": False, "end_time": 0}
 }
 
@@ -107,9 +113,6 @@ def handle_add_timer_10s():
 def handle_audio_control(data):
     curr_track = system_state['current_track']
 
-    if 'duration' in data:
-        system_state['track_duration'] = float(data['duration'])
-
     if 'seek' in data:
         seek_val = float(data['seek'])
         system_state['seek_position'] = seek_val
@@ -134,10 +137,17 @@ def handle_audio_control(data):
 
     socketio.emit('state_update', system_state)
 
+# ПОСЛЕДОВАТЕЛЬНЫЙ ВЫЗОВ ЗВУКОВ (1 -> 2 -> 3 -> 1)
 @socketio.on('host_trigger_sfx')
 def handle_trigger_sfx(data):
-    sfx_type = data.get('sfx')
-    var_id = random.randint(1, 3)
+    sfx_type = data.get('sfx') # fanfare, applause, correct, wrong
+    
+    if sfx_type in sfx_counters:
+        sfx_counters[sfx_type] = (sfx_counters[sfx_type] % 3) + 1
+        var_id = sfx_counters[sfx_type]
+    else:
+        var_id = 1
+
     file_name = f"{sfx_type}_{var_id}.mp3"
     
     socketio.emit('play_sfx_stream', {
