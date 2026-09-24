@@ -33,7 +33,6 @@ system_state = {
     "timer": {"active": False, "end_time": 0}
 }
 
-# АБСОЛЮТНАЯ ЗАЧИСТКА МЕРТВОГО ТАЙМЕРА (чтобы не всплывал)
 def clean_timer_state():
     if system_state['timer']['active'] and system_state['timer']['end_time'] <= time.time():
         system_state['timer']['active'] = False
@@ -43,7 +42,6 @@ def clean_timer_state():
 def index():
     return render_template('index.html')
 
-# ВОТ ТОТ САМЫЙ МАРШРУТ, КОТОРЫЙ Я СЛУЧАЙНО УДАЛИЛ (Исправляет ошибку 404)
 @app.route('/ping')
 def ping():
     return jsonify({"status": "ok", "system": "Event OS Core Active"}), 200
@@ -77,6 +75,7 @@ def switch_module(data):
 @socketio.on('add_timer_10s')
 def add_timer():
     now = time.time()
+    # Жесткая проверка: если таймер жив, просто прибавляем 10 секунд
     if system_state['timer']['active'] and system_state['timer']['end_time'] > now:
         system_state['timer']['end_time'] += 10
     else:
@@ -86,9 +85,11 @@ def add_timer():
 
 @socketio.on('timer_done')
 def timer_done():
-    system_state['timer']['active'] = False
-    system_state['timer']['end_time'] = 0
-    socketio.emit('state_update', system_state)
+    # Защита от случайных срабатываний: принимаем только если время РЕАЛЬНО вышло
+    if system_state['timer']['end_time'] <= time.time() + 1:
+        system_state['timer']['active'] = False
+        system_state['timer']['end_time'] = 0
+        socketio.emit('state_update', system_state)
 
 @socketio.on('host_audio_control')
 def audio_control(data):
@@ -98,7 +99,7 @@ def audio_control(data):
     if 'volume' in data:
         system_state['audio_volume'] = float(data['volume'])
     
-    # Относительная перемотка (+30 сек или -30 сек)
+    # Перемотка на 1 МИНУТУ (60 секунд)
     if 'seek_relative' in data:
         new_seek = system_state['seek_position'] + float(data['seek_relative'])
         if new_seek < 0: new_seek = 0
