@@ -29,7 +29,7 @@ def on_command(data):
     
     if action == 'start':
         state['is_started'] = True
-    elif action == 'next':
+    elif action == 'set_track':
         state['track'] = data.get('track', 1)
         state['status'] = 'stop'
     elif action == 'play_aim':
