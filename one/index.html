@@ -2,18 +2,19 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Тен Игорь Дмитриевич — 1 Годик!</title>
     <style>
         :root {
             --bg-color: #0d0e15;
-            --card-bg: rgba(22, 25, 38, 0.65);
-            --card-border: rgba(255, 255, 255, 0.1);
+            --card-bg: rgba(22, 25, 38, 0.75);
+            --card-border: rgba(255, 255, 255, 0.12);
             --accent-color: #00f2fe;
             --accent-glow: rgba(0, 242, 254, 0.4);
             --accent-secondary: #4facfe;
             --text-color: #f0f3f8;
             --text-dim: #94a3b8;
+            --header-height: 60px;
         }
 
         * {
@@ -21,6 +22,7 @@
             margin: 0;
             padding: 0;
             user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
 
         html {
@@ -31,7 +33,7 @@
             overflow-x: hidden;
         }
 
-        /* 120Hz Background Canvas */
+        /* Canvas Background */
         #particles-canvas {
             position: fixed;
             top: 0;
@@ -42,7 +44,7 @@
             pointer-events: none;
         }
 
-        /* Hero / Intro Header Transformed */
+        /* Header & Intro Component */
         #hero-header {
             position: fixed;
             top: 0;
@@ -54,64 +56,63 @@
             justify-content: center;
             align-items: center;
             z-index: 100;
-            background: radial-gradient(circle, rgba(13,14,21,0.85) 0%, rgba(13,14,21,0.98) 100%);
+            background: radial-gradient(circle, rgba(13,14,21,0.88) 0%, rgba(13,14,21,0.98) 100%);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            transition: all 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: all 0.7s cubic-bezier(0.16, 1, 0.3, 1);
             text-align: center;
             padding: 20px;
-            box-shadow: 0 0 0 rgba(0,0,0,0);
-            border-bottom: 1px solid transparent;
         }
 
-        /* Header state after clicking start */
         #hero-header.as-header {
-            height: 70px;
+            height: var(--header-height);
             flex-direction: row;
             justify-content: space-between;
-            padding: 0 40px;
-            background: rgba(13, 14, 21, 0.85);
+            padding: 0 16px;
+            background: rgba(13, 14, 21, 0.92);
             border-bottom: 1px solid var(--card-border);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
         }
 
         .hero-title {
-            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            font-size: clamp(2.2rem, 7vw, 4rem);
             font-weight: 900;
-            letter-spacing: -1px;
+            letter-spacing: -0.5px;
             background: linear-gradient(135deg, #00f2fe 0%, #4facfe 50%, #00c6ff 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 30px var(--accent-glow);
-            transition: all 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+            text-shadow: 0 0 25px var(--accent-glow);
+            transition: all 0.7s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         #hero-header.as-header .hero-title {
-            font-size: 1.4rem;
-            text-shadow: 0 0 15px var(--accent-glow);
+            font-size: 1.15rem;
+            text-shadow: 0 0 12px var(--accent-glow);
+            white-space: nowrap;
         }
 
         .hero-subtitle {
-            font-size: clamp(1.1rem, 2vw, 1.8rem);
+            font-size: clamp(1rem, 3.5vw, 1.5rem);
             color: var(--text-dim);
-            margin-top: 10px;
-            margin-bottom: 2.5rem;
-            transition: all 0.6s ease;
+            margin-top: 8px;
+            margin-bottom: 2rem;
+            transition: all 0.5s ease;
         }
 
         #hero-header.as-header .hero-subtitle {
-            font-size: 0.95rem;
+            font-size: 0.8rem;
             margin: 0;
             color: var(--accent-color);
-            background: rgba(0, 242, 254, 0.1);
-            padding: 4px 12px;
-            border-radius: 8px;
-            border: 1px solid rgba(0, 242, 254, 0.2);
+            background: rgba(0, 242, 254, 0.12);
+            padding: 3px 10px;
+            border-radius: 6px;
+            border: 1px solid rgba(0, 242, 254, 0.25);
+            white-space: nowrap;
         }
 
         .start-btn {
-            padding: 18px 42px;
-            font-size: 1.2rem;
+            padding: 16px 36px;
+            font-size: 1.1rem;
             font-weight: 700;
             color: #0d0e15;
             background: linear-gradient(135deg, #00f2fe, #4facfe);
@@ -119,60 +120,84 @@
             border-radius: 50px;
             cursor: pointer;
             box-shadow: 0 0 25px var(--accent-glow);
-            transition: all 0.4s ease;
-        }
-
-        .start-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 40px var(--accent-color);
+            transition: all 0.3s ease;
         }
 
         #hero-header.as-header .start-btn {
             opacity: 0;
             visibility: hidden;
             pointer-events: none;
-            transform: scale(0.5);
             position: absolute;
         }
 
-        /* Container adjustment for top header */
+        /* Mobile Top Horizontal Scrollable Bar */
+        .mobile-timeline-bar {
+            display: none;
+            position: fixed;
+            top: var(--header-height);
+            left: 0;
+            width: 100vw;
+            z-index: 90;
+            background: rgba(13, 14, 21, 0.95);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--card-border);
+            padding: 8px 12px;
+            overflow-x: auto;
+            white-space: nowrap;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+        }
+
+        .mobile-timeline-bar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .mobile-nav-item {
+            display: inline-block;
+            padding: 6px 14px;
+            margin-right: 8px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text-dim);
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            text-decoration: none;
+            transition: all 0.25s ease;
+        }
+
+        .mobile-nav-item.active {
+            color: #fff;
+            background: var(--accent-color);
+            color: #0d0e15;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 12px var(--accent-glow);
+        }
+
+        /* Main Container */
         .container {
             position: relative;
             z-index: 10;
             max-width: 1000px;
             margin: 0 auto;
-            padding: 120px 20px 100px 20px;
+            padding: 100px 16px 80px 16px;
             display: grid;
             grid-template-columns: 1fr 220px;
-            gap: 40px;
-            opacity: 0.3;
-            transition: opacity 0.8s ease;
+            gap: 30px;
+            opacity: 0.1;
+            transition: opacity 0.6s ease;
         }
 
         .container.active {
             opacity: 1;
         }
 
-        @media (max-width: 850px) {
-            .container {
-                grid-template-columns: 1fr;
-            }
-            .sidebar {
-                display: none;
-            }
-            #hero-header.as-header {
-                padding: 0 20px;
-            }
-            #hero-header.as-header .hero-subtitle {
-                display: none;
-            }
-        }
-
-        /* Timeline Items */
+        /* Cards Layout */
         .timeline-content {
             display: flex;
             flex-direction: column;
-            gap: 60px;
+            gap: 32px;
         }
 
         .timeline-card {
@@ -180,14 +205,15 @@
             border: 1px solid var(--card-border);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
-            border-radius: 24px;
-            padding: 32px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            border-radius: 20px;
+            padding: 22px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.35);
             opacity: 0;
-            transform: translateY(40px) scale(0.96);
-            transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), 
-                        transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            transform: translateY(30px) scale(0.97);
+            transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), 
+                        transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
             will-change: opacity, transform;
+            scroll-margin-top: 130px; /* Offset for sticky bars */
         }
 
         .timeline-card.visible {
@@ -199,31 +225,33 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 16px;
+            margin-bottom: 12px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-            padding-bottom: 12px;
-        }
-
-        .time-badge {
-            font-size: 1.4rem;
-            font-weight: 800;
-            color: var(--accent-color);
-            background: rgba(0, 242, 254, 0.1);
-            padding: 6px 16px;
-            border-radius: 12px;
-            border: 1px solid rgba(0, 242, 254, 0.2);
+            padding-bottom: 10px;
+            gap: 10px;
         }
 
         .card-title {
-            font-size: 1.6rem;
+            font-size: 1.25rem;
             font-weight: 700;
         }
 
+        .time-badge {
+            font-size: 0.95rem;
+            font-weight: 800;
+            color: var(--accent-color);
+            background: rgba(0, 242, 254, 0.1);
+            padding: 4px 10px;
+            border-radius: 8px;
+            border: 1px solid rgba(0, 242, 254, 0.2);
+            white-space: nowrap;
+        }
+
         .card-body p {
-            font-size: 1.05rem;
-            line-height: 1.6;
+            font-size: 0.95rem;
+            line-height: 1.5;
             color: var(--text-dim);
-            margin-bottom: 12px;
+            margin-bottom: 8px;
         }
 
         .card-body p strong {
@@ -231,47 +259,47 @@
         }
 
         .notes {
-            margin-top: 16px;
-            padding: 14px 18px;
+            margin-top: 12px;
+            padding: 10px 14px;
             background: rgba(255, 255, 255, 0.03);
             border-left: 3px solid var(--accent-color);
-            border-radius: 4px 12px 12px 4px;
-            font-size: 0.95rem;
+            border-radius: 4px 10px 10px 4px;
+            font-size: 0.88rem;
             color: #cbd5e1;
         }
 
-        /* Sidebar Navigation */
+        /* Desktop Sidebar */
         .sidebar {
             position: sticky;
-            top: 100px;
+            top: 90px;
             height: fit-content;
             background: var(--card-bg);
             border: 1px solid var(--card-border);
             backdrop-filter: blur(16px);
-            border-radius: 20px;
-            padding: 20px;
+            border-radius: 18px;
+            padding: 16px;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
         }
 
         .sidebar-title {
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             text-transform: uppercase;
             letter-spacing: 1px;
             color: var(--text-dim);
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
 
         .nav-link {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 10px 14px;
+            padding: 8px 12px;
             color: var(--text-dim);
             text-decoration: none;
-            border-radius: 10px;
-            font-size: 0.95rem;
+            border-radius: 8px;
+            font-size: 0.88rem;
             font-weight: 600;
             transition: all 0.2s ease;
             background: rgba(255, 255, 255, 0.02);
@@ -283,18 +311,63 @@
             border: 1px solid rgba(0, 242, 254, 0.3);
             transform: translateX(4px);
         }
+
+        /* Media Queries for Mobile/Tablets */
+        @media (max-width: 850px) {
+            .container {
+                grid-template-columns: 1fr;
+                padding-top: 130px;
+            }
+            
+            .sidebar {
+                display: none;
+            }
+
+            .mobile-timeline-bar.active {
+                display: flex;
+            }
+
+            #hero-header.as-header .hero-subtitle {
+                display: none;
+            }
+
+            .card-header {
+                flex-direction: column-reverse;
+                align-items: flex-start;
+            }
+
+            .time-badge {
+                align-self: flex-start;
+                font-size: 0.85rem;
+            }
+
+            .card-title {
+                font-size: 1.2rem;
+            }
+        }
     </style>
 </head>
 <body>
 
     <canvas id="particles-canvas"></canvas>
 
-    <!-- Intro Header Transformed Component -->
+    <!-- Intro / Top Sticky Header -->
     <header id="hero-header">
         <h1 class="hero-title">Тен Игорь Дмитриевич</h1>
         <p class="hero-subtitle">1 Годик • Праздничный Тайминг</p>
         <button class="start-btn" onclick="startApp()">Открыть программу</button>
     </header>
+
+    <!-- Mobile Sticky Top Bar for Timings -->
+    <nav class="mobile-timeline-bar" id="mobile-bar">
+        <a href="#t-1800" class="mobile-nav-item">18:00 • Сбор</a>
+        <a href="#t-1840" class="mobile-nav-item">18:40 • Старт</a>
+        <a href="#t-1920" class="mobile-nav-item">19:20 • Музыка</a>
+        <a href="#t-2000" class="mobile-nav-item">20:00 • Горячее</a>
+        <a href="#t-2050" class="mobile-nav-item">20:50 • Алфавит</a>
+        <a href="#t-2140" class="mobile-nav-item">21:40 • Баттл</a>
+        <a href="#t-2230" class="mobile-nav-item">22:30 • Торт</a>
+    </nav>
 
     <!-- Main Content -->
     <div class="container" id="main-container">
@@ -400,7 +473,7 @@
 
         </main>
 
-        <!-- Right Navigation Sidebar -->
+        <!-- Desktop Sidebar Navigation -->
         <aside class="sidebar">
             <div class="sidebar-title">Тайминги</div>
             <a href="#t-1800" class="nav-link"><span>Сбор</span> <span>18:00</span></a>
@@ -414,7 +487,7 @@
     </div>
 
     <script>
-        // --- 120Hz Particle Engine ---
+        // --- Particle Engine ---
         const canvas = document.getElementById('particles-canvas');
         const ctx = canvas.getContext('2d');
 
@@ -422,11 +495,18 @@
         let width = canvas.width = window.innerWidth;
         let height = canvas.height = window.innerHeight;
 
-        let mouse = { x: null, y: null, radius: 150 };
+        let mouse = { x: null, y: null, radius: 120 };
 
         window.addEventListener('mousemove', (e) => {
             mouse.x = e.x;
             mouse.y = e.y;
+        });
+
+        window.addEventListener('touchmove', (e) => {
+            if(e.touches.length > 0) {
+                mouse.x = e.touches[0].clientX;
+                mouse.y = e.touches[0].clientY;
+            }
         });
 
         window.addEventListener('resize', () => {
@@ -440,8 +520,8 @@
                 this.x = Math.random() * width;
                 this.y = Math.random() * height;
                 this.radius = Math.random() * 2 + 1;
-                this.vx = (Math.random() - 0.5) * 0.8;
-                this.vy = (Math.random() - 0.5) * 0.8;
+                this.vx = (Math.random() - 0.5) * 0.7;
+                this.vy = (Math.random() - 0.5) * 0.7;
                 this.alpha = Math.random() * 0.5 + 0.2;
             }
 
@@ -460,8 +540,8 @@
                     if (distance < mouse.radius) {
                         let force = (mouse.radius - distance) / mouse.radius;
                         let angle = Math.atan2(dy, dx);
-                        this.x -= Math.cos(angle) * force * 4;
-                        this.y -= Math.sin(angle) * force * 4;
+                        this.x -= Math.cos(angle) * force * 3;
+                        this.y -= Math.sin(angle) * force * 3;
                     }
                 }
             }
@@ -470,15 +550,13 @@
                 ctx.beginPath();
                 ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
                 ctx.fillStyle = `rgba(0, 242, 254, ${this.alpha})`;
-                ctx.shadowBlur = 10;
-                ctx.shadowColor = 'rgba(0, 242, 254, 0.8)';
                 ctx.fill();
             }
         }
 
         function initParticles() {
             particles = [];
-            const count = Math.floor((width * height) / 12000);
+            const count = Math.floor((width * height) / 14000);
             for (let i = 0; i < count; i++) {
                 particles.push(new Particle());
             }
@@ -496,19 +574,21 @@
         initParticles();
         requestAnimationFrame(animate);
 
-        // --- Transform Intro Screen into Fixed Top Header ---
+        // --- App Transition ---
         function startApp() {
             document.getElementById('hero-header').classList.add('as-header');
             document.getElementById('main-container').classList.add('active');
+            document.getElementById('mobile-bar').classList.add('active');
         }
 
-        // --- Intersection Observer for Cards & Sidebar Nav ---
+        // --- Observer & Nav Highlights ---
         const cards = document.querySelectorAll('.timeline-card');
-        const navLinks = document.querySelectorAll('.nav-link');
+        const desktopNavLinks = document.querySelectorAll('.nav-link');
+        const mobileNavLinks = document.querySelectorAll('.mobile-nav-item');
 
         const observerOptions = {
-            threshold: 0.25,
-            rootMargin: "-60px 0px -10% 0px"
+            threshold: 0.2,
+            rootMargin: "-100px 0px -20% 0px"
         };
 
         const observer = new IntersectionObserver((entries) => {
@@ -517,11 +597,18 @@
                     entry.target.classList.add('visible');
                     
                     const id = entry.target.getAttribute('id');
-                    navLinks.forEach(link => {
-                        if (link.getAttribute('href') === `#${id}`) {
-                            link.classList.add('active');
-                        } else {
-                            link.classList.remove('active');
+                    
+                    // Desktop Links
+                    desktopNavLinks.forEach(link => {
+                        link.classList.toggle('active', link.getAttribute('href') === `#${id}`);
+                    });
+
+                    // Mobile Links & Auto Scroll
+                    mobileNavLinks.forEach(link => {
+                        const isActive = link.getAttribute('href') === `#${id}`;
+                        link.classList.toggle('active', isActive);
+                        if (isActive) {
+                            link.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
                         }
                     });
                 } else {
