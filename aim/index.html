@@ -11,43 +11,57 @@
         
         #particles-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
 
-        /* Лобби с золотым градиентным текстом */
-        #splash-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 10; background: transparent; }
-        .splash-title { 
-            font-size: clamp(3rem, 12vw, 8rem); 
-            font-weight: 900; 
-            text-transform: uppercase; 
-            text-align: center; 
-            padding: 0 10px;
-            /* Золотой градиент для текста */
-            background: linear-gradient(135deg, #f3db74 0%, #d4af37 50%, #aa8011 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            /* Свечение вокруг текста */
-            filter: drop-shadow(0 0 15px rgba(212, 175, 55, 0.4));
-        }
-        .click-hint { margin-top: 30px; font-size: clamp(1rem, 4vw, 1.5rem); color: #888; animation: pulse-text 2s infinite; text-align: center; font-weight: 300; }
+        /* Скрытая сетка 3x3 для вызова пульта админа (1 -> 5 -> 9) */
+        #pin-grid { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: grid; grid-template-columns: 1fr 1fr 1fr; grid-template-rows: 1fr 1fr 1fr; z-index: 20; }
+        .pin-btn { width: 100%; height: 100%; cursor: default; }
+
+        /* Кнопка разблокировки звука для браузеров */
+        #unlock-overlay { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 50; flex-direction: column; justify-content: center; align-items: center; backdrop-filter: blur(8px); cursor: pointer; }
+        .unlock-btn { padding: 20px 40px; font-size: 1.5rem; background: transparent; color: #d4af37; border: 2px solid #d4af37; border-radius: 12px; font-weight: bold; text-transform: uppercase; box-shadow: 0 0 20px rgba(212, 175, 55, 0.4); animation: pulse-text 1.5s infinite; }
         @keyframes pulse-text { 0% { opacity: 0.3; } 50% { opacity: 1; } 100% { opacity: 0.3; } }
 
-        #pin-grid { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: grid; grid-template-columns: 1fr 1fr 1fr; grid-template-rows: 1fr 1fr 1fr; z-index: 20; }
-        .pin-btn { width: 100%; height: 100%; cursor: pointer; }
-
-        /* Экран шоу */
-        #viewer-screen { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; flex-direction: column; justify-content: center; align-items: center; z-index: 5; background: transparent; }
+        /* Главный экран шоу (активен для всех сразу) */
+        #viewer-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 5; background: transparent; }
         
         canvas#equalizer-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; }
 
-        #mystery-box { position: relative; z-index: 3; display: flex; justify-content: center; align-items: center; width: 220px; height: 220px; border-radius: 50%; box-shadow: inset 0 0 50px rgba(212, 175, 55, 0.1); background: rgba(0,0,0,0.7); border: 2px solid rgba(212, 175, 55, 0.2); }
-        #mystery-mark { font-size: 8rem; font-weight: 900; color: #d4af37; text-shadow: 0 0 30px rgba(212, 175, 55, 0.8); animation: breathe 2s ease-in-out infinite alternate; transition: color 0.5s, text-shadow 0.5s; }
-        @keyframes breathe {
-            from { transform: scale(0.95); text-shadow: 0 0 20px rgba(212, 175, 55, 0.5); }
-            to { transform: scale(1.05); text-shadow: 0 0 40px rgba(212, 175, 55, 1); }
+        /* Увеличенный и идеально отцентрированный центральный круг */
+        #mystery-box { 
+            position: relative; 
+            z-index: 3; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            width: min(75vw, 320px); 
+            height: min(75vw, 320px); 
+            border-radius: 50%; 
+            box-shadow: inset 0 0 60px rgba(212, 175, 55, 0.15); 
+            background: rgba(0,0,0,0.8); 
+            border: 3px solid rgba(212, 175, 55, 0.3); 
+        }
+        
+        #mystery-mark { 
+            font-size: clamp(6rem, 22vw, 11rem); 
+            font-weight: 900; 
+            color: #d4af37; 
+            text-shadow: 0 0 35px rgba(212, 175, 55, 0.8); 
+            animation: breathe 2s ease-in-out infinite alternate; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            width: 100%; 
+            height: 100%; 
+            text-align: center; 
+            line-height: 1;
+            transform: translateY(-6px); /* Оптическая компенсация шрифта по вертикали */
         }
 
-        #unlock-overlay { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 50; flex-direction: column; justify-content: center; align-items: center; backdrop-filter: blur(8px); cursor: pointer; }
-        .unlock-btn { padding: 20px 40px; font-size: 1.5rem; background: transparent; color: #d4af37; border: 2px solid #d4af37; border-radius: 12px; font-weight: bold; text-transform: uppercase; box-shadow: 0 0 20px rgba(212, 175, 55, 0.4); animation: pulse-text 1.5s infinite; }
+        @keyframes breathe {
+            from { transform: translateY(-6px) scale(0.95); text-shadow: 0 0 20px rgba(212, 175, 55, 0.5); }
+            to { transform: translateY(-6px) scale(1.05); text-shadow: 0 0 50px rgba(212, 175, 55, 1); }
+        }
 
-        /* Пульт */
+        /* Золотой / Серебряный Пульт Админа (появляется только после ввода пин-кода) */
         #admin-panel { display: none; position: fixed; bottom: 0; left: 0; width: 100%; background: linear-gradient(to top, #0a0a0a, #1a1a1a); border-top: 2px solid #d4af37; z-index: 60; padding: 20px 15px calc(20px + env(safe-area-inset-bottom)); flex-direction: column; align-items: center; box-shadow: 0 -10px 40px rgba(0,0,0,0.9); }
         .admin-header { display: flex; justify-content: space-between; width: 100%; max-width: 600px; margin-bottom: 10px; color: #d4af37; font-weight: bold; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 2px; }
         .debug-info { font-size: 0.85rem; color: #888; text-align: center; margin-bottom: 15px; height: 18px; width: 100%; }
@@ -61,32 +75,25 @@
         .btn-play-orig { background: linear-gradient(135deg, #ffffff, #c0c0c0); }
         .btn-stop { background: linear-gradient(135deg, #660000, #330000); color: #fff; border: 1px solid #ff4444; }
         .btn-next { background: linear-gradient(135deg, #444, #111); color: #d4af37; border: 1px solid #d4af37; }
-        
-        /* Моментальное переключение экранов без задержек */
-        body.show-running #splash-screen { display: none !important; }
-        body.show-running #pin-grid { display: none !important; }
-        body.show-running #viewer-screen { display: flex !important; }
     </style>
 </head>
 <body>
 
     <canvas id="particles-canvas"></canvas>
 
-    <div id="splash-screen">
-        <h1 class="splash-title">Музыка AI</h1>
-        <div class="click-hint">Ожидание подключения...</div>
-    </div>
-
+    <!-- Сетка для вызова админки (1 -> 5 -> 9) -->
     <div id="pin-grid">
         <div class="pin-btn" data-val="1"></div><div class="pin-btn" data-val="2"></div><div class="pin-btn" data-val="3"></div>
         <div class="pin-btn" data-val="4"></div><div class="pin-btn" data-val="5"></div><div class="pin-btn" data-val="6"></div>
         <div class="pin-btn" data-val="7"></div><div class="pin-btn" data-val="8"></div><div class="pin-btn" data-val="9"></div>
     </div>
 
+    <!-- Заглушка разблокировки звука -->
     <div id="unlock-overlay" onclick="forceUnlockAudio()">
-        <button class="unlock-btn">Подключить звук</button>
+        <button class="unlock-btn">🎶 Включить звук</button>
     </div>
 
+    <!-- Главный экран для всех -->
     <div id="viewer-screen">
         <canvas id="equalizer-canvas"></canvas>
         <div id="mystery-box">
@@ -94,9 +101,10 @@
         </div>
     </div>
 
+    <!-- Пульт управления (активируется пин-кодом) -->
     <div id="admin-panel">
         <div class="admin-header">
-            <span>Пульт</span>
+            <span>Пульт управления</span>
             <span id="status-track">Трек: 1 / 12</span>
         </div>
         <div class="debug-info" id="debug-text">Режим пульта: Звук отключен</div>
@@ -131,20 +139,16 @@
             ]
         };
 
-        // Прямое подключение к твоему Render-серверу
         const socket = io('https://aim-d8ck.onrender.com');
-        
         const audioEl = document.getElementById('audio-player');
         const mysteryMark = document.getElementById('mystery-mark');
         const mysteryBox = document.getElementById('mystery-box');
         const debugText = document.getElementById('debug-text');
         
         let isAdmin = false;
-        let isProjector = false;
         let currentTrack = 1;
         let timeOffset = 0; 
         let isAudioContextInit = false;
-
         let audioCtx, analyser;
 
         function initAudio() {
@@ -164,6 +168,13 @@
             } catch (e) { console.error(e); }
         }
 
+        // Авторазблокировка звука кликом
+        window.addEventListener('click', () => {
+            initAudio();
+            if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+        }, { once: true });
+
+        // --- ВХОД В АДМИНКУ ЧЕРЕЗ СЕТКУ 3X3 (1 -> 5 -> 9) ---
         let pinSequence = [];
         document.querySelectorAll('.pin-btn').forEach(btn => {
             btn.addEventListener('touchstart', (e) => { e.preventDefault(); checkPin(e.target.dataset.val); });
@@ -174,48 +185,24 @@
             pinSequence.push(val);
             if (pinSequence.length > 3) pinSequence.shift();
             
-            let seqStr = JSON.stringify(pinSequence);
-
-            // АДМИН ПУЛЬТ: 1 - 5 - 9
-            if (seqStr === JSON.stringify(['1', '5', '9'])) {
+            if (JSON.stringify(pinSequence) === JSON.stringify(['1', '5', '9'])) {
                 isAdmin = true;
-                isProjector = false;
-                audioEl.muted = true;
+                audioEl.muted = true; // Глушим телефон админа
                 document.getElementById('admin-panel').style.display = 'flex';
-                document.getElementById('pin-grid').style.display = 'none';
-                document.querySelector('.click-hint').innerText = 'ПУЛЬТ АКТИВИРОВАН';
+                document.getElementById('pin-grid').style.display = 'none'; // Убираем сетку
                 initAudio();
-            }
-            // ГЛАВНЫЙ ПРОЕКТОР: 3 - 5 - 7
-            else if (seqStr === JSON.stringify(['3', '5', '7'])) {
-                isAdmin = false;
-                isProjector = true;
-                audioEl.muted = false;
-                document.getElementById('pin-grid').style.display = 'none';
-                
-                let hint = document.querySelector('.click-hint');
-                hint.innerText = 'ПРОЕКТОР ГОТОВ. ЗВУК АКТИВИРОВАН.';
-                hint.style.color = '#d4af37';
-                
-                initAudio();
-                if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
             }
         }
 
         function sendCommand(action) {
-            if (action === 'start') {
-                document.body.classList.add('show-running');
-                document.getElementById('btn-start').style.display = 'none';
-            }
             if (action === 'next' && currentTrack < CONFIG.tracks.length) {
                 currentTrack++;
                 document.getElementById('status-track').innerText = `Трек: ${currentTrack} / 12`;
             }
-            debugText.innerText = "Отправка команды...";
-            
             socket.emit('command', { action: action, track: currentTrack });
         }
 
+        // --- СИНХРОНИЗАЦИЯ С СЕРВЕРОМ ---
         socket.on('sync', (data) => {
             timeOffset = (Date.now() / 1000) - data.server_time;
             applyState(data.state, true);
@@ -230,17 +217,12 @@
             currentTrack = state.track;
             document.getElementById('status-track').innerText = `Трек: ${currentTrack} / 12`;
 
-            if (state.is_started) {
-                document.body.classList.add('show-running');
-                document.getElementById('btn-start').style.display = 'none';
-            }
-
             if (state.status === 'stop') {
                 audioEl.pause();
                 mysteryMark.innerText = '?';
                 mysteryMark.style.color = '#d4af37';
                 mysteryMark.style.textShadow = '0 0 30px rgba(212,175,55,0.8)';
-                mysteryBox.style.borderColor = 'rgba(212,175,55,0.2)';
+                mysteryBox.style.borderColor = 'rgba(212,175,55,0.3)';
                 if(isAdmin) debugText.innerText = 'Остановлено ⏹';
             } 
             else {
@@ -272,7 +254,7 @@
                         document.getElementById('unlock-overlay').style.display = 'none';
                         if(isAdmin) debugText.innerText = state.status === 'aim' ? 'Играет Нейромузыка ▶' : 'Играет Оригинал ▶';
                     }).catch(error => {
-                        if (!isAdmin && !isProjector && isInitialSync) {
+                        if (!isAdmin && isInitialSync) {
                             document.getElementById('unlock-overlay').style.display = 'flex';
                         }
                     });
@@ -287,6 +269,7 @@
             document.getElementById('unlock-overlay').style.display = 'none';
         }
 
+        // --- КРУГОВОЙ ЭКВАЛАЙЗЕР ---
         function startCircularEq() {
             const canvas = document.getElementById('equalizer-canvas');
             const ctx = canvas.getContext('2d');
@@ -311,7 +294,7 @@
                 
                 let centerX = canvas.width / 2;
                 let centerY = canvas.height / 2;
-                let baseRadius = 140; 
+                let baseRadius = Math.min(canvas.width, canvas.height) * 0.22; // Динамический радиус под размер круга
 
                 for (let i = 0; i < activeBars; i++) {
                     let dataIndex;
@@ -321,7 +304,7 @@
                         dataIndex = Math.floor((activeBars - i - 1) * (bufferLength * 0.6) / halfBars);
                     }
                     
-                    let barHeight = dataArray[dataIndex] * 0.7; 
+                    let barHeight = dataArray[dataIndex] * 0.65; 
                     if (barHeight < 3) barHeight = 3; 
                     
                     let angle = i * angleStep - (Math.PI / 2);
@@ -348,6 +331,7 @@
             draw();
         }
 
+        // --- ЛЕТАЮЩИЕ ИСКРЫ ---
         const pCanvas = document.getElementById('particles-canvas');
         const pCtx = pCanvas.getContext('2d');
         let particles = [];
