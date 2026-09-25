@@ -8,27 +8,22 @@
     <style>
         body, html { margin: 0; padding: 0; width: 100%; height: 100%; background-color: #111; color: white; font-family: sans-serif; overflow: hidden; }
         
-        /* Экран загрузки (растворяется) */
         #splash-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; background: #000; z-index: 10; transition: opacity 2s ease-out; }
         #splash-screen h1 { font-size: 5rem; letter-spacing: 10px; text-transform: uppercase; }
         
-        /* Главный экран зрителя */
         #viewer-screen { display: none; flex-direction: column; justify-content: center; align-items: center; height: 100%; }
         .record-container { position: relative; width: 300px; height: 300px; margin-bottom: 50px; }
         
-        /* Пластинка */
         .record { width: 100%; height: 100%; border-radius: 50%; background: radial-gradient(circle, #333 30%, #000 70%); border: 2px solid #555; display: flex; justify-content: center; align-items: center; box-shadow: 0 0 20px rgba(0,255,255,0.2); transition: transform 0.2s; }
-        .record.playing { animation: spin 4s linear infinite; } /* Анимация вращения */
+        .record.playing { animation: spin 4s linear infinite; }
         .record h2 { font-size: 6rem; margin: 0; color: #fff; text-shadow: 0 0 10px #0ff; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
         
         canvas { width: 80%; height: 150px; }
 
-        /* Невидимая сетка 3x3 для пинкода */
         #pin-grid { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: grid; grid-template-columns: 1fr 1fr 1fr; grid-template-rows: 1fr 1fr 1fr; z-index: 20; }
-        .pin-btn { width: 100%; height: 100%; cursor: default; } /* Убери комментарий, если нужно увидеть кнопки: background: rgba(255,0,0,0.1); border: 1px solid red; */
+        .pin-btn { width: 100%; height: 100%; cursor: default; }
 
-        /* Админ-панель */
         #admin-panel { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 30; padding: 20px; box-sizing: border-box; flex-direction: column; align-items: center; justify-content: center; }
         .admin-controls { display: flex; flex-direction: column; gap: 20px; width: 300px; }
         button { padding: 15px; font-size: 1.2rem; cursor: pointer; border: none; border-radius: 8px; background: #0ff; color: #000; font-weight: bold; text-transform: uppercase; }
@@ -38,19 +33,16 @@
 </head>
 <body>
 
-    <!-- Заглавный экран -->
     <div id="splash-screen">
         <h1 id="splash-text">Нейромузыка</h1>
     </div>
 
-    <!-- Невидимый ввод пароля (по диагонали: 1, 5, 9) -->
     <div id="pin-grid">
         <div class="pin-btn" data-val="1"></div><div class="pin-btn" data-val="2"></div><div class="pin-btn" data-val="3"></div>
         <div class="pin-btn" data-val="4"></div><div class="pin-btn" data-val="5"></div><div class="pin-btn" data-val="6"></div>
         <div class="pin-btn" data-val="7"></div><div class="pin-btn" data-val="8"></div><div class="pin-btn" data-val="9"></div>
     </div>
 
-    <!-- Пульт управления для админа -->
     <div id="admin-panel">
         <div id="status">Трек: 0</div>
         <div class="admin-controls">
@@ -61,30 +53,29 @@
         </div>
     </div>
 
-    <!-- То, что видит зритель после старта -->
     <div id="viewer-screen">
         <div class="record-container">
             <div class="record" id="vinyl">
                 <h2 id="track-mark">?</h2>
             </div>
         </div>
-        <!-- Здесь скачет эквалайзер -->
         <canvas id="equalizer"></canvas>
     </div>
 
-    <!-- Плеер. crossorigin="anonymous" обязателен, чтобы эквалайзер мог читать звук с чужого домена -->
     <audio id="audio-player" crossorigin="anonymous"></audio>
 
     <script>
+        // Сокет сам определит домен Render, ничего прописывать не нужно
         const socket = io();
-        const BASE_URL = 'https://dashcloudflyer.com/';
+        
+        // Твоя ссылка на Cloudflare R2
+        const BASE_URL = 'https://144716970b040f1876efd2bc2e9158da.r2.cloudflarestorage.com/www/';
         
         let currentTrack = 0;
         let maxTracks = 12;
 
-        // --- Логика ввода Пин-кода (1, 5, 9) ---
         let pinSequence = [];
-        const correctPin = ['1', '5', '9'];
+        const correctPin = ['1', '5', '9']; // Левый-верх, центр, правый-низ
         
         document.querySelectorAll('.pin-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
@@ -99,7 +90,6 @@
             });
         });
 
-        // --- Отправка команд из админки ---
         function sendCmd(action) {
             if (action === 'next_track') {
                 if(currentTrack < maxTracks) currentTrack++;
@@ -110,7 +100,6 @@
             socket.emit('admin_command', { action: action, trackNum: currentTrack });
         }
 
-        // --- Обработка команд на экране ---
         socket.on('viewer_action', (data) => {
             const splash = document.getElementById('splash-screen');
             const viewer = document.getElementById('viewer-screen');
@@ -124,35 +113,36 @@
                     splash.style.display = 'none';
                     pinGrid.style.display = 'none';
                     viewer.style.display = 'flex';
-                    initAudioContext(); // Заводим эквалайзер
-                }, 2000); // 2 секунды на плавное растворение
+                    initAudioContext(); 
+                }, 2000); 
             } 
             
             else if (data.action === 'next_track') {
-                vinyl.classList.add('playing'); // Диск начинает крутиться
+                vinyl.classList.add('playing');
                 document.getElementById('track-mark').innerText = '?';
                 document.getElementById('track-mark').style.color = '#fff';
-                audio.src = `${BASE_URL}AIM${data.trackNum}.mp3`;
+                // Формируем: aim1.mp3, aim2.mp3 и т.д.
+                audio.src = `${BASE_URL}aim${data.trackNum}.mp3`;
                 audio.play();
             } 
             
             else if (data.action === 'play_original') {
-                vinyl.classList.add('playing'); // Диск крутится
-                document.getElementById('track-mark').innerText = '✓'; // Вместо вопроса галочка
+                vinyl.classList.add('playing'); 
+                document.getElementById('track-mark').innerText = '✓';
                 document.getElementById('track-mark').style.color = '#0f0';
-                audio.src = `${BASE_URL}M${data.trackNum}.mp3`;
+                // Формируем: a1.mp3, a2.mp3 и т.д.
+                audio.src = `${BASE_URL}a${data.trackNum}.mp3`;
                 audio.play();
             }
 
             else if (data.action === 'stop_audio') {
-                vinyl.classList.remove('playing'); // Диск останавливается
+                vinyl.classList.remove('playing');
                 audio.pause();
                 document.getElementById('track-mark').innerText = '?';
                 document.getElementById('track-mark').style.color = '#fff';
             }
         });
 
-        // --- Логика эквалайзера ---
         let audioCtx, analyser, source, canvasCtx;
         let isAudioInit = false;
 
@@ -175,7 +165,6 @@
             const canvas = document.getElementById('equalizer');
             canvasCtx = canvas.getContext('2d');
             
-            // Задаем реальный размер canvas
             canvas.width = canvas.offsetWidth;
             canvas.height = canvas.offsetHeight;
 
@@ -183,7 +172,6 @@
                 requestAnimationFrame(draw);
                 analyser.getByteFrequencyData(dataArray);
                 
-                // Очистка фона (черный)
                 canvasCtx.fillStyle = '#111';
                 canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
                 
@@ -193,7 +181,6 @@
                 
                 for(let i = 0; i < bufferLength; i++) {
                     barHeight = dataArray[i] / 2;
-                    // Отрисовка полосок (цвет морской волны)
                     canvasCtx.fillStyle = 'rgb(' + (barHeight + 100) + ', 255, 255)'; 
                     canvasCtx.fillRect(x, canvas.height - barHeight, barWidth, barHeight);
                     x += barWidth + 1;
@@ -202,7 +189,7 @@
             draw();
         }
 
-        // Хак для браузеров: аудио-контекст должен быть активирован кликом
+        // Разблокировка аудио для браузера
         document.body.addEventListener('click', () => {
             if(audioCtx && audioCtx.state === 'suspended') {
                 audioCtx.resume();
