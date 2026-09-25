@@ -11,29 +11,25 @@
         
         #particles-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
 
-        /* Скрытая сетка 3x3 для вызова пульта админа (1 -> 5 -> 9) */
-        #pin-grid { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: grid; grid-template-columns: 1fr 1fr 1fr; grid-template-rows: 1fr 1fr 1fr; z-index: 20; }
-        .pin-btn { width: 100%; height: 100%; cursor: default; }
-
         /* Кнопка разблокировки звука для браузеров */
         #unlock-overlay { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 50; flex-direction: column; justify-content: center; align-items: center; backdrop-filter: blur(8px); cursor: pointer; }
         .unlock-btn { padding: 20px 40px; font-size: 1.5rem; background: transparent; color: #d4af37; border: 2px solid #d4af37; border-radius: 12px; font-weight: bold; text-transform: uppercase; box-shadow: 0 0 20px rgba(212, 175, 55, 0.4); animation: pulse-text 1.5s infinite; }
         @keyframes pulse-text { 0% { opacity: 0.3; } 50% { opacity: 1; } 100% { opacity: 0.3; } }
 
-        /* Главный экран шоу (активен для всех сразу) */
-        #viewer-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 5; background: transparent; }
+        /* Главный экран шоу */
+        #viewer-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 5; background: transparent; padding-bottom: 180px; }
         
         canvas#equalizer-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; }
 
-        /* Увеличенный и идеально отцентрированный центральный круг */
+        /* Центральный круг с надписью АИ музыка */
         #mystery-box { 
             position: relative; 
             z-index: 3; 
             display: flex; 
             justify-content: center; 
             align-items: center; 
-            width: min(75vw, 320px); 
-            height: min(75vw, 320px); 
+            width: min(75vw, 300px); 
+            height: min(75vw, 300px); 
             border-radius: 50%; 
             box-shadow: inset 0 0 60px rgba(212, 175, 55, 0.15); 
             background: rgba(0,0,0,0.8); 
@@ -41,36 +37,54 @@
         }
         
         #mystery-mark { 
-            font-size: clamp(6rem, 22vw, 11rem); 
-            font-weight: 900; 
-            color: #d4af37; 
-            text-shadow: 0 0 35px rgba(212, 175, 55, 0.8); 
-            animation: breathe 2s ease-in-out infinite alternate; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
             width: 100%; 
             height: 100%; 
-            text-align: center; 
-            line-height: 1;
-            transform: translateY(-6px); /* Оптическая компенсация шрифта по вертикали */
+            animation: breathe 2s ease-in-out infinite alternate; 
+            text-align: center;
+        }
+
+        .ai-title {
+            font-size: clamp(3.5rem, 14vw, 6.5rem);
+            font-weight: 900;
+            color: #d4af37;
+            text-shadow: 0 0 35px rgba(212, 175, 55, 0.8);
+            line-height: 0.9;
+            letter-spacing: 2px;
+        }
+
+        .ai-sub {
+            font-size: clamp(1rem, 4vw, 1.8rem);
+            font-weight: 400;
+            color: #c5a017;
+            text-transform: lowercase;
+            letter-spacing: 3px;
+            margin-top: 8px;
+            text-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
         }
 
         @keyframes breathe {
-            from { transform: translateY(-6px) scale(0.95); text-shadow: 0 0 20px rgba(212, 175, 55, 0.5); }
-            to { transform: translateY(-6px) scale(1.05); text-shadow: 0 0 50px rgba(212, 175, 55, 1); }
+            from { transform: scale(0.95); filter: drop-shadow(0 0 15px rgba(212,175,55,0.4)); }
+            to { transform: scale(1.05); filter: drop-shadow(0 0 35px rgba(212,175,55,0.9)); }
         }
 
-        /* Золотой / Серебряный Пульт Админа (появляется только после ввода пин-кода) */
-        #admin-panel { display: none; position: fixed; bottom: 0; left: 0; width: 100%; background: linear-gradient(to top, #0a0a0a, #1a1a1a); border-top: 2px solid #d4af37; z-index: 60; padding: 20px 15px calc(20px + env(safe-area-inset-bottom)); flex-direction: column; align-items: center; box-shadow: 0 -10px 40px rgba(0,0,0,0.9); }
-        .admin-header { display: flex; justify-content: space-between; width: 100%; max-width: 600px; margin-bottom: 10px; color: #d4af37; font-weight: bold; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 2px; }
-        .debug-info { font-size: 0.85rem; color: #888; text-align: center; margin-bottom: 15px; height: 18px; width: 100%; }
+        /* ПУЛЬТ УПРАВЛЕНИЯ (Виден всегда внизу) */
+        #admin-panel { position: fixed; bottom: 0; left: 0; width: 100%; background: linear-gradient(to top, #0a0a0a, #1a1a1a); border-top: 2px solid #d4af37; z-index: 60; padding: 15px 10px calc(15px + env(safe-area-inset-bottom)); flex-direction: column; align-items: center; box-shadow: 0 -10px 40px rgba(0,0,0,0.9); }
+        .admin-header { display: flex; justify-content: space-between; width: 100%; max-width: 600px; margin-bottom: 8px; color: #d4af37; font-weight: bold; font-size: 1rem; text-transform: uppercase; letter-spacing: 1px; }
         
-        .admin-controls { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; width: 100%; max-width: 600px; }
-        .btn { flex: 1 1 calc(50% - 10px); padding: 15px 5px; font-size: 1rem; cursor: pointer; border: none; border-radius: 8px; font-weight: 900; text-transform: uppercase; transition: transform 0.1s; letter-spacing: 1px; color: #111; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        /* Сетка выбора треков от 1 до 12 */
+        .tracks-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 5px; width: 100%; max-width: 600px; margin-bottom: 10px; }
+        .track-btn { padding: 8px 0; font-size: 0.9rem; font-weight: bold; background: #222; color: #aaa; border: 1px solid #444; border-radius: 6px; cursor: pointer; text-align: center; transition: 0.1s; }
+        .track-btn.active { background: #d4af37; color: #000; border-color: #f3db74; box-shadow: 0 0 10px rgba(212,175,55,0.5); }
+
+        .admin-controls { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; width: 100%; max-width: 600px; }
+        .btn { flex: 1 1 calc(50% - 6px); padding: 12px 5px; font-size: 0.95rem; cursor: pointer; border: none; border-radius: 6px; font-weight: 900; text-transform: uppercase; transition: transform 0.1s; letter-spacing: 1px; color: #111; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
         .btn:active { transform: scale(0.95); opacity: 0.9; }
         
-        .btn-start { background: linear-gradient(135deg, #f3db74, #d4af37); flex-basis: 100%; padding: 20px 10px; font-size: 1.2rem; }
+        .btn-start { background: linear-gradient(135deg, #f3db74, #d4af37); flex-basis: 100%; padding: 14px 10px; font-size: 1.1rem; }
         .btn-play-aim { background: linear-gradient(135deg, #e6c27a, #c5a017); }
         .btn-play-orig { background: linear-gradient(135deg, #ffffff, #c0c0c0); }
         .btn-stop { background: linear-gradient(135deg, #660000, #330000); color: #fff; border: 1px solid #ff4444; }
@@ -81,40 +95,39 @@
 
     <canvas id="particles-canvas"></canvas>
 
-    <!-- Сетка для вызова админки (1 -> 5 -> 9) -->
-    <div id="pin-grid">
-        <div class="pin-btn" data-val="1"></div><div class="pin-btn" data-val="2"></div><div class="pin-btn" data-val="3"></div>
-        <div class="pin-btn" data-val="4"></div><div class="pin-btn" data-val="5"></div><div class="pin-btn" data-val="6"></div>
-        <div class="pin-btn" data-val="7"></div><div class="pin-btn" data-val="8"></div><div class="pin-btn" data-val="9"></div>
-    </div>
-
-    <!-- Заглушка разблокировки звука -->
     <div id="unlock-overlay" onclick="forceUnlockAudio()">
         <button class="unlock-btn">🎶 Включить звук</button>
     </div>
 
-    <!-- Главный экран для всех -->
+    <!-- Главный экран -->
     <div id="viewer-screen">
         <canvas id="equalizer-canvas"></canvas>
         <div id="mystery-box">
-            <div id="mystery-mark">?</div>
+            <div id="mystery-mark">
+                <span class="ai-title">АИ</span>
+                <span class="ai-sub">музыка</span>
+            </div>
         </div>
     </div>
 
-    <!-- Пульт управления (активируется пин-кодом) -->
+    <!-- Пульт управления внизу -->
     <div id="admin-panel">
         <div class="admin-header">
             <span>Пульт управления</span>
             <span id="status-track">Трек: 1 / 12</span>
         </div>
-        <div class="debug-info" id="debug-text">Режим пульта: Звук отключен</div>
         
+        <!-- Кнопки быстрого выбора треков от 1 до 12 -->
+        <div class="tracks-grid" id="tracks-grid">
+            <!-- Генерируются скриптом -->
+        </div>
+
         <div class="admin-controls">
             <button class="btn btn-start" id="btn-start" onclick="sendCommand('start')">🚀 Запустить шоу</button>
-            <button class="btn btn-play-aim" onclick="sendCommand('play_aim')">▶ Загадка</button>
+            <button class="btn btn-play-aim" onclick="sendCommand('play_aim')">▶ Загадка (АИ)</button>
             <button class="btn btn-play-orig" onclick="sendCommand('play_orig')">▶ Оригинал</button>
             <button class="btn btn-stop" onclick="sendCommand('stop')">⏹ Стоп</button>
-            <button class="btn btn-next" onclick="sendCommand('next')">⏭ След. трек</button>
+            <button class="btn btn-next" onclick="nextTrack()">⏭ След. трек</button>
         </div>
     </div>
 
@@ -123,33 +136,38 @@
     <script>
         const CONFIG = {
             baseUrl: 'https://pub-372ba5f717cf4a8694558f47682d65d9.r2.dev/',
-            tracks: [
-                { id: 1, aim: 'aim1.mp3', orig: 'm1.mp3' },
-                { id: 2, aim: 'aim2.mp3', orig: 'm2.mp3' },
-                { id: 3, aim: 'aim3.mp3', orig: 'm3.mp3' },
-                { id: 4, aim: 'aim4.mp3', orig: 'm4.mp3' },
-                { id: 5, aim: 'aim5.mp3', orig: 'm5.mp3' },
-                { id: 6, aim: 'aim6.mp3', orig: 'm6.mp3' },
-                { id: 7, aim: 'aim7.mp3', orig: 'm7.mp3' },
-                { id: 8, aim: 'aim8.mp3', orig: 'm8.mp3' },
-                { id: 9, aim: 'aim9.mp3', orig: 'm9.mp3' },
-                { id: 10, aim: 'aim10.mp3', orig: 'm10.mp3' },
-                { id: 11, aim: 'aim11.mp3', orig: 'm11.mp3' },
-                { id: 12, aim: 'aim12.mp3', orig: 'm12.mp3' }
-            ]
+            tracks: Array.from({length: 12}, (_, i) => ({
+                id: i + 1,
+                aim: `aim${i + 1}.mp3`,
+                orig: `m${i + 1}.mp3`
+            }))
         };
 
         const socket = io('https://aim-d8ck.onrender.com');
         const audioEl = document.getElementById('audio-player');
         const mysteryMark = document.getElementById('mystery-mark');
         const mysteryBox = document.getElementById('mystery-box');
-        const debugText = document.getElementById('debug-text');
         
-        let isAdmin = false;
         let currentTrack = 1;
         let timeOffset = 0; 
         let isAudioContextInit = false;
         let audioCtx, analyser;
+
+        // Генерация кнопок треков 1-12 на пульте
+        const tracksGrid = document.getElementById('tracks-grid');
+        CONFIG.tracks.forEach(t => {
+            let btn = document.createElement('button');
+            btn.className = `track-btn ${t.id === 1 ? 'active' : ''}`;
+            btn.innerText = t.id;
+            btn.onclick = () => selectTrack(t.id);
+            tracksGrid.appendChild(btn);
+        });
+
+        function highlightActiveTrack() {
+            document.querySelectorAll('.track-btn').forEach(b => {
+                b.classList.toggle('active', parseInt(b.innerText) === currentTrack);
+            });
+        }
 
         function initAudio() {
             if (isAudioContextInit) return;
@@ -168,36 +186,32 @@
             } catch (e) { console.error(e); }
         }
 
-        // Авторазблокировка звука кликом
         window.addEventListener('click', () => {
             initAudio();
             if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
         }, { once: true });
 
-        // --- ВХОД В АДМИНКУ ЧЕРЕЗ СЕТКУ 3X3 (1 -> 5 -> 9) ---
-        let pinSequence = [];
-        document.querySelectorAll('.pin-btn').forEach(btn => {
-            btn.addEventListener('touchstart', (e) => { e.preventDefault(); checkPin(e.target.dataset.val); });
-            btn.addEventListener('click', (e) => { checkPin(e.target.dataset.val); });
-        });
+        function selectTrack(num) {
+            currentTrack = num;
+            highlightActiveTrack();
+            document.getElementById('status-track').innerText = `Трек: ${currentTrack} / 12`;
+            socket.emit('command', { action: 'set_track', track: currentTrack });
+        }
 
-        function checkPin(val) {
-            pinSequence.push(val);
-            if (pinSequence.length > 3) pinSequence.shift();
-            
-            if (JSON.stringify(pinSequence) === JSON.stringify(['1', '5', '9'])) {
-                isAdmin = true;
-                audioEl.muted = true; // Глушим телефон админа
-                document.getElementById('admin-panel').style.display = 'flex';
-                document.getElementById('pin-grid').style.display = 'none'; // Убираем сетку
-                initAudio();
+        function nextTrack() {
+            if (currentTrack < CONFIG.tracks.length) {
+                currentTrack++;
+            } else {
+                currentTrack = 1; // Зацикливаем на 1
             }
+            highlightActiveTrack();
+            document.getElementById('status-track').innerText = `Трек: ${currentTrack} / 12`;
+            socket.emit('command', { action: 'set_track', track: currentTrack });
         }
 
         function sendCommand(action) {
-            if (action === 'next' && currentTrack < CONFIG.tracks.length) {
-                currentTrack++;
-                document.getElementById('status-track').innerText = `Трек: ${currentTrack} / 12`;
+            if (action === 'start') {
+                document.getElementById('btn-start').style.display = 'none';
             }
             socket.emit('command', { action: action, track: currentTrack });
         }
@@ -215,29 +229,29 @@
 
         function applyState(state, isInitialSync) {
             currentTrack = state.track;
+            highlightActiveTrack();
             document.getElementById('status-track').innerText = `Трек: ${currentTrack} / 12`;
+
+            if (state.is_started) {
+                document.getElementById('btn-start').style.display = 'none';
+            }
 
             if (state.status === 'stop') {
                 audioEl.pause();
-                mysteryMark.innerText = '?';
+                mysteryMark.innerHTML = `<span class="ai-title">АИ</span><span class="ai-sub">музыка</span>`;
                 mysteryMark.style.color = '#d4af37';
-                mysteryMark.style.textShadow = '0 0 30px rgba(212,175,55,0.8)';
                 mysteryBox.style.borderColor = 'rgba(212,175,55,0.3)';
-                if(isAdmin) debugText.innerText = 'Остановлено ⏹';
             } 
             else {
                 let url = '';
                 if (state.status === 'aim') {
                     url = CONFIG.baseUrl + CONFIG.tracks[currentTrack - 1].aim;
-                    mysteryMark.innerText = '?';
+                    mysteryMark.innerHTML = `<span class="ai-title">АИ</span><span class="ai-sub">музыка</span>`;
                     mysteryMark.style.color = '#d4af37';
-                    mysteryMark.style.textShadow = '0 0 50px rgba(212,175,55,1)';
                     mysteryBox.style.borderColor = 'rgba(212,175,55,0.6)';
                 } else {
                     url = CONFIG.baseUrl + CONFIG.tracks[currentTrack - 1].orig;
-                    mysteryMark.innerText = '✓';
-                    mysteryMark.style.color = '#e0e0e0'; 
-                    mysteryMark.style.textShadow = '0 0 50px rgba(224,224,224,1)';
+                    mysteryMark.innerHTML = `<span style="font-size: 5rem; font-weight: 900; color: #e0e0e0;">✓</span>`;
                     mysteryBox.style.borderColor = 'rgba(224,224,224,0.6)';
                 }
 
@@ -252,9 +266,8 @@
                 if (playPromise !== undefined) {
                     playPromise.then(() => {
                         document.getElementById('unlock-overlay').style.display = 'none';
-                        if(isAdmin) debugText.innerText = state.status === 'aim' ? 'Играет Нейромузыка ▶' : 'Играет Оригинал ▶';
                     }).catch(error => {
-                        if (!isAdmin && isInitialSync) {
+                        if (isInitialSync) {
                             document.getElementById('unlock-overlay').style.display = 'flex';
                         }
                     });
@@ -294,7 +307,7 @@
                 
                 let centerX = canvas.width / 2;
                 let centerY = canvas.height / 2;
-                let baseRadius = Math.min(canvas.width, canvas.height) * 0.22; // Динамический радиус под размер круга
+                let baseRadius = Math.min(canvas.width, canvas.height) * 0.22;
 
                 for (let i = 0; i < activeBars; i++) {
                     let dataIndex;
@@ -320,7 +333,7 @@
                     ctx.lineWidth = 5;
                     ctx.lineCap = 'round';
                     
-                    if (mysteryMark.innerText === '✓') {
+                    if (mysteryMark.innerText.includes('✓')) {
                         ctx.strokeStyle = `rgba(224, 224, 224, ${barHeight/255 + 0.3})`; 
                     } else {
                         ctx.strokeStyle = `rgba(212, 175, 55, ${barHeight/255 + 0.3})`; 
