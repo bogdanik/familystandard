@@ -4,14 +4,14 @@ from flask import Flask, render_template
 from flask_socketio import SocketIO, emit
 
 app = Flask(__name__, template_folder='.')
-app.config['SECRET_KEY'] = 'super-secret-show-key'
+app.config['SECRET_KEY'] = 'super-secret-show'
 socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
 
-# Глобальная память сервера
-show_state = {
-    'is_running': False,
-    'current_track': 1,
-    'status': 'stopped', # 'stopped', 'playing_aim', 'playing_orig'
+# Серверная память состояний
+state = {
+    'is_started': False,
+    'track': 1,
+    'status': 'stop', # варианты: 'stop', 'aim', 'orig'
     'start_time': 0
 }
 
@@ -20,34 +20,32 @@ def index():
     return render_template('index.html')
 
 @socketio.on('connect')
-def handle_connect():
-    # Когда кто-то открывает ссылку, отдаем ему текущее состояние шоу
-    emit('sync_state', {
-        'state': show_state,
-        'server_time': time.time()
-    })
+def on_connect():
+    # Как только любой зритель или админ открывает страницу,
+    # отдаем ему текущее состояние лобби и серверное время для синхронизации
+    emit('sync', {'state': state, 'server_time': time.time()})
 
-@socketio.on('admin_command')
-def handle_admin_command(data):
-    global show_state
+@socketio.on('command')
+def on_command(data):
+    global state
     action = data.get('action')
     
-    if action == 'start_show':
-        show_state['is_running'] = True
-    elif action == 'next_track':
-        show_state['current_track'] = data.get('trackNum', 1)
-        show_state['status'] = 'stopped'
+    if action == 'start':
+        state['is_started'] = True
+    elif action == 'next':
+        state['track'] = data.get('track', 1)
+        state['status'] = 'stop'
     elif action == 'play_aim':
-        show_state['status'] = 'playing_aim'
-        show_state['start_time'] = time.time()
+        state['status'] = 'aim'
+        state['start_time'] = time.time()
     elif action == 'play_orig':
-        show_state['status'] = 'playing_orig'
-        show_state['start_time'] = time.time()
-    elif action == 'stop_audio':
-        show_state['status'] = 'stopped'
-
-    # Пересылаем команду всем экранам
-    emit('viewer_action', data, broadcast=True)
+        state['status'] = 'orig'
+        state['start_time'] = time.time()
+    elif action == 'stop':
+        state['status'] = 'stop'
+        
+    # Рассылаем обновление всем (зрителям и админу)
+    emit('update', {'state': state, 'server_time': time.time()}, broadcast=True)
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 10000))
