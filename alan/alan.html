@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Family Standard // Cyber Briefing for Alan</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-color: #030a05;
+      --card-bg: rgba(6, 24, 12, 0.75);
+      --accent-neon: #00ff66;
+      --accent-glow: rgba(0, 255, 102, 0.4);
+      --text-main: #e0ffe8;
+      --text-muted: #7aa885;
+      --border-color: rgba(0, 255, 102, 0.25);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
+
+    body, html {
+      width: 100%;
+      height: 100%;
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      font-family: 'Rajdhani', sans-serif;
+      overflow: hidden;
+    }
+
+    /* BACKGROUND CANVAS */
+    #particle-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      pointer-events: none;
+      will-change: transform;
+    }
+
+    /* OVERLAY INTRO */
+    #intro-screen {
+      position: fixed;
+      inset: 0;
+      background: var(--bg-color);
+      z-index: 999;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      animation: fadeOutIntro 1s ease-in-out forwards 2.2s;
+      pointer-events: none;
+    }
+
+    .intro-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(2rem, 6vw, 4.5rem);
+      color: var(--accent-neon);
+      text-shadow: 0 0 20px var(--accent-glow), 0 0 40px var(--accent-neon);
+      letter-spacing: 4px;
+      animation: pulseText 1.5s infinite alternate ease-in-out;
+    }
+
+    @keyframes pulseText {
+      0% { opacity: 0.7; transform: scale(0.98); }
+      100% { opacity: 1; transform: scale(1.02); }
+    }
+
+    @keyframes fadeOutIntro {
+      0% { opacity: 1; visibility: visible; }
+      100% { opacity: 0; visibility: hidden; }
+    }
+
+    /* SCROLL CONTAINER WITH SNAP */
+    .viewport-container {
+      width: 100%;
+      height: 100vh;
+      overflow-y: scroll;
+      scroll-snap-type: y mandatory;
+      scroll-behavior: smooth;
+      position: relative;
+      z-index: 2;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .section-card {
+      scroll-snap-align: center;
+      scroll-snap-stop: always;
+      min-height: 100vh;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem 1.5rem;
+    }
+
+    .cyber-box {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      box-shadow: 0 0 30px rgba(0, 255, 102, 0.1), inset 0 0 15px rgba(0, 255, 102, 0.05);
+      border-radius: 4px;
+      width: 100%;
+      max-width: 800px;
+      padding: 2.5rem;
+      position: relative;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      transform: translateZ(0); /* GPU acceleration */
+      opacity: 0.1;
+      transform: translateY(40px) scale(0.96);
+      transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* CYBER CORNER ACCENTS */
+    .cyber-box::before, .cyber-box::after {
+      content: '';
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      border-color: var(--accent-neon);
+      border-style: solid;
+    }
+    .cyber-box::before { top: -2px; left: -2px; border-width: 2px 0 0 2px; }
+    .cyber-box::after { bottom: -2px; right: -2px; border-width: 0 2px 2px 0; }
+
+    /* VISIBLE STATE VIA INTERSECTION OBSERVER */
+    .section-card.active .cyber-box {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+
+    /* TYPOGRAPHY */
+    .tag {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.85rem;
+      color: var(--accent-neon);
+      letter-spacing: 2px;
+      margin-bottom: 0.5rem;
+      display: inline-block;
+      text-transform: uppercase;
+    }
+
+    h2 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(1.4rem, 3.5vw, 2.2rem);
+      color: #ffffff;
+      margin-bottom: 1.2rem;
+      text-shadow: 0 0 10px var(--accent-glow);
+    }
+
+    p {
+      font-size: 1.15rem;
+      line-height: 1.6;
+      color: var(--text-main);
+      margin-bottom: 1rem;
+    }
+
+    ul {
+      list-style: none;
+      margin-bottom: 1rem;
+    }
+
+    li {
+      position: relative;
+      padding-left: 1.5rem;
+      margin-bottom: 0.6rem;
+      font-size: 1.05rem;
+    }
+
+    li::before {
+      content: '>';
+      position: absolute;
+      left: 0;
+      color: var(--accent-neon);
+      font-weight: bold;
+      font-family: 'Orbitron', sans-serif;
+    }
+
+    .highlight {
+      color: var(--accent-neon);
+      font-weight: 600;
+    }
+
+    .forbidden li::before {
+      content: '✕';
+      color: #ff3366;
+    }
+
+    /* NAVIGATION HINT */
+    .scroll-hint {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.75rem;
+      color: var(--accent-neon);
+      letter-spacing: 2px;
+      z-index: 10;
+      pointer-events: none;
+      animation: bounce 2s infinite;
+    }
+
+    @keyframes bounce {
+      0%, 20%, 50%, 80%, 100% { transform: translate(-50%, 0); }
+      40% { transform: translate(-50%, -8px); }
+      60% { transform: translate(-50%, -4px); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 100 FPS PARTICLE CANVAS -->
+  <canvas id="particle-canvas"></canvas>
+
+  <!-- INTRO SCREEN -->
+  <div id="intro-screen">
+    <div class="intro-title">ALAN, HELLO...</div>
+  </div>
+
+  <!-- SCROLLABLE CARDS CONTAINER -->
+  <div class="viewport-container">
+
+    <!-- BLOCK 1: BRIEFING OVERVIEW -->
+    <section class="section-card">
+      <div class="cyber-box">
+        <span class="tag">// SYSTEM INIT // PROTOCOL_01</span>
+        <h2>Стратегия Медиа-Направления Family Standard</h2>
+        <p>Привет, Алан! Твоя концепция выхода за рамки стандартных каталогов и развития живых персонажей принята. Мы запускаем отдельное направление внутри <span class="highlight">Family Standard</span> в формате авторского реалити-шоу с элементами супергероики.</p>
+        <p>Ты становишься первым лицом этого направления, запускаешь сериал и прорабатываешь ЛОР своего персонажа.</p>
+      </div>
+    </section>
+
+    <!-- BLOCK 2: POSITION & TITLES -->
+    <section class="section-card">
+      <div class="cyber-box">
+        <span class="tag">// IDENTITY // TITLES</span>
+        <h2>Направление & Варианты Должностей</h2>
+        <p>Твоя должность — это универсальный пост компании. Выбери наименование своего статуса:</p>
+        <ul>
+          <li><span class="highlight">Главный Хранитель Впечатлений</span> (CXO / Chief Experience Officer)</li>
+          <li><span class="highlight">Магистр Праздничных Измерений</span></li>
+          <li><span class="highlight">Верховный Архитектор Эмоций</span></li>
+          <li><span class="highlight">Директор Департамента Чудес</span></li>
+        </ul>
+        <p>Название сериала/рубрики в Reels: <span class="highlight">«Хроники Хранителя»</span> или <span class="highlight">«Бюро Чудес»</span>.</p>
+      </div>
+    </section>
+
+    <!-- BLOCK 3: CHARACTER & LORE -->
+    <section class="section-card">
+      <div class="cyber-box">
+        <span class="tag">// CHARACTER // LORE BUILDER</span>
+        <h2>Образ, ЛОР и Суперспособности</h2>
+        <p>У тебя полная творческая свобода в проработке своего персонажа:</p>
+        <ul>
+          <li><span class="highlight">Костюм и Стиль:</span> Выбираешь сам (строгий костюм + артефакт, футуризм или оверсайз).</li>
+          <li><span class="highlight">ЛОР (История):</span> В какой-то момент ты осознал, что видишь мир иначе и способной управлять энергией праздников.</li>
+          <li><span class="highlight">Суперспособности (Критично):</span> Закрепи за собой 2–3 фикс-способности (например: остановка времени на 5 сек, телепортация за спину аниматору, подстройка обстоятельств).</li>
+        </ul>
+        <p><i>Ограничения этих сил создают главный сюжетный интерес.</i></p>
+      </div>
+    </section>
+
+    <!-- BLOCK 4: REALITY SHOW & DELEGATION -->
+    <section class="section-card">
+      <div class="cyber-box">
+        <span class="tag">// HIERARCHY // RECURSION</span>
+        <h2>Формат Реалити-Шоу и Передача Власти</h2>
+        <p><span class="highlight">Иерархия:</span> Ты — Начальник и Блогер. Аниматоры — твои приспешники и рекруты, которых ты обучаешь, проверяешь на прочность и принимаешь экзамены.</p>
+        <p><span class="highlight">Наследие бренда:</span> Если в будущем ты решишь двигаться дальше, твой персонаж передаст титул и должность преемнику. Новый герой придет со своими способностями и продолжит сериал без потери смысла.</p>
+      </div>
+    </section>
+
+    <!-- BLOCK 5: STRICT RULES -->
+    <section class="section-card">
+      <div class="cyber-box">
+        <span class="tag">// RESTRICTIONS // PROTOCOLS</span>
+        <h2>Жесткие Правила (Red Lines)</h2>
+        <ul class="forbidden">
+          <li>Никакого негатива в сторону детей и родителей (вся критика строго внутри команды).</li>
+          <li>Запрет на разрушение магии перед детьми (закулисье снимается строго в офисе/гримерке).</li>
+          <li>Запрет на демонстрацию брака без контекста «Инспектор отправляет это на пересдачу».</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- BLOCK 6: ACTION ITEMS -->
+    <section class="section-card">
+      <div class="cyber-box">
+        <span class="tag">// EXECUTION // NEXT STEPS</span>
+        <h2>Первый Шаг к Запуску</h2>
+        <ul>
+          <li>Выбери наименование должности и название сериала.</li>
+          <li>Заполни Паспорт Персонажа (Имя, Костюм, ЛОР, 2-3 Суперспособности).</li>
+          <li>Напиши первые 3 сценария в формате реалити-экзамена для аниматоров.</li>
+        </ul>
+        <p style="text-align: center; margin-top: 1.5rem; color: var(--accent-neon); font-family: 'Orbitron'; font-weight: bold;">
+          [ ЖДЕМ ПАСПОРТ ПЕРСОНАЖА НА СОГЛАСОВАНИЕ ]
+        </p>
+      </div>
+    </section>
+
+  </div>
+
+  <div class="scroll-hint">▼ СВAЙП / СКРОЛЛ ВНИЗ ▼</div>
+
+  <script>
+    /* --- 100 FPS PARTICLE ENGINE --- */
+    const canvas = document.getElementById('particle-canvas');
+    const ctx = canvas.getContext('2d');
+
+    let width = canvas.width = window.innerWidth;
+    let height = canvas.height = window.innerHeight;
+
+    window.addEventListener('resize', () => {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+      initParticles();
+    });
+
+    const PARTICLE_COUNT = 100;
+    const particles = [];
+
+    class Particle {
+      constructor() {
+        this.reset();
+      }
+
+      reset() {
+        this.x = Math.random() * width;
+        this.y = Math.random() * height;
+        this.vx = (Math.random() - 0.5) * 0.8;
+        this.vy = (Math.random() - 0.5) * 0.8;
+        this.size = Math.random() * 2 + 1;
+        this.alpha = Math.random() * 0.6 + 0.2;
+      }
+
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+
+        if (this.x < 0 || this.x > width) this.vx *= -1;
+        if (this.y < 0 || this.y > height) this.vy *= -1;
+      }
+
+      draw() {
+        ctx.save();
+        ctx.globalAlpha = this.alpha;
+        ctx.fillStyle = '#00ff66';
+        ctx.shadowBlur = 8;
+        ctx.shadowColor = '#00ff66';
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    function initParticles() {
+      particles.length = 0;
+      for (let i = 0; i < PARTICLE_COUNT; i++) {
+        particles.push(new Particle());
+      }
+    }
+
+    function connectParticles() {
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+          const dx = particles[i].x - particles[j].x;
+          const dy = particles[i].y - particles[j].y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+
+          if (dist < 110) {
+            ctx.save();
+            ctx.globalAlpha = (1 - dist / 110) * 0.25;
+            ctx.strokeStyle = '#00ff66';
+            ctx.lineWidth = 0.8;
+            ctx.beginPath();
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.stroke();
+            ctx.restore();
+          }
+        }
+      }
+    }
+
+    function animate() {
+      ctx.clearRect(0, 0, width, height);
+      for (let i = 0; i < particles.length; i++) {
+        particles[i].update();
+        particles[i].draw();
+      }
+      connectParticles();
+      requestAnimationFrame(animate);
+    }
+
+    initParticles();
+    requestAnimationFrame(animate);
+
+    /* --- INTERSECTION OBSERVER FOR FADE CARDS --- */
+    const cards = document.querySelectorAll('.section-card');
+    const observerOptions = {
+      root: document.querySelector('.viewport-container'),
+      threshold: 0.6
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('active');
+        } else {
+          entry.target.classList.remove('active');
+        }
+      });
+    }, observerOptions);
+
+    cards.forEach(card => observer.observe(card));
+  </script>
+</body>
+</html>
