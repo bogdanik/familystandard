@@ -7,95 +7,106 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.5/socket.io.min.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-tap-highlight-color: transparent; }
-        body, html { width: 100%; height: 100%; background: #050505; color: white; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
+        body, html { width: 100%; height: 100%; background: #050505; color: white; font-family: 'Segoe UI', Tahoma, sans-serif; overflow: hidden; }
         
         /* 1. ЭКРАН-ВРАТАРЬ (РАЗБЛОКИРОВКА ЗВУКА) */
-        #gatekeeper { position: fixed; inset: 0; z-index: 10000; background: #000; display: flex; justify-content: center; align-items: center; cursor: pointer; }
-        .gate-btn { color: #d4af37; font-size: 1.5rem; font-weight: bold; text-transform: uppercase; letter-spacing: 4px; animation: pulse 2s infinite; }
-        @keyframes pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; text-shadow: 0 0 20px #d4af37; } }
+        #gatekeeper { position: fixed; inset: 0; z-index: 10000; background: rgba(5,5,5,0.95); display: flex; justify-content: center; align-items: center; cursor: pointer; backdrop-filter: blur(10px); }
+        .gate-btn { color: #d4af37; font-size: 1.5rem; font-weight: bold; text-transform: uppercase; letter-spacing: 4px; animation: pulse 2s infinite; text-align: center; border: 1px solid rgba(212,175,55,0.5); padding: 20px 40px; border-radius: 12px; background: rgba(212,175,55,0.1); }
+        @keyframes pulse { 0%, 100% { opacity: 0.7; box-shadow: 0 0 10px rgba(212,175,55,0.2); } 50% { opacity: 1; text-shadow: 0 0 20px #d4af37; box-shadow: 0 0 30px rgba(212,175,55,0.6); } }
 
         /* 2. ФОНОВЫЕ СВЯЗАННЫЕ ЧАСТИЦЫ */
         canvas#network-bg { position: fixed; inset: 0; z-index: 1; pointer-events: none; }
 
         /* 3. ОСНОВНОЙ ЭКРАН И ЭКВАЛАЙЗЕР */
-        #main-stage { position: absolute; inset: 0; display: flex; justify-content: center; align-items: center; z-index: 5; padding-bottom: 80px; }
+        #main-stage { position: absolute; inset: 0; display: flex; justify-content: center; align-items: center; z-index: 5; padding-bottom: 90px; }
         canvas#eq-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; pointer-events: none; }
 
-        /* 4. ВИНИЛОВАЯ ПЛАСТИНКА */
+        /* 4. ВИНИЛОВАЯ ПЛАСТИНКА СО СВЕЧЕНИЕМ */
         .vinyl-record { 
-            position: relative; z-index: 10; width: 220px; height: 220px; border-radius: 50%;
-            /* Текстура винила */
-            background: repeating-radial-gradient( #111, #111 4px, #1a1a1a 5px, #1a1a1a 6px );
-            box-shadow: 0 0 30px rgba(0,0,0,0.9), inset 0 0 20px rgba(0,0,0,1);
+            position: relative; z-index: 10; width: 230px; height: 230px; border-radius: 50%;
+            background: repeating-radial-gradient( #0a0a0a, #0a0a0a 4px, #161616 5px, #161616 6px );
+            border: 2px solid rgba(212, 175, 55, 0.4);
             display: flex; justify-content: center; align-items: center;
-            border: 2px solid #000;
+            
+            /* Базовое легкое свечение в покое */
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.15), inset 0 0 20px rgba(0,0,0,1);
+            transition: box-shadow 0.4s ease, border-color 0.4s ease;
+            
             animation: spin 3s linear infinite;
-            animation-play-state: paused; /* Изначально стоит */
+            animation-play-state: paused;
         }
-        .vinyl-record.playing { animation-play-state: running; }
+        
+        /* Мощное свечение при воспроизведении музыки */
+        .vinyl-record.playing { 
+            animation-play-state: running; 
+            border-color: rgba(212, 175, 55, 0.9);
+            box-shadow: 0 0 60px rgba(212, 175, 55, 0.8), inset 0 0 20px rgba(0,0,0,1);
+        }
+        
         @keyframes spin { 100% { transform: rotate(360deg); } }
 
-        /* Центр винила (Яблоко) */
+        /* Сердцевина (без дырки, с четким текстом) */
         .vinyl-label {
-            width: 75px; height: 75px; border-radius: 50%;
-            background: linear-gradient(135deg, #d4af37, #b8860b);
-            display: flex; justify-content: center; align-items: center;
-            font-size: 1.5rem; font-weight: 900; color: #000;
-            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
-            position: relative;
+            width: 85px; height: 85px; border-radius: 50%;
+            background: linear-gradient(135deg, #f3db74, #b8860b);
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.5), 0 0 10px rgba(0,0,0,0.8);
+            color: #000;
         }
-        /* Дырка по центру */
-        .vinyl-label::after {
-            content: ''; position: absolute; width: 12px; height: 12px;
-            background: #050505; border-radius: 50%;
-        }
-        .label-text { position: absolute; z-index: 2; font-size: 1.6rem; letter-spacing: 1px; }
+        
+        .text-main { font-size: 2rem; font-weight: 900; line-height: 0.9; letter-spacing: 1px; }
+        .text-sub { font-size: 0.65rem; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; margin-top: 3px; }
 
         /* 5. МИНИМАЛИСТИЧНЫЕ КНОПКИ УПРАВЛЕНИЯ */
         #controls { position: fixed; bottom: 20px; left: 0; width: 100%; z-index: 50; display: flex; flex-direction: column; align-items: center; gap: 15px; }
         
-        .tracks-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; max-width: 400px; padding: 0 10px; }
+        .tracks-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; max-width: 420px; padding: 0 15px; }
         .track-btn { 
-            width: 45px; height: 45px; border-radius: 50%; border: 1px solid rgba(212, 175, 55, 0.3);
-            background: rgba(0,0,0,0.6); color: #aaa; font-weight: bold; font-size: 1.1rem;
-            display: flex; justify-content: center; align-items: center; cursor: pointer; transition: 0.2s;
+            width: 48px; height: 48px; border-radius: 50%; border: 1px solid rgba(212, 175, 55, 0.3);
+            background: rgba(10,10,10,0.8); color: #aaa; font-weight: bold; font-size: 1.2rem;
+            display: flex; justify-content: center; align-items: center; cursor: pointer; transition: all 0.2s;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
         }
-        .track-btn.active { background: #d4af37; color: #000; border-color: #fff; box-shadow: 0 0 15px rgba(212, 175, 55, 0.8); transform: scale(1.1); }
+        .track-btn.active { background: #d4af37; color: #000; border-color: #fff; box-shadow: 0 0 20px rgba(212, 175, 55, 0.8); transform: scale(1.1); }
 
-        .action-row { display: flex; gap: 10px; }
+        .action-row { display: flex; gap: 10px; padding: 0 15px; width: 100%; max-width: 420px; }
         .action-btn { 
-            padding: 12px 20px; border-radius: 12px; border: none; font-weight: bold; 
+            flex: 1; padding: 14px 0; border-radius: 12px; border: none; font-weight: 900; 
             font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; cursor: pointer;
-            background: rgba(20, 20, 20, 0.7); color: #fff; border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(20, 20, 20, 0.85); color: #fff; border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5); transition: 0.1s;
         }
         .action-btn:active { transform: scale(0.95); }
-        .btn-aim { color: #d4af37; border-color: rgba(212, 175, 55, 0.4); }
-        .btn-stop { color: #ff4444; }
+        .btn-aim { color: #d4af37; border-color: rgba(212, 175, 55, 0.5); }
+        .btn-stop { color: #ff4444; border-color: rgba(255, 68, 68, 0.3); flex: 0.6; }
     </style>
 </head>
 <body>
 
-    <!-- Вратарь для легальной разблокировки аудио -->
+    <!-- Экран старта для разблокировки звука -->
     <div id="gatekeeper" onclick="startSystem()">
-        <div class="gate-btn">Нажмите для старта шоу</div>
+        <div class="gate-btn">Нажмите для старта</div>
     </div>
 
+    <!-- Связанные частицы -->
     <canvas id="network-bg"></canvas>
 
+    <!-- Винил и эквалайзер -->
     <div id="main-stage">
         <canvas id="eq-canvas"></canvas>
         <div class="vinyl-record" id="vinyl">
-            <div class="vinyl-label">
-                <span class="label-text" id="vinyl-text">АИ</span>
+            <div class="vinyl-label" id="vinyl-label">
+                <div class="text-main" id="text-main">АИ</div>
+                <div class="text-sub" id="text-sub">музыка</div>
             </div>
         </div>
     </div>
 
-    <!-- Чистый невидимый пульт -->
+    <!-- Прозрачный пульт управления -->
     <div id="controls">
         <div class="tracks-grid" id="tracks-grid"></div>
         <div class="action-row">
-            <button class="action-btn btn-aim" onclick="sendCommand('play_aim')">▶ АИ Загадка</button>
+            <button class="action-btn btn-aim" onclick="sendCommand('play_aim')">▶ Загадка</button>
             <button class="action-btn" onclick="sendCommand('play_orig')">▶ Оригинал</button>
             <button class="action-btn btn-stop" onclick="sendCommand('stop')">⏹ Стоп</button>
         </div>
@@ -104,22 +115,26 @@
     <audio id="audio-player" crossorigin="anonymous"></audio>
 
     <script>
+        // ИСПРАВЛЕН РЕГИСТР: aim1.mp3 и m1.mp3
         const CONFIG = {
             baseUrl: 'https://pub-372ba5f717cf4a8694558f47682d65d9.r2.dev/',
-            tracks: Array.from({length: 12}, (_, i) => ({ aim: `AIM${i + 1}.mp3`, orig: `M${i + 1}.mp3` }))
+            tracks: Array.from({length: 12}, (_, i) => ({ 
+                aim: `aim${i + 1}.mp3`, 
+                orig: `m${i + 1}.mp3` 
+            }))
         };
 
         const socket = io();
         const audioEl = document.getElementById('audio-player');
         const vinyl = document.getElementById('vinyl');
-        const vinylText = document.getElementById('vinyl-text');
+        const tMain = document.getElementById('text-main');
+        const tSub = document.getElementById('text-sub');
         
         let currentTrack = 1;
         let timeOffset = 0;
         let audioCtx, analyser, isInit = false;
-        let eqHeights = Array(80).fill(2); // Массив для плавности эквалайзера
+        let eqHeights = Array(80).fill(2); 
 
-        // 1. СТАРТ СИСТЕМЫ (Снятие всех блокировок браузера)
         function startSystem() {
             document.getElementById('gatekeeper').style.display = 'none';
             audioEl.load();
@@ -139,7 +154,6 @@
             }
         }
 
-        // 2. ГЕНЕРАЦИЯ КНОПОК
         const grid = document.getElementById('tracks-grid');
         for (let i = 1; i <= 12; i++) {
             let btn = document.createElement('div');
@@ -155,7 +169,6 @@
             });
         }
 
-        // 3. ОТПРАВКА И ПРИЕМ КОМАНД
         function sendCommand(action) {
             if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
             socket.emit('command', { action: action, track: currentTrack });
@@ -169,24 +182,29 @@
             if (data.state.status === 'stop') {
                 audioEl.pause();
                 vinyl.classList.remove('playing');
-                vinylText.innerText = 'АИ';
-                vinylText.style.color = '#000';
+                tMain.innerText = 'АИ';
+                tSub.innerText = 'МУЗЫКА';
             } else {
                 let url = CONFIG.baseUrl + (data.state.status === 'aim' ? CONFIG.tracks[currentTrack-1].aim : CONFIG.tracks[currentTrack-1].orig);
                 
-                vinylText.innerText = data.state.status === 'aim' ? 'АИ' : '✓';
-                vinylText.style.color = data.state.status === 'aim' ? '#000' : '#fff';
+                if (data.state.status === 'aim') {
+                    tMain.innerText = 'АИ';
+                    tSub.innerText = 'МУЗЫКА';
+                } else {
+                    tMain.innerText = '✓';
+                    tSub.innerText = '';
+                }
 
                 if (!audioEl.src.endsWith(url)) { audioEl.src = url; audioEl.load(); }
 
                 let playPos = ((Date.now() / 1000) - timeOffset) - data.state.start_time;
                 if (playPos > 0 && Math.abs(audioEl.currentTime - playPos) > 1.5) audioEl.currentTime = playPos;
                 
-                audioEl.play().then(() => vinyl.classList.add('playing')).catch(e => console.log("Ждем клика", e));
+                audioEl.play().then(() => vinyl.classList.add('playing')).catch(e => console.log(e));
             }
         });
 
-        // 4. КРУГОВОЙ ЭКВАЛАЙЗЕР С ПЛАВНОСТЬЮ (Вокруг винила)
+        // ЭКВАЛАЙЗЕР
         function startEq() {
             const canvas = document.getElementById('eq-canvas');
             const ctx = canvas.getContext('2d');
@@ -203,15 +221,13 @@
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 
                 let cx = canvas.width / 2;
-                let cy = canvas.height / 2 - 40; // Смещение из-за нижнего меню
-                let baseRadius = 120; // Чуть больше пластинки
+                let cy = canvas.height / 2 - 45; 
+                let baseRadius = 125; 
 
                 for (let i = 0; i < bars; i++) {
-                    // Берем частоты плавно из массива
                     let dataIndex = Math.floor(i * (dataArray.length * 0.5) / bars);
                     let targetH = dataArray[dataIndex] * 0.6;
                     
-                    // Формула плавности как в Event OS
                     eqHeights[i] += (targetH - eqHeights[i]) * 0.2;
                     let h = Math.max(eqHeights[i], 3);
 
@@ -226,15 +242,20 @@
                     ctx.lineTo(x2, y2);
                     ctx.lineWidth = 4;
                     ctx.lineCap = 'round';
-                    // Золотой свет
-                    ctx.strokeStyle = `rgba(212, 175, 55, ${h/100 + 0.2})`;
+                    
+                    // Меняем цвет эквалайзера в зависимости от текста
+                    if (tMain.innerText === '✓') {
+                        ctx.strokeStyle = `rgba(224, 224, 224, ${h/100 + 0.2})`;
+                    } else {
+                        ctx.strokeStyle = `rgba(212, 175, 55, ${h/100 + 0.2})`;
+                    }
                     ctx.stroke();
                 }
             }
             draw();
         }
 
-        // 5. ФОН: ЧАСТИЦЫ СО СВЯЗЯМИ (Constellation effect)
+        // ЧАСТИЦЫ
         const netCanvas = document.getElementById('network-bg');
         const netCtx = netCanvas.getContext('2d');
         let dots = [];
@@ -264,7 +285,6 @@
                 netCtx.fillStyle = 'rgba(212, 175, 55, 0.6)';
                 netCtx.fill();
 
-                // Проверка связей с другими точками
                 for(let j=i+1; j<dots.length; j++) {
                     let p2 = dots[j];
                     let dist = Math.sqrt((p.x - p2.x)**2 + (p.y - p2.y)**2);
