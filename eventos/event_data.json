@@ -6,7 +6,7 @@
   "screen_pin": "222",
   "cdn_base_url": "https://pub-372ba5f717cf4a8694558f47682d65d9.r2.dev/",
   "modules": [
-    {"id": "quiz", "name": "🎮 Квиз Интерактив", "path": "https://bogdanik.github.io/quiz-backend/"},
+    {"id": "quiz", "name": "🎮 Интерактив", "path": "https://familystandard.uz/aim/"},
     {"id": "bunker", "name": "🏚️ Игра Бункер", "path": "bunker.html"}
   ]
 }
