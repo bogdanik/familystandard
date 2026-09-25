@@ -11,13 +11,13 @@
         
         #particles-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
 
-        /* Кнопка разблокировки звука для браузеров */
-        #unlock-overlay { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 50; flex-direction: column; justify-content: center; align-items: center; backdrop-filter: blur(8px); cursor: pointer; }
-        .unlock-btn { padding: 20px 40px; font-size: 1.5rem; background: transparent; color: #d4af37; border: 2px solid #d4af37; border-radius: 12px; font-weight: bold; text-transform: uppercase; box-shadow: 0 0 20px rgba(212, 175, 55, 0.4); animation: pulse-text 1.5s infinite; }
+        /* Кнопка разблокировки звука (если браузер заблокировал автоплей) */
+        #unlock-overlay { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 50; flex-direction: column; justify-content: center; align-items: center; backdrop-filter: blur(10px); cursor: pointer; }
+        .unlock-btn { padding: 20px 40px; font-size: 1.5rem; background: transparent; color: #d4af37; border: 2px solid #d4af37; border-radius: 12px; font-weight: bold; text-transform: uppercase; box-shadow: 0 0 25px rgba(212, 175, 55, 0.4); animation: pulse-text 1.5s infinite; }
         @keyframes pulse-text { 0% { opacity: 0.3; } 50% { opacity: 1; } 100% { opacity: 0.3; } }
 
-        /* Главный экран шоу */
-        #viewer-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 5; background: transparent; padding-bottom: 180px; }
+        /* Главный экран шоу (полный экран, идеальный центр) */
+        #viewer-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 5; background: transparent; }
         
         canvas#equalizer-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; }
 
@@ -31,9 +31,9 @@
             width: min(75vw, 300px); 
             height: min(75vw, 300px); 
             border-radius: 50%; 
-            box-shadow: inset 0 0 60px rgba(212, 175, 55, 0.15); 
-            background: rgba(0,0,0,0.8); 
-            border: 3px solid rgba(212, 175, 55, 0.3); 
+            box-shadow: inset 0 0 60px rgba(212, 175, 55, 0.15), 0 0 30px rgba(0,0,0,0.8); 
+            background: rgba(5, 5, 5, 0.85); 
+            border: 3px solid rgba(212, 175, 55, 0.35); 
         }
         
         #mystery-mark { 
@@ -71,24 +71,40 @@
             to { transform: scale(1.05); filter: drop-shadow(0 0 35px rgba(212,175,55,0.9)); }
         }
 
-        /* ПУЛЬТ УПРАВЛЕНИЯ (Виден всегда внизу) */
-        #admin-panel { position: fixed; bottom: 0; left: 0; width: 100%; background: linear-gradient(to top, #0a0a0a, #1a1a1a); border-top: 2px solid #d4af37; z-index: 60; padding: 15px 10px calc(15px + env(safe-area-inset-bottom)); flex-direction: column; align-items: center; box-shadow: 0 -10px 40px rgba(0,0,0,0.9); }
-        .admin-header { display: flex; justify-content: space-between; width: 100%; max-width: 600px; margin-bottom: 8px; color: #d4af37; font-weight: bold; font-size: 1rem; text-transform: uppercase; letter-spacing: 1px; }
+        /* ПУЛЬТ УПРАВЛЕНИЯ: Эффект стекла (Glassmorphism) снизу */
+        #admin-panel { 
+            position: fixed; 
+            bottom: 0; 
+            left: 0; 
+            width: 100%; 
+            background: rgba(10, 10, 10, 0.65); 
+            backdrop-filter: blur(16px); 
+            -webkit-backdrop-filter: blur(16px); 
+            border-top: 1px solid rgba(212, 175, 55, 0.3); 
+            z-index: 60; 
+            padding: 12px 10px calc(12px + env(safe-area-inset-bottom)); 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            box-shadow: 0 -10px 30px rgba(0,0,0,0.6); 
+        }
+        
+        .admin-header { display: flex; justify-content: space-between; width: 100%; max-width: 600px; margin-bottom: 6px; color: #d4af37; font-weight: bold; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 1px; }
         
         /* Сетка выбора треков от 1 до 12 */
-        .tracks-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 5px; width: 100%; max-width: 600px; margin-bottom: 10px; }
-        .track-btn { padding: 8px 0; font-size: 0.9rem; font-weight: bold; background: #222; color: #aaa; border: 1px solid #444; border-radius: 6px; cursor: pointer; text-align: center; transition: 0.1s; }
-        .track-btn.active { background: #d4af37; color: #000; border-color: #f3db74; box-shadow: 0 0 10px rgba(212,175,55,0.5); }
+        .tracks-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; width: 100%; max-width: 600px; margin-bottom: 8px; }
+        .track-btn { padding: 6px 0; font-size: 0.85rem; font-weight: bold; background: rgba(30, 30, 30, 0.6); color: #aaa; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 5px; cursor: pointer; text-align: center; transition: 0.1s; }
+        .track-btn.active { background: #d4af37; color: #000; border-color: #f3db74; box-shadow: 0 0 10px rgba(212,175,55,0.6); }
 
-        .admin-controls { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; width: 100%; max-width: 600px; }
-        .btn { flex: 1 1 calc(50% - 6px); padding: 12px 5px; font-size: 0.95rem; cursor: pointer; border: none; border-radius: 6px; font-weight: 900; text-transform: uppercase; transition: transform 0.1s; letter-spacing: 1px; color: #111; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        .admin-controls { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; width: 100%; max-width: 600px; }
+        .btn { flex: 1 1 calc(50% - 5px); padding: 10px 4px; font-size: 0.9rem; cursor: pointer; border: none; border-radius: 6px; font-weight: 900; text-transform: uppercase; transition: transform 0.1s; letter-spacing: 1px; color: #111; box-shadow: 0 4px 15px rgba(0,0,0,0.4); }
         .btn:active { transform: scale(0.95); opacity: 0.9; }
         
-        .btn-start { background: linear-gradient(135deg, #f3db74, #d4af37); flex-basis: 100%; padding: 14px 10px; font-size: 1.1rem; }
+        .btn-start { background: linear-gradient(135deg, #f3db74, #d4af37); flex-basis: 100%; padding: 12px 10px; font-size: 1rem; }
         .btn-play-aim { background: linear-gradient(135deg, #e6c27a, #c5a017); }
         .btn-play-orig { background: linear-gradient(135deg, #ffffff, #c0c0c0); }
-        .btn-stop { background: linear-gradient(135deg, #660000, #330000); color: #fff; border: 1px solid #ff4444; }
-        .btn-next { background: linear-gradient(135deg, #444, #111); color: #d4af37; border: 1px solid #d4af37; }
+        .btn-stop { background: linear-gradient(135deg, #880000, #440000); color: #fff; border: 1px solid #ff4444; }
+        .btn-next { background: linear-gradient(135deg, #333, #111); color: #d4af37; border: 1px solid rgba(212,175,55,0.4); }
     </style>
 </head>
 <body>
@@ -99,7 +115,7 @@
         <button class="unlock-btn">🎶 Включить звук</button>
     </div>
 
-    <!-- Главный экран -->
+    <!-- Главный экран шоу -->
     <div id="viewer-screen">
         <canvas id="equalizer-canvas"></canvas>
         <div id="mystery-box">
@@ -110,7 +126,7 @@
         </div>
     </div>
 
-    <!-- Пульт управления внизу -->
+    <!-- Пульт управления с эффектом стекла -->
     <div id="admin-panel">
         <div class="admin-header">
             <span>Пульт управления</span>
@@ -118,9 +134,7 @@
         </div>
         
         <!-- Кнопки быстрого выбора треков от 1 до 12 -->
-        <div class="tracks-grid" id="tracks-grid">
-            <!-- Генерируются скриптом -->
-        </div>
+        <div class="tracks-grid" id="tracks-grid"></div>
 
         <div class="admin-controls">
             <button class="btn btn-start" id="btn-start" onclick="sendCommand('start')">🚀 Запустить шоу</button>
@@ -131,7 +145,8 @@
         </div>
     </div>
 
-    <audio id="audio-player" crossorigin="anonymous"></audio>
+    <!-- Полноценный аудио плеер с обработкой состояния -->
+    <audio id="audio-player" preload="auto" crossorigin="anonymous"></audio>
 
     <script>
         const CONFIG = {
@@ -153,7 +168,7 @@
         let isAudioContextInit = false;
         let audioCtx, analyser;
 
-        // Генерация кнопок треков 1-12 на пульте
+        // Генерация кнопок треков 1-12
         const tracksGrid = document.getElementById('tracks-grid');
         CONFIG.tracks.forEach(t => {
             let btn = document.createElement('button');
@@ -169,6 +184,7 @@
             });
         }
 
+        // Инициализация Web Audio API и обработка плеера
         function initAudio() {
             if (isAudioContextInit) return;
             try {
@@ -202,7 +218,7 @@
             if (currentTrack < CONFIG.tracks.length) {
                 currentTrack++;
             } else {
-                currentTrack = 1; // Зацикливаем на 1
+                currentTrack = 1;
             }
             highlightActiveTrack();
             document.getElementById('status-track').innerText = `Трек: ${currentTrack} / 12`;
@@ -216,7 +232,7 @@
             socket.emit('command', { action: action, track: currentTrack });
         }
 
-        // --- СИНХРОНИЗАЦИЯ С СЕРВЕРОМ ---
+        // --- СИНХРОНИЗАЦИЯ С СЕРВЕРОМ И ПЛЕЕР ---
         socket.on('sync', (data) => {
             timeOffset = (Date.now() / 1000) - data.server_time;
             applyState(data.state, true);
@@ -239,28 +255,32 @@
             if (state.status === 'stop') {
                 audioEl.pause();
                 mysteryMark.innerHTML = `<span class="ai-title">АИ</span><span class="ai-sub">музыка</span>`;
-                mysteryMark.style.color = '#d4af37';
-                mysteryBox.style.borderColor = 'rgba(212,175,55,0.3)';
+                mysteryBox.style.borderColor = 'rgba(212,175,55,0.35)';
             } 
             else {
                 let url = '';
                 if (state.status === 'aim') {
                     url = CONFIG.baseUrl + CONFIG.tracks[currentTrack - 1].aim;
                     mysteryMark.innerHTML = `<span class="ai-title">АИ</span><span class="ai-sub">музыка</span>`;
-                    mysteryMark.style.color = '#d4af37';
-                    mysteryBox.style.borderColor = 'rgba(212,175,55,0.6)';
+                    mysteryBox.style.borderColor = 'rgba(212,175,55,0.7)';
                 } else {
                     url = CONFIG.baseUrl + CONFIG.tracks[currentTrack - 1].orig;
                     mysteryMark.innerHTML = `<span style="font-size: 5rem; font-weight: 900; color: #e0e0e0;">✓</span>`;
-                    mysteryBox.style.borderColor = 'rgba(224,224,224,0.6)';
+                    mysteryBox.style.borderColor = 'rgba(224,224,224,0.7)';
                 }
 
-                if (audioEl.src !== url) audioEl.src = url;
+                // Жесткая проверка и загрузка трека плеером
+                if (audioEl.src !== url) {
+                    audioEl.src = url;
+                    audioEl.load();
+                }
 
                 let currentServerTime = (Date.now() / 1000) - timeOffset;
                 let playPosition = currentServerTime - state.start_time;
 
-                if (playPosition > 0) audioEl.currentTime = playPosition;
+                if (playPosition > 0 && Math.abs(audioEl.currentTime - playPosition) > 1.5) {
+                    audioEl.currentTime = playPosition;
+                }
 
                 let playPromise = audioEl.play();
                 if (playPromise !== undefined) {
@@ -278,7 +298,7 @@
         function forceUnlockAudio() {
             initAudio();
             if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
-            audioEl.play();
+            audioEl.play().catch(e => console.log("Play blocked"));
             document.getElementById('unlock-overlay').style.display = 'none';
         }
 
@@ -333,7 +353,7 @@
                     ctx.lineWidth = 5;
                     ctx.lineCap = 'round';
                     
-                    if (mysteryMark.innerText.includes('✓')) {
+                    if (mysteryMark.innerHTML.includes('✓')) {
                         ctx.strokeStyle = `rgba(224, 224, 224, ${barHeight/255 + 0.3})`; 
                     } else {
                         ctx.strokeStyle = `rgba(212, 175, 55, ${barHeight/255 + 0.3})`; 
