@@ -4,14 +4,14 @@ from flask import Flask, render_template
 from flask_socketio import SocketIO, emit
 
 app = Flask(__name__, template_folder='.')
-app.config['SECRET_KEY'] = 'super-secret-show'
+app.config['SECRET_KEY'] = 'super-secret'
 socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
 
-# Серверная память состояний
+# Сервер запоминает состояние шоу, чтобы опоздавшие зрители видели актуальную картину
 state = {
     'is_started': False,
     'track': 1,
-    'status': 'stop', # варианты: 'stop', 'aim', 'orig'
+    'status': 'stop',
     'start_time': 0
 }
 
@@ -21,8 +21,6 @@ def index():
 
 @socketio.on('connect')
 def on_connect():
-    # Как только любой зритель или админ открывает страницу,
-    # отдаем ему текущее состояние лобби и серверное время для синхронизации
     emit('sync', {'state': state, 'server_time': time.time()})
 
 @socketio.on('command')
@@ -44,7 +42,6 @@ def on_command(data):
     elif action == 'stop':
         state['status'] = 'stop'
         
-    # Рассылаем обновление всем (зрителям и админу)
     emit('update', {'state': state, 'server_time': time.time()}, broadcast=True)
 
 if __name__ == '__main__':
