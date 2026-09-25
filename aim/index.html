@@ -6,10 +6,10 @@
     <title>Нейромузыка - Шоу</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
     <style>
-        body, html { margin: 0; padding: 0; width: 100%; height: 100%; background-color: #111; color: white; font-family: sans-serif; overflow: hidden; }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; background-color: #111; color: white; font-family: sans-serif; overflow: hidden; user-select: none; }
         
         #splash-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; background: #000; z-index: 10; transition: opacity 2s ease-out; }
-        #splash-screen h1 { font-size: 5rem; letter-spacing: 10px; text-transform: uppercase; }
+        #splash-screen h1 { font-size: 5rem; letter-spacing: 10px; text-transform: uppercase; text-align: center; }
         
         #viewer-screen { display: none; flex-direction: column; justify-content: center; align-items: center; height: 100%; }
         .record-container { position: relative; width: 300px; height: 300px; margin-bottom: 50px; }
@@ -21,13 +21,16 @@
         
         canvas { width: 80%; height: 150px; }
 
+        /* Сетка пароля: на весь экран, поверх сплеш-скрина */
         #pin-grid { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: grid; grid-template-columns: 1fr 1fr 1fr; grid-template-rows: 1fr 1fr 1fr; z-index: 20; }
-        .pin-btn { width: 100%; height: 100%; cursor: default; }
+        .pin-btn { width: 100%; height: 100%; cursor: pointer; transition: background 0.1s; }
+        /* Легкая обратная связь при тапе, чтобы было понятно, что нажал */
+        .pin-btn:active { background: rgba(255, 255, 255, 0.05); } 
 
-        #admin-panel { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 30; padding: 20px; box-sizing: border-box; flex-direction: column; align-items: center; justify-content: center; }
-        .admin-controls { display: flex; flex-direction: column; gap: 20px; width: 300px; }
+        #admin-panel { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,1); z-index: 30; padding: 20px; box-sizing: border-box; flex-direction: column; align-items: center; justify-content: center; }
+        .admin-controls { display: flex; flex-direction: column; gap: 20px; width: 300px; max-width: 90%; }
         button { padding: 15px; font-size: 1.2rem; cursor: pointer; border: none; border-radius: 8px; background: #0ff; color: #000; font-weight: bold; text-transform: uppercase; }
-        button:active { background: #00cccc; }
+        button:active { background: #00cccc; transform: scale(0.98); }
         #status { text-align: center; margin-bottom: 20px; color: #0ff; font-size: 1.5rem; }
     </style>
 </head>
@@ -37,6 +40,7 @@
         <h1 id="splash-text">Нейромузыка</h1>
     </div>
 
+    <!-- Невидимая сетка 3х3 (Нажимай: 1 -> 5 -> 9) -->
     <div id="pin-grid">
         <div class="pin-btn" data-val="1"></div><div class="pin-btn" data-val="2"></div><div class="pin-btn" data-val="3"></div>
         <div class="pin-btn" data-val="4"></div><div class="pin-btn" data-val="5"></div><div class="pin-btn" data-val="6"></div>
@@ -65,31 +69,37 @@
     <audio id="audio-player" crossorigin="anonymous"></audio>
 
     <script>
-        // Сокет сам определит домен Render, ничего прописывать не нужно
         const socket = io();
-        
-        // Твоя ссылка на Cloudflare R2
         const BASE_URL = 'https://144716970b040f1876efd2bc2e9158da.r2.cloudflarestorage.com/www/';
         
         let currentTrack = 0;
         let maxTracks = 12;
+        
+        // Флаг админа: блокирует воспроизведение звука на этом устройстве
+        let isAdmin = false;
 
+        // --- Логика невидимого пароля ---
         let pinSequence = [];
-        const correctPin = ['1', '5', '9']; // Левый-верх, центр, правый-низ
+        const correctPin = ['1', '5', '9']; // Диагональ: левый-верх, центр, правый-низ
         
         document.querySelectorAll('.pin-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 pinSequence.push(e.target.dataset.val);
                 if (pinSequence.length > 3) pinSequence.shift();
                 
+                // Если пароль совпал
                 if (JSON.stringify(pinSequence) === JSON.stringify(correctPin)) {
+                    isAdmin = true; // Назначаем это устройство пультом
+                    
                     document.getElementById('admin-panel').style.display = 'flex';
                     document.getElementById('pin-grid').style.display = 'none';
                     document.getElementById('splash-screen').style.display = 'none';
+                    document.getElementById('viewer-screen').style.display = 'none'; // Гарантированно прячем винил
                 }
             });
         });
 
+        // --- Отправка команд на сервер ---
         function sendCmd(action) {
             if (action === 'next_track') {
                 if(currentTrack < maxTracks) currentTrack++;
@@ -100,7 +110,11 @@
             socket.emit('admin_command', { action: action, trackNum: currentTrack });
         }
 
+        // --- Прием команд (Для зрителя) ---
         socket.on('viewer_action', (data) => {
+            // Если это устройство админа — игнорируем команду! Звук тут играть не будет.
+            if (isAdmin) return; 
+
             const splash = document.getElementById('splash-screen');
             const viewer = document.getElementById('viewer-screen');
             const pinGrid = document.getElementById('pin-grid');
@@ -111,7 +125,7 @@
                 splash.style.opacity = '0';
                 setTimeout(() => {
                     splash.style.display = 'none';
-                    pinGrid.style.display = 'none';
+                    pinGrid.style.display = 'none'; // Зритель больше не может ввести пин-код
                     viewer.style.display = 'flex';
                     initAudioContext(); 
                 }, 2000); 
@@ -121,16 +135,14 @@
                 vinyl.classList.add('playing');
                 document.getElementById('track-mark').innerText = '?';
                 document.getElementById('track-mark').style.color = '#fff';
-                // Формируем: aim1.mp3, aim2.mp3 и т.д.
                 audio.src = `${BASE_URL}aim${data.trackNum}.mp3`;
-                audio.play();
+                audio.play().catch(e => console.log("Браузер заблокировал автоплей. Кликните по экрану."));
             } 
             
             else if (data.action === 'play_original') {
                 vinyl.classList.add('playing'); 
                 document.getElementById('track-mark').innerText = '✓';
                 document.getElementById('track-mark').style.color = '#0f0';
-                // Формируем: a1.mp3, a2.mp3 и т.д.
                 audio.src = `${BASE_URL}a${data.trackNum}.mp3`;
                 audio.play();
             }
@@ -143,6 +155,7 @@
             }
         });
 
+        // --- Логика эквалайзера ---
         let audioCtx, analyser, source, canvasCtx;
         let isAudioInit = false;
 
@@ -189,7 +202,7 @@
             draw();
         }
 
-        // Разблокировка аудио для браузера
+        // Разблокировка аудио для зрительского экрана
         document.body.addEventListener('click', () => {
             if(audioCtx && audioCtx.state === 'suspended') {
                 audioCtx.resume();
