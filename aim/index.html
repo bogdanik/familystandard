@@ -87,19 +87,15 @@
         </div>
     </div>
 
-    <!-- ВАЖНО: Добавлен preload="auto" для кэширования -->
+    <!-- Атрибуты как в Event OS -->
     <audio id="audio-player" crossorigin="anonymous" preload="auto"></audio>
 
     <script>
         const CONFIG = {
             baseUrl: 'https://pub-372ba5f717cf4a8694558f47682d65d9.r2.dev/',
-            tracks: Array.from({length: 12}, (_, i) => ({ 
-                aim: `aim${i + 1}.mp3`, 
-                orig: `m${i + 1}.mp3` 
-            }))
+            tracks: Array.from({length: 12}, (_, i) => ({ aim: `aim${i + 1}.mp3`, orig: `m${i + 1}.mp3` }))
         };
 
-        // ВАЖНО: Жесткая привязка к твоему Render-серверу
         const socket = io("https://aim-d8ck.onrender.com", { transports: ['websocket', 'polling'] });
         const audioEl = document.getElementById('audio-player');
         const vinyl = document.getElementById('vinyl');
@@ -107,19 +103,21 @@
         const tSub = document.getElementById('text-sub');
         
         let currentTrack = 1;
-        let timeOffset = 0;
         let audioCtx, analyser, isInit = false;
-        let eqHeights = Array(80).fill(2); 
+        
+        // --- УМНЫЙ АУДИО-МЕНЕДЖЕР (СПИЗЖЕНО ИЗ EVENT OS) ---
+        let targetVolume = 1.0;      
+        let isFadingToSeek = false;
+        let pendingSeekTime = 0;
+        let state_is_playing = false;
 
+        // Вратарь - логика один-в-один из submitAuth() Event OS
         function startSystem() {
             document.getElementById('gatekeeper').style.display = 'none';
             
-            // ВАЖНО: Принудительно задаем ссылку до вызова play(), чтобы браузер реально начал подгрузку
             audioEl.src = CONFIG.baseUrl + CONFIG.tracks[0].aim;
             audioEl.load();
-            audioEl.play().then(() => {
-                audioEl.pause();
-            }).catch(e => console.log("Unlock error:", e));
+            audioEl.play().then(() => audioEl.pause()).catch(()=>{});
             
             if (!isInit) {
                 try {
@@ -136,6 +134,31 @@
             }
         }
 
+        // Плавный фэйд на 25ms (Точная копия из Event OS)
+        setInterval(() => {
+            if (!audioEl) return;
+
+            let bgVolTarget = state_is_playing ? targetVolume : 0;
+            if (isFadingToSeek) bgVolTarget = 0;
+
+            let diffBg = bgVolTarget - audioEl.volume;
+            if (Math.abs(diffBg) > 0.02) {
+                audioEl.volume += Math.sign(diffBg) * 0.02; 
+            } else {
+                audioEl.volume = bgVolTarget;
+                if (bgVolTarget === 0) {
+                    if (isFadingToSeek) {
+                        audioEl.currentTime = pendingSeekTime; 
+                        isFadingToSeek = false; 
+                    } else if (!state_is_playing && !audioEl.paused) {
+                        audioEl.pause();
+                        vinyl.classList.remove('playing');
+                    }
+                }
+            }
+        }, 25);
+
+        // Генерация кнопок
         const grid = document.getElementById('tracks-grid');
         for (let i = 1; i <= 12; i++) {
             let btn = document.createElement('div');
@@ -156,40 +179,51 @@
             socket.emit('command', { action: action, track: currentTrack });
         }
 
-        socket.on('sync', data => {
-            timeOffset = (Date.now() / 1000) - data.server_time;
-            currentTrack = data.state.track;
+        // Обновление стейта с сервера (Логика Event OS)
+        socket.on('state_update', state => {
+            currentTrack = state.track_id;
+            state_is_playing = state.is_playing;
             updateUI();
 
-            if (data.state.status === 'stop') {
-                audioEl.pause();
-                vinyl.classList.remove('playing');
+            if (!state.is_playing) {
+                tMain.innerText = 'АИ';
+                tSub.innerText = 'МУЗЫКА';
+                return;
+            } 
+            
+            // UI Обновление
+            if (state.track_type === 'aim') {
                 tMain.innerText = 'АИ';
                 tSub.innerText = 'МУЗЫКА';
             } else {
-                let url = CONFIG.baseUrl + (data.state.status === 'aim' ? CONFIG.tracks[currentTrack-1].aim : CONFIG.tracks[currentTrack-1].orig);
-                
-                if (data.state.status === 'aim') {
-                    tMain.innerText = 'АИ';
-                    tSub.innerText = 'МУЗЫКА';
-                } else {
-                    tMain.innerText = '✓';
-                    tSub.innerText = '';
-                }
+                tMain.innerText = '✓';
+                tSub.innerText = '';
+            }
 
-                if (!audioEl.src.endsWith(url)) { 
-                    audioEl.src = url; 
-                    audioEl.load(); 
+            // Логика подгрузки и перескока (Из Event OS: applyAudioState)
+            let url = CONFIG.baseUrl + (state.track_type === 'aim' ? CONFIG.tracks[currentTrack-1].aim : CONFIG.tracks[currentTrack-1].orig);
+            
+            if (!audioEl.src.endsWith(url)) {
+                audioEl.src = url;
+                audioEl.currentTime = state.seek_position;
+                if (state.is_playing) {
+                    audioEl.volume = 0;
+                    audioEl.play().then(() => vinyl.classList.add('playing')).catch(()=>{});
                 }
-
-                let playPos = ((Date.now() / 1000) - timeOffset) - data.state.start_time;
-                if (playPos > 0 && Math.abs(audioEl.currentTime - playPos) > 1.5) audioEl.currentTime = playPos;
-                
-                audioEl.play().then(() => vinyl.classList.add('playing')).catch(e => console.log("Play sync error:", e));
+            } else {
+                let needsSeek = Math.abs(audioEl.currentTime - state.seek_position) > 2.5;
+                if (needsSeek && state.is_playing) {
+                    isFadingToSeek = true;
+                    pendingSeekTime = state.seek_position;
+                } else if (state.is_playing && audioEl.paused) {
+                    audioEl.volume = 0; 
+                    audioEl.play().then(() => vinyl.classList.add('playing')).catch(()=>{});
+                }
             }
         });
 
-        // ЭКВАЛАЙЗЕР
+        // --- ЭКВАЛАЙЗЕР ---
+        let eqHeights = Array(80).fill(2); 
         function startEq() {
             const canvas = document.getElementById('eq-canvas');
             const ctx = canvas.getContext('2d');
@@ -211,7 +245,7 @@
 
                 for (let i = 0; i < bars; i++) {
                     let dataIndex = Math.floor(i * (dataArray.length * 0.5) / bars);
-                    let targetH = dataArray[dataIndex] * 0.6;
+                    let targetH = state_is_playing ? dataArray[dataIndex] * 0.6 : 0;
                     
                     eqHeights[i] += (targetH - eqHeights[i]) * 0.2;
                     let h = Math.max(eqHeights[i], 3);
@@ -239,7 +273,7 @@
             draw();
         }
 
-        // ЧАСТИЦЫ
+        // --- ЧАСТИЦЫ ---
         const netCanvas = document.getElementById('network-bg');
         const netCtx = netCanvas.getContext('2d');
         let dots = [];
