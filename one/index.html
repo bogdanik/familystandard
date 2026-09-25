@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тен Игорь Дмитриевич — 1 Годик!</title>
+    <style>
+        :root {
+            --bg-color: #0d0e15;
+            --card-bg: rgba(22, 25, 38, 0.65);
+            --card-border: rgba(255, 255, 255, 0.1);
+            --accent-color: #00f2fe;
+            --accent-glow: rgba(0, 242, 254, 0.4);
+            --accent-secondary: #4facfe;
+            --text-color: #f0f3f8;
+            --text-dim: #94a3b8;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            overflow-x: hidden;
+        }
+
+        /* 120Hz Background Canvas */
+        #particles-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* Hero / Intro Header Transformed */
+        #hero-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            background: radial-gradient(circle, rgba(13,14,21,0.85) 0%, rgba(13,14,21,0.98) 100%);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            transition: all 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+            text-align: center;
+            padding: 20px;
+            box-shadow: 0 0 0 rgba(0,0,0,0);
+            border-bottom: 1px solid transparent;
+        }
+
+        /* Header state after clicking start */
+        #hero-header.as-header {
+            height: 70px;
+            flex-direction: row;
+            justify-content: space-between;
+            padding: 0 40px;
+            background: rgba(13, 14, 21, 0.85);
+            border-bottom: 1px solid var(--card-border);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .hero-title {
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            font-weight: 900;
+            letter-spacing: -1px;
+            background: linear-gradient(135deg, #00f2fe 0%, #4facfe 50%, #00c6ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px var(--accent-glow);
+            transition: all 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        #hero-header.as-header .hero-title {
+            font-size: 1.4rem;
+            text-shadow: 0 0 15px var(--accent-glow);
+        }
+
+        .hero-subtitle {
+            font-size: clamp(1.1rem, 2vw, 1.8rem);
+            color: var(--text-dim);
+            margin-top: 10px;
+            margin-bottom: 2.5rem;
+            transition: all 0.6s ease;
+        }
+
+        #hero-header.as-header .hero-subtitle {
+            font-size: 0.95rem;
+            margin: 0;
+            color: var(--accent-color);
+            background: rgba(0, 242, 254, 0.1);
+            padding: 4px 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(0, 242, 254, 0.2);
+        }
+
+        .start-btn {
+            padding: 18px 42px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #0d0e15;
+            background: linear-gradient(135deg, #00f2fe, #4facfe);
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 0 25px var(--accent-glow);
+            transition: all 0.4s ease;
+        }
+
+        .start-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 40px var(--accent-color);
+        }
+
+        #hero-header.as-header .start-btn {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transform: scale(0.5);
+            position: absolute;
+        }
+
+        /* Container adjustment for top header */
+        .container {
+            position: relative;
+            z-index: 10;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 120px 20px 100px 20px;
+            display: grid;
+            grid-template-columns: 1fr 220px;
+            gap: 40px;
+            opacity: 0.3;
+            transition: opacity 0.8s ease;
+        }
+
+        .container.active {
+            opacity: 1;
+        }
+
+        @media (max-width: 850px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+            .sidebar {
+                display: none;
+            }
+            #hero-header.as-header {
+                padding: 0 20px;
+            }
+            #hero-header.as-header .hero-subtitle {
+                display: none;
+            }
+        }
+
+        /* Timeline Items */
+        .timeline-content {
+            display: flex;
+            flex-direction: column;
+            gap: 60px;
+        }
+
+        .timeline-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-radius: 24px;
+            padding: 32px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            opacity: 0;
+            transform: translateY(40px) scale(0.96);
+            transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), 
+                        transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            will-change: opacity, transform;
+        }
+
+        .timeline-card.visible {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding-bottom: 12px;
+        }
+
+        .time-badge {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--accent-color);
+            background: rgba(0, 242, 254, 0.1);
+            padding: 6px 16px;
+            border-radius: 12px;
+            border: 1px solid rgba(0, 242, 254, 0.2);
+        }
+
+        .card-title {
+            font-size: 1.6rem;
+            font-weight: 700;
+        }
+
+        .card-body p {
+            font-size: 1.05rem;
+            line-height: 1.6;
+            color: var(--text-dim);
+            margin-bottom: 12px;
+        }
+
+        .card-body p strong {
+            color: var(--text-color);
+        }
+
+        .notes {
+            margin-top: 16px;
+            padding: 14px 18px;
+            background: rgba(255, 255, 255, 0.03);
+            border-left: 3px solid var(--accent-color);
+            border-radius: 4px 12px 12px 4px;
+            font-size: 0.95rem;
+            color: #cbd5e1;
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            position: sticky;
+            top: 100px;
+            height: fit-content;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            backdrop-filter: blur(16px);
+            border-radius: 20px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .sidebar-title {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-dim);
+            margin-bottom: 8px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 14px;
+            color: var(--text-dim);
+            text-decoration: none;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: #fff;
+            background: var(--accent-glow);
+            border: 1px solid rgba(0, 242, 254, 0.3);
+            transform: translateX(4px);
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="particles-canvas"></canvas>
+
+    <!-- Intro Header Transformed Component -->
+    <header id="hero-header">
+        <h1 class="hero-title">Тен Игорь Дмитриевич</h1>
+        <p class="hero-subtitle">1 Годик • Праздничный Тайминг</p>
+        <button class="start-btn" onclick="startApp()">Открыть программу</button>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container" id="main-container">
+        <main class="timeline-content">
+            
+            <section class="timeline-card" id="t-1800">
+                <div class="card-header">
+                    <h2 class="card-title">Сбор гостей & Велком</h2>
+                    <span class="time-badge">18:00 – 18:40</span>
+                </div>
+                <div class="card-body">
+                    <p>Сбор родственников и друзей в ресторане «Алмаз». Фоновая музыка, разогрев и подготовка к празднованию.</p>
+                    <div class="notes">
+                        <strong>Заметки:</strong> Встречать всех без строгой официозности. Задавать расслабленный, драйвовый тон с самого входа.
+                    </div>
+                </div>
+            </section>
+
+            <section class="timeline-card" id="t-1840">
+                <div class="card-header">
+                    <h2 class="card-title">Первый стол & Старт</h2>
+                    <span class="time-badge">18:40 – 19:20</span>
+                </div>
+                <div class="card-body">
+                    <p>Старт программы. Представление Игоря, а также родителей — Димы и Анастасии.</p>
+                    <p><strong>Тост 1:</strong> Дедушки Юра и Гриша, бабушки Лены.</p>
+                    <p><strong>Тост 2:</strong> Адибай Стас и Адя Алина.</p>
+                    <div class="notes">
+                        <strong>Интерактив:</strong> Быстрый блиц про вес (3 600 г) и рост (54 см) виновника торжества.
+                    </div>
+                </div>
+            </section>
+
+            <section class="timeline-card" id="t-1920">
+                <div class="card-header">
+                    <h2 class="card-title">Интерактив: Нейромузыка</h2>
+                    <span class="time-badge">19:20 – 20:00</span>
+                </div>
+                <div class="card-body">
+                    <p>Музыкальная разрядка и первый конкурс с вручением Приза №1.</p>
+                    <p><strong>Тост 3:</strong> Братья (Максим, Рома, Дима, Женя) и сестра Наталья.</p>
+                    <div class="notes">
+                        <strong>Подготовка:</strong> В 19:50 проверить готовность кухни и приезд аниматоров.
+                    </div>
+                </div>
+            </section>
+
+            <section class="timeline-card" id="t-2000">
+                <div class="card-header">
+                    <h2 class="card-title">Горячее & Аниматоры</h2>
+                    <span class="time-badge">20:00 – 20:50</span>
+                </div>
+                <div class="card-body">
+                    <p>Вынос горячих блюд. Аниматоры забирают детей в отдельную игровую зону.</p>
+                    <p><strong>Тост 4:</strong> Дедушка Алик, бабушка Люба, бабушка Мила, дедушка Женя.</p>
+                    <p><strong>Тост 5:</strong> Дедушка Алик с семьей, бабушка Роза, Эльмира, дядя Дима.</p>
+                    <div class="notes">
+                        <strong>Заметка:</strong> Время взрослым спокойно поесть и выпить.
+                    </div>
+                </div>
+            </section>
+
+            <section class="timeline-card" id="t-2050">
+                <div class="card-header">
+                    <h2 class="card-title">Танцевальный Алфавит</h2>
+                    <span class="time-badge">20:50 – 21:40</span>
+                </div>
+                <div class="card-body">
+                    <p>Выход на танцпол. Веселый конкурс на выбывание с вручением Приза №2.</p>
+                    <p><strong>Тост 6:</strong> Медемя Алла, Оля, Наталья с семьями.</p>
+                    <div class="notes">
+                        <strong>Правило:</strong> На остановку музыки встать в форму названной буквы. Кто затупил — выбывает!
+                    </div>
+                </div>
+            </section>
+
+            <section class="timeline-card" id="t-2140">
+                <div class="card-header">
+                    <h2 class="card-title">Танцевальный Баттл</h2>
+                    <span class="time-badge">21:40 – 22:30</span>
+                </div>
+                <div class="card-body">
+                    <p>Максимальный разнос танцпола. Стенка на стенку за Приз №3.</p>
+                    <p><strong>Тост 7:</strong> Друзья родителей (Димы и Насти).</p>
+                    <div class="notes">
+                        <strong>Атмосфера:</strong> Самый шумный и свободный блок вечера.
+                    </div>
+                </div>
+            </section>
+
+            <section class="timeline-card" id="t-2230">
+                <div class="card-header">
+                    <h2 class="card-title">Торт & Финал</h2>
+                    <span class="time-badge">22:30 – 23:00</span>
+                </div>
+                <div class="card-body">
+                    <p>Торжественный вынос праздничного торта с 1 свечой. Ответное слово родителей.</p>
+                    <div class="notes">
+                        <strong>Завершение:</strong> Общее фото, спасибо всем гостям, переход в свободный танцевальный режим.
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- Right Navigation Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-title">Тайминги</div>
+            <a href="#t-1800" class="nav-link"><span>Сбор</span> <span>18:00</span></a>
+            <a href="#t-1840" class="nav-link"><span>Старт</span> <span>18:40</span></a>
+            <a href="#t-1920" class="nav-link"><span>Интерактив</span> <span>19:20</span></a>
+            <a href="#t-2000" class="nav-link"><span>Горячее</span> <span>20:00</span></a>
+            <a href="#t-2050" class="nav-link"><span>Алфавит</span> <span>20:50</span></a>
+            <a href="#t-2140" class="nav-link"><span>Баттл</span> <span>21:40</span></a>
+            <a href="#t-2230" class="nav-link"><span>Торт</span> <span>22:30</span></a>
+        </aside>
+    </div>
+
+    <script>
+        // --- 120Hz Particle Engine ---
+        const canvas = document.getElementById('particles-canvas');
+        const ctx = canvas.getContext('2d');
+
+        let particles = [];
+        let width = canvas.width = window.innerWidth;
+        let height = canvas.height = window.innerHeight;
+
+        let mouse = { x: null, y: null, radius: 150 };
+
+        window.addEventListener('mousemove', (e) => {
+            mouse.x = e.x;
+            mouse.y = e.y;
+        });
+
+        window.addEventListener('resize', () => {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+            initParticles();
+        });
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.radius = Math.random() * 2 + 1;
+                this.vx = (Math.random() - 0.5) * 0.8;
+                this.vy = (Math.random() - 0.5) * 0.8;
+                this.alpha = Math.random() * 0.5 + 0.2;
+            }
+
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+
+                if (this.x < 0 || this.x > width) this.vx *= -1;
+                if (this.y < 0 || this.y > height) this.vy *= -1;
+
+                if (mouse.x !== null && mouse.y !== null) {
+                    let dx = mouse.x - this.x;
+                    let dy = mouse.y - this.y;
+                    let distance = Math.sqrt(dx * dx + dy * dy);
+
+                    if (distance < mouse.radius) {
+                        let force = (mouse.radius - distance) / mouse.radius;
+                        let angle = Math.atan2(dy, dx);
+                        this.x -= Math.cos(angle) * force * 4;
+                        this.y -= Math.sin(angle) * force * 4;
+                    }
+                }
+            }
+
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(0, 242, 254, ${this.alpha})`;
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = 'rgba(0, 242, 254, 0.8)';
+                ctx.fill();
+            }
+        }
+
+        function initParticles() {
+            particles = [];
+            const count = Math.floor((width * height) / 12000);
+            for (let i = 0; i < count; i++) {
+                particles.push(new Particle());
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, width, height);
+            for (let i = 0; i < particles.length; i++) {
+                particles[i].update();
+                particles[i].draw();
+            }
+            requestAnimationFrame(animate);
+        }
+
+        initParticles();
+        requestAnimationFrame(animate);
+
+        // --- Transform Intro Screen into Fixed Top Header ---
+        function startApp() {
+            document.getElementById('hero-header').classList.add('as-header');
+            document.getElementById('main-container').classList.add('active');
+        }
+
+        // --- Intersection Observer for Cards & Sidebar Nav ---
+        const cards = document.querySelectorAll('.timeline-card');
+        const navLinks = document.querySelectorAll('.nav-link');
+
+        const observerOptions = {
+            threshold: 0.25,
+            rootMargin: "-60px 0px -10% 0px"
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    
+                    const id = entry.target.getAttribute('id');
+                    navLinks.forEach(link => {
+                        if (link.getAttribute('href') === `#${id}`) {
+                            link.classList.add('active');
+                        } else {
+                            link.classList.remove('active');
+                        }
+                    });
+                } else {
+                    entry.target.classList.remove('visible');
+                }
+            });
+        }, observerOptions);
+
+        cards.forEach(card => observer.observe(card));
+    </script>
+</body>
+</html>
