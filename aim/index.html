@@ -6,77 +6,104 @@
     <title>Нейромузыка - Шоу</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
     <style>
-        body, html { margin: 0; padding: 0; width: 100%; height: 100%; background-color: #050505; color: white; font-family: sans-serif; overflow: hidden; user-select: none; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body, html { width: 100%; height: 100%; background-color: #050505; color: white; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow: hidden; user-select: none; }
         
-        /* Холст для летающих частиц на заднем фоне */
-        #particles { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
+        /* Холст для частиц */
+        #particles-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
 
         /* Заглавный экран */
-        #splash-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; z-index: 10; pointer-events: none; }
-        .splash-text { font-size: 5rem; letter-spacing: 10px; text-transform: uppercase; text-align: center; color: #fff; text-shadow: 0 0 20px #0ff; animation: pulse 0.5s infinite alternate; }
-        
-        /* Анимация пульсации и падения вниз */
-        @keyframes pulse { 0% { transform: scale(1); text-shadow: 0 0 10px #0ff; } 100% { transform: scale(1.03); text-shadow: 0 0 30px #0ff, 0 0 50px #0ff; } }
-        .splash-text.fall-down { transform: translateY(150vh); transition: transform 1.2s cubic-bezier(0.5, -0.2, 0.2, 1); opacity: 0; }
-        
-        /* Главный экран зрителя */
-        #viewer-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 5; opacity: 0; transition: opacity 2s; pointer-events: none; }
-        #viewer-screen.active { opacity: 1; }
+        #splash-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 10; background: #050505; transition: opacity 0.5s; }
+        .splash-title { font-size: 5rem; font-weight: 900; letter-spacing: 10px; text-transform: uppercase; color: #fff; text-shadow: 0 0 15px #00ffff; }
+        .click-hint { margin-top: 20px; font-size: 1.2rem; color: #888; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { opacity: 0.3; } 50% { opacity: 1; } 100% { opacity: 0.3; } }
 
-        .record-container { position: relative; width: 300px; height: 300px; margin-bottom: 50px; }
-        .record { width: 100%; height: 100%; border-radius: 50%; background: radial-gradient(circle, #333 30%, #000 70%); border: 2px solid #555; display: flex; justify-content: center; align-items: center; box-shadow: 0 0 20px rgba(0,255,255,0.2); transition: transform 0.2s; }
-        .record.playing { animation: spin 4s linear infinite; }
-        .record h2 { font-size: 6rem; margin: 0; color: #fff; text-shadow: 0 0 10px #0ff; }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
+        /* Экран винила (основной) */
+        #viewer-screen { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; flex-direction: column; justify-content: center; align-items: center; z-index: 5; }
         
-        canvas#equalizer { width: 80%; height: 150px; }
+        /* Винил */
+        .record-container { position: relative; width: 350px; height: 350px; margin-top: -100px; z-index: 6; }
+        .record { width: 100%; height: 100%; border-radius: 50%; background: radial-gradient(circle, #1a1a1a 20%, #000 80%); border: 4px solid #333; display: flex; justify-content: center; align-items: center; box-shadow: 0 0 40px rgba(0, 255, 255, 0.15); transition: transform 0.2s; }
+        .record::before { content: ''; position: absolute; width: 95%; height: 95%; border-radius: 50%; border: 1px solid #222; }
+        .record::after { content: ''; position: absolute; width: 85%; height: 85%; border-radius: 50%; border: 1px solid #111; }
+        .record.spin { animation: spinning 3s linear infinite; }
+        .record h2 { position: relative; z-index: 2; font-size: 4rem; margin: 0; color: #fff; background: #111; width: 120px; height: 120px; border-radius: 50%; display: flex; justify-content: center; align-items: center; border: 2px solid #00ffff; box-shadow: inset 0 0 15px rgba(0,255,255,0.5); }
+        @keyframes spinning { 100% { transform: rotate(360deg); } }
+        
+        /* Эквалайзер (теперь жестко внизу) */
+        #eq-container { position: absolute; bottom: 0; left: 0; width: 100%; height: 250px; z-index: 4; display: flex; align-items: flex-end; }
+        canvas#equalizer-canvas { width: 100%; height: 100%; }
 
-        /* Невидимая сетка 3х3 (Нажимай: 1 -> 5 -> 9) */
+        /* Невидимая сетка 3х3 (Пин-код) */
         #pin-grid { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: grid; grid-template-columns: 1fr 1fr 1fr; grid-template-rows: 1fr 1fr 1fr; z-index: 20; }
-        .pin-btn { width: 100%; height: 100%; cursor: pointer; transition: background 0.1s; }
-        .pin-btn:active { background: rgba(255, 255, 255, 0.05); } 
+        .pin-btn { width: 100%; height: 100%; cursor: pointer; }
 
-        /* Пульт админа (прозрачный, поверх всего) */
-        #admin-panel { display: none; position: absolute; bottom: 20px; left: 0; width: 100%; z-index: 30; padding: 20px; box-sizing: border-box; flex-direction: column; align-items: center; pointer-events: none; }
-        .admin-controls { display: flex; flex-direction: column; gap: 10px; width: 300px; max-width: 90%; pointer-events: auto; }
-        button { padding: 12px; font-size: 1.1rem; cursor: pointer; border: none; border-radius: 8px; background: rgba(0, 255, 255, 0.8); color: #000; font-weight: bold; text-transform: uppercase; backdrop-filter: blur(5px); }
-        button:active { background: #00cccc; transform: scale(0.98); }
-        #status { text-align: center; margin-bottom: 10px; color: #fff; font-size: 1.2rem; background: rgba(0,0,0,0.5); padding: 5px; border-radius: 5px; pointer-events: auto; }
+        /* ПАНЕЛЬ АДМИНА (Снизу) */
+        #admin-panel { display: none; position: fixed; bottom: 0; left: 0; width: 100%; background: #111; border-top: 2px solid #00ffff; z-index: 30; padding: 15px; flex-direction: column; align-items: center; box-shadow: 0 -10px 30px rgba(0,0,0,0.8); }
+        .admin-header { display: flex; justify-content: space-between; width: 100%; max-width: 600px; margin-bottom: 15px; color: #00ffff; font-weight: bold; font-size: 1.1rem; }
+        .debug-info { font-size: 0.9rem; color: #aaa; text-align: center; margin-bottom: 10px; height: 20px; }
+        
+        .admin-controls { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; width: 100%; max-width: 600px; }
+        .btn { flex: 1 1 calc(50% - 10px); padding: 15px 10px; font-size: 1rem; cursor: pointer; border: none; border-radius: 6px; font-weight: bold; text-transform: uppercase; transition: 0.1s; display: flex; justify-content: center; align-items: center; gap: 8px; }
+        .btn:active { transform: scale(0.95); }
+        
+        .btn-start { background: #00ffff; color: #000; flex-basis: 100%; margin-bottom: 10px; }
+        .btn-play-aim { background: #2d00f7; color: #fff; }
+        .btn-play-orig { background: #00a896; color: #fff; }
+        .btn-stop { background: #d90429; color: #fff; }
+        .btn-next { background: #444; color: #fff; }
+        
+        /* Убираем сетку и сплеш, если шоу началось */
+        body.show-running #splash-screen { display: none; }
+        body.show-running #pin-grid { display: none; }
+        body.show-running #viewer-screen { display: flex; }
     </style>
 </head>
 <body>
 
-    <!-- Частицы -->
-    <canvas id="particles"></canvas>
+    <canvas id="particles-canvas"></canvas>
 
+    <!-- Экран до старта -->
     <div id="splash-screen">
-        <h1 class="splash-text" id="splash-text">Нейромузыка</h1>
+        <h1 class="splash-title">Нейромузыка</h1>
+        <div class="click-hint">Коснитесь экрана перед вводом пароля</div>
     </div>
 
+    <!-- Пароль: 1 (Лев-верх) -> 5 (Центр) -> 9 (Прав-низ) -->
     <div id="pin-grid">
         <div class="pin-btn" data-val="1"></div><div class="pin-btn" data-val="2"></div><div class="pin-btn" data-val="3"></div>
         <div class="pin-btn" data-val="4"></div><div class="pin-btn" data-val="5"></div><div class="pin-btn" data-val="6"></div>
         <div class="pin-btn" data-val="7"></div><div class="pin-btn" data-val="8"></div><div class="pin-btn" data-val="9"></div>
     </div>
 
-    <!-- Визуал (Пластинка и эквалайзер) -->
+    <!-- Экран шоу -->
     <div id="viewer-screen">
         <div class="record-container">
-            <div class="record" id="vinyl">
-                <h2 id="track-mark">?</h2>
+            <div class="record" id="vinyl-disk">
+                <h2 id="disk-label">Т-1</h2>
             </div>
         </div>
-        <canvas id="equalizer"></canvas>
+        <div id="eq-container">
+            <canvas id="equalizer-canvas"></canvas>
+        </div>
     </div>
 
-    <!-- Панель админа -->
+    <!-- Пульт (Снизу) -->
     <div id="admin-panel">
-        <div id="status">Трек: 0</div>
+        <div class="admin-header">
+            <span>Управление Шоу</span>
+            <span id="status-track">Трек: 1 / 12</span>
+        </div>
+        <div class="debug-info" id="debug-text">Готов к работе</div>
+        
         <div class="admin-controls">
-            <button onclick="sendCmd('start_show')">Старт программы</button>
-            <button onclick="sendCmd('next_track')">След. трек (Нейро)</button>
-            <button onclick="sendCmd('play_original')">Показать оригинал</button>
-            <button onclick="sendCmd('stop_audio')">Стоп</button>
+            <button class="btn btn-start" id="btn-start" onclick="emitAndExecute('start_show')">🚀 Старт программы</button>
+            
+            <button class="btn btn-play-aim" onclick="emitAndExecute('play_aim')">▶ Нейро</button>
+            <button class="btn btn-play-orig" onclick="emitAndExecute('play_orig')">▶ Оригинал</button>
+            
+            <button class="btn btn-stop" onclick="emitAndExecute('stop_audio')">⏹ Стоп</button>
+            <button class="btn btn-next" onclick="emitAndExecute('next_track')">⏭ След. трек</button>
         </div>
     </div>
 
@@ -84,10 +111,10 @@
 
     <script>
         // ==========================================
-        // БЛОК НАСТРОЕК ССЫЛОК И ТРЕКОВ
+        // НАСТРОЙКИ ССЫЛОК И ТРЕКОВ
         // ==========================================
-        const AUDIO_CONFIG = {
-            baseUrl: 'https://144716970b040f1876efd2bc2e9158da.r2.cloudflarestorage.com/www/',
+        const CONFIG = {
+            baseUrl: 'https://pub-372ba5f717cf4a8694558f47682d65d9.r2.dev/',
             tracks: [
                 { id: 1, aim: 'aim1.mp3', orig: 'm1.mp3' },
                 { id: 2, aim: 'aim2.mp3', orig: 'm2.mp3' },
@@ -104,182 +131,193 @@
             ]
         };
 
-        // Предзагрузка треков для мгновенного старта
-        window.onload = () => {
-            AUDIO_CONFIG.tracks.forEach(track => {
-                let p1 = new Audio(); p1.src = AUDIO_CONFIG.baseUrl + track.aim;
-                let p2 = new Audio(); p2.src = AUDIO_CONFIG.baseUrl + track.orig;
-            });
-        };
-
         const socket = io();
-        let currentTrack = 0;
-        let isShowStarted = false;
+        let currentTrack = 1; 
 
-        // --- Логика пароля (1, 5, 9) ---
-        let pinSequence = [];
-        const correctPin = ['1', '5', '9'];
-        
+        // DOM элементы
+        const audioEl = document.getElementById('audio-player');
+        const vinylEl = document.getElementById('vinyl-disk');
+        const diskLabel = document.getElementById('disk-label');
+        const debugText = document.getElementById('debug-text');
+        const statusTrack = document.getElementById('status-track');
+
+        // Обработчики статуса аудио (для отладки файлов)
+        audioEl.addEventListener('playing', () => { debugText.style.color = '#0f0'; debugText.innerText = 'Аудио играет ✓'; });
+        audioEl.addEventListener('waiting', () => { debugText.style.color = '#ffaa00'; debugText.innerText = 'Буферизация (Загрузка)...'; });
+        audioEl.addEventListener('error', () => { debugText.style.color = '#f00'; debugText.innerText = 'ОШИБКА! Файл не найден или CORS.'; });
+
+        // --- ИНИЦИАЛИЗАЦИЯ ЗВУКА ---
+        let audioCtx = null;
+        let analyser = null;
+        let sourceNode = null;
+
+        function safeInitAudio() {
+            try {
+                if (!audioCtx) {
+                    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                    audioCtx = new AudioCtx();
+                    analyser = audioCtx.createAnalyser();
+                    analyser.fftSize = 128;
+
+                    sourceNode = audioCtx.createMediaElementSource(audioEl);
+                    sourceNode.connect(analyser);
+                    analyser.connect(audioCtx.destination);
+                    
+                    startEqualizer();
+                }
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+            } catch (err) {
+                console.error("Ошибка Audio API:", err);
+            }
+        }
+
+        // Любой клик по экрану снимает блок браузера на звук
+        window.addEventListener('click', safeInitAudio, { once: true });
+        window.addEventListener('touchstart', safeInitAudio, { once: true });
+
+        // --- ЛОГИКА ПИН-КОДА ---
+        let pinHistory = [];
         document.querySelectorAll('.pin-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
-                pinSequence.push(e.target.dataset.val);
-                if (pinSequence.length > 3) pinSequence.shift();
-                
-                if (JSON.stringify(pinSequence) === JSON.stringify(correctPin)) {
+                safeInitAudio(); // Поднимаем звук
+                pinHistory.push(e.target.dataset.val);
+                if (pinHistory.length > 3) pinHistory.shift();
+
+                // Пароль: 1 - 5 - 9
+                if (JSON.stringify(pinHistory) === JSON.stringify(['1', '5', '9'])) {
                     document.getElementById('admin-panel').style.display = 'flex';
                     document.getElementById('pin-grid').style.display = 'none';
-                    // Инициируем аудио контекст заранее для админа при вводе пароля
-                    if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
                 }
             });
         });
 
-        function sendCmd(action) {
-            if (action === 'next_track') {
-                if(currentTrack < AUDIO_CONFIG.tracks.length) currentTrack++;
-                document.getElementById('status').innerText = `Трек: ${currentTrack} (Нейро)`;
-            } else if (action === 'play_original') {
-                document.getElementById('status').innerText = `Трек: ${currentTrack} (Оригинал)`;
-            }
+        // --- ВЫПОЛНЕНИЕ КОМАНД (Локально + Сокет) ---
+        function emitAndExecute(action) {
+            safeInitAudio();
+            // Сначала сразу меняем визуал на телефоне админа, чтобы не было задержки
+            executeCommand(action, currentTrack);
+            // Отправляем на проектор
             socket.emit('admin_command', { action: action, trackNum: currentTrack });
         }
 
         socket.on('viewer_action', (data) => {
-            const text = document.getElementById('splash-text');
-            const viewer = document.getElementById('viewer-screen');
-            const pinGrid = document.getElementById('pin-grid');
-            const audio = document.getElementById('audio-player');
-            const vinyl = document.getElementById('vinyl');
-
-            if (data.action === 'start_show' && !isShowStarted) {
-                isShowStarted = true;
-                pinGrid.style.display = 'none'; 
-                
-                text.classList.remove('pulse');
-                text.classList.add('fall-down'); // Текст улетает вниз
-                
-                setTimeout(() => {
-                    viewer.classList.add('active'); // Появляется винил и эквалайзер
-                    initAudioContext(); 
-                }, 1000); 
-            } 
-            
-            else if (data.action === 'next_track') {
-                vinyl.classList.add('playing');
-                document.getElementById('track-mark').innerText = '?';
-                document.getElementById('track-mark').style.color = '#fff';
-                
-                const track = AUDIO_CONFIG.tracks.find(t => t.id === data.trackNum);
-                audio.src = AUDIO_CONFIG.baseUrl + track.aim;
-                audio.play().catch(e => console.log("Кликните по экрану один раз для звука."));
-            } 
-            
-            else if (data.action === 'play_original') {
-                vinyl.classList.add('playing'); 
-                document.getElementById('track-mark').innerText = '✓';
-                document.getElementById('track-mark').style.color = '#0f0';
-                
-                const track = AUDIO_CONFIG.tracks.find(t => t.id === data.trackNum);
-                audio.src = AUDIO_CONFIG.baseUrl + track.orig;
-                audio.play();
-            }
-
-            else if (data.action === 'stop_audio') {
-                vinyl.classList.remove('playing');
-                audio.pause();
-                document.getElementById('track-mark').innerText = '?';
-                document.getElementById('track-mark').style.color = '#fff';
-            }
+            safeInitAudio();
+            executeCommand(data.action, data.trackNum);
         });
 
-        // --- Движок Частиц (120 fps оптимизация) ---
-        const partCanvas = document.getElementById('particles');
-        const pCtx = partCanvas.getContext('2d');
-        let particlesArray = [];
-
-        function initParticles() {
-            partCanvas.width = window.innerWidth;
-            partCanvas.height = window.innerHeight;
-            particlesArray = [];
-            for (let i = 0; i < 100; i++) {
-                particlesArray.push({
-                    x: Math.random() * partCanvas.width,
-                    y: Math.random() * partCanvas.height,
-                    size: Math.random() * 3 + 1,
-                    speedY: (Math.random() * -1) - 0.5,
-                    opacity: Math.random()
-                });
+        function executeCommand(action, trackNum) {
+            if (action === 'start_show') {
+                document.body.classList.add('show-running');
+                document.getElementById('btn-start').style.display = 'none'; // Прячем кнопку старта у админа
+            } 
+            else if (action === 'next_track') {
+                if (currentTrack < CONFIG.tracks.length) {
+                    currentTrack++;
+                }
+                statusTrack.innerText = `Трек: ${currentTrack} / 12`;
+                diskLabel.innerText = `Т-${currentTrack}`;
+                diskLabel.style.color = '#fff';
+                diskLabel.style.borderColor = '#00ffff';
+                vinylEl.classList.remove('spin');
+                audioEl.pause();
+                debugText.innerText = 'Трек переключен. Нажмите Play.';
+                debugText.style.color = '#aaa';
+            } 
+            else if (action === 'play_aim') {
+                vinylEl.classList.add('spin');
+                diskLabel.innerText = '?';
+                diskLabel.style.color = '#00ffff';
+                diskLabel.style.borderColor = '#00ffff';
+                
+                let trackInfo = CONFIG.tracks[currentTrack - 1];
+                let url = CONFIG.baseUrl + trackInfo.aim;
+                
+                debugText.innerText = 'Запрос: ' + trackInfo.aim;
+                if (audioEl.src !== url) audioEl.src = url;
+                audioEl.play().catch(e => { debugText.innerText = 'Браузер блокирует звук!'; });
+            } 
+            else if (action === 'play_orig') {
+                vinylEl.classList.add('spin');
+                diskLabel.innerText = '✓';
+                diskLabel.style.color = '#00ff00';
+                diskLabel.style.borderColor = '#00ff00';
+                
+                let trackInfo = CONFIG.tracks[currentTrack - 1];
+                let url = CONFIG.baseUrl + trackInfo.orig;
+                
+                debugText.innerText = 'Запрос: ' + trackInfo.orig;
+                if (audioEl.src !== url) audioEl.src = url;
+                audioEl.play().catch(e => { debugText.innerText = 'Браузер блокирует звук!'; });
+            } 
+            else if (action === 'stop_audio') {
+                vinylEl.classList.remove('spin');
+                audioEl.pause();
+                debugText.innerText = 'Остановлено';
+                debugText.style.color = '#aaa';
             }
         }
-        
-        function animateParticles() {
-            pCtx.clearRect(0, 0, partCanvas.width, partCanvas.height);
-            particlesArray.forEach(p => {
-                p.y += p.speedY;
-                if (p.y < 0) p.y = partCanvas.height;
-                pCtx.fillStyle = `rgba(0, 255, 255, ${p.opacity})`;
+
+        // --- ЭКВАЛАЙЗЕР ---
+        function startEqualizer() {
+            const eqCanvas = document.getElementById('equalizer-canvas');
+            const eqCtx = eqCanvas.getContext('2d');
+            
+            function resizeEq() {
+                eqCanvas.width = eqCanvas.offsetWidth;
+                eqCanvas.height = eqCanvas.offsetHeight;
+            }
+            window.addEventListener('resize', resizeEq);
+            resizeEq();
+
+            const bufferLength = analyser.frequencyBinCount;
+            const dataArray = new Uint8Array(bufferLength);
+
+            function drawEq() {
+                requestAnimationFrame(drawEq);
+                analyser.getByteFrequencyData(dataArray);
+
+                eqCtx.clearRect(0, 0, eqCanvas.width, eqCanvas.height);
+                const barWidth = (eqCanvas.width / bufferLength) * 2.5;
+                let x = 0;
+
+                for (let i = 0; i < bufferLength; i++) {
+                    let barHeight = dataArray[i]; // Ограничиваем высоту
+                    // Градиент цвета от громкости
+                    eqCtx.fillStyle = `rgb(0, ${Math.min(255, barHeight + 50)}, 255)`;
+                    eqCtx.fillRect(x, eqCanvas.height - barHeight, barWidth, barHeight);
+                    x += barWidth + 1;
+                }
+            }
+            drawEq();
+        }
+
+        // --- ЛЕТАЮЩИЕ ЧАСТИЦЫ ---
+        const pCanvas = document.getElementById('particles-canvas');
+        const pCtx = pCanvas.getContext('2d');
+        let particles = [];
+
+        function resizeP() { pCanvas.width = window.innerWidth; pCanvas.height = window.innerHeight; }
+        window.addEventListener('resize', resizeP);
+        resizeP();
+
+        for (let i = 0; i < 70; i++) {
+            particles.push({ x: Math.random() * pCanvas.width, y: Math.random() * pCanvas.height, size: Math.random() * 2 + 1, speed: Math.random() * 0.5 + 0.2, op: Math.random() * 0.5 + 0.1 });
+        }
+        function drawP() {
+            pCtx.clearRect(0, 0, pCanvas.width, pCanvas.height);
+            particles.forEach(p => {
+                p.y -= p.speed;
+                if (p.y < 0) p.y = pCanvas.height;
+                pCtx.fillStyle = `rgba(0, 255, 255, ${p.op})`;
                 pCtx.beginPath();
                 pCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
                 pCtx.fill();
             });
-            requestAnimationFrame(animateParticles);
+            requestAnimationFrame(drawP);
         }
-        initParticles();
-        animateParticles();
-        window.addEventListener('resize', initParticles);
-
-        // --- Эквалайзер (Web Audio API) ---
-        let audioCtx, analyser, source, canvasCtx;
-        let isAudioInit = false;
-
-        function initAudioContext() {
-            if (isAudioInit) return;
-            isAudioInit = true;
-
-            const audio = document.getElementById('audio-player');
-            const AudioContext = window.AudioContext || window.webkitAudioContext;
-            audioCtx = new AudioContext();
-            analyser = audioCtx.createAnalyser();
-            
-            source = audioCtx.createMediaElementSource(audio);
-            source.connect(analyser);
-            analyser.connect(audioCtx.destination);
-            
-            analyser.fftSize = 128;
-            const bufferLength = analyser.frequencyBinCount;
-            const dataArray = new Uint8Array(bufferLength);
-            
-            const eqCanvas = document.getElementById('equalizer');
-            canvasCtx = eqCanvas.getContext('2d');
-            
-            eqCanvas.width = eqCanvas.offsetWidth;
-            eqCanvas.height = eqCanvas.offsetHeight;
-
-            function draw() {
-                requestAnimationFrame(draw);
-                analyser.getByteFrequencyData(dataArray);
-                
-                canvasCtx.clearRect(0, 0, eqCanvas.width, eqCanvas.height);
-                
-                const barWidth = (eqCanvas.width / bufferLength) * 2;
-                let barHeight;
-                let x = 0;
-                
-                for(let i = 0; i < bufferLength; i++) {
-                    barHeight = dataArray[i];
-                    canvasCtx.fillStyle = 'rgb(' + (barHeight + 50) + ', 255, 255)'; 
-                    canvasCtx.fillRect(x, eqCanvas.height - barHeight / 2, barWidth, barHeight / 2);
-                    x += barWidth + 2;
-                }
-            }
-            draw();
-        }
-
-        document.body.addEventListener('click', () => {
-            if(audioCtx && audioCtx.state === 'suspended') {
-                audioCtx.resume();
-            }
-        });
+        drawP();
     </script>
 </body>
 </html>
