@@ -3,24 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Нейромузыка - Шоу</title>
+    <title>Музыка AI - Шоу</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; touch-action: manipulation; }
-        /* Прозрачные фоны везде, чтобы частицы было видно сквозь экраны */
         body, html { width: 100%; height: 100%; background-color: #030303; color: white; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow: hidden; user-select: none; -webkit-user-select: none; }
         
         #particles-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
 
-        #splash-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 10; background: transparent; transition: opacity 0.5s; }
-        .splash-title { font-size: clamp(2.5rem, 8vw, 7rem); font-weight: 900; letter-spacing: clamp(4px, 2vw, 15px); text-transform: uppercase; color: #d4af37; text-shadow: 0 0 20px rgba(212, 175, 55, 0.5); text-align: center; padding: 0 20px; }
+        /* Лобби с золотым градиентным текстом */
+        #splash-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 10; background: transparent; }
+        .splash-title { 
+            font-size: clamp(3rem, 12vw, 8rem); 
+            font-weight: 900; 
+            text-transform: uppercase; 
+            text-align: center; 
+            padding: 0 10px;
+            /* Золотой градиент для текста */
+            background: linear-gradient(135deg, #f3db74 0%, #d4af37 50%, #aa8011 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            /* Свечение вокруг текста */
+            filter: drop-shadow(0 0 15px rgba(212, 175, 55, 0.4));
+        }
         .click-hint { margin-top: 30px; font-size: clamp(1rem, 4vw, 1.5rem); color: #888; animation: pulse-text 2s infinite; text-align: center; font-weight: 300; }
         @keyframes pulse-text { 0% { opacity: 0.3; } 50% { opacity: 1; } 100% { opacity: 0.3; } }
 
         #pin-grid { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: grid; grid-template-columns: 1fr 1fr 1fr; grid-template-rows: 1fr 1fr 1fr; z-index: 20; }
         .pin-btn { width: 100%; height: 100%; cursor: pointer; }
 
-        /* Экран шоу - теперь прозрачный, чтобы не перекрывать искры */
+        /* Экран шоу */
         #viewer-screen { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; flex-direction: column; justify-content: center; align-items: center; z-index: 5; background: transparent; }
         
         canvas#equalizer-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; }
@@ -35,7 +47,7 @@
         #unlock-overlay { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 50; flex-direction: column; justify-content: center; align-items: center; backdrop-filter: blur(8px); cursor: pointer; }
         .unlock-btn { padding: 20px 40px; font-size: 1.5rem; background: transparent; color: #d4af37; border: 2px solid #d4af37; border-radius: 12px; font-weight: bold; text-transform: uppercase; box-shadow: 0 0 20px rgba(212, 175, 55, 0.4); animation: pulse-text 1.5s infinite; }
 
-        /* Золотой / Серебряный Пульт */
+        /* Пульт */
         #admin-panel { display: none; position: fixed; bottom: 0; left: 0; width: 100%; background: linear-gradient(to top, #0a0a0a, #1a1a1a); border-top: 2px solid #d4af37; z-index: 60; padding: 20px 15px calc(20px + env(safe-area-inset-bottom)); flex-direction: column; align-items: center; box-shadow: 0 -10px 40px rgba(0,0,0,0.9); }
         .admin-header { display: flex; justify-content: space-between; width: 100%; max-width: 600px; margin-bottom: 10px; color: #d4af37; font-weight: bold; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 2px; }
         .debug-info { font-size: 0.85rem; color: #888; text-align: center; margin-bottom: 15px; height: 18px; width: 100%; }
@@ -50,9 +62,10 @@
         .btn-stop { background: linear-gradient(135deg, #660000, #330000); color: #fff; border: 1px solid #ff4444; }
         .btn-next { background: linear-gradient(135deg, #444, #111); color: #d4af37; border: 1px solid #d4af37; }
         
-        body.show-running #splash-screen { display: none; }
-        body.show-running #pin-grid { display: none; }
-        body.show-running #viewer-screen { display: flex; }
+        /* Моментальное переключение экранов без задержек */
+        body.show-running #splash-screen { display: none !important; }
+        body.show-running #pin-grid { display: none !important; }
+        body.show-running #viewer-screen { display: flex !important; }
     </style>
 </head>
 <body>
@@ -60,7 +73,7 @@
     <canvas id="particles-canvas"></canvas>
 
     <div id="splash-screen">
-        <h1 class="splash-title">Нейромузыка</h1>
+        <h1 class="splash-title">Музыка AI</h1>
         <div class="click-hint">Ожидание подключения...</div>
     </div>
 
@@ -83,7 +96,7 @@
 
     <div id="admin-panel">
         <div class="admin-header">
-            <span>Пульт управления</span>
+            <span>Пульт</span>
             <span id="status-track">Трек: 1 / 12</span>
         </div>
         <div class="debug-info" id="debug-text">Режим пульта: Звук отключен</div>
@@ -118,7 +131,9 @@
             ]
         };
 
-        const socket = io();
+        // Прямое подключение к твоему Render-серверу
+        const socket = io('https://aim-d8ck.onrender.com');
+        
         const audioEl = document.getElementById('audio-player');
         const mysteryMark = document.getElementById('mystery-mark');
         const mysteryBox = document.getElementById('mystery-box');
@@ -149,7 +164,6 @@
             } catch (e) { console.error(e); }
         }
 
-        // --- РОЛИ И ПАРОЛИ ---
         let pinSequence = [];
         document.querySelectorAll('.pin-btn').forEach(btn => {
             btn.addEventListener('touchstart', (e) => { e.preventDefault(); checkPin(e.target.dataset.val); });
@@ -166,7 +180,7 @@
             if (seqStr === JSON.stringify(['1', '5', '9'])) {
                 isAdmin = true;
                 isProjector = false;
-                audioEl.muted = true; // Полностью глушим звук на пульте
+                audioEl.muted = true;
                 document.getElementById('admin-panel').style.display = 'flex';
                 document.getElementById('pin-grid').style.display = 'none';
                 document.querySelector('.click-hint').innerText = 'ПУЛЬТ АКТИВИРОВАН';
@@ -176,7 +190,7 @@
             else if (seqStr === JSON.stringify(['3', '5', '7'])) {
                 isAdmin = false;
                 isProjector = true;
-                audioEl.muted = false; // Проектор обязан играть звук
+                audioEl.muted = false;
                 document.getElementById('pin-grid').style.display = 'none';
                 
                 let hint = document.querySelector('.click-hint');
@@ -188,9 +202,7 @@
             }
         }
 
-        // --- МОМЕНТАЛЬНАЯ ОТПРАВКА КОМАНД ---
         function sendCommand(action) {
-            // Мгновенный отклик интерфейса на самом пульте (даже до ответа сервера)
             if (action === 'start') {
                 document.body.classList.add('show-running');
                 document.getElementById('btn-start').style.display = 'none';
@@ -201,11 +213,9 @@
             }
             debugText.innerText = "Отправка команды...";
             
-            // Отправляем на сервер (и он разошлет всем проекторам)
             socket.emit('command', { action: action, track: currentTrack });
         }
 
-        // --- СИНХРОНИЗАЦИЯ ЧЕРЕЗ СЕРВЕР ---
         socket.on('sync', (data) => {
             timeOffset = (Date.now() / 1000) - data.server_time;
             applyState(data.state, true);
@@ -277,7 +287,6 @@
             document.getElementById('unlock-overlay').style.display = 'none';
         }
 
-        // --- КРУГОВОЙ СИММЕТРИЧНЫЙ ЭКВАЛАЙЗЕР ---
         function startCircularEq() {
             const canvas = document.getElementById('equalizer-canvas');
             const ctx = canvas.getContext('2d');
@@ -289,8 +298,8 @@
             window.addEventListener('resize', resize);
             resize();
 
-            const bufferLength = analyser.frequencyBinCount; // 128
-            const activeBars = 80; // Делаем 80 полос по кругу для плавности
+            const bufferLength = analyser.frequencyBinCount;
+            const activeBars = 80;
             const halfBars = activeBars / 2;
             const angleStep = (Math.PI * 2) / activeBars;
             const dataArray = new Uint8Array(bufferLength);
@@ -302,11 +311,9 @@
                 
                 let centerX = canvas.width / 2;
                 let centerY = canvas.height / 2;
-                // Базовый радиус кольца эквалайзера (вокруг знака вопроса)
                 let baseRadius = 140; 
 
                 for (let i = 0; i < activeBars; i++) {
-                    // Симметричный расчет частот (эффект "бабочки")
                     let dataIndex;
                     if (i < halfBars) {
                         dataIndex = Math.floor(i * (bufferLength * 0.6) / halfBars);
@@ -330,7 +337,6 @@
                     ctx.lineWidth = 5;
                     ctx.lineCap = 'round';
                     
-                    // Цвета: Золото для Загадки, Серебро для Оригинала
                     if (mysteryMark.innerText === '✓') {
                         ctx.strokeStyle = `rgba(224, 224, 224, ${barHeight/255 + 0.3})`; 
                     } else {
@@ -342,7 +348,6 @@
             draw();
         }
 
-        // --- ЛЕТАЮЩИЕ ИСКРЫ ---
         const pCanvas = document.getElementById('particles-canvas');
         const pCtx = pCanvas.getContext('2d');
         let particles = [];
@@ -365,7 +370,7 @@
         function drawP() {
             pCtx.clearRect(0, 0, pCanvas.width, pCanvas.height);
             particles.forEach(p => {
-                p.y -= p.speedY; // Летят вверх
+                p.y -= p.speedY;
                 p.x += p.speedX;
                 if (p.y < 0) {
                     p.y = pCanvas.height;
