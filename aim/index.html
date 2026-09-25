@@ -7,51 +7,54 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; touch-action: manipulation; }
-        body, html { width: 100%; height: 100%; background-color: #030303; color: white; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow: hidden; user-select: none; -webkit-user-select: none; }
+        body, html { width: 100%; height: 100%; background-color: #050505; color: white; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow: hidden; user-select: none; -webkit-user-select: none; }
         
-        /* Заглавный экран (Лобби) */
-        #splash-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 10; background: #030303; transition: opacity 0.5s; }
-        .splash-title { font-size: clamp(2.5rem, 8vw, 7rem); font-weight: 900; letter-spacing: clamp(4px, 2vw, 15px); text-transform: uppercase; color: #fff; text-shadow: 0 0 20px #00ffff; text-align: center; padding: 0 20px; }
-        .click-hint { margin-top: 30px; font-size: clamp(1rem, 4vw, 1.5rem); color: #888; animation: pulse-text 2s infinite; text-align: center; }
-        @keyframes pulse-text { 0% { opacity: 0.2; } 50% { opacity: 1; } 100% { opacity: 0.2; } }
+        /* Искры на фоне */
+        #particles-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
 
-        /* Ввод пин-кода (поверх сплеш-экрана) */
+        /* Лобби */
+        #splash-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 10; background: radial-gradient(circle at center, #111 0%, #030303 100%); transition: opacity 0.8s; }
+        .splash-title { font-size: clamp(2.5rem, 8vw, 7rem); font-weight: 900; letter-spacing: clamp(4px, 2vw, 15px); text-transform: uppercase; color: #d4af37; text-shadow: 0 0 20px rgba(212, 175, 55, 0.5); text-align: center; padding: 0 20px; }
+        .click-hint { margin-top: 30px; font-size: clamp(1rem, 4vw, 1.5rem); color: #888; animation: pulse-text 2s infinite; text-align: center; font-weight: 300; }
+        @keyframes pulse-text { 0% { opacity: 0.3; } 50% { opacity: 1; } 100% { opacity: 0.3; } }
+
+        /* Сетка ввода Пин-кодов */
         #pin-grid { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: grid; grid-template-columns: 1fr 1fr 1fr; grid-template-rows: 1fr 1fr 1fr; z-index: 20; }
         .pin-btn { width: 100%; height: 100%; cursor: pointer; }
 
         /* Главный экран трансляции */
-        #viewer-screen { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; flex-direction: column; justify-content: center; align-items: center; z-index: 5; background: radial-gradient(circle at center, #111 0%, #000 100%); }
+        #viewer-screen { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; flex-direction: column; justify-content: center; align-items: center; z-index: 5; background: #030303; }
         
-        /* Неоновый символ загадки */
-        #mystery-box { display: flex; justify-content: center; align-items: center; height: 60vh; width: 100%; margin-top: -10vh; }
-        #mystery-mark { font-size: clamp(8rem, 35vw, 25rem); font-weight: 900; color: #00ffff; text-shadow: 0 0 20px #00ffff, 0 0 40px #00ffff; animation: breathe 2s ease-in-out infinite alternate; transition: color 0.5s, text-shadow 0.5s; }
+        /* Радиальный эквалайзер (на весь экран, под символом) */
+        canvas#equalizer-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; }
+
+        /* Центральный символ */
+        #mystery-box { position: relative; z-index: 3; display: flex; justify-content: center; align-items: center; width: 250px; height: 250px; border-radius: 50%; box-shadow: inset 0 0 50px rgba(212, 175, 55, 0.1); background: rgba(0,0,0,0.5); border: 2px solid rgba(212, 175, 55, 0.2); }
+        #mystery-mark { font-size: clamp(5rem, 15vw, 10rem); font-weight: 900; color: #d4af37; text-shadow: 0 0 30px rgba(212, 175, 55, 0.8); animation: breathe 2s ease-in-out infinite alternate; transition: color 0.5s, text-shadow 0.5s; }
         @keyframes breathe {
-            from { transform: scale(0.95); text-shadow: 0 0 20px #00ffff, 0 0 40px #00ffff; }
-            to { transform: scale(1.05); text-shadow: 0 0 30px #00ffff, 0 0 60px #00ffff, 0 0 100px #00ffff; }
+            from { transform: scale(0.95); text-shadow: 0 0 20px rgba(212, 175, 55, 0.5); }
+            to { transform: scale(1.05); text-shadow: 0 0 40px rgba(212, 175, 55, 1); }
         }
 
-        /* Эквалайзер */
-        #eq-container { position: absolute; bottom: 0; left: 0; width: 100%; height: 30vh; min-height: 150px; z-index: 4; display: flex; align-items: flex-end; }
-        canvas#equalizer-canvas { width: 100%; height: 100%; }
-
-        /* Заглушка для автоплея браузера */
+        /* Заглушка для опоздавших зрителей */
         #unlock-overlay { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 50; flex-direction: column; justify-content: center; align-items: center; backdrop-filter: blur(8px); cursor: pointer; }
-        .unlock-btn { padding: 20px 40px; font-size: clamp(1.2rem, 5vw, 2rem); background: transparent; color: #00ffff; border: 2px solid #00ffff; border-radius: 12px; font-weight: bold; text-transform: uppercase; box-shadow: 0 0 20px rgba(0,255,255,0.4), inset 0 0 20px rgba(0,255,255,0.4); animation: pulse-text 1.5s infinite; }
+        .unlock-btn { padding: 20px 40px; font-size: clamp(1.2rem, 5vw, 2rem); background: transparent; color: #d4af37; border: 2px solid #d4af37; border-radius: 12px; font-weight: bold; text-transform: uppercase; box-shadow: 0 0 20px rgba(212, 175, 55, 0.4); animation: pulse-text 1.5s infinite; }
 
-        /* Панель Админа */
-        #admin-panel { display: none; position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(10, 10, 10, 0.98); border-top: 2px solid #00ffff; z-index: 60; padding: 15px 15px calc(15px + env(safe-area-inset-bottom)); flex-direction: column; align-items: center; box-shadow: 0 -10px 40px rgba(0,0,0,0.9); backdrop-filter: blur(10px); }
-        .admin-header { display: flex; justify-content: space-between; width: 100%; max-width: 600px; margin-bottom: 12px; color: #00ffff; font-weight: bold; font-size: clamp(0.9rem, 4vw, 1.1rem); }
-        .debug-info { font-size: 0.85rem; color: #888; text-align: center; margin-bottom: 12px; height: 18px; width: 100%; }
+        /* Золотой / Серебряный Пульт Админа */
+        #admin-panel { display: none; position: fixed; bottom: 0; left: 0; width: 100%; background: linear-gradient(to top, #0a0a0a, #111); border-top: 2px solid #d4af37; z-index: 60; padding: 20px 15px calc(20px + env(safe-area-inset-bottom)); flex-direction: column; align-items: center; box-shadow: 0 -10px 40px rgba(0,0,0,0.9); }
+        .admin-header { display: flex; justify-content: space-between; width: 100%; max-width: 600px; margin-bottom: 10px; color: #d4af37; font-weight: bold; font-size: clamp(1rem, 4vw, 1.2rem); text-transform: uppercase; letter-spacing: 2px; }
+        .debug-info { font-size: 0.85rem; color: #888; text-align: center; margin-bottom: 15px; height: 18px; width: 100%; }
         
-        .admin-controls { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; width: 100%; max-width: 600px; }
-        .btn { flex: 1 1 calc(50% - 8px); padding: 15px 5px; font-size: clamp(0.85rem, 3.5vw, 1rem); cursor: pointer; border: none; border-radius: 8px; font-weight: bold; text-transform: uppercase; transition: transform 0.1s; }
-        .btn:active { transform: scale(0.96); opacity: 0.8; }
+        .admin-controls { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; width: 100%; max-width: 600px; }
+        .btn { flex: 1 1 calc(50% - 10px); padding: 15px 5px; font-size: clamp(0.9rem, 3.5vw, 1.1rem); cursor: pointer; border: none; border-radius: 8px; font-weight: 900; text-transform: uppercase; transition: transform 0.1s; letter-spacing: 1px; color: #111; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        .btn:active { transform: scale(0.95); opacity: 0.9; }
         
-        .btn-start { background: #00ffff; color: #000; flex-basis: 100%; margin-bottom: 5px; padding: 18px 10px; font-size: clamp(1rem, 4.5vw, 1.2rem); }
-        .btn-play-aim { background: #2d00f7; color: #fff; }
-        .btn-play-orig { background: #00a896; color: #fff; }
-        .btn-stop { background: #d90429; color: #fff; }
-        .btn-next { background: #444; color: #fff; }
+        /* Стилизация кнопок под металл */
+        .btn-start { background: linear-gradient(135deg, #f3db74, #d4af37); flex-basis: 100%; padding: 20px 10px; font-size: clamp(1.1rem, 4.5vw, 1.3rem); }
+        .btn-play-aim { background: linear-gradient(135deg, #e6c27a, #c5a017); }
+        .btn-play-orig { background: linear-gradient(135deg, #ffffff, #c0c0c0); }
+        .btn-stop { background: linear-gradient(135deg, #990000, #550000); color: #fff; border: 1px solid #ff4444; }
+        .btn-next { background: linear-gradient(135deg, #555, #222); color: #d4af37; border: 1px solid #d4af37; }
         
         body.show-running #splash-screen { display: none; }
         body.show-running #pin-grid { display: none; }
@@ -60,44 +63,41 @@
 </head>
 <body>
 
-    <!-- Лобби -->
+    <canvas id="particles-canvas"></canvas>
+
     <div id="splash-screen">
         <h1 class="splash-title">Нейромузыка</h1>
-        <div class="click-hint">Ожидание старта программы...</div>
+        <div class="click-hint">Ожидание подключения...</div>
     </div>
 
-    <!-- Ввод пинкода (1-5-9) -->
+    <!-- Невидимая сетка 3x3 -->
     <div id="pin-grid">
         <div class="pin-btn" data-val="1"></div><div class="pin-btn" data-val="2"></div><div class="pin-btn" data-val="3"></div>
         <div class="pin-btn" data-val="4"></div><div class="pin-btn" data-val="5"></div><div class="pin-btn" data-val="6"></div>
         <div class="pin-btn" data-val="7"></div><div class="pin-btn" data-val="8"></div><div class="pin-btn" data-val="9"></div>
     </div>
 
-    <!-- Разблокировка звука (для тех, кто зашел с опозданием и браузер заблокировал звук) -->
     <div id="unlock-overlay" onclick="forceUnlockAudio()">
-        <button class="unlock-btn">Включить звук</button>
+        <button class="unlock-btn">Подключить звук</button>
     </div>
 
-    <!-- Основной экран -->
+    <!-- Экран кругового эквалайзера -->
     <div id="viewer-screen">
+        <canvas id="equalizer-canvas"></canvas>
         <div id="mystery-box">
             <div id="mystery-mark">?</div>
         </div>
-        <div id="eq-container">
-            <canvas id="equalizer-canvas"></canvas>
-        </div>
     </div>
 
-    <!-- Пульт -->
     <div id="admin-panel">
         <div class="admin-header">
-            <span>Управление</span>
+            <span>Пульт</span>
             <span id="status-track">Трек: 1 / 12</span>
         </div>
-        <div class="debug-info" id="debug-text">Режим админа: Звук приглушен</div>
+        <div class="debug-info" id="debug-text">Режим админа: Звук отключен</div>
         
         <div class="admin-controls">
-            <button class="btn btn-start" id="btn-start" onclick="sendCommand('start')">🚀 Старт программы</button>
+            <button class="btn btn-start" id="btn-start" onclick="sendCommand('start')">Запустить шоу</button>
             <button class="btn btn-play-aim" onclick="sendCommand('play_aim')">▶ Загадка</button>
             <button class="btn btn-play-orig" onclick="sendCommand('play_orig')">▶ Оригинал</button>
             <button class="btn btn-stop" onclick="sendCommand('stop')">⏹ Стоп</button>
@@ -129,40 +129,36 @@
         const socket = io();
         const audioEl = document.getElementById('audio-player');
         const mysteryMark = document.getElementById('mystery-mark');
+        const mysteryBox = document.getElementById('mystery-box');
         const debugText = document.getElementById('debug-text');
         
         let isAdmin = false;
+        let isProjector = false;
         let currentTrack = 1;
-        let timeOffset = 0; // Разница между временем сервера и клиента
+        let timeOffset = 0; 
         let isAudioContextInit = false;
 
         let audioCtx, analyser;
 
-        // Инициализация звукового контекста
+        // Инициализация Web Audio
         function initAudio() {
             if (isAudioContextInit) return;
             try {
                 const AudioCtx = window.AudioContext || window.webkitAudioContext;
                 audioCtx = new AudioCtx();
                 analyser = audioCtx.createAnalyser();
-                analyser.fftSize = 256;
+                analyser.fftSize = 128; // Для кругового эквалайзера
 
                 let source = audioCtx.createMediaElementSource(audioEl);
                 source.connect(analyser);
                 analyser.connect(audioCtx.destination);
                 
                 isAudioContextInit = true;
-                startEq();
+                startCircularEq();
             } catch (e) { console.error(e); }
         }
 
-        // Любой клик по экрану разрешает работу со звуком
-        window.addEventListener('click', () => {
-            initAudio();
-            if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
-        }, { once: true });
-
-        // --- ЛОГИКА АДМИНА ---
+        // --- РОЛЕВАЯ МОДЕЛЬ (ПИН-КОДЫ) ---
         let pinSequence = [];
         document.querySelectorAll('.pin-btn').forEach(btn => {
             btn.addEventListener('touchstart', (e) => { e.preventDefault(); checkPin(e.target.dataset.val); });
@@ -170,19 +166,38 @@
         });
 
         function checkPin(val) {
-            initAudio(); // Поднимаем контекст
             pinSequence.push(val);
             if (pinSequence.length > 3) pinSequence.shift();
+            
+            let seqStr = JSON.stringify(pinSequence);
 
-            if (JSON.stringify(pinSequence) === JSON.stringify(['1', '5', '9'])) {
+            // АДМИН: 1 - 5 - 9 (Верх-Лево -> Центр -> Низ-Право)
+            if (seqStr === JSON.stringify(['1', '5', '9'])) {
                 isAdmin = true;
-                audioEl.muted = true; // Глушим звук для админа навсегда
+                isProjector = false;
+                audioEl.muted = true; // Глушим телефон
                 document.getElementById('admin-panel').style.display = 'flex';
                 document.getElementById('pin-grid').style.display = 'none';
+                document.querySelector('.click-hint').innerText = 'Подключен как ПУЛЬТ';
+                initAudio();
+            }
+            // ПРОЕКТОР: 3 - 5 - 7 (Верх-Право -> Центр -> Низ-Лево)
+            else if (seqStr === JSON.stringify(['3', '5', '7'])) {
+                isAdmin = false;
+                isProjector = true;
+                audioEl.muted = false; // Обязательно со звуком
+                document.getElementById('pin-grid').style.display = 'none';
+                
+                let hint = document.querySelector('.click-hint');
+                hint.innerText = 'ПРОЕКТОР ГОТОВ. Ожидание старта...';
+                hint.style.color = '#d4af37';
+                
+                // Ввод пин-кода считается жестом пользователя, звук разблокируется!
+                initAudio();
+                if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
             }
         }
 
-        // Отправка команды
         function sendCommand(action) {
             if (action === 'next' && currentTrack < CONFIG.tracks.length) {
                 currentTrack++;
@@ -190,9 +205,8 @@
             socket.emit('command', { action: action, track: currentTrack });
         }
 
-        // --- ПРИЕМ СИНХРОНИЗАЦИИ ---
+        // --- СИНХРОНИЗАЦИЯ И СЕТЬ ---
         socket.on('sync', (data) => {
-            // Вычисляем задержку часов
             timeOffset = (Date.now() / 1000) - data.server_time;
             applyState(data.state, true);
         });
@@ -214,44 +228,40 @@
             if (state.status === 'stop') {
                 audioEl.pause();
                 mysteryMark.innerText = '?';
-                mysteryMark.style.color = '#00ffff';
-                mysteryMark.style.textShadow = '0 0 20px #00ffff, 0 0 40px #00ffff';
-                if(isAdmin) debugText.innerText = 'Остановлено';
+                mysteryMark.style.color = '#d4af37';
+                mysteryMark.style.textShadow = '0 0 30px rgba(212,175,55,0.8)';
+                mysteryBox.style.borderColor = 'rgba(212,175,55,0.2)';
             } 
             else {
-                // Если играет aim или orig
                 let url = '';
                 if (state.status === 'aim') {
                     url = CONFIG.baseUrl + CONFIG.tracks[currentTrack - 1].aim;
                     mysteryMark.innerText = '?';
-                    mysteryMark.style.color = '#00ffff';
-                    mysteryMark.style.textShadow = '0 0 20px #00ffff, 0 0 40px #00ffff';
+                    mysteryMark.style.color = '#d4af37';
+                    mysteryMark.style.textShadow = '0 0 40px rgba(212,175,55,1)';
+                    mysteryBox.style.borderColor = 'rgba(212,175,55,0.5)';
                 } else {
                     url = CONFIG.baseUrl + CONFIG.tracks[currentTrack - 1].orig;
                     mysteryMark.innerText = '✓';
-                    mysteryMark.style.color = '#00ff00';
-                    mysteryMark.style.textShadow = '0 0 20px #00ff00, 0 0 40px #00ff00';
+                    mysteryMark.style.color = '#e0e0e0'; // Серебро для оригинала
+                    mysteryMark.style.textShadow = '0 0 40px rgba(224,224,224,1)';
+                    mysteryBox.style.borderColor = 'rgba(224,224,224,0.5)';
                 }
 
                 if (audioEl.src !== url) audioEl.src = url;
 
-                // Вычисляем, на какой секунде должен играть трек прямо сейчас
                 let currentServerTime = (Date.now() / 1000) - timeOffset;
                 let playPosition = currentServerTime - state.start_time;
 
-                if (playPosition > 0) {
-                    audioEl.currentTime = playPosition;
-                }
+                if (playPosition > 0) audioEl.currentTime = playPosition;
 
-                // Пытаемся запустить
                 let playPromise = audioEl.play();
                 if (playPromise !== undefined) {
                     playPromise.then(() => {
                         document.getElementById('unlock-overlay').style.display = 'none';
-                        if(isAdmin) debugText.innerText = 'Трек играет (без звука)';
                     }).catch(error => {
-                        // Если браузер заблокировал (пользователь не кликал по странице)
-                        if (!isAdmin && isInitialSync) {
+                        // Если зритель без пин-кода (не проектор и не админ) зашел во время песни
+                        if (!isAdmin && !isProjector && isInitialSync) {
                             document.getElementById('unlock-overlay').style.display = 'flex';
                         }
                     });
@@ -259,7 +269,6 @@
             }
         }
 
-        // Кнопка принудительной разблокировки (для зрителей)
         function forceUnlockAudio() {
             initAudio();
             if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
@@ -267,8 +276,8 @@
             document.getElementById('unlock-overlay').style.display = 'none';
         }
 
-        // --- ЭКВАЛАЙЗЕР ---
-        function startEq() {
+        // --- КРУГОВОЙ ЭКВАЛАЙЗЕР ---
+        function startCircularEq() {
             const canvas = document.getElementById('equalizer-canvas');
             const ctx = canvas.getContext('2d');
             
@@ -281,31 +290,95 @@
 
             const bufferLength = analyser.frequencyBinCount;
             const dataArray = new Uint8Array(bufferLength);
+            
+            // Используем только нижнюю половину частот (она выглядит активнее)
+            const activeBars = Math.floor(bufferLength / 1.5);
+            const angleStep = (Math.PI * 2) / activeBars;
 
             function draw() {
                 requestAnimationFrame(draw);
                 analyser.getByteFrequencyData(dataArray);
 
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
-                const barWidth = (canvas.width / bufferLength) * 2.5;
-                let x = 0;
+                
+                let centerX = canvas.width / 2;
+                let centerY = canvas.height / 2;
+                let baseRadius = 135; // Чуть больше, чем центральный mystery-box
 
-                for (let i = 0; i < bufferLength; i++) {
-                    let barHeight = dataArray[i]; 
+                for (let i = 0; i < activeBars; i++) {
+                    let barHeight = dataArray[i] * 0.7; 
+                    if (barHeight < 2) barHeight = 2; // Минимальная высота
                     
-                    // Цвет зависит от статуса символа (Голубой или Зеленый)
+                    let angle = i * angleStep - (Math.PI / 2); // Начинаем с верха
+
+                    let x1 = centerX + Math.cos(angle) * baseRadius;
+                    let y1 = centerY + Math.sin(angle) * baseRadius;
+                    
+                    let x2 = centerX + Math.cos(angle) * (baseRadius + barHeight);
+                    let y2 = centerY + Math.sin(angle) * (baseRadius + barHeight);
+
+                    ctx.beginPath();
+                    ctx.moveTo(x1, y1);
+                    ctx.lineTo(x2, y2);
+                    ctx.lineWidth = 4;
+                    ctx.lineCap = 'round';
+                    
+                    // Цветовая схема: Золото для загадки, Серебро для ответа
                     if (mysteryMark.innerText === '✓') {
-                        ctx.fillStyle = `rgb(0, ${Math.min(255, barHeight + 50)}, 0)`;
+                        ctx.strokeStyle = `rgba(224, 224, 224, ${barHeight/255 + 0.3})`; // Серебро
                     } else {
-                        ctx.fillStyle = `rgb(0, ${Math.min(255, barHeight + 50)}, 255)`;
+                        ctx.strokeStyle = `rgba(212, 175, 55, ${barHeight/255 + 0.3})`; // Золото
                     }
                     
-                    ctx.fillRect(x, canvas.height - barHeight, barWidth, barHeight);
-                    x += barWidth + 1;
+                    ctx.stroke();
                 }
             }
             draw();
         }
+
+        // --- ИСКРЫ (ЗОЛОТЫЕ И СЕРЕБРЯНЫЕ) ---
+        const pCanvas = document.getElementById('particles-canvas');
+        const pCtx = pCanvas.getContext('2d');
+        let particles = [];
+        
+        function resizeP() { pCanvas.width = window.innerWidth; pCanvas.height = window.innerHeight; }
+        window.addEventListener('resize', resizeP);
+        resizeP();
+        
+        for (let i = 0; i < 60; i++) {
+            particles.push({ 
+                x: Math.random() * pCanvas.width, 
+                y: Math.random() * pCanvas.height, 
+                size: Math.random() * 2.5 + 0.5, 
+                speedY: Math.random() * 1 + 0.5, 
+                speedX: (Math.random() - 0.5) * 0.5,
+                colorType: Math.random() > 0.5 ? 'gold' : 'silver'
+            });
+        }
+        
+        function drawP() {
+            pCtx.clearRect(0, 0, pCanvas.width, pCanvas.height);
+            particles.forEach(p => {
+                p.y -= p.speedY; // Летят вверх как искры
+                p.x += p.speedX;
+                if (p.y < 0) {
+                    p.y = pCanvas.height;
+                    p.x = Math.random() * pCanvas.width;
+                }
+                
+                if (p.colorType === 'gold') {
+                    pCtx.fillStyle = `rgba(212, 175, 55, ${Math.random() * 0.5 + 0.3})`;
+                } else {
+                    pCtx.fillStyle = `rgba(220, 220, 220, ${Math.random() * 0.5 + 0.3})`;
+                }
+                
+                pCtx.beginPath();
+                pCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                pCtx.fill();
+            });
+            requestAnimationFrame(drawP);
+        }
+        drawP();
     </script>
 </body>
 </html>
