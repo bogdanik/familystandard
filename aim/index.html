@@ -11,12 +11,12 @@
         
         #particles-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
 
-        /* Главный экран шоу (всегда строго по центру экрана, панель его не двигает) */
+        /* Главный экран шоу */
         #viewer-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 5; background: transparent; }
         
         canvas#equalizer-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; }
 
-        /* Центральный круг с надписью АИ музыка */
+        /* Центральный круг */
         #mystery-box { 
             position: relative; 
             z-index: 3; 
@@ -66,13 +66,13 @@
             to { transform: scale(1.05); filter: drop-shadow(0 0 35px rgba(212,175,55,0.9)); }
         }
 
-        /* ПУЛЬТ УПРАВЛЕНИЯ: Эффект стекла (Glassmorphism) фиксирован снизу */
+        /* Пульт управления с отладкой */
         #admin-panel { 
             position: fixed; 
             bottom: 0; 
             left: 0; 
             width: 100%; 
-            background: rgba(10, 10, 10, 0.75); 
+            background: rgba(10, 10, 10, 0.85); 
             backdrop-filter: blur(16px); 
             -webkit-backdrop-filter: blur(16px); 
             border-top: 1px solid rgba(212, 175, 55, 0.3); 
@@ -86,10 +86,11 @@
         
         .admin-header { display: flex; justify-content: space-between; width: 100%; max-width: 600px; margin-bottom: 6px; color: #d4af37; font-weight: bold; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 1px; }
         
-        /* Индикатор таймера плеера */
-        #audio-timer { color: #fff; font-family: monospace; font-size: 0.9rem; background: rgba(0,0,0,0.5); padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(212,175,55,0.3); }
+        /* Строка статуса и отладки прямо на пульте */
+        .debug-bar { display: flex; justify-content: space-between; width: 100%; max-width: 600px; margin-bottom: 8px; font-size: 0.8rem; font-family: monospace; }
+        #debug-text { color: #ffaa00; }
+        #audio-timer { color: #fff; background: rgba(0,0,0,0.5); padding: 1px 6px; border-radius: 4px; border: 1px solid rgba(212,175,55,0.3); }
 
-        /* Сетка выбора треков от 1 до 12 */
         .tracks-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; width: 100%; max-width: 600px; margin-bottom: 8px; }
         .track-btn { padding: 6px 0; font-size: 0.85rem; font-weight: bold; background: rgba(30, 30, 30, 0.6); color: #aaa; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 5px; cursor: pointer; text-align: center; transition: 0.1s; }
         .track-btn.active { background: #d4af37; color: #000; border-color: #f3db74; box-shadow: 0 0 10px rgba(212,175,55,0.6); }
@@ -109,7 +110,6 @@
 
     <canvas id="particles-canvas"></canvas>
 
-    <!-- Главный экран шоу -->
     <div id="viewer-screen">
         <canvas id="equalizer-canvas"></canvas>
         <div id="mystery-box">
@@ -120,14 +120,18 @@
         </div>
     </div>
 
-    <!-- Пульт управления с эффектом стекла и таймером -->
+    <!-- Пульт управления со встроенной отладкой -->
     <div id="admin-panel">
         <div class="admin-header">
             <span id="status-track">Трек: 1 / 12</span>
-            <span id="audio-timer">00:00 / 00:00</span>
+            <span>Пульт</span>
         </div>
         
-        <!-- Кнопки быстрого выбора треков от 1 до 12 -->
+        <div class="debug-bar">
+            <span id="debug-text">Статус: Готов</span>
+            <span id="audio-timer">00:00 / 00:00</span>
+        </div>
+
         <div class="tracks-grid" id="tracks-grid"></div>
 
         <div class="admin-controls">
@@ -142,12 +146,13 @@
     <audio id="audio-player" preload="auto" crossorigin="anonymous"></audio>
 
     <script>
+        // ИСПРАВЛЕННЫЙ КОНФИГ С УЧЕТОМ ТОЧНЫХ ИМЕН ФАЙЛОВ В ОБЛАКЕ (AIM и M с заглавных)
         const CONFIG = {
             baseUrl: 'https://pub-372ba5f717cf4a8694558f47682d65d9.r2.dev/',
             tracks: Array.from({length: 12}, (_, i) => ({
                 id: i + 1,
-                aim: `aim${i + 1}.mp3`,
-                orig: `m${i + 1}.mp3`
+                aim: `AIM${i + 1}.mp3`,
+                orig: `M${i + 1}.mp3`
             }))
         };
 
@@ -155,13 +160,25 @@
         const audioEl = document.getElementById('audio-player');
         const mysteryMark = document.getElementById('mystery-mark');
         const mysteryBox = document.getElementById('mystery-box');
+        const debugText = document.getElementById('debug-text');
         
         let currentTrack = 1;
         let timeOffset = 0; 
         let isAudioContextInit = false;
         let audioCtx, analyser;
 
-        // Генерация кнопок треков 1-12
+        // Отслеживание ошибок загрузки файлов (чтобы видеть 404 в реальном времени)
+        audioEl.addEventListener('error', (e) => {
+            let errCode = audioEl.error ? audioEl.error.code : 'unknown';
+            debugText.innerText = `Ошибка файла (Код: ${errCode}) 404/CORS`;
+            debugText.style.color = '#ff4444';
+        });
+
+        audioEl.addEventListener('playing', () => {
+            debugText.innerText = 'Воспроизведение ✓';
+            debugText.style.color = '#00ff00';
+        });
+
         const tracksGrid = document.getElementById('tracks-grid');
         CONFIG.tracks.forEach(t => {
             let btn = document.createElement('button');
@@ -177,7 +194,6 @@
             });
         }
 
-        // Инициализация Web Audio API по клику на любую кнопку
         function initAudio() {
             if (isAudioContextInit) return;
             try {
@@ -195,7 +211,6 @@
             } catch (e) { console.error(e); }
         }
 
-        // Форматирование времени для таймера (00:00)
         function formatTime(seconds) {
             if (isNaN(seconds) || seconds < 0) return "00:00";
             let mins = Math.floor(seconds / 60);
@@ -204,9 +219,7 @@
         }
 
         audioEl.addEventListener('timeupdate', () => {
-            let current = formatTime(audioEl.currentTime);
-            let duration = formatTime(audioEl.duration);
-            document.getElementById('audio-timer').innerText = `${current} / ${duration}`;
+            document.getElementById('audio-timer').innerText = `${formatTime(audioEl.currentTime)} / ${formatTime(audioEl.duration)}`;
         });
 
         function selectTrack(num) {
@@ -230,7 +243,7 @@
         }
 
         function sendCommand(action) {
-            initAudio(); // Гарантированно разблокируем аудиоконтекст при нажатии любой кнопки
+            initAudio();
             if (audioCtx && audioCtx.state === 'suspended') {
                 audioCtx.resume();
             }
@@ -240,7 +253,6 @@
             socket.emit('command', { action: action, track: currentTrack });
         }
 
-        // --- СИНХРОНИЗАЦИЯ С СЕРВЕРОМ И ПЛЕЕР ---
         socket.on('sync', (data) => {
             timeOffset = (Date.now() / 1000) - data.server_time;
             applyState(data.state);
@@ -265,6 +277,8 @@
                 mysteryMark.innerHTML = `<span class="ai-title">АИ</span><span class="ai-sub">музыка</span>`;
                 mysteryBox.style.borderColor = 'rgba(212,175,55,0.35)';
                 document.getElementById('audio-timer').innerText = "00:00 / 00:00";
+                debugText.innerText = 'Остановлено';
+                debugText.style.color = '#888';
             } 
             else {
                 let url = '';
@@ -290,8 +304,9 @@
                     audioEl.currentTime = playPosition;
                 }
 
-                audioEl.play().catch(e => {
-                    console.log("Ожидание действия пользователя для звука");
+                audioEl.play().catch(error => {
+                    debugText.innerText = 'Блокировка автоплея! Нажмите любую кнопку.';
+                    debugText.style.color = '#ffaa00';
                 });
             }
         }
