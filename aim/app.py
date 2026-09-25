@@ -5,8 +5,8 @@ from flask_socketio import SocketIO, emit
 app = Flask(__name__, template_folder='.')
 app.config['SECRET_KEY'] = 'super-secret-show-key'
 
-# Переключили на gevent для стабильной работы на Render
-socketio = SocketIO(app, cors_allowed_origins="*", async_mode='gevent')
+# Используем threading — самый безотказный режим для наших задач
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
 
 @app.route('/')
 def index():
