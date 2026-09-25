@@ -7,7 +7,6 @@ app = Flask(__name__, template_folder='.')
 app.config['SECRET_KEY'] = 'super-secret'
 socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
 
-# Сервер запоминает состояние шоу, чтобы опоздавшие зрители видели актуальную картину
 state = {
     'is_started': False,
     'track': 1,
