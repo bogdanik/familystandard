@@ -6,7 +6,361 @@
     <title>Музыка AI - Шоу</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.5/socket.io.min.js"></script>
     <style>
+        :root {<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Музыка AI - Шоу</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.5/socket.io.min.js"></script>
+    <style>
         :root {
+            --bg-black: #030303; --gold-light: #fffbeb; --gold-main: #d4af37;
+            --gold-glow: rgba(212, 175, 55, 0.4); --glass-bg: rgba(10, 10, 10, 0.65);
+            --glass-border: rgba(212, 175, 55, 0.25);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; touch-action: manipulation; }
+        body, html { width: 100%; height: 100%; background-color: var(--bg-black); color: white; font-family: 'Segoe UI', Tahoma, sans-serif; overflow: hidden; }
+        
+        #particles-canvas { position: fixed; inset: 0; z-index: 1; pointer-events: none; }
+
+        /* ГЛАВНЫЙ ЭКРАН СТРОГО ПО ЦЕНТРУ */
+        #viewer-screen { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 5; background: transparent; padding-bottom: 120px; }
+        canvas#equalizer-canvas { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 2; pointer-events: none; }
+
+        #mystery-box { 
+            position: relative; z-index: 3; display: flex; justify-content: center; align-items: center; 
+            width: min(70vw, 260px); height: min(70vw, 260px); border-radius: 50%; 
+            box-shadow: inset 0 0 50px rgba(212, 175, 55, 0.15), 0 0 30px rgba(0,0,0,0.8); 
+            background: rgba(5, 5, 5, 0.8); border: 3px solid rgba(212, 175, 55, 0.35); 
+        }
+        
+        #mystery-mark { display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%; height: 100%; animation: breathe 2s ease-in-out infinite alternate; text-align: center; }
+        .ai-title { font-size: clamp(3rem, 12vw, 5.5rem); font-weight: 900; color: #d4af37; text-shadow: 0 0 35px rgba(212, 175, 55, 0.8); line-height: 0.9; letter-spacing: 2px; }
+        .ai-sub { font-size: clamp(0.8rem, 3vw, 1.4rem); font-weight: 400; color: #c5a017; text-transform: lowercase; letter-spacing: 3px; margin-top: 6px; text-shadow: 0 0 20px rgba(212, 175, 55, 0.5); }
+
+        @keyframes breathe {
+            from { transform: scale(0.95); filter: drop-shadow(0 0 15px rgba(212,175,55,0.4)); }
+            to { transform: scale(1.05); filter: drop-shadow(0 0 35px rgba(212,175,55,0.9)); }
+        }
+
+        /* ПЛАВАЮЩАЯ ПАНЕЛЬ УПРАВЛЕНИЯ (GLASSMORPHISM ПОВЕРХ ЭКРАНА) */
+        #admin-panel { 
+            position: fixed; bottom: 0; left: 0; width: 100%; background: var(--glass-bg); 
+            backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-top: 1px solid var(--glass-border); 
+            z-index: 60; padding: 10px 10px calc(10px + env(safe-area-inset-bottom)); display: flex; flex-direction: column; align-items: center; 
+            box-shadow: 0 -10px 30px rgba(0,0,0,0.5); 
+        }
+        
+        .admin-header { display: flex; justify-content: space-between; width: 100%; max-width: 600px; margin-bottom: 5px; color: #d4af37; font-weight: bold; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; }
+        .debug-bar { display: flex; justify-content: space-between; width: 100%; max-width: 600px; margin-bottom: 6px; font-size: 0.75rem; font-family: monospace; }
+        #debug-text { color: #00ff00; }
+        #audio-timer { color: #fff; background: rgba(0,0,0,0.4); padding: 1px 5px; border-radius: 4px; border: 1px solid rgba(212,175,55,0.3); }
+
+        .tracks-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; width: 100%; max-width: 600px; margin-bottom: 6px; }
+        .track-btn { padding: 5px 0; font-size: 0.8rem; font-weight: bold; background: rgba(30, 30, 30, 0.5); color: #aaa; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 5px; cursor: pointer; text-align: center; }
+        .track-btn.active { background: #d4af37; color: #000; border-color: #f3db74; box-shadow: 0 0 10px rgba(212,175,55,0.6); }
+
+        .admin-controls { display: flex; flex-wrap: wrap; justify-content: center; gap: 5px; width: 100%; max-width: 600px; }
+        .btn { flex: 1 1 calc(50% - 5px); padding: 9px 4px; font-size: 0.85rem; cursor: pointer; border: none; border-radius: 6px; font-weight: 900; text-transform: uppercase; color: #111; box-shadow: 0 4px 15px rgba(0,0,0,0.4); }
+        .btn:active { transform: scale(0.95); opacity: 0.9; }
+        
+        .btn-start { background: linear-gradient(135deg, #f3db74, #d4af37); flex-basis: 100%; padding: 11px 10px; font-size: 0.95rem; }
+        .btn-play-aim { background: linear-gradient(135deg, #e6c27a, #c5a017); }
+        .btn-play-orig { background: linear-gradient(135deg, #ffffff, #c0c0c0); }
+        .btn-stop { background: linear-gradient(135deg, #880000, #440000); color: #fff; border: 1px solid #ff4444; }
+        .btn-next { background: linear-gradient(135deg, #333, #111); color: #d4af37; border: 1px solid rgba(212,175,55,0.4); }
+    </style>
+</head>
+<body>
+
+    <canvas id="particles-canvas"></canvas>
+
+    <div id="viewer-screen">
+        <canvas id="equalizer-canvas"></canvas>
+        <div id="mystery-box">
+            <div id="mystery-mark">
+                <span class="ai-title">АИ</span>
+                <span class="ai-sub">музыка</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ПЛАВАЮЩИЙ ПУЛЬТ УПРАВЛЕНИЯ -->
+    <div id="admin-panel">
+        <div class="admin-header">
+            <span id="status-track">Трек: 1 / 12</span>
+            <span>Пульт шоу</span>
+        </div>
+        
+        <div class="debug-bar">
+            <span id="debug-text">Готов к работе</span>
+            <span id="audio-timer">00:00 / 00:00</span>
+        </div>
+
+        <div class="tracks-grid" id="tracks-grid"></div>
+
+        <div class="admin-controls">
+            <button class="btn btn-start" id="btn-start" onclick="sendCommand('start')">🚀 Начать шоу</button>
+            <button class="btn btn-play-aim" onclick="sendCommand('play_aim')">▶ Загадка (АИ)</button>
+            <button class="btn btn-play-orig" onclick="sendCommand('play_orig')">▶ Оригинал</button>
+            <button class="btn btn-stop" onclick="sendCommand('stop')">⏹ Стоп</button>
+            <button class="btn btn-next" onclick="nextTrack()">⏭ След. трек</button>
+        </div>
+    </div>
+
+    <audio id="audio-player" preload="auto" crossorigin="anonymous"></audio>
+
+    <script>
+        const CONFIG = {
+            baseUrl: 'https://pub-372ba5f717cf4a8694558f47682d65d9.r2.dev/',
+            tracks: Array.from({length: 12}, (_, i) => ({
+                id: i + 1,
+                aim: `AIM${i + 1}.mp3`,
+                orig: `M${i + 1}.mp3`
+            }))
+        };
+
+        const socket = io();
+        const audioEl = document.getElementById('audio-player');
+        const mysteryMark = document.getElementById('mystery-mark');
+        const mysteryBox = document.getElementById('mystery-box');
+        const debugText = document.getElementById('debug-text');
+        
+        let currentTrack = 1;
+        let timeOffset = 0; 
+        let audioCtx, analyser, isAudioInit = false;
+
+        // Автоматическая разблокировка аудио при первом же клике на любую кнопку
+        function ensureAudioUnlocked() {
+            if (!isAudioInit) {
+                try {
+                    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+                    audioCtx = new AudioContextClass();
+                    analyser = audioCtx.createAnalyser();
+                    analyser.fftSize = 256; 
+
+                    let source = audioCtx.createMediaElementSource(audioEl);
+                    source.connect(analyser);
+                    analyser.connect(audioCtx.destination);
+                    
+                    isAudioInit = true;
+                    startCircularEq();
+                } catch (e) { console.error("AudioContext error:", e); }
+            }
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        // Генерация кнопок треков 1-12
+        const tracksGrid = document.getElementById('tracks-grid');
+        CONFIG.tracks.forEach(t => {
+            let btn = document.createElement('button');
+            btn.className = `track-btn ${t.id === 1 ? 'active' : ''}`;
+            btn.innerText = t.id;
+            btn.onclick = () => selectTrack(t.id);
+            tracksGrid.appendChild(btn);
+        });
+
+        function highlightActiveTrack() {
+            document.querySelectorAll('.track-btn').forEach(b => {
+                b.classList.toggle('active', parseInt(b.innerText) === currentTrack);
+            });
+        }
+
+        audioEl.addEventListener('error', () => {
+            debugText.innerText = 'Ошибка: Файл не найден в R2';
+            debugText.style.color = '#ff4444';
+        });
+
+        audioEl.addEventListener('playing', () => {
+            debugText.innerText = 'Воспроизведение активно ✓';
+            debugText.style.color = '#00ff00';
+        });
+
+        function formatTime(seconds) {
+            if (isNaN(seconds) || seconds < 0) return "00:00";
+            let mins = Math.floor(seconds / 60);
+            let secs = Math.floor(seconds % 60);
+            return `${mins < 10 ? '0' : ''}${mins}:${secs < 10 ? '0' : ''}${secs}`;
+        }
+
+        audioEl.addEventListener('timeupdate', () => {
+            document.getElementById('audio-timer').innerText = `${formatTime(audioEl.currentTime)} / ${formatTime(audioEl.duration)}`;
+        });
+
+        function selectTrack(num) {
+            ensureAudioUnlocked();
+            currentTrack = num;
+            highlightActiveTrack();
+            document.getElementById('status-track').innerText = `Трек: ${currentTrack} / 12`;
+            socket.emit('command', { action: 'set_track', track: currentTrack });
+        }
+
+        function nextTrack() {
+            ensureAudioUnlocked();
+            if (currentTrack < CONFIG.tracks.length) {
+                currentTrack++;
+            } else {
+                currentTrack = 1;
+            }
+            highlightActiveTrack();
+            document.getElementById('status-track').innerText = `Трек: ${currentTrack} / 12`;
+            socket.emit('command', { action: 'set_track', track: currentTrack });
+        }
+
+        function sendCommand(action) {
+            ensureAudioUnlocked();
+            if (action === 'start') {
+                let startBtn = document.getElementById('btn-start');
+                if (startBtn) startBtn.style.display = 'none';
+            }
+            socket.emit('command', { action: action, track: currentTrack });
+        }
+
+        // Синхронизация с сервером
+        socket.on('sync', (data) => {
+            timeOffset = (Date.now() / 1000) - data.server_time;
+            applyState(data.state);
+        });
+
+        socket.on('update', (data) => {
+            timeOffset = (Date.now() / 1000) - data.server_time;
+            applyState(data.state);
+        });
+
+        function applyState(state) {
+            currentTrack = state.track;
+            highlightActiveTrack();
+            document.getElementById('status-track').innerText = `Трек: ${currentTrack} / 12`;
+
+            if (state.is_started) {
+                let startBtn = document.getElementById('btn-start');
+                if (startBtn) startBtn.style.display = 'none';
+            }
+
+            if (state.status === 'stop') {
+                audioEl.pause();
+                mysteryMark.innerHTML = `<span class="ai-title">АИ</span><span class="ai-sub">музыка</span>`;
+                mysteryBox.style.borderColor = 'rgba(212,175,55,0.35)';
+                document.getElementById('audio-timer').innerText = "00:00 / 00:00";
+                debugText.innerText = 'Остановлено';
+                debugText.style.color = '#888';
+            } 
+            else {
+                let url = '';
+                if (state.status === 'aim') {
+                    url = CONFIG.baseUrl + CONFIG.tracks[currentTrack - 1].aim;
+                    mysteryMark.innerHTML = `<span class="ai-title">АИ</span><span class="ai-sub">музыка</span>`;
+                    mysteryBox.style.borderColor = 'rgba(212,175,55,0.7)';
+                } else {
+                    url = CONFIG.baseUrl + CONFIG.tracks[currentTrack - 1].orig;
+                    mysteryMark.innerHTML = `<span style="font-size: 5rem; font-weight: 900; color: #e0e0e0;">✓</span>`;
+                    mysteryBox.style.borderColor = 'rgba(224,224,224,0.7)';
+                }
+
+                if (!audioEl.src.endsWith(url)) {
+                    audioEl.src = url;
+                    audioEl.load();
+                }
+
+                let currentServerTime = (Date.now() / 1000) - timeOffset;
+                let playPosition = currentServerTime - state.start_time;
+
+                if (playPosition > 0 && Math.abs(audioEl.currentTime - playPosition) > 1.5) {
+                    audioEl.currentTime = playPosition;
+                }
+
+                // Прямой вызов воспроизведения, так как клик по пульту уже разблокировал аудиоконтекст
+                audioEl.play().catch(error => {
+                    debugText.innerText = 'Нажмите кнопку повторно для старта';
+                    debugText.style.color = '#ffaa00';
+                });
+            }
+        }
+
+        // Круговой эквалайзер
+        function startCircularEq() {
+            const canvas = document.getElementById('equalizer-canvas');
+            const ctx = canvas.getContext('2d');
+            
+            function resize() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+            window.addEventListener('resize', resize);
+            resize();
+
+            const bufferLength = analyser ? analyser.frequencyBinCount : 128;
+            const activeBars = 80;
+            const halfBars = activeBars / 2;
+            const angleStep = (Math.PI * 2) / activeBars;
+            const dataArray = new Uint8Array(bufferLength);
+
+            function draw() {
+                requestAnimationFrame(draw);
+                if (analyser) analyser.getByteFrequencyData(dataArray);
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                let centerX = canvas.width / 2;
+                let centerY = canvas.height / 2;
+                let baseRadius = Math.min(canvas.width, canvas.height) * 0.22;
+
+                for (let i = 0; i < activeBars; i++) {
+                    let dataIndex = i < halfBars ? Math.floor(i * (bufferLength * 0.6) / halfBars) : Math.floor((activeBars - i - 1) * (bufferLength * 0.6) / halfBars);
+                    let barHeight = dataArray[dataIndex] ? dataArray[dataIndex] * 0.65 : 3; 
+                    if (barHeight < 3) barHeight = 3; 
+                    
+                    let angle = i * angleStep - (Math.PI / 2);
+                    let x1 = centerX + Math.cos(angle) * baseRadius;
+                    let y1 = centerY + Math.sin(angle) * baseRadius;
+                    let x2 = centerX + Math.cos(angle) * (baseRadius + barHeight);
+                    let y2 = centerY + Math.sin(angle) * (baseRadius + barHeight);
+
+                    ctx.beginPath();
+                    ctx.moveTo(x1, y1);
+                    ctx.lineTo(x2, y2);
+                    ctx.lineWidth = 5;
+                    ctx.lineCap = 'round';
+                    ctx.strokeStyle = mysteryMark.innerHTML.includes('✓') ? `rgba(224, 224, 224, ${barHeight/255 + 0.3})` : `rgba(212, 175, 55, ${barHeight/255 + 0.3})`;
+                    ctx.stroke();
+                }
+            }
+            draw();
+        }
+
+        // Частицы (искры)
+        const pCanvas = document.getElementById('particles-canvas');
+        const pCtx = pCanvas.getContext('2d');
+        let particles = [];
+        function resizeP() { pCanvas.width = window.innerWidth; pCanvas.height = window.innerHeight; }
+        window.addEventListener('resize', resizeP);
+        resizeP();
+        
+        for (let i = 0; i < 70; i++) {
+            particles.push({ 
+                x: Math.random() * pCanvas.width, y: Math.random() * pCanvas.height, 
+                size: Math.random() * 2.5 + 0.5, speedY: Math.random() * 1.5 + 0.5, 
+                speedX: (Math.random() - 0.5) * 0.5, colorType: Math.random() > 0.5 ? 'gold' : 'silver'
+            });
+        }
+        
+        function drawP() {
+            pCtx.clearRect(0, 0, pCanvas.width, pCanvas.height);
+            particles.forEach(p => {
+                p.y -= p.speedY; p.x += p.speedX;
+                if (p.y < 0) { p.y = pCanvas.height; p.x = Math.random() * pCanvas.width; }
+                pCtx.fillStyle = p.colorType === 'gold' ? `rgba(212, 175, 55, ${Math.random() * 0.5 + 0.3})` : `rgba(220, 220, 220, ${Math.random() * 0.5 + 0.3})`;
+                pCtx.beginPath(); pCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2); pCtx.fill();
+            });
+            requestAnimationFrame(drawP);
+        }
+        drawP();
+    </script>
+</body>
+</html>
             --bg-black: #030303; --gold-light: #fffbeb; --gold-main: #d4af37;
             --gold-glow: rgba(212, 175, 55, 0.4); --glass-card: rgba(15, 23, 42, 0.95);
             --glass-border: rgba(229, 231, 235, 0.2);
