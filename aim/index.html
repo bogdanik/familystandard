@@ -11,12 +11,7 @@
         
         #particles-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
 
-        /* Кнопка разблокировки звука (если браузер заблокировал автоплей) */
-        #unlock-overlay { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 50; flex-direction: column; justify-content: center; align-items: center; backdrop-filter: blur(10px); cursor: pointer; }
-        .unlock-btn { padding: 20px 40px; font-size: 1.5rem; background: transparent; color: #d4af37; border: 2px solid #d4af37; border-radius: 12px; font-weight: bold; text-transform: uppercase; box-shadow: 0 0 25px rgba(212, 175, 55, 0.4); animation: pulse-text 1.5s infinite; }
-        @keyframes pulse-text { 0% { opacity: 0.3; } 50% { opacity: 1; } 100% { opacity: 0.3; } }
-
-        /* Главный экран шоу (полный экран, идеальный центр) */
+        /* Главный экран шоу (всегда строго по центру экрана, панель его не двигает) */
         #viewer-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 5; background: transparent; }
         
         canvas#equalizer-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; }
@@ -28,8 +23,8 @@
             display: flex; 
             justify-content: center; 
             align-items: center; 
-            width: min(75vw, 300px); 
-            height: min(75vw, 300px); 
+            width: min(75vw, 280px); 
+            height: min(75vw, 280px); 
             border-radius: 50%; 
             box-shadow: inset 0 0 60px rgba(212, 175, 55, 0.15), 0 0 30px rgba(0,0,0,0.8); 
             background: rgba(5, 5, 5, 0.85); 
@@ -48,7 +43,7 @@
         }
 
         .ai-title {
-            font-size: clamp(3.5rem, 14vw, 6.5rem);
+            font-size: clamp(3.2rem, 13vw, 6rem);
             font-weight: 900;
             color: #d4af37;
             text-shadow: 0 0 35px rgba(212, 175, 55, 0.8);
@@ -57,12 +52,12 @@
         }
 
         .ai-sub {
-            font-size: clamp(1rem, 4vw, 1.8rem);
+            font-size: clamp(0.9rem, 3.5vw, 1.6rem);
             font-weight: 400;
             color: #c5a017;
             text-transform: lowercase;
             letter-spacing: 3px;
-            margin-top: 8px;
+            margin-top: 6px;
             text-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
         }
 
@@ -71,13 +66,13 @@
             to { transform: scale(1.05); filter: drop-shadow(0 0 35px rgba(212,175,55,0.9)); }
         }
 
-        /* ПУЛЬТ УПРАВЛЕНИЯ: Эффект стекла (Glassmorphism) снизу */
+        /* ПУЛЬТ УПРАВЛЕНИЯ: Эффект стекла (Glassmorphism) фиксирован снизу */
         #admin-panel { 
             position: fixed; 
             bottom: 0; 
             left: 0; 
             width: 100%; 
-            background: rgba(10, 10, 10, 0.65); 
+            background: rgba(10, 10, 10, 0.75); 
             backdrop-filter: blur(16px); 
             -webkit-backdrop-filter: blur(16px); 
             border-top: 1px solid rgba(212, 175, 55, 0.3); 
@@ -91,6 +86,9 @@
         
         .admin-header { display: flex; justify-content: space-between; width: 100%; max-width: 600px; margin-bottom: 6px; color: #d4af37; font-weight: bold; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 1px; }
         
+        /* Индикатор таймера плеера */
+        #audio-timer { color: #fff; font-family: monospace; font-size: 0.9rem; background: rgba(0,0,0,0.5); padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(212,175,55,0.3); }
+
         /* Сетка выбора треков от 1 до 12 */
         .tracks-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; width: 100%; max-width: 600px; margin-bottom: 8px; }
         .track-btn { padding: 6px 0; font-size: 0.85rem; font-weight: bold; background: rgba(30, 30, 30, 0.6); color: #aaa; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 5px; cursor: pointer; text-align: center; transition: 0.1s; }
@@ -111,10 +109,6 @@
 
     <canvas id="particles-canvas"></canvas>
 
-    <div id="unlock-overlay" onclick="forceUnlockAudio()">
-        <button class="unlock-btn">🎶 Включить звук</button>
-    </div>
-
     <!-- Главный экран шоу -->
     <div id="viewer-screen">
         <canvas id="equalizer-canvas"></canvas>
@@ -126,11 +120,11 @@
         </div>
     </div>
 
-    <!-- Пульт управления с эффектом стекла -->
+    <!-- Пульт управления с эффектом стекла и таймером -->
     <div id="admin-panel">
         <div class="admin-header">
-            <span>Пульт управления</span>
             <span id="status-track">Трек: 1 / 12</span>
+            <span id="audio-timer">00:00 / 00:00</span>
         </div>
         
         <!-- Кнопки быстрого выбора треков от 1 до 12 -->
@@ -145,7 +139,6 @@
         </div>
     </div>
 
-    <!-- Полноценный аудио плеер с обработкой состояния -->
     <audio id="audio-player" preload="auto" crossorigin="anonymous"></audio>
 
     <script>
@@ -184,7 +177,7 @@
             });
         }
 
-        // Инициализация Web Audio API и обработка плеера
+        // Инициализация Web Audio API по клику на любую кнопку
         function initAudio() {
             if (isAudioContextInit) return;
             try {
@@ -202,12 +195,22 @@
             } catch (e) { console.error(e); }
         }
 
-        window.addEventListener('click', () => {
-            initAudio();
-            if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
-        }, { once: true });
+        // Форматирование времени для таймера (00:00)
+        function formatTime(seconds) {
+            if (isNaN(seconds) || seconds < 0) return "00:00";
+            let mins = Math.floor(seconds / 60);
+            let secs = Math.floor(seconds % 60);
+            return `${mins < 10 ? '0' : ''}${mins}:${secs < 10 ? '0' : ''}${secs}`;
+        }
+
+        audioEl.addEventListener('timeupdate', () => {
+            let current = formatTime(audioEl.currentTime);
+            let duration = formatTime(audioEl.duration);
+            document.getElementById('audio-timer').innerText = `${current} / ${duration}`;
+        });
 
         function selectTrack(num) {
+            initAudio();
             currentTrack = num;
             highlightActiveTrack();
             document.getElementById('status-track').innerText = `Трек: ${currentTrack} / 12`;
@@ -215,6 +218,7 @@
         }
 
         function nextTrack() {
+            initAudio();
             if (currentTrack < CONFIG.tracks.length) {
                 currentTrack++;
             } else {
@@ -226,6 +230,10 @@
         }
 
         function sendCommand(action) {
+            initAudio(); // Гарантированно разблокируем аудиоконтекст при нажатии любой кнопки
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
             if (action === 'start') {
                 document.getElementById('btn-start').style.display = 'none';
             }
@@ -235,15 +243,15 @@
         // --- СИНХРОНИЗАЦИЯ С СЕРВЕРОМ И ПЛЕЕР ---
         socket.on('sync', (data) => {
             timeOffset = (Date.now() / 1000) - data.server_time;
-            applyState(data.state, true);
+            applyState(data.state);
         });
 
         socket.on('update', (data) => {
             timeOffset = (Date.now() / 1000) - data.server_time;
-            applyState(data.state, false);
+            applyState(data.state);
         });
 
-        function applyState(state, isInitialSync) {
+        function applyState(state) {
             currentTrack = state.track;
             highlightActiveTrack();
             document.getElementById('status-track').innerText = `Трек: ${currentTrack} / 12`;
@@ -256,6 +264,7 @@
                 audioEl.pause();
                 mysteryMark.innerHTML = `<span class="ai-title">АИ</span><span class="ai-sub">музыка</span>`;
                 mysteryBox.style.borderColor = 'rgba(212,175,55,0.35)';
+                document.getElementById('audio-timer').innerText = "00:00 / 00:00";
             } 
             else {
                 let url = '';
@@ -269,7 +278,6 @@
                     mysteryBox.style.borderColor = 'rgba(224,224,224,0.7)';
                 }
 
-                // Жесткая проверка и загрузка трека плеером
                 if (audioEl.src !== url) {
                     audioEl.src = url;
                     audioEl.load();
@@ -282,24 +290,10 @@
                     audioEl.currentTime = playPosition;
                 }
 
-                let playPromise = audioEl.play();
-                if (playPromise !== undefined) {
-                    playPromise.then(() => {
-                        document.getElementById('unlock-overlay').style.display = 'none';
-                    }).catch(error => {
-                        if (isInitialSync) {
-                            document.getElementById('unlock-overlay').style.display = 'flex';
-                        }
-                    });
-                }
+                audioEl.play().catch(e => {
+                    console.log("Ожидание действия пользователя для звука");
+                });
             }
-        }
-
-        function forceUnlockAudio() {
-            initAudio();
-            if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
-            audioEl.play().catch(e => console.log("Play blocked"));
-            document.getElementById('unlock-overlay').style.display = 'none';
         }
 
         // --- КРУГОВОЙ ЭКВАЛАЙЗЕР ---
