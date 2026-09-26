@@ -395,15 +395,11 @@
         }
         animateCanvas();
 
-        // ================= ПОДКЛЮЧЕНИЕ К СЕРВЕРУ RENDER =================
-        // Динамическое определение хоста или явный Render URL
-        const RENDER_SERVER_URL = "https://pic-jj29.onrender.com";
-        const SERVER_URL = (window.location.protocol.startsWith('http') && window.location.hostname !== 'localhost' && !window.location.hostname.startsWith('127.')) 
-            ? window.location.origin 
-            : RENDER_SERVER_URL;
-
-        const socket = io(SERVER_URL, {
-            transports: ['websocket', 'polling']
+        // ================= ЖЕСТКОЕ ПОДКЛЮЧЕНИЕ К СЕРВЕРУ RENDER =================
+        // Подключаемся напрямую к Render-серверу с поддержкой HTTP Polling -> WebSocket
+        const socket = io("https://pic-jj29.onrender.com", {
+            transports: ['polling', 'websocket'],
+            upgrade: true
         });
 
         const R2_BASE_URL = "https://pub-372ba5f717cf4a8694558f47682d65d9.r2.dev/";
