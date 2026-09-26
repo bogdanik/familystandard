@@ -41,7 +41,7 @@
         }
         #btn-hello:hover { background: white; color: black; }
         
-        /* Маленькая незаметная кнопка входа админа снизу */
+        /* Маленькая кнопка входа админа снизу */
         #btn-play-admin {
             position: absolute; bottom: 20px; width: 30px; height: 30px;
             background: transparent; border: 1px solid rgba(255,255,255,0.3);
@@ -135,7 +135,7 @@
         <button class="admin-btn" id="btn-next">НАЧАТЬ ИГРУ</button>
     </div>
 
-    <!-- Аудиоплеер (crossorigin="anonymous" критически важен для эквалайзера) -->
+    <!-- Аудиоплеер (crossorigin="anonymous" важен для эквалайзера) -->
     <audio id="audio-player" crossorigin="anonymous"></audio>
 
     <script>
@@ -162,8 +162,9 @@
         let audioContext, analyser, dataArray;
         let localState = { round: 0, playing: false, track: null };
         let fadeInterval = null;
+        let isAdmin = false; // Флаг: админ (управление без звука) или зритель (со звуком)
 
-        // Инициализация звукового контекста
+        // Инициализация звукового контекста (для режима зрителя)
         function initAudio() {
             if(!audioContext) {
                 audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -177,16 +178,17 @@
             if(audioContext.state === 'suspended') audioContext.resume();
         }
 
-        // Вход зрителя
+        // Вход зрителя (экран с аудио)
         document.getElementById('btn-hello').onclick = () => {
+            isAdmin = false;
             initAudio();
             entryScreen.style.display = 'none';
             mainScreen.style.display = 'flex';
         };
 
-        // Вход админа
+        // Вход админа (пульт без аудио)
         document.getElementById('btn-play-admin').onclick = () => {
-            initAudio();
+            isAdmin = true;
             entryScreen.style.display = 'none';
             mainScreen.style.display = 'flex';
             adminPanel.style.display = 'flex';
@@ -276,29 +278,31 @@
                 if (state.track === 'aim') btnAi.classList.add('active-btn');
                 if (state.track === 'm') btnOrig.classList.add('active-btn');
 
-                let trackPrefix = state.track === 'aim' ? 'aim' : 'm';
-                let targetSrc = `${CLOUD_URL}${trackPrefix}${state.round}.mp3`;
+                // Воспроизведение запускаем ТОЛЬКО если это устройство зрителя (!isAdmin)
+                if (!isAdmin) {
+                    let trackPrefix = state.track === 'aim' ? 'aim' : 'm';
+                    let targetSrc = `${CLOUD_URL}${trackPrefix}${state.round}.mp3`;
 
-                // Загружаем новый файл только если сменился раунд или трек
-                if (audio.src !== targetSrc) {
-                    audio.src = targetSrc;
-                    audio.currentTime = 0;
-                    smoothPlay(audio);
-                } 
-                // Возобновляем, если стоял на паузе
-                else if (audio.paused || audio.volume < 1) {
-                    smoothPlay(audio);
+                    if (audio.src !== targetSrc) {
+                        audio.src = targetSrc;
+                        audio.currentTime = 0;
+                        smoothPlay(audio);
+                    } else if (audio.paused || audio.volume < 1) {
+                        smoothPlay(audio);
+                    }
                 }
 
                 centerCircle.style.opacity = 1;
             } else {
-                // Плавная пауза
-                smoothPause(audio);
+                // На устройстве зрителя плавно глушим звук при паузе
+                if (!isAdmin) {
+                    smoothPause(audio);
+                }
 
                 if (state.trigger_animation) centerCircle.style.opacity = 0;
             }
 
-            // Анимация текста раунда
+            // Анимация текста раунда (отображается у всех)
             if (state.trigger_animation) {
                 roundTitle.innerText = `РАУНД ${state.round}`;
                 roundTitle.classList.remove('animate-round');
@@ -367,7 +371,8 @@
             requestAnimationFrame(animateEqualizer);
             ctxEq.clearRect(0, 0, canvasEq.width, canvasEq.height);
 
-            if(analyser && localState.playing && !audio.paused) {
+            // Эквалайзер рисуется только на экране зрителя, где реально воспроизводится звук
+            if(!isAdmin && analyser && localState.playing && !audio.paused) {
                 analyser.getByteFrequencyData(dataArray);
                 const cx = canvasEq.width / 2, cy = canvasEq.height / 2;
                 const radius = 120; const bars = 64; const step = (Math.PI * 2) / bars;
