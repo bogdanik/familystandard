@@ -4,10 +4,10 @@ from flask_socketio import SocketIO, emit
 app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins="*")
 
-# Функция создания чистого состояния
+# Исходное состояние интерактива
 def get_initial_state():
     return {
-        "round": 0,              # 0 = ожидание нажатия "СТАРТ"
+        "round": 0,              # 0 = режим ожидания
         "track": None,          # 'aim' или 'm'
         "playing": False,        # Воспроизводится ли трек
         "trigger_animation": False,
@@ -24,7 +24,7 @@ def handle_connect():
 def handle_request_start():
     global game_state
     
-    # Если игра не начата или админ еще не назначен
+    # Первый нажавший становится Админом
     if game_state["round"] == 0 or game_state["admin_sid"] is None:
         game_state["admin_sid"] = request.sid
         game_state["round"] = 1
@@ -32,13 +32,18 @@ def handle_request_start():
         game_state["track"] = None
         game_state["trigger_animation"] = True
         
-        # Назначаем кликнувшего АДМИНОМ
         emit('role_assigned', {'is_admin': True}, room=request.sid)
     else:
-        # Все остальные становятся ЗРИТЕЛЯМИ
+        # Остальные — Зрители
         emit('role_assigned', {'is_admin': False}, room=request.sid)
 
-    # Рассылаем обновленное состояние всем
+    emit('state_update', game_state, broadcast=True)
+
+# Глобальный сброс состояния по запросу с любого экрана
+@socketio.on('request_reset')
+def handle_request_reset():
+    global game_state
+    game_state = get_initial_state()
     emit('state_update', game_state, broadcast=True)
 
 @socketio.on('admin_command')
@@ -58,7 +63,6 @@ def handle_admin_command(data):
             game_state['track'] = None
             game_state['trigger_animation'] = True
     elif action == 'end_game':
-        # Завершение сессии и сброс для всех
         game_state = get_initial_state()
     elif action == 'play':
         game_state['track'] = data.get('track')
