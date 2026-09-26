@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Family Standard OS — Фото</title>
+    <title>Family Standard OS — Галерея Карусель</title>
     <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
     <style>
         * {
@@ -22,7 +22,6 @@
             color: #fceade;
         }
 
-        /* Canvas фон */
         #bgCanvas {
             position: absolute;
             top: 0;
@@ -44,7 +43,7 @@
             align-items: center;
         }
 
-        /* ================= ПОЛУПРОЗРАЧНАЯ КНОПКА ЗАКРЫТИЯ ВВЕРХУ СПРАВА ================= */
+        /* КРЕСТИК ВВЕРХУ СПРАВА ДЛЯ СБРОСА */
         .top-close-btn {
             position: fixed;
             top: 22px;
@@ -78,18 +77,18 @@
             background: rgba(255, 59, 48, 0.85);
             border-color: #ff3b30;
             color: #ffffff;
-            transform: scale(1.12);
+            transform: scale3d(1.12, 1.12, 1);
             box-shadow: 0 0 25px rgba(255, 59, 48, 0.7);
         }
 
         .top-close-btn:active {
-            transform: scale(0.95);
+            transform: scale3d(0.95, 0.95, 1);
         }
 
-        /* ================= СТАРТОВЫЙ ЭКРАН ================= */
+        /* СТАРТОВЫЙ ЭКРАН */
         .splash-screen {
             position: absolute;
-            z-index: 10;
+            z-index: 20;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -152,7 +151,7 @@
             background: linear-gradient(135deg, #f4a261, #a04928);
         }
 
-        /* ================= ПРОЗРАЧНАЯ СЦЕНА ================= */
+        /* СЦЕНА КАРУСЕЛИ */
         .stage-frame {
             position: relative;
             width: 100vw;
@@ -177,30 +176,97 @@
             perspective: 1200px;
         }
 
-        /* 120 FPS УСКОРЕНИЕ ДЛЯ КАРТИНОК */
-        .slide-img {
-            max-width: 88vw;
-            max-height: 80vh;
-            width: auto;
-            height: auto;
-            object-fit: contain;
-            border-radius: 16px;
+        /* СТИЛИ КАРТОЧЕК В КАРУСЕЛИ */
+        .slide-card {
             position: absolute;
-            will-change: transform, opacity;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 48vw;
+            max-width: 680px;
+            height: 72vh;
+            max-height: 620px;
+            border-radius: 20px;
+            overflow: hidden;
+            will-change: transform, opacity, filter, box-shadow;
             backface-visibility: hidden;
             transform-style: preserve-3d;
-            
-            border: 3px solid rgba(224, 169, 109, 0.85);
-            box-shadow: 
-                0 0 25px 5px rgba(224, 169, 109, 0.6),
-                0 0 65px 15px rgba(140, 66, 39, 0.45);
+            transition: transform 0.85s cubic-bezier(0.22, 1, 0.36, 1),
+                        opacity 0.85s cubic-bezier(0.22, 1, 0.36, 1),
+                        filter 0.85s cubic-bezier(0.22, 1, 0.36, 1),
+                        box-shadow 0.85s cubic-bezier(0.22, 1, 0.36, 1);
         }
 
-        /* ================= ПУЛЬТ ВЕДУЩЕГО ================= */
+        .slide-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            object-position: center;
+            border-radius: 16px;
+            will-change: transform;
+        }
+
+        /* ПОЗИЦИЯ 1: ЦЕНТРАЛЬНАЯ КАРТОЧКА В ФОКУСЕ */
+        .card-center {
+            transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
+            opacity: 1;
+            z-index: 10;
+            border: 3px solid rgba(224, 169, 109, 0.9);
+            box-shadow: 
+                0 0 35px 8px rgba(224, 169, 109, 0.65),
+                0 0 80px 20px rgba(140, 66, 39, 0.5);
+            filter: brightness(1);
+        }
+
+        .card-center .slide-img {
+            animation: kenBurnsZoom 10.5s linear forwards;
+        }
+
+        @keyframes kenBurnsZoom {
+            0% { transform: scale3d(1, 1, 1); }
+            100% { transform: scale3d(1.22, 1.22, 1); }
+        }
+
+        /* ПОЗИЦИЯ 2: ЛЕВАЯ КАРТОЧКА */
+        .card-left {
+            transform: translate3d(-52vw, 0, -100px) scale3d(0.72, 0.72, 1);
+            opacity: 0.45;
+            z-index: 5;
+            border: 2px solid rgba(224, 169, 109, 0.35);
+            box-shadow: 0 0 20px rgba(140, 66, 39, 0.3);
+            filter: brightness(0.55);
+        }
+
+        /* ПОЗИЦИЯ 3: ПРАВАЯ КАРТОЧКА */
+        .card-right {
+            transform: translate3d(52vw, 0, -100px) scale3d(0.72, 0.72, 1);
+            opacity: 0.45;
+            z-index: 5;
+            border: 2px solid rgba(224, 169, 109, 0.35);
+            box-shadow: 0 0 20px rgba(140, 66, 39, 0.3);
+            filter: brightness(0.55);
+        }
+
+        /* СКРЫТЫЕ ПОЗИЦИИ ЗА ЭКРАНОМ ДЛЯ ВЪЕЗДА/ВЫЕЗДА */
+        .card-far-left {
+            transform: translate3d(-108vw, 0, -200px) scale3d(0.5, 0.5, 1);
+            opacity: 0;
+            z-index: 1;
+            filter: brightness(0.3);
+        }
+
+        .card-far-right {
+            transform: translate3d(108vw, 0, -200px) scale3d(0.5, 0.5, 1);
+            opacity: 0;
+            z-index: 1;
+            filter: brightness(0.3);
+        }
+
+        /* ПУЛЬТ ВЕДУЩЕГО */
         .admin-panel {
             position: absolute;
             bottom: 25px;
-            z-index: 10;
+            z-index: 30;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -281,67 +347,26 @@
             color: #fff;
             font-weight: bold;
         }
-
-        /* ================= УПРАВЛЯЕМЫЕ 120 FPS ЭФФЕКТЫ ================= */
-        .effect-a-out { animation: cornerFlyOut 0.75s forwards cubic-bezier(0.22, 1, 0.36, 1); }
-        .effect-a-in  { animation: cornerFlyIn 0.75s forwards cubic-bezier(0.22, 1, 0.36, 1); }
-
-        @keyframes cornerFlyOut {
-            0% { transform: translate3d(0, 0, 0) rotate(0deg) scale3d(1, 1, 1); opacity: 1; }
-            100% { transform: translate3d(-120vw, -80vh, 0) rotate(-22deg) scale3d(0.5, 0.5, 1); opacity: 0; }
-        }
-        @keyframes cornerFlyIn {
-            0% { transform: translate3d(120vw, 80vh, 0) rotate(22deg) scale3d(0.5, 0.5, 1); opacity: 0; }
-            100% { transform: translate3d(0, 0, 0) rotate(0deg) scale3d(1, 1, 1); opacity: 1; }
-        }
-
-        .effect-b-out { animation: swipeLeftOut 0.75s forwards cubic-bezier(0.22, 1, 0.36, 1); }
-        .effect-b-in  { animation: swipeLeftIn 0.75s forwards cubic-bezier(0.22, 1, 0.36, 1); }
-
-        @keyframes swipeLeftOut {
-            0% { transform: translate3d(0, 0, 0) scale3d(1, 1, 1); opacity: 1; }
-            100% { transform: translate3d(-120vw, 0, 0) scale3d(0.8, 0.8, 1); opacity: 0; }
-        }
-        @keyframes swipeLeftIn {
-            0% { transform: translate3d(120vw, 0, 0) scale3d(0.8, 0.8, 1); opacity: 0; }
-            100% { transform: translate3d(0, 0, 0) scale3d(1, 1, 1); opacity: 1; }
-        }
-
-        .effect-c-out { animation: depthZoomOut 0.75s forwards cubic-bezier(0.22, 1, 0.36, 1); }
-        .effect-c-in  { animation: depthZoomIn 0.75s forwards cubic-bezier(0.22, 1, 0.36, 1); }
-
-        @keyframes depthZoomOut {
-            0% { transform: scale3d(1, 1, 1) rotate(0deg); opacity: 1; }
-            100% { transform: scale3d(1.4, 1.4, 1) rotate(6deg); opacity: 0; }
-        }
-        @keyframes depthZoomIn {
-            0% { transform: scale3d(0.2, 0.2, 1) rotate(-10deg); opacity: 0; }
-            100% { transform: scale3d(1, 1, 1) rotate(0deg); opacity: 1; }
-        }
     </style>
 </head>
 <body>
 
     <canvas id="bgCanvas"></canvas>
 
-    <!-- ПОЛУПРОЗРАЧНЫЙ КРЕСТИК ЗАКРЫТИЯ СЕССИИ ВВЕРХУ СПРАВА -->
     <button id="topCloseBtn" class="top-close-btn" title="Закрыть сессию и вернуться на старт">✖</button>
 
     <div class="main-container">
 
-        <!-- 1. ЗАСТАВКА -->
         <div id="splashScreen" class="splash-screen">
             <h1 class="brand-title">FAMILY STANDARD OS</h1>
             <div class="brand-subtitle">ФОТО</div>
             <button id="startBtn" class="start-btn">▶ СТАРТ</button>
         </div>
 
-        <!-- 2. СЦЕНА -->
         <div id="stageFrame" class="stage-frame">
             <div id="imageWrapper" class="image-wrapper"></div>
         </div>
 
-        <!-- 3. ПУЛЬТ ВЕДУЩЕГО -->
         <div id="adminPanel" class="admin-panel">
             <div class="panel-header">
                 <span id="slideIndicator" class="slide-counter">ФОТО 1 / 20</span>
@@ -358,7 +383,7 @@
     </div>
 
     <script>
-        // ================= 120 FPS CANVAS С ДЕЛЬТА-ТАЙМОМ =================
+        // 120 FPS CANVAS С ДЕЛЬТА-ТАЙМОМ
         const canvas = document.getElementById('bgCanvas');
         const ctx = canvas.getContext('2d');
         let particles = [];
@@ -376,7 +401,7 @@
             constructor() {
                 this.x = Math.random() * canvas.width;
                 this.y = Math.random() * canvas.height;
-                this.vx = (Math.random() - 0.5) * 60; // Пикселей в секунду
+                this.vx = (Math.random() - 0.5) * 60;
                 this.vy = (Math.random() - 0.5) * 60;
                 this.radius = Math.random() * 2.5 + 1;
                 this.color = Math.random() > 0.5 ? '#e0a96d' : '#8c4227';
@@ -406,7 +431,7 @@
 
         function animateCanvas(currentTime) {
             let dt = (currentTime - lastTime) / 1000;
-            if (dt > 0.1) dt = 0.1; // Защита от скачков при переключении вкладок
+            if (dt > 0.1) dt = 0.1;
             lastTime = currentTime;
 
             ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -434,7 +459,7 @@
         }
         requestAnimationFrame(animateCanvas);
 
-        // ================= СИНХРОНИЗАЦИЯ СОКЕТОВ =================
+        // ПОДКЛЮЧЕНИЕ К СЕРВЕРУ И ДИНАМИЧЕСКАЯ КАРУСЕЛЬ
         const socket = io("https://pic-jj29.onrender.com", {
             transports: ['polling', 'websocket'],
             upgrade: true
@@ -462,10 +487,13 @@
         const autoBtn = document.getElementById('autoBtn');
         const endBtn = document.getElementById('endBtn');
 
+        // КЭШ ИЗОБРАЖЕНИЙ ДЛЯ ПРЕДЗАГРУЗКИ
+        const persistentCache = {};
         function preloadImages() {
             for (let i = 1; i <= totalSlidesCount; i++) {
                 const img = new Image();
                 img.src = `${R2_BASE_URL}pic${i}.jpg`;
+                persistentCache[i] = img;
             }
         }
         preloadImages();
@@ -479,7 +507,7 @@
 
             updateUI();
             if (currentSlideIndex > 0) {
-                renderSlide(currentSlideIndex, 0);
+                updateCarousel(currentSlideIndex);
             }
         });
 
@@ -487,7 +515,6 @@
             socket.emit('start_session');
         });
 
-        // Кнопка крестика вверху справа для мгновенного сброса
         topCloseBtn.addEventListener('click', () => {
             socket.emit('reset_session');
         });
@@ -497,45 +524,99 @@
             if (socket.id === data.admin_sid) isAdmin = true;
 
             updateUI();
-            renderSlide(currentSlideIndex, 0);
+            updateCarousel(currentSlideIndex);
         });
 
         socket.on('slide_updated', (data) => {
             currentSlideIndex = data.current_slide;
             updateUI();
-            renderSlide(currentSlideIndex, data.effect_type);
+            updateCarousel(currentSlideIndex);
         });
 
-        function renderSlide(slideNum, effectType) {
-            if (slideNum < 1) return;
-
-            const newImg = document.createElement('img');
-            newImg.src = `${R2_BASE_URL}pic${slideNum}.jpg`;
-            newImg.className = 'slide-img';
-
-            const effects = ['effect-a', 'effect-b', 'effect-c'];
-            const currentEffect = effects[effectType % 3];
-            const oldImg = imageWrapper.querySelector('.slide-img');
-
-            if (oldImg) {
-                oldImg.className = `slide-img ${currentEffect}-out`;
-                newImg.className = `slide-img ${currentEffect}-in`;
-                imageWrapper.appendChild(newImg);
-                setTimeout(() => {
-                    if (oldImg && oldImg.parentNode) oldImg.parentNode.removeChild(oldImg);
-                }, 730);
-            } else {
-                newImg.style.opacity = '1';
-                imageWrapper.appendChild(newImg);
+        // ЛОГИКА 3D-КАРУСЕЛИ
+        function updateCarousel(centerNum) {
+            if (centerNum < 1) {
+                imageWrapper.innerHTML = '';
+                return;
             }
+
+            const total = totalSlidesCount;
+            const centerIdx = centerNum;
+            const leftIdx = centerIdx > 1 ? centerIdx - 1 : total;
+            const rightIdx = centerIdx < total ? centerIdx + 1 : 1;
+
+            const neededMap = {
+                [leftIdx]: 'card-left',
+                [centerIdx]: 'card-center',
+                [rightIdx]: 'card-right'
+            };
+
+            const existingCards = {};
+            imageWrapper.querySelectorAll('.slide-card').forEach(card => {
+                const num = parseInt(card.dataset.slide, 10);
+                existingCards[num] = card;
+            });
+
+            // 1. Плавно удаляем карточки, которые больше не нужны
+            Object.keys(existingCards).forEach(numStr => {
+                const num = parseInt(numStr, 10);
+                if (!neededMap[num]) {
+                    const card = existingCards[num];
+                    if (card.classList.contains('card-left') || card.classList.contains('card-center')) {
+                        card.className = 'slide-card card-far-left';
+                    } else {
+                        card.className = 'slide-card card-far-right';
+                    }
+                    setTimeout(() => {
+                        if (card && card.parentNode) card.remove();
+                    }, 850);
+                }
+            });
+
+            // 2. Обновляем или сдвигаем карточки Лево / Центр / Право
+            [leftIdx, centerIdx, rightIdx].forEach(num => {
+                const targetClass = neededMap[num];
+                let card = existingCards[num];
+
+                if (card) {
+                    card.className = `slide-card ${targetClass}`;
+                } else {
+                    card = document.createElement('div');
+                    card.dataset.slide = num;
+
+                    if (targetClass === 'card-right') {
+                        card.className = 'slide-card card-far-right';
+                    } else if (targetClass === 'card-left') {
+                        card.className = 'slide-card card-far-left';
+                    } else {
+                        card.className = 'slide-card card-far-right';
+                    }
+
+                    const img = document.createElement('img');
+                    img.className = 'slide-img';
+                    img.src = `${R2_BASE_URL}pic${num}.jpg`;
+                    img.onerror = function() {
+                        setTimeout(() => {
+                            this.src = `${R2_BASE_URL}pic${num}.jpg?retry=${Date.now()}`;
+                        }, 800);
+                    };
+
+                    card.appendChild(img);
+                    imageWrapper.appendChild(card);
+
+                    // Принудительный reflow для активации анимации входа
+                    void card.offsetWidth;
+
+                    card.className = `slide-card ${targetClass}`;
+                }
+            });
         }
 
         function updateUI() {
             if (currentSlideIndex > 0) {
                 splashScreen.classList.add('hidden');
-                topCloseBtn.classList.add('visible'); // Показываем крестик сверху справа
+                topCloseBtn.classList.add('visible');
 
-                // Пульт показываем ИСКЛЮЧИТЕЛЬНО ведущему
                 if (isAdmin) {
                     adminPanel.classList.add('visible');
                     slideIndicator.innerText = `ФОТО ${currentSlideIndex} / ${totalSlidesCount}`;
