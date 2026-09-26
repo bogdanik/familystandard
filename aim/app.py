@@ -1,15 +1,9 @@
-import eventlet
-eventlet.monkey_patch() # Важнейшая строка для работы WebSockets (Socket.IO) на сервере
-
 from flask import Flask
 from flask_socketio import SocketIO, emit
-from flask_cors import CORS
 
 app = Flask(__name__)
-CORS(app)
-socketio = SocketIO(app, cors_allowed_origins="*", async_mode='eventlet')
+socketio = SocketIO(app, cors_allowed_origins="*")
 
-# Игра начинается с нулевого раунда (режим ожидания)
 game_state = {
     "round": 0,
     "track": None,
