@@ -37,4 +37,5 @@ def handle_admin_command(data):
     emit('state_update', game_state, broadcast=True)
 
 if __name__ == '__main__':
-    socketio.run(app, host='0.0.0.0', port=10000)
+    # Добавлен флаг allow_unsafe_werkzeug=True
+    socketio.run(app, host='0.0.0.0', port=10000, allow_unsafe_werkzeug=True)
