@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Family Standard OS — Галерея Карусель</title>
+    <title>Family Standard OS — Apple Photo Stack</title>
     <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
     <style>
         * {
@@ -17,11 +17,12 @@
             width: 100%;
             height: 100%;
             overflow: hidden;
-            background: #0f0704;
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: #080503;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
             color: #fceade;
         }
 
+        /* Canvas фон */
         #bgCanvas {
             position: absolute;
             top: 0;
@@ -43,27 +44,27 @@
             align-items: center;
         }
 
-        /* КРЕСТИК ВВЕРХУ СПРАВА ДЛЯ СБРОСА */
+        /* КРЕСТИК ЗАКРЫТИЯ В ВЕРХНЕМ УГЛУ (APPLE STYLE) */
         .top-close-btn {
             position: fixed;
-            top: 22px;
-            right: 22px;
+            top: 24px;
+            right: 24px;
             z-index: 100;
-            width: 48px;
-            height: 48px;
+            width: 44px;
+            height: 44px;
             border-radius: 50%;
-            background: rgba(30, 16, 10, 0.45);
-            border: 1px solid rgba(224, 169, 109, 0.3);
-            color: rgba(252, 234, 222, 0.7);
-            font-size: 1.3rem;
-            font-weight: 300;
+            background: rgba(40, 20, 12, 0.5);
+            border: 1px solid rgba(224, 169, 109, 0.25);
+            color: rgba(252, 234, 222, 0.75);
+            font-size: 1.2rem;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            backdrop-filter: blur(10px);
-            transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
             opacity: 0;
             pointer-events: none;
         }
@@ -74,84 +75,81 @@
         }
 
         .top-close-btn:hover {
-            background: rgba(255, 59, 48, 0.85);
+            background: rgba(255, 59, 48, 0.88);
             border-color: #ff3b30;
             color: #ffffff;
-            transform: scale3d(1.12, 1.12, 1);
-            box-shadow: 0 0 25px rgba(255, 59, 48, 0.7);
+            transform: scale3d(1.1, 1.1, 1);
+            box-shadow: 0 0 25px rgba(255, 59, 48, 0.6);
         }
 
-        .top-close-btn:active {
-            transform: scale3d(0.95, 0.95, 1);
-        }
-
-        /* СТАРТОВЫЙ ЭКРАН */
+        /* СТАРТОВЫЙ ЭКРАН С БРЕНДИНГОМ APPLE OS */
         .splash-screen {
             position: absolute;
-            z-index: 20;
+            z-index: 30;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             text-align: center;
-            padding: 45px 65px;
-            background: rgba(25, 13, 8, 0.85);
-            border: 1px solid rgba(224, 169, 109, 0.35);
-            border-radius: 28px;
-            backdrop-filter: blur(20px);
-            box-shadow: 0 0 50px rgba(140, 66, 39, 0.4);
-            transition: all 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+            padding: 50px 70px;
+            background: rgba(28, 14, 8, 0.82);
+            border: 1px solid rgba(224, 169, 109, 0.3);
+            border-radius: 32px;
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            box-shadow: 0 30px 70px rgba(0, 0, 0, 0.7), 0 0 40px rgba(140, 66, 39, 0.3);
+            transition: all 0.65s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .splash-screen.hidden {
             opacity: 0;
             pointer-events: none;
-            transform: scale3d(0.85, 0.85, 1);
+            transform: scale3d(0.88, 0.88, 1);
             visibility: hidden;
         }
 
         .brand-title {
-            font-size: 2.6rem;
-            font-weight: 900;
-            letter-spacing: 4px;
+            font-size: 2.7rem;
+            font-weight: 800;
+            letter-spacing: 5px;
             text-transform: uppercase;
-            background: linear-gradient(135deg, #ffffff 20%, #e0a96d 100%);
+            background: linear-gradient(135deg, #ffffff 30%, #e0a96d 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 30px rgba(224, 169, 109, 0.3);
+            text-shadow: 0 0 30px rgba(224, 169, 109, 0.25);
             margin-bottom: 6px;
         }
 
         .brand-subtitle {
-            font-size: 1.2rem;
+            font-size: 1.15rem;
             font-weight: 600;
-            letter-spacing: 8px;
+            letter-spacing: 9px;
             color: #d4a373;
             text-transform: uppercase;
-            margin-bottom: 35px;
+            margin-bottom: 38px;
         }
 
         .start-btn {
             padding: 20px 64px;
-            font-size: 2rem;
-            font-weight: 800;
+            font-size: 1.9rem;
+            font-weight: 700;
             color: #fff;
             background: linear-gradient(135deg, #e0a96d, #8c4227);
             border: none;
             border-radius: 60px;
             cursor: pointer;
-            box-shadow: 0 0 35px rgba(224, 169, 109, 0.5);
-            transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+            box-shadow: 0 10px 35px rgba(224, 169, 109, 0.45);
+            transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
             letter-spacing: 3px;
         }
 
         .start-btn:hover {
-            transform: scale3d(1.08, 1.08, 1);
-            box-shadow: 0 0 55px rgba(224, 169, 109, 0.8);
+            transform: scale3d(1.06, 1.06, 1);
+            box-shadow: 0 15px 45px rgba(224, 169, 109, 0.75);
             background: linear-gradient(135deg, #f4a261, #a04928);
         }
 
-        /* СЦЕНА КАРУСЕЛИ */
+        /* СЦЕНА 3D-СТОПКИ */
         .stage-frame {
             position: relative;
             width: 100vw;
@@ -173,115 +171,147 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            perspective: 1200px;
+            perspective: 1400px;
         }
 
-        /* СТИЛИ КАРТОЧЕК В КАРУСЕЛИ */
+        /* КАРТОЧКА: СТРОГО ОБЛЕГАЕТ ФОТОГРАФИЮ (fit-content) */
         .slide-card {
             position: absolute;
-            display: flex;
-            justify-content: center;
+            top: 50%;
+            left: 50%;
+            width: fit-content;
+            height: fit-content;
+            display: inline-flex;
             align-items: center;
-            width: 48vw;
-            max-width: 680px;
-            height: 72vh;
-            max-height: 620px;
-            border-radius: 20px;
+            justify-content: center;
+            border-radius: 22px;
             overflow: hidden;
+            background: rgba(18, 9, 5, 0.7);
+            border: 2px solid rgba(224, 169, 109, 0.6);
             will-change: transform, opacity, filter, box-shadow;
             backface-visibility: hidden;
             transform-style: preserve-3d;
-            transition: transform 0.85s cubic-bezier(0.22, 1, 0.36, 1),
-                        opacity 0.85s cubic-bezier(0.22, 1, 0.36, 1),
-                        filter 0.85s cubic-bezier(0.22, 1, 0.36, 1),
-                        box-shadow 0.85s cubic-bezier(0.22, 1, 0.36, 1);
+            
+            /* Физика плавного свайпа в стиле Apple */
+            transition: transform 0.85s cubic-bezier(0.16, 1, 0.3, 1),
+                        opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1),
+                        filter 0.85s cubic-bezier(0.16, 1, 0.3, 1),
+                        box-shadow 0.85s cubic-bezier(0.16, 1, 0.3, 1),
+                        border-color 0.85s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .slide-img {
-            width: 100%;
-            height: 100%;
+            display: block;
+            max-height: 74vh;
+            max-width: 50vw;
+            width: auto;
+            height: auto;
             object-fit: contain;
-            object-position: center;
-            border-radius: 16px;
+            border-radius: 20px;
             will-change: transform;
         }
 
-        /* ПОЗИЦИЯ 1: ЦЕНТРАЛЬНАЯ КАРТОЧКА В ФОКУСЕ */
-        .card-center {
-            transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
+        /* ================= 3D ПОЗИЦИИ APPLE STACK (СТОПКА) ================= */
+
+        /* 1. ЦЕНТРАЛЬНАЯ АКТИВНАЯ ФОТОГРАФИЯ */
+        .pos-center {
+            transform: translate3d(-50%, -50%, 0) scale3d(1, 1, 1) rotate(0deg);
             opacity: 1;
-            z-index: 10;
-            border: 3px solid rgba(224, 169, 109, 0.9);
+            z-index: 30;
+            border-color: rgba(224, 169, 109, 0.95);
             box-shadow: 
-                0 0 35px 8px rgba(224, 169, 109, 0.65),
-                0 0 80px 20px rgba(140, 66, 39, 0.5);
+                0 25px 60px -10px rgba(0, 0, 0, 0.9),
+                0 0 40px 8px rgba(224, 169, 109, 0.5);
             filter: brightness(1);
         }
 
-        .card-center .slide-img {
+        .pos-center .slide-img {
             animation: kenBurnsZoom 10.5s linear forwards;
         }
 
         @keyframes kenBurnsZoom {
             0% { transform: scale3d(1, 1, 1); }
-            100% { transform: scale3d(1.22, 1.22, 1); }
+            100% { transform: scale3d(1.18, 1.18, 1); }
         }
 
-        /* ПОЗИЦИЯ 2: ЛЕВАЯ КАРТОЧКА */
-        .card-left {
-            transform: translate3d(-52vw, 0, -100px) scale3d(0.72, 0.72, 1);
-            opacity: 0.45;
+        /* 2. ЛЕВАЯ СТОПКА (STACK) - НАЛОЖЕНИЕ ДРУГ НА ДРУГА ВЕЕРОМ */
+        
+        /* Верхний слой стопки (последний свайпнутый) */
+        .pos-stack-1 {
+            transform: translate3d(calc(-50% - 32vw), calc(-50% + 12px), -40px) scale3d(0.82, 0.82, 1) rotate(-4deg);
+            opacity: 0.8;
+            z-index: 20;
+            border-color: rgba(224, 169, 109, 0.4);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.7);
+            filter: brightness(0.65);
+        }
+
+        /* Средний слой стопки */
+        .pos-stack-2 {
+            transform: translate3d(calc(-50% - 35vw), calc(-50% + 24px), -80px) scale3d(0.74, 0.74, 1) rotate(-8deg);
+            opacity: 0.5;
+            z-index: 10;
+            border-color: rgba(224, 169, 109, 0.25);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
+            filter: brightness(0.45);
+        }
+
+        /* Нижний крайний слой стопки */
+        .pos-stack-3 {
+            transform: translate3d(calc(-50% - 38vw), calc(-50% + 36px), -120px) scale3d(0.66, 0.66, 1) rotate(-12deg);
+            opacity: 0.22;
             z-index: 5;
-            border: 2px solid rgba(224, 169, 109, 0.35);
-            box-shadow: 0 0 20px rgba(140, 66, 39, 0.3);
-            filter: brightness(0.55);
+            border-color: rgba(224, 169, 109, 0.15);
+            filter: brightness(0.25);
         }
 
-        /* ПОЗИЦИЯ 3: ПРАВАЯ КАРТОЧКА */
-        .card-right {
-            transform: translate3d(52vw, 0, -100px) scale3d(0.72, 0.72, 1);
-            opacity: 0.45;
-            z-index: 5;
-            border: 2px solid rgba(224, 169, 109, 0.35);
-            box-shadow: 0 0 20px rgba(140, 66, 39, 0.3);
-            filter: brightness(0.55);
-        }
-
-        /* СКРЫТЫЕ ПОЗИЦИИ ЗА ЭКРАНОМ ДЛЯ ВЪЕЗДА/ВЫЕЗДА */
-        .card-far-left {
-            transform: translate3d(-108vw, 0, -200px) scale3d(0.5, 0.5, 1);
+        /* Уходящие из стопки в небытие */
+        .pos-far-left {
+            transform: translate3d(calc(-50% - 50vw), calc(-50% + 50px), -200px) scale3d(0.5, 0.5, 1) rotate(-16deg);
             opacity: 0;
             z-index: 1;
-            filter: brightness(0.3);
+            filter: brightness(0.1);
         }
 
-        .card-far-right {
-            transform: translate3d(108vw, 0, -200px) scale3d(0.5, 0.5, 1);
+        /* 3. СПРАВА: ПОДГОТОВЛЕННОЕ ФОТО «ИЗ НИОТКУДА» */
+        .pos-right-1 {
+            transform: translate3d(calc(-50% + 38vw), -50%, -60px) scale3d(0.76, 0.76, 1) rotate(3deg);
+            opacity: 0.4;
+            z-index: 15;
+            border-color: rgba(224, 169, 109, 0.3);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            filter: brightness(0.5);
+        }
+
+        /* Рождение новой фотографии из глубины правого края */
+        .pos-far-right {
+            transform: translate3d(calc(-50% + 80vw), -50%, -160px) scale3d(0.45, 0.45, 1) rotate(10deg);
             opacity: 0;
             z-index: 1;
-            filter: brightness(0.3);
+            filter: brightness(0.1);
         }
 
-        /* ПУЛЬТ ВЕДУЩЕГО */
+        /* ПУЛЬТ ВЕДУЩЕГО В СТИЛЕ APPLE UI */
         .admin-panel {
             position: absolute;
             bottom: 25px;
-            z-index: 30;
+            z-index: 40;
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 10px;
-            background: rgba(25, 13, 8, 0.92);
-            border: 1px solid rgba(224, 169, 109, 0.4);
-            border-radius: 20px;
-            padding: 14px 24px;
-            backdrop-filter: blur(18px);
-            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.85);
+            background: rgba(25, 13, 8, 0.88);
+            border: 1px solid rgba(224, 169, 109, 0.35);
+            border-radius: 24px;
+            padding: 14px 26px;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
 
             opacity: 0;
             transform: translate3d(0, 40px, 0);
             pointer-events: none;
-            transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+            transition: all 0.45s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .admin-panel.visible {
@@ -301,7 +331,7 @@
         }
 
         .slide-counter {
-            font-size: 1.1rem;
+            font-size: 1.05rem;
             font-weight: 700;
             color: #e0a96d;
             letter-spacing: 1px;
@@ -320,16 +350,16 @@
             font-size: 0.95rem;
             font-weight: 600;
             border: none;
-            border-radius: 10px;
+            border-radius: 12px;
             cursor: pointer;
             background: rgba(255, 255, 255, 0.08);
             color: #fceade;
-            border: 1px solid rgba(224, 169, 109, 0.25);
-            transition: all 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+            border: 1px solid rgba(224, 169, 109, 0.22);
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .ctrl-btn:hover {
-            background: rgba(224, 169, 109, 0.2);
+            background: rgba(224, 169, 109, 0.22);
             border-color: #e0a96d;
             color: #e0a96d;
         }
@@ -337,7 +367,7 @@
         .ctrl-btn.active {
             background: linear-gradient(135deg, #e0a96d, #8c4227);
             color: #fff;
-            box-shadow: 0 0 15px rgba(224, 169, 109, 0.6);
+            box-shadow: 0 0 18px rgba(224, 169, 109, 0.55);
             border-color: transparent;
         }
 
@@ -401,8 +431,8 @@
             constructor() {
                 this.x = Math.random() * canvas.width;
                 this.y = Math.random() * canvas.height;
-                this.vx = (Math.random() - 0.5) * 60;
-                this.vy = (Math.random() - 0.5) * 60;
+                this.vx = (Math.random() - 0.5) * 50;
+                this.vy = (Math.random() - 0.5) * 50;
                 this.radius = Math.random() * 2.5 + 1;
                 this.color = Math.random() > 0.5 ? '#e0a96d' : '#8c4227';
             }
@@ -449,7 +479,7 @@
                         ctx.beginPath();
                         ctx.moveTo(particles[i].x, particles[i].y);
                         ctx.lineTo(particles[j].x, particles[j].y);
-                        ctx.strokeStyle = `rgba(224, 169, 109, ${1 - dist / maxDistance * 0.6})`;
+                        ctx.strokeStyle = `rgba(224, 169, 109, ${1 - dist / maxDistance * 0.5})`;
                         ctx.lineWidth = 0.6;
                         ctx.stroke();
                     }
@@ -459,7 +489,7 @@
         }
         requestAnimationFrame(animateCanvas);
 
-        // ПОДКЛЮЧЕНИЕ К СЕРВЕРУ И ДИНАМИЧЕСКАЯ КАРУСЕЛЬ
+        // ПОДКЛЮЧЕНИЕ К СЕРВЕРУ И APPLE STACK МЕХАНИКА
         const socket = io("https://pic-jj29.onrender.com", {
             transports: ['polling', 'websocket'],
             upgrade: true
@@ -474,6 +504,9 @@
         let isRandom = false;
         let autoPlayTimer = null;
 
+        // Хранение истории свайпов для реализации левой стопки (Stack)
+        let stackHistory = [];
+
         const splashScreen = document.getElementById('splashScreen');
         const startBtn = document.getElementById('startBtn');
         const topCloseBtn = document.getElementById('topCloseBtn');
@@ -487,7 +520,6 @@
         const autoBtn = document.getElementById('autoBtn');
         const endBtn = document.getElementById('endBtn');
 
-        // КЭШ ИЗОБРАЖЕНИЙ ДЛЯ ПРЕДЗАГРУЗКИ
         const persistentCache = {};
         function preloadImages() {
             for (let i = 1; i <= totalSlidesCount; i++) {
@@ -507,7 +539,7 @@
 
             updateUI();
             if (currentSlideIndex > 0) {
-                updateCarousel(currentSlideIndex);
+                updateStackView(currentSlideIndex);
             }
         });
 
@@ -523,18 +555,29 @@
             currentSlideIndex = data.current_slide;
             if (socket.id === data.admin_sid) isAdmin = true;
 
+            stackHistory = []; // Очищаем историю стопки
             updateUI();
-            updateCarousel(currentSlideIndex);
+            updateStackView(currentSlideIndex);
         });
 
         socket.on('slide_updated', (data) => {
+            const oldIdx = currentSlideIndex;
             currentSlideIndex = data.current_slide;
+
+            // Добавляем старый слайд в историю стопки слева
+            if (oldIdx > 0 && oldIdx !== currentSlideIndex) {
+                stackHistory.push(oldIdx);
+                if (stackHistory.length > 5) {
+                    stackHistory.shift(); // Храним не более 5 элементов
+                }
+            }
+
             updateUI();
-            updateCarousel(currentSlideIndex);
+            updateStackView(currentSlideIndex);
         });
 
-        // ЛОГИКА 3D-КАРУСЕЛИ
-        function updateCarousel(centerNum) {
+        // ОСНОВНАЯ ЛОГИКА 3D-СТОПКИ APPLE (STACK)
+        function updateStackView(centerNum) {
             if (centerNum < 1) {
                 imageWrapper.innerHTML = '';
                 return;
@@ -542,14 +585,20 @@
 
             const total = totalSlidesCount;
             const centerIdx = centerNum;
-            const leftIdx = centerIdx > 1 ? centerIdx - 1 : total;
-            const rightIdx = centerIdx < total ? centerIdx + 1 : 1;
+            const right1Idx = centerIdx < total ? centerIdx + 1 : 1;
 
-            const neededMap = {
-                [leftIdx]: 'card-left',
-                [centerIdx]: 'card-center',
-                [rightIdx]: 'card-right'
-            };
+            // Определяем до 3-х последних слайдов для левой стопки
+            const stack1 = stackHistory.length >= 1 ? stackHistory[stackHistory.length - 1] : null;
+            const stack2 = stackHistory.length >= 2 ? stackHistory[stackHistory.length - 2] : null;
+            const stack3 = stackHistory.length >= 3 ? stackHistory[stackHistory.length - 3] : null;
+
+            const neededMap = {};
+            if (stack3) neededMap[stack3] = 'pos-stack-3';
+            if (stack2) neededMap[stack2] = 'pos-stack-2';
+            if (stack1) neededMap[stack1] = 'pos-stack-1';
+
+            neededMap[centerIdx] = 'pos-center';
+            neededMap[right1Idx] = 'pos-right-1';
 
             const existingCards = {};
             imageWrapper.querySelectorAll('.slide-card').forEach(card => {
@@ -557,15 +606,15 @@
                 existingCards[num] = card;
             });
 
-            // 1. Плавно удаляем карточки, которые больше не нужны
+            // 1. Уводим в небытие уходящие слои стопки
             Object.keys(existingCards).forEach(numStr => {
                 const num = parseInt(numStr, 10);
                 if (!neededMap[num]) {
                     const card = existingCards[num];
-                    if (card.classList.contains('card-left') || card.classList.contains('card-center')) {
-                        card.className = 'slide-card card-far-left';
+                    if (card.className.includes('stack') || card.className.includes('center')) {
+                        card.className = 'slide-card pos-far-left';
                     } else {
-                        card.className = 'slide-card card-far-right';
+                        card.className = 'slide-card pos-far-right';
                     }
                     setTimeout(() => {
                         if (card && card.parentNode) card.remove();
@@ -573,8 +622,9 @@
                 }
             });
 
-            // 2. Обновляем или сдвигаем карточки Лево / Центр / Право
-            [leftIdx, centerIdx, rightIdx].forEach(num => {
+            // 2. Обновляем и выстраиваем нужные карточки
+            Object.keys(neededMap).forEach(numStr => {
+                const num = parseInt(numStr, 10);
                 const targetClass = neededMap[num];
                 let card = existingCards[num];
 
@@ -584,12 +634,12 @@
                     card = document.createElement('div');
                     card.dataset.slide = num;
 
-                    if (targetClass === 'card-right') {
-                        card.className = 'slide-card card-far-right';
-                    } else if (targetClass === 'card-left') {
-                        card.className = 'slide-card card-far-left';
+                    if (targetClass === 'pos-right-1') {
+                        card.className = 'slide-card pos-far-right';
+                    } else if (targetClass.includes('stack')) {
+                        card.className = 'slide-card pos-far-left';
                     } else {
-                        card.className = 'slide-card card-far-right';
+                        card.className = 'slide-card pos-far-right';
                     }
 
                     const img = document.createElement('img');
@@ -604,7 +654,7 @@
                     card.appendChild(img);
                     imageWrapper.appendChild(card);
 
-                    // Принудительный reflow для активации анимации входа
+                    // Reflow для включения CSS анимаций
                     void card.offsetWidth;
 
                     card.className = `slide-card ${targetClass}`;
@@ -684,6 +734,7 @@
             isAdmin = false;
             isAutoPlay = false;
             isRandom = false;
+            stackHistory = [];
             if (autoPlayTimer) clearInterval(autoPlayTimer);
             updateUI();
         });
