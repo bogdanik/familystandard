@@ -1,16 +1,17 @@
+import os
 import random
 from flask import Flask, render_template, request
 from flask_socketio import SocketIO, emit
 
-app = Flask(__name__)
+# template_folder='.' позволяет держать index.html прямо в корне проекта без подпапки templates
+app = Flask(__name__, template_folder='.', static_folder='.')
 app.config['SECRET_KEY'] = 'family_standard_chocolate_2026'
-# async_mode='threading' обеспечивает стабильную работу на Render без сторонних библиотек
-socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
+socketio = SocketIO(app, cors_allowed_origins="*")
 
-# Глобальное состояние сессии
+# Состояние сессии
 state = {
     'admin_sid': None,
-    'current_slide': 0,    # 0 = Заставка (СТАРТ), 1..20 = Фотографии
+    'current_slide': 0,    # 0 = Заставка (СТАРТ), 1..20 = Картинки
     'total_slides': 20,
     'auto_play': False,
     'is_random': False
@@ -22,10 +23,6 @@ def index():
 
 @socketio.on('connect')
 def handle_connect():
-    # Если шоу на 0 слайде, сбрасываем привязку админа для новых подключений
-    if state['current_slide'] == 0:
-        state['admin_sid'] = None
-
     is_admin = (request.sid == state['admin_sid'])
     emit('init_state', {
         'current_slide': state['current_slide'],
@@ -36,30 +33,23 @@ def handle_connect():
         'is_random': state['is_random']
     })
 
-@socketio.on('disconnect')
-def handle_disconnect():
-    if request.sid == state['admin_sid']:
-        state['admin_sid'] = None
-
 @socketio.on('start_session')
 def handle_start():
-    # Нажавший СТАРТ гарантированно получает роль Admin
-    state['admin_sid'] = request.sid
-    if state['current_slide'] == 0:
+    if state['admin_sid'] is None or state['current_slide'] == 0:
+        state['admin_sid'] = request.sid
         state['current_slide'] = 1
-
-    emit('session_started', {
-        'current_slide': state['current_slide'],
-        'admin_sid': state['admin_sid']
-    }, broadcast=True)
+        emit('session_started', {
+            'current_slide': state['current_slide'],
+            'admin_sid': state['admin_sid']
+        }, broadcast=True)
 
 @socketio.on('change_slide')
 def handle_change_slide(data):
-    # Разрешаем переключение ведущему
-    if state['admin_sid'] and request.sid != state['admin_sid']:
+    if request.sid != state['admin_sid']:
         return
 
     action = data.get('action')
+    
     if action == 'next':
         if state['is_random']:
             candidates = [i for i in range(1, state['total_slides'] + 1) if i != state['current_slide']]
@@ -75,6 +65,7 @@ def handle_change_slide(data):
         state['current_slide'] = action
 
     effect_index = (state['current_slide'] % 3)
+
     emit('slide_updated', {
         'current_slide': state['current_slide'],
         'effect_type': effect_index
@@ -82,21 +73,21 @@ def handle_change_slide(data):
 
 @socketio.on('toggle_autoplay')
 def handle_toggle_autoplay(data):
-    if state['admin_sid'] and request.sid != state['admin_sid']:
+    if request.sid != state['admin_sid']:
         return
     state['auto_play'] = data.get('auto_play', False)
     emit('autoplay_updated', {'auto_play': state['auto_play']}, broadcast=True)
 
 @socketio.on('toggle_random')
 def handle_toggle_random(data):
-    if state['admin_sid'] and request.sid != state['admin_sid']:
+    if request.sid != state['admin_sid']:
         return
     state['is_random'] = data.get('is_random', False)
     emit('random_updated', {'is_random': state['is_random']}, broadcast=True)
 
 @socketio.on('reset_session')
 def handle_reset():
-    if state['admin_sid'] and request.sid != state['admin_sid']:
+    if request.sid != state['admin_sid']:
         return
     state['admin_sid'] = None
     state['current_slide'] = 0
