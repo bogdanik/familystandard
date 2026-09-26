@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Интерактивное Шоу — Слайдшоу</title>
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+
+        body, html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #05050a;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #ffffff;
+        }
+
+        #bgCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .main-container {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .stage-frame {
+            position: relative;
+            width: 80vw;
+            max-width: 900px;
+            height: 60vh;
+            max-height: 600px;
+            border-radius: 16px;
+            border: 2px solid rgba(0, 229, 255, 0.4);
+            box-shadow: 0 0 35px rgba(0, 229, 255, 0.25), inset 0 0 20px rgba(0, 0, 0, 0.8);
+            background: rgba(10, 12, 24, 0.65);
+            backdrop-filter: blur(10px);
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.5s ease;
+        }
+
+        .image-wrapper {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .slide-img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            border-radius: 8px;
+            position: absolute;
+            will-change: transform, opacity;
+        }
+
+        .placeholder-text {
+            font-size: 1.5rem;
+            color: rgba(0, 229, 255, 0.6);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            text-shadow: 0 0 10px rgba(0, 229, 255, 0.5);
+            text-align: center;
+            padding: 20px;
+        }
+
+        .start-btn {
+            position: absolute;
+            z-index: 10;
+            padding: 18px 48px;
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #fff;
+            background: linear-gradient(135deg, #00e5ff, #7b2cbf);
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 0 25px rgba(0, 229, 255, 0.6);
+            transition: all 0.3s ease;
+            letter-spacing: 2px;
+        }
+
+        .start-btn:hover {
+            transform: scale(1.08);
+            box-shadow: 0 0 40px rgba(0, 229, 255, 0.9);
+        }
+
+        .start-btn.hidden {
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(0.5);
+        }
+
+        .admin-panel {
+            position: absolute;
+            bottom: 30px;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            background: rgba(15, 18, 35, 0.85);
+            border: 1px solid rgba(0, 229, 255, 0.3);
+            border-radius: 20px;
+            padding: 16px 28px;
+            backdrop-filter: blur(15px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+            opacity: 0;
+            transform: translateY(50px);
+            pointer-events: none;
+            transition: all 0.4s ease;
+        }
+
+        .admin-panel.visible {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        .panel-header {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 8px;
+        }
+
+        .slide-counter {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #00e5ff;
+            letter-spacing: 1px;
+        }
+
+        .reset-btn {
+            background: rgba(255, 59, 48, 0.2);
+            border: 1px solid #ff3b30;
+            color: #ff3b30;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.9rem;
+        }
+
+        .reset-btn:hover {
+            background: #ff3b30;
+            color: #fff;
+            box-shadow: 0 0 12px rgba(255, 59, 48, 0.6);
+        }
+
+        .controls-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .ctrl-btn {
+            padding: 10px 18px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.2s ease;
+        }
+
+        .ctrl-btn:hover {
+            background: rgba(0, 229, 255, 0.2);
+            border-color: #00e5ff;
+            color: #00e5ff;
+        }
+
+        .ctrl-btn.active {
+            background: #00e5ff;
+            color: #000;
+            box-shadow: 0 0 15px rgba(0, 229, 255, 0.6);
+        }
+
+        .end-btn {
+            background: linear-gradient(135deg, #ff3b30, #ff9500);
+            border: none;
+            color: #fff;
+            font-weight: bold;
+            display: none;
+        }
+
+        .end-btn.visible {
+            display: block;
+        }
+
+        /* Эффекты переходов */
+        .effect-a-out { animation: swipeLeftOut 0.7s forwards ease-in-out; }
+        .effect-a-in { animation: swipeLeftIn 0.7s forwards ease-in-out; }
+        @keyframes swipeLeftOut { 0% { transform: translateX(0) scale(1); opacity: 1; } 100% { transform: translateX(-100%) scale(0.7); opacity: 0; } }
+        @keyframes swipeLeftIn { 0% { transform: translateX(100%) scale(1.2); opacity: 0; } 100% { transform: translateX(0) scale(1); opacity: 1; } }
+
+        .effect-b-out { animation: zoomDissolveOut 0.7s forwards ease-in-out; }
+        .effect-b-in { animation: zoomDissolveIn 0.7s forwards ease-in-out; }
+        @keyframes zoomDissolveOut { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(1.4); opacity: 0; } }
+        @keyframes zoomDissolveIn { 0% { transform: scale(0.6); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+
+        .effect-c-out { animation: swipeUpTiltOut 0.7s forwards ease-in-out; }
+        .effect-c-in { animation: swipeUpTiltIn 0.7s forwards ease-in-out; }
+        @keyframes swipeUpTiltOut { 0% { transform: translateY(0) rotate(0deg); opacity: 1; } 100% { transform: translateY(-100%) rotate(-12deg); opacity: 0; } }
+        @keyframes swipeUpTiltIn { 0% { transform: translateY(100%) rotate(12deg); opacity: 0; } 100% { transform: translateY(0) rotate(0deg); opacity: 1; } }
+    </style>
+</head>
+<body>
+
+    <canvas id="bgCanvas"></canvas>
+
+    <div class="main-container">
+        <button id="startBtn" class="start-btn">СТАРТ</button>
+
+        <div id="stageFrame" class="stage-frame">
+            <div id="placeholderText" class="placeholder-text">Ожидание запуска шоу...</div>
+            <div id="imageWrapper" class="image-wrapper"></div>
+        </div>
+
+        <div id="adminPanel" class="admin-panel">
+            <div class="panel-header">
+                <span id="slideIndicator" class="slide-counter">ФОТО 1 / 20</span>
+                <button id="resetBtn" class="reset-btn" title="Тройной клик для сброса">✖</button>
+            </div>
+            <div class="controls-row">
+                <button id="prevBtn" class="ctrl-btn">◄ Назад</button>
+                <button id="nextBtn" class="ctrl-btn">Вперед ►</button>
+                <button id="randomBtn" class="ctrl-btn">🔀 Рандом</button>
+                <button id="autoBtn" class="ctrl-btn">Автопоказ (10 сек)</button>
+                <button id="endBtn" class="ctrl-btn end-btn">THE END</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Анимированный Canvas фон
+        const canvas = document.getElementById('bgCanvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        const particleCount = 65;
+        const maxDistance = 140;
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.vx = (Math.random() - 0.5) * 1.2;
+                this.vy = (Math.random() - 0.5) * 1.2;
+                this.radius = Math.random() * 2.5 + 1;
+                this.color = Math.random() > 0.5 ? '#00e5ff' : '#7b2cbf';
+            }
+
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+                if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+            }
+
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = this.color;
+                ctx.fill();
+                ctx.shadowBlur = 0;
+            }
+        }
+
+        for (let i = 0; i < particleCount; i++) particles.push(new Particle());
+
+        function animateCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < particles.length; i++) {
+                particles[i].update();
+                particles[i].draw();
+                for (let j = i + 1; j < particles.length; j++) {
+                    const dx = particles[i].x - particles[j].x;
+                    const dy = particles[i].y - particles[j].y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist < maxDistance) {
+                        ctx.beginPath();
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.strokeStyle = `rgba(0, 229, 255, ${1 - dist / maxDistance * 0.8})`;
+                        ctx.lineWidth = 0.6;
+                        ctx.stroke();
+                    }
+                }
+            }
+            requestAnimationFrame(animateCanvas);
+        }
+        animateCanvas();
+
+        // Сокеты и логика
+        const socket = io();
+        const R2_BASE_URL = "https://pub-372ba5f717cf4a8694558f47682d65d9.r2.dev/";
+
+        let isAdmin = false;
+        let currentSlideIndex = 0;
+        let totalSlidesCount = 20;
+        let isAutoPlay = false;
+        let isRandom = false;
+        let autoPlayTimer = null;
+
+        const startBtn = document.getElementById('startBtn');
+        const placeholderText = document.getElementById('placeholderText');
+        const imageWrapper = document.getElementById('imageWrapper');
+        const adminPanel = document.getElementById('adminPanel');
+        const slideIndicator = document.getElementById('slideIndicator');
+        const resetBtn = document.getElementById('resetBtn');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const randomBtn = document.getElementById('randomBtn');
+        const autoBtn = document.getElementById('autoBtn');
+        const endBtn = document.getElementById('endBtn');
+
+        function preloadImages() {
+            for (let i = 1; i <= totalSlidesCount; i++) {
+                const img = new Image();
+                img.src = `${R2_BASE_URL}pic${i}.jpg`;
+            }
+        }
+        preloadImages();
+
+        socket.on('init_state', (data) => {
+            currentSlideIndex = data.current_slide;
+            totalSlidesCount = data.total_slides;
+            isAdmin = data.is_admin;
+            isAutoPlay = data.auto_play;
+            isRandom = data.is_random;
+            updateUI();
+        });
+
+        startBtn.addEventListener('click', () => {
+            socket.emit('start_session');
+        });
+
+        socket.on('session_started', (data) => {
+            currentSlideIndex = data.current_slide;
+            if (socket.id === data.admin_sid) isAdmin = true;
+            updateUI();
+            renderSlide(currentSlideIndex, 0);
+        });
+
+        socket.on('slide_updated', (data) => {
+            currentSlideIndex = data.current_slide;
+            updateUI();
+            renderSlide(currentSlideIndex, data.effect_type);
+        });
+
+        function renderSlide(slideNum, effectType) {
+            if (slideNum < 1) return;
+            placeholderText.style.display = 'none';
+
+            const newImg = document.createElement('img');
+            newImg.src = `${R2_BASE_URL}pic${slideNum}.jpg`;
+            newImg.className = 'slide-img';
+
+            const effects = ['effect-a', 'effect-b', 'effect-c'];
+            const currentEffect = effects[effectType % 3];
+            const oldImg = imageWrapper.querySelector('.slide-img');
+
+            if (oldImg) {
+                oldImg.className = `slide-img ${currentEffect}-out`;
+                newImg.className = `slide-img ${currentEffect}-in`;
+                imageWrapper.appendChild(newImg);
+                setTimeout(() => {
+                    if (oldImg && oldImg.parentNode) oldImg.parentNode.removeChild(oldImg);
+                }, 650);
+            } else {
+                newImg.style.opacity = '1';
+                imageWrapper.appendChild(newImg);
+            }
+        }
+
+        function updateUI() {
+            if (currentSlideIndex > 0) {
+                startBtn.classList.add('hidden');
+                if (isAdmin) adminPanel.classList.add('visible');
+                slideIndicator.innerText = `ФОТО ${currentSlideIndex} / ${totalSlidesCount}`;
+            } else {
+                startBtn.classList.remove('hidden');
+                adminPanel.classList.remove('visible');
+                placeholderText.style.display = 'block';
+                imageWrapper.innerHTML = '';
+            }
+
+            if (currentSlideIndex === totalSlidesCount && !isRandom) {
+                endBtn.classList.add('visible');
+            } else {
+                endBtn.classList.remove('visible');
+            }
+
+            if (isAutoPlay) autoBtn.classList.add('active');
+            else autoBtn.classList.remove('active');
+
+            if (isRandom) randomBtn.classList.add('active');
+            else randomBtn.classList.remove('active');
+        }
+
+        prevBtn.addEventListener('click', () => {
+            if (isAdmin) socket.emit('change_slide', { action: 'prev' });
+        });
+
+        nextBtn.addEventListener('click', () => {
+            if (isAdmin) socket.emit('change_slide', { action: 'next' });
+        });
+
+        randomBtn.addEventListener('click', () => {
+            if (!isAdmin) return;
+            isRandom = !isRandom;
+            socket.emit('toggle_random', { is_random: isRandom });
+        });
+
+        socket.on('random_updated', (data) => {
+            isRandom = data.is_random;
+            updateUI();
+        });
+
+        autoBtn.addEventListener('click', () => {
+            if (!isAdmin) return;
+            isAutoPlay = !isAutoPlay;
+            socket.emit('toggle_autoplay', { auto_play: isAutoPlay });
+        });
+
+        socket.on('autoplay_updated', (data) => {
+            isAutoPlay = data.auto_play;
+            updateUI();
+
+            if (autoPlayTimer) clearInterval(autoPlayTimer);
+
+            if (isAutoPlay && isAdmin) {
+                autoPlayTimer = setInterval(() => {
+                    socket.emit('change_slide', { action: 'next' });
+                }, 10000);
+            }
+        });
+
+        let resetClickCount = 0;
+        let resetTimer = null;
+
+        resetBtn.addEventListener('click', () => {
+            if (!isAdmin) return;
+            resetClickCount++;
+            if (resetClickCount === 1) resetBtn.innerText = '1/3';
+            else if (resetClickCount === 2) resetBtn.innerText = '2/3';
+            else if (resetClickCount >= 3) {
+                socket.emit('reset_session');
+                resetClickCount = 0;
+                resetBtn.innerText = '✖';
+                return;
+            }
+
+            clearTimeout(resetTimer);
+            resetTimer = setTimeout(() => {
+                resetClickCount = 0;
+                resetBtn.innerText = '✖';
+            }, 3000);
+        });
+
+        endBtn.addEventListener('click', () => {
+            if (isAdmin) socket.emit('reset_session');
+        });
+
+        socket.on('session_reset', () => {
+            currentSlideIndex = 0;
+            isAdmin = false;
+            isAutoPlay = false;
+            isRandom = false;
+            if (autoPlayTimer) clearInterval(autoPlayTimer);
+            updateUI();
+        });
+    </script>
+</body>
+</html>
