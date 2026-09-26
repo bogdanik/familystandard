@@ -3,15 +3,14 @@ import random
 from flask import Flask, render_template, request
 from flask_socketio import SocketIO, emit
 
-# template_folder='.' позволяет держать index.html прямо в корне проекта
 app = Flask(__name__, template_folder='.', static_folder='.')
-app.config['SECRET_KEY'] = 'family_standard_carousel_2026'
+app.config['SECRET_KEY'] = 'family_standard_apple_stack_2026'
 socketio = SocketIO(app, cors_allowed_origins="*")
 
 # Глобальное состояние сессии
 state = {
     'admin_sid': None,
-    'current_slide': 0,    # 0 = Заставка (СТАРТ), 1..20 = Карусель
+    'current_slide': 0,    # 0 = Заставка (СТАРТ), 1..20 = Стопка Слайд-шоу
     'total_slides': 20,
     'auto_play': False,
     'is_random': False
