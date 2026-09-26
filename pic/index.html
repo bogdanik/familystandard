@@ -44,7 +44,7 @@
             align-items: center;
         }
 
-        /* КРЕСТИК ЗАКРЫТИЯ В ВЕРХНЕМ УГЛУ (APPLE STYLE) */
+        /* КРЕСТИК ЗАКРЫТИЯ В ВЕРХНЕМ УГЛУ */
         .top-close-btn {
             position: fixed;
             top: 24px;
@@ -82,7 +82,7 @@
             box-shadow: 0 0 25px rgba(255, 59, 48, 0.6);
         }
 
-        /* СТАРТОВЫЙ ЭКРАН С БРЕНДИНГОМ APPLE OS */
+        /* СТАРТОВЫЙ ЭКРАН */
         .splash-screen {
             position: absolute;
             z-index: 30;
@@ -149,7 +149,7 @@
             background: linear-gradient(135deg, #f4a261, #a04928);
         }
 
-        /* СЦЕНА 3D-СТОПКИ */
+        /* СЦЕНА КАРУСЕЛИ */
         .stage-frame {
             position: relative;
             width: 100vw;
@@ -174,7 +174,7 @@
             perspective: 1400px;
         }
 
-        /* КАРТОЧКА: СТРОГО ОБЛЕГАЕТ ФОТОГРАФИЮ (fit-content) */
+        /* КАРТОЧКА: ПЛОТНО ОБЛЕГАЕТ ФОТОГРАФИЮ */
         .slide-card {
             position: absolute;
             top: 50%;
@@ -187,12 +187,11 @@
             border-radius: 22px;
             overflow: hidden;
             background: rgba(18, 9, 5, 0.7);
-            border: 2px solid rgba(224, 169, 109, 0.6);
+            border: 3px solid rgba(224, 169, 109, 0.6);
             will-change: transform, opacity, filter, box-shadow;
             backface-visibility: hidden;
             transform-style: preserve-3d;
             
-            /* Физика плавного свайпа в стиле Apple */
             transition: transform 0.85s cubic-bezier(0.16, 1, 0.3, 1),
                         opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1),
                         filter 0.85s cubic-bezier(0.16, 1, 0.3, 1),
@@ -202,70 +201,69 @@
 
         .slide-img {
             display: block;
-            max-height: 74vh;
-            max-width: 50vw;
+            max-height: 72vh;
+            max-width: 48vw;
             width: auto;
             height: auto;
             object-fit: contain;
-            border-radius: 20px;
-            will-change: transform;
+            border-radius: 19px;
         }
 
-        /* ================= 3D ПОЗИЦИИ APPLE STACK (СТОПКА) ================= */
+        /* ================= 3D-ПОЗИЦИИ КАРУСЕЛИ ================= */
 
-        /* 1. ЦЕНТРАЛЬНАЯ АКТИВНАЯ ФОТОГРАФИЯ */
+        /* 1. ЦЕНТРАЛЬНАЯ КАРТОЧКА: УВЕЛИЧИВАЕТСЯ ВСЯ РАМКА ЦЕЛИКОМ ДО 150% ЗА 10 СЕКУНД */
         .pos-center {
-            transform: translate3d(-50%, -50%, 0) scale3d(1, 1, 1) rotate(0deg);
             opacity: 1;
             z-index: 30;
             border-color: rgba(224, 169, 109, 0.95);
             box-shadow: 
                 0 25px 60px -10px rgba(0, 0, 0, 0.9),
-                0 0 40px 8px rgba(224, 169, 109, 0.5);
+                0 0 45px 10px rgba(224, 169, 109, 0.55);
             filter: brightness(1);
+            animation: frame150Zoom 10.5s linear forwards;
         }
 
-        .pos-center .slide-img {
-            animation: kenBurnsZoom 10.5s linear forwards;
+        @keyframes frame150Zoom {
+            0% {
+                transform: translate3d(-50%, -50%, 0) scale3d(1, 1, 1) rotate(0deg);
+            }
+            100% {
+                transform: translate3d(-50%, -50%, 0) scale3d(1.5, 1.5, 1) rotate(0deg);
+            }
         }
 
-        @keyframes kenBurnsZoom {
-            0% { transform: scale3d(1, 1, 1); }
-            100% { transform: scale3d(1.18, 1.18, 1); }
-        }
-
-        /* 2. ЛЕВАЯ СТОПКА (STACK) - НАЛОЖЕНИЕ ДРУГ НА ДРУГА ВЕЕРОМ */
+        /* 2. ЛЕВАЯ СТОПКА (STACK): ПРОЗРАЧНОСТЬ 50% -> 35% -> 20% */
         
-        /* Верхний слой стопки (последний свайпнутый) */
+        /* Первое ушедшее фото влево */
         .pos-stack-1 {
-            transform: translate3d(calc(-50% - 32vw), calc(-50% + 12px), -40px) scale3d(0.82, 0.82, 1) rotate(-4deg);
-            opacity: 0.8;
+            transform: translate3d(calc(-50% - 32vw), calc(-50% + 12px), -40px) scale3d(0.8, 0.8, 1) rotate(-4deg);
+            opacity: 0.5; /* 50% прозрачности */
             z-index: 20;
             border-color: rgba(224, 169, 109, 0.4);
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.7);
             filter: brightness(0.65);
         }
 
-        /* Средний слой стопки */
+        /* Второе фото в стопке */
         .pos-stack-2 {
-            transform: translate3d(calc(-50% - 35vw), calc(-50% + 24px), -80px) scale3d(0.74, 0.74, 1) rotate(-8deg);
-            opacity: 0.5;
-            z-index: 10;
+            transform: translate3d(calc(-50% - 35vw), calc(-50% + 24px), -80px) scale3d(0.72, 0.72, 1) rotate(-8deg);
+            opacity: 0.35; /* 35% прозрачности */
+            z-index: 15;
             border-color: rgba(224, 169, 109, 0.25);
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
             filter: brightness(0.45);
         }
 
-        /* Нижний крайний слой стопки */
+        /* Третье крайнее фото в стопке */
         .pos-stack-3 {
-            transform: translate3d(calc(-50% - 38vw), calc(-50% + 36px), -120px) scale3d(0.66, 0.66, 1) rotate(-12deg);
-            opacity: 0.22;
-            z-index: 5;
+            transform: translate3d(calc(-50% - 38vw), calc(-50% + 36px), -120px) scale3d(0.64, 0.64, 1) rotate(-12deg);
+            opacity: 0.20; /* 20% прозрачности */
+            z-index: 10;
             border-color: rgba(224, 169, 109, 0.15);
             filter: brightness(0.25);
         }
 
-        /* Уходящие из стопки в небытие */
+        /* Исчезающие за пределами стопки */
         .pos-far-left {
             transform: translate3d(calc(-50% - 50vw), calc(-50% + 50px), -200px) scale3d(0.5, 0.5, 1) rotate(-16deg);
             opacity: 0;
@@ -273,17 +271,24 @@
             filter: brightness(0.1);
         }
 
-        /* 3. СПРАВА: ПОДГОТОВЛЕННОЕ ФОТО «ИЗ НИОТКУДА» */
+        /* 3. СПРАВА: СЛЕДУЮЩИЕ КАРТОЧКИ (50% И 30% ПРОЗРАЧНОСТИ) */
         .pos-right-1 {
-            transform: translate3d(calc(-50% + 38vw), -50%, -60px) scale3d(0.76, 0.76, 1) rotate(3deg);
-            opacity: 0.4;
-            z-index: 15;
-            border-color: rgba(224, 169, 109, 0.3);
+            transform: translate3d(calc(-50% + 34vw), -50%, -50px) scale3d(0.78, 0.78, 1) rotate(3deg);
+            opacity: 0.5; /* 50% прозрачности */
+            z-index: 22;
+            border-color: rgba(224, 169, 109, 0.35);
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            filter: brightness(0.5);
+            filter: brightness(0.65);
         }
 
-        /* Рождение новой фотографии из глубины правого края */
+        .pos-right-2 {
+            transform: translate3d(calc(-50% + 40vw), -50%, -90px) scale3d(0.70, 0.70, 1) rotate(6deg);
+            opacity: 0.3; /* 30% прозрачности */
+            z-index: 18;
+            border-color: rgba(224, 169, 109, 0.2);
+            filter: brightness(0.45);
+        }
+
         .pos-far-right {
             transform: translate3d(calc(-50% + 80vw), -50%, -160px) scale3d(0.45, 0.45, 1) rotate(10deg);
             opacity: 0;
@@ -291,7 +296,7 @@
             filter: brightness(0.1);
         }
 
-        /* ПУЛЬТ ВЕДУЩЕГО В СТИЛЕ APPLE UI */
+        /* ПУЛЬТ ВЕДУЩЕГО */
         .admin-panel {
             position: absolute;
             bottom: 25px;
@@ -323,9 +328,8 @@
         .panel-header {
             width: 100%;
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             align-items: center;
-            gap: 20px;
             border-bottom: 1px solid rgba(224, 169, 109, 0.15);
             padding-bottom: 6px;
         }
@@ -340,13 +344,12 @@
         .controls-row {
             display: flex;
             align-items: center;
-            gap: 10px;
-            flex-wrap: wrap;
+            gap: 12px;
             justify-content: center;
         }
 
         .ctrl-btn {
-            padding: 10px 18px;
+            padding: 10px 20px;
             font-size: 0.95rem;
             font-weight: 600;
             border: none;
@@ -369,13 +372,6 @@
             color: #fff;
             box-shadow: 0 0 18px rgba(224, 169, 109, 0.55);
             border-color: transparent;
-        }
-
-        .end-btn {
-            background: linear-gradient(135deg, #ff3b30, #d32f2f);
-            border: none;
-            color: #fff;
-            font-weight: bold;
         }
     </style>
 </head>
@@ -404,9 +400,7 @@
             <div class="controls-row">
                 <button id="prevBtn" class="ctrl-btn">◄ Назад</button>
                 <button id="nextBtn" class="ctrl-btn">Вперед ►</button>
-                <button id="randomBtn" class="ctrl-btn">🔀 Рандом</button>
                 <button id="autoBtn" class="ctrl-btn">Автопоказ (10 сек)</button>
-                <button id="endBtn" class="ctrl-btn end-btn">THE END</button>
             </div>
         </div>
 
@@ -501,10 +495,8 @@
         let currentSlideIndex = 0;
         let totalSlidesCount = 20;
         let isAutoPlay = false;
-        let isRandom = false;
         let autoPlayTimer = null;
 
-        // Хранение истории свайпов для реализации левой стопки (Stack)
         let stackHistory = [];
 
         const splashScreen = document.getElementById('splashScreen');
@@ -516,9 +508,7 @@
         const slideIndicator = document.getElementById('slideIndicator');
         const prevBtn = document.getElementById('prevBtn');
         const nextBtn = document.getElementById('nextBtn');
-        const randomBtn = document.getElementById('randomBtn');
         const autoBtn = document.getElementById('autoBtn');
-        const endBtn = document.getElementById('endBtn');
 
         const persistentCache = {};
         function preloadImages() {
@@ -535,7 +525,6 @@
             totalSlidesCount = data.total_slides;
             isAdmin = data.is_admin;
             isAutoPlay = data.auto_play;
-            isRandom = data.is_random;
 
             updateUI();
             if (currentSlideIndex > 0) {
@@ -555,7 +544,7 @@
             currentSlideIndex = data.current_slide;
             if (socket.id === data.admin_sid) isAdmin = true;
 
-            stackHistory = []; // Очищаем историю стопки
+            stackHistory = [];
             updateUI();
             updateStackView(currentSlideIndex);
         });
@@ -564,11 +553,10 @@
             const oldIdx = currentSlideIndex;
             currentSlideIndex = data.current_slide;
 
-            // Добавляем старый слайд в историю стопки слева
             if (oldIdx > 0 && oldIdx !== currentSlideIndex) {
                 stackHistory.push(oldIdx);
                 if (stackHistory.length > 5) {
-                    stackHistory.shift(); // Храним не более 5 элементов
+                    stackHistory.shift();
                 }
             }
 
@@ -576,7 +564,7 @@
             updateStackView(currentSlideIndex);
         });
 
-        // ОСНОВНАЯ ЛОГИКА 3D-СТОПКИ APPLE (STACK)
+        // 3D APPLE STACK МЕХАНИКА
         function updateStackView(centerNum) {
             if (centerNum < 1) {
                 imageWrapper.innerHTML = '';
@@ -586,8 +574,8 @@
             const total = totalSlidesCount;
             const centerIdx = centerNum;
             const right1Idx = centerIdx < total ? centerIdx + 1 : 1;
+            const right2Idx = right1Idx < total ? right1Idx + 1 : 1;
 
-            // Определяем до 3-х последних слайдов для левой стопки
             const stack1 = stackHistory.length >= 1 ? stackHistory[stackHistory.length - 1] : null;
             const stack2 = stackHistory.length >= 2 ? stackHistory[stackHistory.length - 2] : null;
             const stack3 = stackHistory.length >= 3 ? stackHistory[stackHistory.length - 3] : null;
@@ -599,6 +587,7 @@
 
             neededMap[centerIdx] = 'pos-center';
             neededMap[right1Idx] = 'pos-right-1';
+            neededMap[right2Idx] = 'pos-right-2';
 
             const existingCards = {};
             imageWrapper.querySelectorAll('.slide-card').forEach(card => {
@@ -606,7 +595,7 @@
                 existingCards[num] = card;
             });
 
-            // 1. Уводим в небытие уходящие слои стопки
+            // 1. Убираем устаревшие карточки
             Object.keys(existingCards).forEach(numStr => {
                 const num = parseInt(numStr, 10);
                 if (!neededMap[num]) {
@@ -622,7 +611,7 @@
                 }
             });
 
-            // 2. Обновляем и выстраиваем нужные карточки
+            // 2. Выстраиваем слои стопки
             Object.keys(neededMap).forEach(numStr => {
                 const num = parseInt(numStr, 10);
                 const targetClass = neededMap[num];
@@ -634,7 +623,7 @@
                     card = document.createElement('div');
                     card.dataset.slide = num;
 
-                    if (targetClass === 'pos-right-1') {
+                    if (targetClass.includes('right')) {
                         card.className = 'slide-card pos-far-right';
                     } else if (targetClass.includes('stack')) {
                         card.className = 'slide-card pos-far-left';
@@ -654,7 +643,6 @@
                     card.appendChild(img);
                     imageWrapper.appendChild(card);
 
-                    // Reflow для включения CSS анимаций
                     void card.offsetWidth;
 
                     card.className = `slide-card ${targetClass}`;
@@ -682,9 +670,6 @@
 
             if (isAutoPlay) autoBtn.classList.add('active');
             else autoBtn.classList.remove('active');
-
-            if (isRandom) randomBtn.classList.add('active');
-            else randomBtn.classList.remove('active');
         }
 
         prevBtn.addEventListener('click', () => {
@@ -693,17 +678,6 @@
 
         nextBtn.addEventListener('click', () => {
             if (isAdmin) socket.emit('change_slide', { action: 'next' });
-        });
-
-        randomBtn.addEventListener('click', () => {
-            if (!isAdmin) return;
-            isRandom = !isRandom;
-            socket.emit('toggle_random', { is_random: isRandom });
-        });
-
-        socket.on('random_updated', (data) => {
-            isRandom = data.is_random;
-            updateUI();
         });
 
         autoBtn.addEventListener('click', () => {
@@ -725,15 +699,10 @@
             }
         });
 
-        endBtn.addEventListener('click', () => {
-            if (isAdmin) socket.emit('reset_session');
-        });
-
         socket.on('session_reset', () => {
             currentSlideIndex = 0;
             isAdmin = false;
             isAutoPlay = false;
-            isRandom = false;
             stackHistory = [];
             if (autoPlayTimer) clearInterval(autoPlayTimer);
             updateUI();
