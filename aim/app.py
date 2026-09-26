@@ -1,112 +1,80 @@
-import os
-import random
-from flask import Flask, render_template, request
+from flask import Flask, request
 from flask_socketio import SocketIO, emit
 
-app = Flask(__name__, template_folder='.', static_folder='.')
-app.config['SECRET_KEY'] = 'family_standard_chocolate_2026'
+app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins="*")
 
-state = {
-    'admin_sid': None,
-    'current_slide': 0,
-    'total_slides': 20,
-    'auto_play': False,
-    'is_random': False
-}
+# Функция создания чистого состояния
+def get_initial_state():
+    return {
+        "round": 0,              # 0 = ожидание нажатия "СТАРТ"
+        "track": None,          # 'aim' или 'm'
+        "playing": False,        # Воспроизводится ли трек
+        "trigger_animation": False,
+        "admin_sid": None        # Socket ID первого нажавшего
+    }
 
-@app.route('/')
-def index():
-    return render_template('index.html')
+game_state = get_initial_state()
 
 @socketio.on('connect')
 def handle_connect():
-    is_admin = (request.sid == state['admin_sid'])
-    emit('init_state', {
-        'current_slide': state['current_slide'],
-        'total_slides': state['total_slides'],
-        'is_admin': is_admin,
-        'has_admin': state['admin_sid'] is not None,
-        'auto_play': state['auto_play'],
-        'is_random': state['is_random']
-    })
+    emit('state_update', game_state)
 
-@socketio.on('disconnect')
-def handle_disconnect():
-    if request.sid == state['admin_sid']:
-        state['admin_sid'] = None
-        emit('admin_status_changed', {'has_admin': False}, broadcast=True)
+@socketio.on('request_start')
+def handle_request_start():
+    global game_state
+    
+    # Если игра не начата или админ еще не назначен
+    if game_state["round"] == 0 or game_state["admin_sid"] is None:
+        game_state["admin_sid"] = request.sid
+        game_state["round"] = 1
+        game_state["playing"] = False
+        game_state["track"] = None
+        game_state["trigger_animation"] = True
+        
+        # Назначаем кликнувшего АДМИНОМ
+        emit('role_assigned', {'is_admin': True}, room=request.sid)
+    else:
+        # Все остальные становятся ЗРИТЕЛЯМИ
+        emit('role_assigned', {'is_admin': False}, room=request.sid)
 
-@socketio.on('start_session')
-def handle_start():
-    if state['admin_sid'] is None or state['current_slide'] == 0:
-        state['admin_sid'] = request.sid
-        state['current_slide'] = 1
-        emit('session_started', {
-            'current_slide': state['current_slide'],
-            'admin_sid': state['admin_sid']
-        }, broadcast=True)
+    # Рассылаем обновленное состояние всем
+    emit('state_update', game_state, broadcast=True)
 
-@socketio.on('change_slide')
-def handle_change_slide(data):
-    if request.sid != state['admin_sid']:
+@socketio.on('admin_command')
+def handle_admin_command(data):
+    global game_state
+    
+    # Игнорируем команды не от админа
+    if request.sid != game_state["admin_sid"]:
         return
 
     action = data.get('action')
-    
-    if action == 'next':
-        if state['is_random']:
-            candidates = [i for i in range(1, state['total_slides'] + 1) if i != state['current_slide']]
-            if candidates:
-                state['current_slide'] = random.choice(candidates)
-        else:
-            if state['current_slide'] < state['total_slides']:
-                state['current_slide'] += 1
-            else:
-                state['current_slide'] = 1
 
-    elif action == 'prev':
-        if state['is_random']:
-            candidates = [i for i in range(1, state['total_slides'] + 1) if i != state['current_slide']]
-            if candidates:
-                state['current_slide'] = random.choice(candidates)
-        else:
-            if state['current_slide'] > 1:
-                state['current_slide'] -= 1
-            else:
-                state['current_slide'] = state['total_slides']
+    if action == 'next_round':
+        if game_state['round'] < 12:
+            game_state['round'] += 1
+            game_state['playing'] = False
+            game_state['track'] = None
+            game_state['trigger_animation'] = True
+    elif action == 'end_game':
+        # Завершение сессии и сброс для всех
+        game_state = get_initial_state()
+    elif action == 'play':
+        game_state['track'] = data.get('track')
+        game_state['playing'] = True
+        game_state['trigger_animation'] = False
+    elif action == 'pause':
+        game_state['playing'] = False
+        game_state['trigger_animation'] = False
 
-    elif isinstance(action, int) and 1 <= action <= state['total_slides']:
-        state['current_slide'] = action
+    emit('state_update', game_state, broadcast=True)
 
-    effect_index = (state['current_slide'] % 3)
-
-    emit('slide_updated', {
-        'current_slide': state['current_slide'],
-        'effect_type': effect_index
-    }, broadcast=True)
-
-@socketio.on('toggle_autoplay')
-def handle_toggle_autoplay(data):
-    if request.sid != state['admin_sid']:
-        return
-    state['auto_play'] = data.get('auto_play', False)
-    emit('autoplay_updated', {'auto_play': state['auto_play']}, broadcast=True)
-
-@socketio.on('toggle_random')
-def handle_toggle_random(data):
-    if request.sid != state['admin_sid']:
-        return
-    state['is_random'] = data.get('is_random', False)
-    emit('random_updated', {'is_random': state['is_random']}, broadcast=True)
-
-@socketio.on('reset_session')
-def handle_reset():
-    state['admin_sid'] = None
-    state['current_slide'] = 0
-    state['auto_play'] = False
-    state['is_random'] = False
-    emit('session_reset', {}, broadcast=True)
+@socketio.on('disconnect')
+def handle_disconnect():
+    global game_state
+    if request.sid == game_state["admin_sid"]:
+        game_state["admin_sid"] = None
 
 if __name__ == '__main__':
     socketio.run(app, host='0.0.0.0', port=10000, allow_unsafe_werkzeug=True)
