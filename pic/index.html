@@ -22,7 +22,7 @@
             color: #fceade;
         }
 
-        /* Canvas фон с какао-частицами */
+        /* Canvas фон */
         #bgCanvas {
             position: absolute;
             top: 0;
@@ -30,6 +30,7 @@
             width: 100%;
             height: 100%;
             z-index: 1;
+            will-change: transform;
         }
 
         .main-container {
@@ -41,6 +42,48 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
+        }
+
+        /* ================= ПОЛУПРОЗРАЧНАЯ КНОПКА ЗАКРЫТИЯ ВВЕРХУ СПРАВА ================= */
+        .top-close-btn {
+            position: fixed;
+            top: 22px;
+            right: 22px;
+            z-index: 100;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: rgba(30, 16, 10, 0.45);
+            border: 1px solid rgba(224, 169, 109, 0.3);
+            color: rgba(252, 234, 222, 0.7);
+            font-size: 1.3rem;
+            font-weight: 300;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .top-close-btn.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .top-close-btn:hover {
+            background: rgba(255, 59, 48, 0.85);
+            border-color: #ff3b30;
+            color: #ffffff;
+            transform: scale(1.12);
+            box-shadow: 0 0 25px rgba(255, 59, 48, 0.7);
+        }
+
+        .top-close-btn:active {
+            transform: scale(0.95);
         }
 
         /* ================= СТАРТОВЫЙ ЭКРАН ================= */
@@ -58,13 +101,13 @@
             border-radius: 28px;
             backdrop-filter: blur(20px);
             box-shadow: 0 0 50px rgba(140, 66, 39, 0.4);
-            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: all 0.6s cubic-bezier(0.22, 1, 0.36, 1);
         }
 
         .splash-screen.hidden {
             opacity: 0;
             pointer-events: none;
-            transform: scale(0.85);
+            transform: scale3d(0.85, 0.85, 1);
             visibility: hidden;
         }
 
@@ -99,17 +142,17 @@
             border-radius: 60px;
             cursor: pointer;
             box-shadow: 0 0 35px rgba(224, 169, 109, 0.5);
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
             letter-spacing: 3px;
         }
 
         .start-btn:hover {
-            transform: scale(1.08);
+            transform: scale3d(1.08, 1.08, 1);
             box-shadow: 0 0 55px rgba(224, 169, 109, 0.8);
             background: linear-gradient(135deg, #f4a261, #a04928);
         }
 
-        /* ================= ПРОЗРАЧНАЯ СЦЕНА БЕЗ ПОДЛОЖКИ ================= */
+        /* ================= ПРОЗРАЧНАЯ СЦЕНА ================= */
         .stage-frame {
             position: relative;
             width: 100vw;
@@ -119,9 +162,7 @@
             align-items: center;
             overflow: hidden;
             pointer-events: none;
-            background: transparent; /* Без фона */
-            border: none;             /* Без внешней коробки */
-            box-shadow: none;
+            background: transparent;
         }
 
         .image-wrapper {
@@ -133,9 +174,10 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            perspective: 1200px;
         }
 
-        /* САМА ФОТОГРАФИЯ В СВЕТЯЩЕЙСЯ РАМКЕ (СВЕЧЕНИЕ СТРОГО НАРУЖУ) */
+        /* 120 FPS УСКОРЕНИЕ ДЛЯ КАРТИНОК */
         .slide-img {
             max-width: 88vw;
             max-height: 80vh;
@@ -145,11 +187,10 @@
             border-radius: 16px;
             position: absolute;
             will-change: transform, opacity;
+            backface-visibility: hidden;
+            transform-style: preserve-3d;
             
-            /* Рамка волнового светящегося контура */
             border: 3px solid rgba(224, 169, 109, 0.85);
-            
-            /* Свечение СТРОГО НАРУЖУ (без inset) */
             box-shadow: 
                 0 0 25px 5px rgba(224, 169, 109, 0.6),
                 0 0 65px 15px rgba(140, 66, 39, 0.45);
@@ -172,14 +213,14 @@
             box-shadow: 0 10px 35px rgba(0, 0, 0, 0.85);
 
             opacity: 0;
-            transform: translateY(40px);
+            transform: translate3d(0, 40px, 0);
             pointer-events: none;
-            transition: all 0.4s ease;
+            transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
         }
 
         .admin-panel.visible {
             opacity: 1;
-            transform: translateY(0);
+            transform: translate3d(0, 0, 0);
             pointer-events: auto;
         }
 
@@ -200,28 +241,6 @@
             letter-spacing: 1px;
         }
 
-        .reset-btn {
-            background: rgba(255, 59, 48, 0.2);
-            border: 1px solid #ff3b30;
-            color: #ff3b30;
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            font-size: 0.9rem;
-        }
-
-        .reset-btn:hover {
-            background: #ff3b30;
-            color: #fff;
-            box-shadow: 0 0 12px rgba(255, 59, 48, 0.6);
-        }
-
         .controls-row {
             display: flex;
             align-items: center;
@@ -240,7 +259,7 @@
             background: rgba(255, 255, 255, 0.08);
             color: #fceade;
             border: 1px solid rgba(224, 169, 109, 0.25);
-            transition: all 0.2s ease;
+            transition: all 0.2s cubic-bezier(0.22, 1, 0.36, 1);
         }
 
         .ctrl-btn:hover {
@@ -261,52 +280,43 @@
             border: none;
             color: #fff;
             font-weight: bold;
-            display: none;
         }
 
-        .end-btn.visible {
-            display: block;
-        }
-
-        /* ================= ЭФФЕКТЫ ПЕРЕХОДОВ КАРТИНОК С РАМКАМИ ================= */
-        
-        /* Эффект A: ПРИЛЕТ ИЗ УГЛА C ПОВОРОТОМ */
-        .effect-a-out { animation: cornerFlyOut 0.75s forwards cubic-bezier(0.4, 0, 0.2, 1); }
-        .effect-a-in  { animation: cornerFlyIn 0.75s forwards cubic-bezier(0.16, 1, 0.3, 1); }
+        /* ================= УПРАВЛЯЕМЫЕ 120 FPS ЭФФЕКТЫ ================= */
+        .effect-a-out { animation: cornerFlyOut 0.75s forwards cubic-bezier(0.22, 1, 0.36, 1); }
+        .effect-a-in  { animation: cornerFlyIn 0.75s forwards cubic-bezier(0.22, 1, 0.36, 1); }
 
         @keyframes cornerFlyOut {
-            0% { transform: translate(0, 0) rotate(0deg) scale(1); opacity: 1; }
-            100% { transform: translate(-120vw, -80vh) rotate(-22deg) scale(0.5); opacity: 0; }
+            0% { transform: translate3d(0, 0, 0) rotate(0deg) scale3d(1, 1, 1); opacity: 1; }
+            100% { transform: translate3d(-120vw, -80vh, 0) rotate(-22deg) scale3d(0.5, 0.5, 1); opacity: 0; }
         }
         @keyframes cornerFlyIn {
-            0% { transform: translate(120vw, 80vh) rotate(22deg) scale(0.5); opacity: 0; }
-            100% { transform: translate(0, 0) rotate(0deg) scale(1); opacity: 1; }
+            0% { transform: translate3d(120vw, 80vh, 0) rotate(22deg) scale3d(0.5, 0.5, 1); opacity: 0; }
+            100% { transform: translate3d(0, 0, 0) rotate(0deg) scale3d(1, 1, 1); opacity: 1; }
         }
 
-        /* Эффект B: ГОРИЗОНТАЛЬНЫЙ СВАЙП */
-        .effect-b-out { animation: swipeLeftOut 0.75s forwards cubic-bezier(0.4, 0, 0.2, 1); }
-        .effect-b-in  { animation: swipeLeftIn 0.75s forwards cubic-bezier(0.16, 1, 0.3, 1); }
+        .effect-b-out { animation: swipeLeftOut 0.75s forwards cubic-bezier(0.22, 1, 0.36, 1); }
+        .effect-b-in  { animation: swipeLeftIn 0.75s forwards cubic-bezier(0.22, 1, 0.36, 1); }
 
         @keyframes swipeLeftOut {
-            0% { transform: translateX(0) scale(1); opacity: 1; }
-            100% { transform: translateX(-120vw) scale(0.8); opacity: 0; }
+            0% { transform: translate3d(0, 0, 0) scale3d(1, 1, 1); opacity: 1; }
+            100% { transform: translate3d(-120vw, 0, 0) scale3d(0.8, 0.8, 1); opacity: 0; }
         }
         @keyframes swipeLeftIn {
-            0% { transform: translateX(120vw) scale(0.8); opacity: 0; }
-            100% { transform: translateX(0) scale(1); opacity: 1; }
+            0% { transform: translate3d(120vw, 0, 0) scale3d(0.8, 0.8, 1); opacity: 0; }
+            100% { transform: translate3d(0, 0, 0) scale3d(1, 1, 1); opacity: 1; }
         }
 
-        /* Эффект C: ЗУМ ИЗ ГЛУБИНЫ И РАСТВОРЕНИЕ */
-        .effect-c-out { animation: depthZoomOut 0.75s forwards cubic-bezier(0.4, 0, 0.2, 1); }
-        .effect-c-in  { animation: depthZoomIn 0.75s forwards cubic-bezier(0.16, 1, 0.3, 1); }
+        .effect-c-out { animation: depthZoomOut 0.75s forwards cubic-bezier(0.22, 1, 0.36, 1); }
+        .effect-c-in  { animation: depthZoomIn 0.75s forwards cubic-bezier(0.22, 1, 0.36, 1); }
 
         @keyframes depthZoomOut {
-            0% { transform: scale(1) rotate(0deg); opacity: 1; }
-            100% { transform: scale(1.4) rotate(6deg); opacity: 0; }
+            0% { transform: scale3d(1, 1, 1) rotate(0deg); opacity: 1; }
+            100% { transform: scale3d(1.4, 1.4, 1) rotate(6deg); opacity: 0; }
         }
         @keyframes depthZoomIn {
-            0% { transform: scale(0.2) rotate(-10deg); opacity: 0; }
-            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+            0% { transform: scale3d(0.2, 0.2, 1) rotate(-10deg); opacity: 0; }
+            100% { transform: scale3d(1, 1, 1) rotate(0deg); opacity: 1; }
         }
     </style>
 </head>
@@ -314,16 +324,19 @@
 
     <canvas id="bgCanvas"></canvas>
 
+    <!-- ПОЛУПРОЗРАЧНЫЙ КРЕСТИК ЗАКРЫТИЯ СЕССИИ ВВЕРХУ СПРАВА -->
+    <button id="topCloseBtn" class="top-close-btn" title="Закрыть сессию и вернуться на старт">✖</button>
+
     <div class="main-container">
 
-        <!-- 1. ЗАСТАВКА ВЕДУЩЕГО -->
+        <!-- 1. ЗАСТАВКА -->
         <div id="splashScreen" class="splash-screen">
             <h1 class="brand-title">FAMILY STANDARD OS</h1>
             <div class="brand-subtitle">ФОТО</div>
             <button id="startBtn" class="start-btn">▶ СТАРТ</button>
         </div>
 
-        <!-- 2. ПРОЗРАЧНАЯ СЦЕНА -->
+        <!-- 2. СЦЕНА -->
         <div id="stageFrame" class="stage-frame">
             <div id="imageWrapper" class="image-wrapper"></div>
         </div>
@@ -332,7 +345,6 @@
         <div id="adminPanel" class="admin-panel">
             <div class="panel-header">
                 <span id="slideIndicator" class="slide-counter">ФОТО 1 / 20</span>
-                <button id="resetBtn" class="reset-btn" title="Тройной клик для сброса">✖</button>
             </div>
             <div class="controls-row">
                 <button id="prevBtn" class="ctrl-btn">◄ Назад</button>
@@ -346,11 +358,11 @@
     </div>
 
     <script>
-        // ================= CANVAS ФОН С ТЕПЛЫМИ ЧАСТИЦАМИ =================
+        // ================= 120 FPS CANVAS С ДЕЛЬТА-ТАЙМОМ =================
         const canvas = document.getElementById('bgCanvas');
         const ctx = canvas.getContext('2d');
         let particles = [];
-        const particleCount = 60;
+        const particleCount = 55;
         const maxDistance = 140;
 
         function resizeCanvas() {
@@ -364,15 +376,15 @@
             constructor() {
                 this.x = Math.random() * canvas.width;
                 this.y = Math.random() * canvas.height;
-                this.vx = (Math.random() - 0.5) * 1.0;
-                this.vy = (Math.random() - 0.5) * 1.0;
+                this.vx = (Math.random() - 0.5) * 60; // Пикселей в секунду
+                this.vy = (Math.random() - 0.5) * 60;
                 this.radius = Math.random() * 2.5 + 1;
                 this.color = Math.random() > 0.5 ? '#e0a96d' : '#8c4227';
             }
 
-            update() {
-                this.x += this.vx;
-                this.y += this.vy;
+            update(dt) {
+                this.x += this.vx * dt;
+                this.y += this.vy * dt;
                 if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
                 if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
             }
@@ -381,7 +393,7 @@
                 ctx.beginPath();
                 ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
                 ctx.fillStyle = this.color;
-                ctx.shadowBlur = 10;
+                ctx.shadowBlur = 8;
                 ctx.shadowColor = this.color;
                 ctx.fill();
                 ctx.shadowBlur = 0;
@@ -390,15 +402,24 @@
 
         for (let i = 0; i < particleCount; i++) particles.push(new Particle());
 
-        function animateCanvas() {
+        let lastTime = performance.now();
+
+        function animateCanvas(currentTime) {
+            let dt = (currentTime - lastTime) / 1000;
+            if (dt > 0.1) dt = 0.1; // Защита от скачков при переключении вкладок
+            lastTime = currentTime;
+
             ctx.clearRect(0, 0, canvas.width, canvas.height);
+
             for (let i = 0; i < particles.length; i++) {
-                particles[i].update();
+                particles[i].update(dt);
                 particles[i].draw();
+
                 for (let j = i + 1; j < particles.length; j++) {
                     const dx = particles[i].x - particles[j].x;
                     const dy = particles[i].y - particles[j].y;
                     const dist = Math.sqrt(dx * dx + dy * dy);
+
                     if (dist < maxDistance) {
                         ctx.beginPath();
                         ctx.moveTo(particles[i].x, particles[i].y);
@@ -411,9 +432,9 @@
             }
             requestAnimationFrame(animateCanvas);
         }
-        animateCanvas();
+        requestAnimationFrame(animateCanvas);
 
-        // ================= ПОДКЛЮЧЕНИЕ К СЕРВЕРУ =================
+        // ================= СИНХРОНИЗАЦИЯ СОКЕТОВ =================
         const socket = io("https://pic-jj29.onrender.com", {
             transports: ['polling', 'websocket'],
             upgrade: true
@@ -430,11 +451,11 @@
 
         const splashScreen = document.getElementById('splashScreen');
         const startBtn = document.getElementById('startBtn');
+        const topCloseBtn = document.getElementById('topCloseBtn');
         const stageFrame = document.getElementById('stageFrame');
         const imageWrapper = document.getElementById('imageWrapper');
         const adminPanel = document.getElementById('adminPanel');
         const slideIndicator = document.getElementById('slideIndicator');
-        const resetBtn = document.getElementById('resetBtn');
         const prevBtn = document.getElementById('prevBtn');
         const nextBtn = document.getElementById('nextBtn');
         const randomBtn = document.getElementById('randomBtn');
@@ -464,6 +485,11 @@
 
         startBtn.addEventListener('click', () => {
             socket.emit('start_session');
+        });
+
+        // Кнопка крестика вверху справа для мгновенного сброса
+        topCloseBtn.addEventListener('click', () => {
+            socket.emit('reset_session');
         });
 
         socket.on('session_started', (data) => {
@@ -497,7 +523,7 @@
                 imageWrapper.appendChild(newImg);
                 setTimeout(() => {
                     if (oldImg && oldImg.parentNode) oldImg.parentNode.removeChild(oldImg);
-                }, 720);
+                }, 730);
             } else {
                 newImg.style.opacity = '1';
                 imageWrapper.appendChild(newImg);
@@ -507,18 +533,20 @@
         function updateUI() {
             if (currentSlideIndex > 0) {
                 splashScreen.classList.add('hidden');
-                if (isAdmin) adminPanel.classList.add('visible');
-                slideIndicator.innerText = `ФОТО ${currentSlideIndex} / ${totalSlidesCount}`;
+                topCloseBtn.classList.add('visible'); // Показываем крестик сверху справа
+
+                // Пульт показываем ИСКЛЮЧИТЕЛЬНО ведущему
+                if (isAdmin) {
+                    adminPanel.classList.add('visible');
+                    slideIndicator.innerText = `ФОТО ${currentSlideIndex} / ${totalSlidesCount}`;
+                } else {
+                    adminPanel.classList.remove('visible');
+                }
             } else {
                 splashScreen.classList.remove('hidden');
+                topCloseBtn.classList.remove('visible');
                 adminPanel.classList.remove('visible');
                 imageWrapper.innerHTML = '';
-            }
-
-            if (currentSlideIndex === totalSlidesCount && !isRandom) {
-                endBtn.classList.add('visible');
-            } else {
-                endBtn.classList.remove('visible');
             }
 
             if (isAutoPlay) autoBtn.classList.add('active');
@@ -564,28 +592,6 @@
                     socket.emit('change_slide', { action: 'next' });
                 }, 10000);
             }
-        });
-
-        let resetClickCount = 0;
-        let resetTimer = null;
-
-        resetBtn.addEventListener('click', () => {
-            if (!isAdmin) return;
-            resetClickCount++;
-            if (resetClickCount === 1) resetBtn.innerText = '1/3';
-            else if (resetClickCount === 2) resetBtn.innerText = '2/3';
-            else if (resetClickCount >= 3) {
-                socket.emit('reset_session');
-                resetClickCount = 0;
-                resetBtn.innerText = '✖';
-                return;
-            }
-
-            clearTimeout(resetTimer);
-            resetTimer = setTimeout(() => {
-                resetClickCount = 0;
-                resetBtn.innerText = '✖';
-            }, 3000);
         });
 
         endBtn.addEventListener('click', () => {
