@@ -1,49 +1,46 @@
-import os
-import time
-from flask import Flask, render_template
-from flask_socketio import SocketIO
+from flask import Flask
+from flask_socketio import SocketIO, emit
+from flask_cors import CORS
 
-app = Flask(__name__, template_folder='.')
-app.config['SECRET_KEY'] = 'ai-vinyl-secret'
-socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
+app = Flask(__name__)
+CORS(app)
+# Разрешаем подключения с любых доменов
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode='eventlet')
 
-# Стейт точно как в Event OS
-system_state = {
-    "track_id": 1,
-    "track_type": "",  # 'aim' или 'orig'
-    "is_playing": False,
-    "seek_position": 0.0
+# Глобальное состояние интерактива
+game_state = {
+    "round": 1,
+    "track": None,    # 'aim' или 'm'
+    "playing": False, # играет или на паузе
+    "trigger_animation": False # флаг для запуска анимации раунда
 }
-
-@app.route('/')
-def index():
-    return render_template('index.html')
 
 @socketio.on('connect')
 def handle_connect():
-    socketio.emit('state_update', system_state)
+    # При подключении (зрителя или админа) сразу отдаем текущее состояние
+    emit('state_update', game_state)
 
-@socketio.on('command')
-def handle_command(data):
-    global system_state
-    
+@socketio.on('admin_command')
+def handle_admin_command(data):
+    global game_state
     action = data.get('action')
-    system_state['track_id'] = data.get('track', system_state['track_id'])
-    
-    if action == 'stop' or action == 'set_track':
-        system_state['is_playing'] = False
-        system_state['seek_position'] = 0.0
-    elif action == 'play_aim':
-        system_state['track_type'] = 'aim'
-        system_state['is_playing'] = True
-        system_state['seek_position'] = 0.0
-    elif action == 'play_orig':
-        system_state['track_type'] = 'orig'
-        system_state['is_playing'] = True
-        system_state['seek_position'] = 0.0
 
-    socketio.emit('state_update', system_state)
+    if action == 'next_round':
+        if game_state['round'] < 12:
+            game_state['round'] += 1
+        game_state['playing'] = False
+        game_state['track'] = None
+        game_state['trigger_animation'] = True # Запускаем анимацию на экранах
+    elif action == 'play':
+        game_state['track'] = data.get('track')
+        game_state['playing'] = True
+        game_state['trigger_animation'] = False
+    elif action == 'pause':
+        game_state['playing'] = False
+        game_state['trigger_animation'] = False
+
+    # Рассылаем обновленное состояние всем зрителям и самому админу
+    emit('state_update', game_state, broadcast=True)
 
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 10000))
-    socketio.run(app, host='0.0.0.0', port=port, allow_unsafe_werkzeug=True)
+    socketio.run(app, host='0.0.0.0', port=10000)
