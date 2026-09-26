@@ -17,12 +17,12 @@
             width: 100%;
             height: 100%;
             overflow: hidden;
-            background-color: #05050a;
+            background: #120905;
             font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            color: #ffffff;
+            color: #fceade;
         }
 
-        /* Canvas фон */
+        /* Canvas фон с теплыми какао-частицами */
         #bgCanvas {
             position: absolute;
             top: 0;
@@ -32,7 +32,6 @@
             z-index: 1;
         }
 
-        /* Главный контейнер */
         .main-container {
             position: relative;
             z-index: 2;
@@ -44,7 +43,7 @@
             align-items: center;
         }
 
-        /* ================= СТАРТОВЫЙ ЭКРАН (ЗАСТАВКА) ================= */
+        /* ================= ШОКОЛАДНЫЙ СТАРТОВЫЙ ЭКРАН ================= */
         .splash-screen {
             position: absolute;
             z-index: 10;
@@ -53,12 +52,12 @@
             align-items: center;
             justify-content: center;
             text-align: center;
-            padding: 40px 60px;
-            background: rgba(10, 12, 24, 0.75);
-            border: 1px solid rgba(0, 229, 255, 0.3);
+            padding: 45px 65px;
+            background: rgba(30, 16, 10, 0.85);
+            border: 1px solid rgba(224, 169, 109, 0.35);
             border-radius: 28px;
             backdrop-filter: blur(20px);
-            box-shadow: 0 0 50px rgba(0, 229, 255, 0.2), inset 0 0 30px rgba(0, 0, 0, 0.8);
+            box-shadow: 0 0 50px rgba(140, 66, 39, 0.4), inset 0 0 30px rgba(0, 0, 0, 0.9);
             transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
@@ -70,14 +69,14 @@
         }
 
         .brand-title {
-            font-size: 2.5rem;
+            font-size: 2.6rem;
             font-weight: 900;
             letter-spacing: 4px;
             text-transform: uppercase;
-            background: linear-gradient(135deg, #ffffff 30%, #00e5ff 100%);
+            background: linear-gradient(135deg, #ffffff 20%, #e0a96d 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 30px rgba(0, 229, 255, 0.4);
+            text-shadow: 0 0 30px rgba(224, 169, 109, 0.3);
             margin-bottom: 6px;
         }
 
@@ -85,51 +84,51 @@
             font-size: 1.2rem;
             font-weight: 600;
             letter-spacing: 8px;
-            color: rgba(0, 229, 255, 0.8);
+            color: #d4a373;
             text-transform: uppercase;
             margin-bottom: 35px;
         }
 
-        /* Крупная кнопка СТАРТ */
+        /* Кнопка СТАРТ с градиентом теплой карамели и шоколада */
         .start-btn {
             padding: 20px 64px;
             font-size: 2rem;
             font-weight: 800;
             color: #fff;
-            background: linear-gradient(135deg, #00e5ff, #7b2cbf);
+            background: linear-gradient(135deg, #e0a96d, #8c4227);
             border: none;
             border-radius: 60px;
             cursor: pointer;
-            box-shadow: 0 0 35px rgba(0, 229, 255, 0.6);
+            box-shadow: 0 0 35px rgba(224, 169, 109, 0.5);
             transition: all 0.3s ease;
             letter-spacing: 3px;
         }
 
         .start-btn:hover {
             transform: scale(1.08);
-            box-shadow: 0 0 55px rgba(0, 229, 255, 0.9);
+            box-shadow: 0 0 55px rgba(224, 169, 109, 0.8);
+            background: linear-gradient(135deg, #f4a261, #a04928);
         }
 
         .start-btn:active {
             transform: scale(0.98);
         }
 
-        /* ================= РАМКА ДЛЯ КАРТИНОК (ПОЯВЛЯЕТСЯ ПОСЛЕ СТАРТА) ================= */
+        /* ================= РАМКА ДЛЯ КАРТИНОК ================= */
         .stage-frame {
             position: relative;
             width: 92vw;
             height: 82vh;
             border-radius: 20px;
-            border: 2px solid rgba(0, 229, 255, 0.4);
-            box-shadow: 0 0 45px rgba(0, 229, 255, 0.25), inset 0 0 30px rgba(0, 0, 0, 0.85);
-            background: rgba(10, 12, 24, 0.65);
+            border: 2px solid rgba(224, 169, 109, 0.4);
+            box-shadow: 0 0 45px rgba(140, 66, 39, 0.35), inset 0 0 30px rgba(0, 0, 0, 0.9);
+            background: rgba(26, 14, 9, 0.75);
             backdrop-filter: blur(12px);
             overflow: hidden;
             display: flex;
             justify-content: center;
             align-items: center;
 
-            /* Изначально рамка скрыта */
             opacity: 0;
             transform: scale(0.95);
             pointer-events: none;
@@ -153,7 +152,6 @@
             align-items: center;
         }
 
-        /* Адаптивные фотографии без искажения пропорций */
         .slide-img {
             width: 100%;
             height: 100%;
@@ -173,14 +171,13 @@
             flex-direction: column;
             align-items: center;
             gap: 10px;
-            background: rgba(15, 18, 35, 0.9);
-            border: 1px solid rgba(0, 229, 255, 0.35);
+            background: rgba(30, 16, 10, 0.92);
+            border: 1px solid rgba(224, 169, 109, 0.4);
             border-radius: 20px;
             padding: 14px 24px;
             backdrop-filter: blur(18px);
-            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.8);
+            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.85);
 
-            /* Изначально скрыт */
             opacity: 0;
             transform: translateY(40px);
             pointer-events: none;
@@ -199,14 +196,14 @@
             justify-content: space-between;
             align-items: center;
             gap: 20px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid rgba(224, 169, 109, 0.15);
             padding-bottom: 6px;
         }
 
         .slide-counter {
             font-size: 1.1rem;
             font-weight: 700;
-            color: #00e5ff;
+            color: #e0a96d;
             letter-spacing: 1px;
         }
 
@@ -247,26 +244,27 @@
             border: none;
             border-radius: 10px;
             cursor: pointer;
-            background: rgba(255, 255, 255, 0.1);
-            color: #fff;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.08);
+            color: #fceade;
+            border: 1px solid rgba(224, 169, 109, 0.25);
             transition: all 0.2s ease;
         }
 
         .ctrl-btn:hover {
-            background: rgba(0, 229, 255, 0.2);
-            border-color: #00e5ff;
-            color: #00e5ff;
+            background: rgba(224, 169, 109, 0.2);
+            border-color: #e0a96d;
+            color: #e0a96d;
         }
 
         .ctrl-btn.active {
-            background: #00e5ff;
-            color: #000;
-            box-shadow: 0 0 15px rgba(0, 229, 255, 0.6);
+            background: linear-gradient(135deg, #e0a96d, #8c4227);
+            color: #fff;
+            box-shadow: 0 0 15px rgba(224, 169, 109, 0.6);
+            border-color: transparent;
         }
 
         .end-btn {
-            background: linear-gradient(135deg, #ff3b30, #ff9500);
+            background: linear-gradient(135deg, #ff3b30, #d32f2f);
             border: none;
             color: #fff;
             font-weight: bold;
@@ -277,7 +275,7 @@
             display: block;
         }
 
-        /* ================= АНИМАЦИИ ПЕРЕХОДОВ ================= */
+        /* Анимации переходов */
         .effect-a-out { animation: swipeLeftOut 0.7s forwards ease-in-out; }
         .effect-a-in { animation: swipeLeftIn 0.7s forwards ease-in-out; }
         @keyframes swipeLeftOut { 0% { transform: translateX(0) scale(1); opacity: 1; } 100% { transform: translateX(-100%) scale(0.7); opacity: 0; } }
@@ -296,19 +294,18 @@
 </head>
 <body>
 
-    <!-- Canvas фон с неоновыми частицами -->
     <canvas id="bgCanvas"></canvas>
 
     <div class="main-container">
 
-        <!-- 1. СТАРТОВЫЙ ЭКРАН С БРЕНДИНГОМ (Отображается до старта) -->
+        <!-- 1. ЗАСТАВКА С БРЕНДИНГОМ -->
         <div id="splashScreen" class="splash-screen">
             <h1 class="brand-title">FAMILY STANDARD OS</h1>
             <div class="brand-subtitle">ФОТО</div>
             <button id="startBtn" class="start-btn">▶ СТАРТ</button>
         </div>
 
-        <!-- 2. РАМКА СЦЕНЫ (Появляется плавно ТОЛЬКО после старта) -->
+        <!-- 2. РАМКА СЦЕНЫ -->
         <div id="stageFrame" class="stage-frame">
             <div id="imageWrapper" class="image-wrapper"></div>
         </div>
@@ -331,11 +328,11 @@
     </div>
 
     <script>
-        // ================= CANVAS ФОН =================
+        // ================= CANVAS ТЕПЛЫЕ КАКАО-ЧАСТИЦЫ =================
         const canvas = document.getElementById('bgCanvas');
         const ctx = canvas.getContext('2d');
         let particles = [];
-        const particleCount = 65;
+        const particleCount = 60;
         const maxDistance = 140;
 
         function resizeCanvas() {
@@ -349,10 +346,10 @@
             constructor() {
                 this.x = Math.random() * canvas.width;
                 this.y = Math.random() * canvas.height;
-                this.vx = (Math.random() - 0.5) * 1.2;
-                this.vy = (Math.random() - 0.5) * 1.2;
+                this.vx = (Math.random() - 0.5) * 1.0;
+                this.vy = (Math.random() - 0.5) * 1.0;
                 this.radius = Math.random() * 2.5 + 1;
-                this.color = Math.random() > 0.5 ? '#00e5ff' : '#7b2cbf';
+                this.color = Math.random() > 0.5 ? '#e0a96d' : '#8c4227';
             }
 
             update() {
@@ -388,7 +385,7 @@
                         ctx.beginPath();
                         ctx.moveTo(particles[i].x, particles[i].y);
                         ctx.lineTo(particles[j].x, particles[j].y);
-                        ctx.strokeStyle = `rgba(0, 229, 255, ${1 - dist / maxDistance * 0.8})`;
+                        ctx.strokeStyle = `rgba(224, 169, 109, ${1 - dist / maxDistance * 0.6})`;
                         ctx.lineWidth = 0.6;
                         ctx.stroke();
                     }
@@ -398,8 +395,17 @@
         }
         animateCanvas();
 
-        // ================= СОКЕТЫ И ЛОГИКА ИНТЕРФЕЙСА =================
-        const socket = io();
+        // ================= ПОДКЛЮЧЕНИЕ К СЕРВЕРУ RENDER =================
+        // Динамическое определение хоста или явный Render URL
+        const RENDER_SERVER_URL = "https://pic-jj29.onrender.com";
+        const SERVER_URL = (window.location.protocol.startsWith('http') && window.location.hostname !== 'localhost' && !window.location.hostname.startsWith('127.')) 
+            ? window.location.origin 
+            : RENDER_SERVER_URL;
+
+        const socket = io(SERVER_URL, {
+            transports: ['websocket', 'polling']
+        });
+
         const R2_BASE_URL = "https://pub-372ba5f717cf4a8694558f47682d65d9.r2.dev/";
 
         let isAdmin = false;
@@ -422,7 +428,6 @@
         const autoBtn = document.getElementById('autoBtn');
         const endBtn = document.getElementById('endBtn');
 
-        // Кэширование изображений
         function preloadImages() {
             for (let i = 1; i <= totalSlidesCount; i++) {
                 const img = new Image();
@@ -431,7 +436,6 @@
         }
         preloadImages();
 
-        // Получение состояния сервера при подключении
         socket.on('init_state', (data) => {
             currentSlideIndex = data.current_slide;
             totalSlidesCount = data.total_slides;
@@ -445,7 +449,6 @@
             }
         });
 
-        // Старт сессии по клику «СТАРТ»
         startBtn.addEventListener('click', () => {
             socket.emit('start_session');
         });
@@ -458,14 +461,12 @@
             renderSlide(currentSlideIndex, 0);
         });
 
-        // Переключение слайда
         socket.on('slide_updated', (data) => {
             currentSlideIndex = data.current_slide;
             updateUI();
             renderSlide(currentSlideIndex, data.effect_type);
         });
 
-        // Отрисовка фото в рамке
         function renderSlide(slideNum, effectType) {
             if (slideNum < 1) return;
 
@@ -490,31 +491,26 @@
             }
         }
 
-        // Обновление отображения панелей
         function updateUI() {
             if (currentSlideIndex > 0) {
-                // Шоу запущенно: скрываем заставку, показываем рамку
                 splashScreen.classList.add('hidden');
                 stageFrame.classList.add('visible');
 
                 if (isAdmin) adminPanel.classList.add('visible');
                 slideIndicator.innerText = `ФОТО ${currentSlideIndex} / ${totalSlidesCount}`;
             } else {
-                // До старта или при сбросе: показываем заставку, скрываем рамку
                 splashScreen.classList.remove('hidden');
                 stageFrame.classList.remove('visible');
                 adminPanel.classList.remove('visible');
                 imageWrapper.innerHTML = '';
             }
 
-            // Кнопка THE END на последнем слайде (если не включен рандом)
             if (currentSlideIndex === totalSlidesCount && !isRandom) {
                 endBtn.classList.add('visible');
             } else {
                 endBtn.classList.remove('visible');
             }
 
-            // Статусы кнопок
             if (isAutoPlay) autoBtn.classList.add('active');
             else autoBtn.classList.remove('active');
 
@@ -522,7 +518,6 @@
             else randomBtn.classList.remove('active');
         }
 
-        // Управление пультом
         prevBtn.addEventListener('click', () => {
             if (isAdmin) socket.emit('change_slide', { action: 'prev' });
         });
@@ -561,7 +556,6 @@
             }
         });
 
-        // Сброс тройным кликом
         let resetClickCount = 0;
         let resetTimer = null;
 
