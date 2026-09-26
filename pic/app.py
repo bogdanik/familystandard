@@ -3,7 +3,7 @@ from flask import Flask, render_template, request
 from flask_socketio import SocketIO, emit
 
 app = Flask(__name__, template_folder='.', static_folder='.')
-app.config['SECRET_KEY'] = 'family_standard_apple_stack_2026'
+app.config['SECRET_KEY'] = 'family_standard_apple_swipe_2026'
 socketio = SocketIO(app, cors_allowed_origins="*")
 
 # Глобальное состояние сессии
