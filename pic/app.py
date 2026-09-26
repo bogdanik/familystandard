@@ -1,5 +1,4 @@
 import os
-import random
 from flask import Flask, render_template, request
 from flask_socketio import SocketIO, emit
 
@@ -10,10 +9,9 @@ socketio = SocketIO(app, cors_allowed_origins="*")
 # Глобальное состояние сессии
 state = {
     'admin_sid': None,
-    'current_slide': 0,    # 0 = Заставка (СТАРТ), 1..20 = Стопка Слайд-шоу
+    'current_slide': 0,    # 0 = Заставка (СТАРТ), 1..20 = Слайд-шоу
     'total_slides': 20,
-    'auto_play': False,
-    'is_random': False
+    'auto_play': False
 }
 
 @app.route('/')
@@ -28,8 +26,7 @@ def handle_connect():
         'total_slides': state['total_slides'],
         'is_admin': is_admin,
         'has_admin': state['admin_sid'] is not None,
-        'auto_play': state['auto_play'],
-        'is_random': state['is_random']
+        'auto_play': state['auto_play']
     })
 
 @socketio.on('disconnect')
@@ -56,26 +53,16 @@ def handle_change_slide(data):
     action = data.get('action')
     
     if action == 'next':
-        if state['is_random']:
-            candidates = [i for i in range(1, state['total_slides'] + 1) if i != state['current_slide']]
-            if candidates:
-                state['current_slide'] = random.choice(candidates)
+        if state['current_slide'] < state['total_slides']:
+            state['current_slide'] += 1
         else:
-            if state['current_slide'] < state['total_slides']:
-                state['current_slide'] += 1
-            else:
-                state['current_slide'] = 1
+            state['current_slide'] = 1
 
     elif action == 'prev':
-        if state['is_random']:
-            candidates = [i for i in range(1, state['total_slides'] + 1) if i != state['current_slide']]
-            if candidates:
-                state['current_slide'] = random.choice(candidates)
+        if state['current_slide'] > 1:
+            state['current_slide'] -= 1
         else:
-            if state['current_slide'] > 1:
-                state['current_slide'] -= 1
-            else:
-                state['current_slide'] = state['total_slides']
+            state['current_slide'] = state['total_slides']
 
     elif isinstance(action, int) and 1 <= action <= state['total_slides']:
         state['current_slide'] = action
@@ -91,19 +78,11 @@ def handle_toggle_autoplay(data):
     state['auto_play'] = data.get('auto_play', False)
     emit('autoplay_updated', {'auto_play': state['auto_play']}, broadcast=True)
 
-@socketio.on('toggle_random')
-def handle_toggle_random(data):
-    if request.sid != state['admin_sid']:
-        return
-    state['is_random'] = data.get('is_random', False)
-    emit('random_updated', {'is_random': state['is_random']}, broadcast=True)
-
 @socketio.on('reset_session')
 def handle_reset():
     state['admin_sid'] = None
     state['current_slide'] = 0
     state['auto_play'] = False
-    state['is_random'] = False
     emit('session_reset', {}, broadcast=True)
 
 if __name__ == '__main__':
