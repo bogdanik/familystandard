@@ -16,9 +16,21 @@
         }
 
         #status-indicator {
-            position: absolute; top: 12px; left: 15px;
+            position: absolute; top: 15px; left: 15px;
             color: rgba(255,255,255,0.4); font-size: 12px; z-index: 1000;
             letter-spacing: 1px;
+        }
+
+        /* Глобальная кнопка сброса (Крестик) в правом верхнем углу */
+        #btn-global-reset {
+            position: absolute; top: 15px; right: 20px; z-index: 1000;
+            background: rgba(255, 0, 0, 0.2); border: 1px solid #ff3333;
+            color: #ff5555; border-radius: 8px; padding: 6px 14px;
+            font-size: 14px; font-weight: 900; cursor: pointer;
+            transition: all 0.2s ease; backdrop-filter: blur(5px);
+        }
+        #btn-global-reset:hover {
+            background: #ff0000; color: white; box-shadow: 0 0 15px #ff0000;
         }
 
         /* Канвасы графики */
@@ -94,10 +106,9 @@
             padding: 25px 35px; border-radius: 25px;
             border: 2px solid #0055ff; gap: 15px;
             box-shadow: 0 0 60px rgba(0, 85, 255, 0.7);
-            backdrop-filter: blur(10px); min-width: 320px;
+            backdrop-filter: blur(10px); min-width: 300px;
         }
 
-        /* Шапка пульта (Номер раунда + Выключение звука на пульте + Крестик) */
         .admin-header {
             display: flex; justify-content: space-between; align-items: center;
             width: 100%; border-bottom: 1px solid rgba(0, 85, 255, 0.3);
@@ -106,8 +117,7 @@
 
         #admin-round-display {
             font-size: 18px; font-weight: 900; color: #0088ff;
-            letter-spacing: 2px; text-shadow: 0 0 10px #0055ff;
-            flex-grow: 1;
+            letter-spacing: 2px; text-shadow: 0 0 10px #0055ff; flex-grow: 1;
         }
 
         .header-controls { display: flex; gap: 8px; }
@@ -119,13 +129,6 @@
             transition: all 0.2s ease;
         }
         .icon-btn:hover { background: rgba(255, 255, 255, 0.3); }
-
-        #btn-emergency-close {
-            background: rgba(255, 0, 0, 0.2); border: 1px solid #ff3333; color: #ff5555;
-        }
-        #btn-emergency-close:hover {
-            background: #ff0000; color: white; box-shadow: 0 0 12px #ff0000;
-        }
 
         .admin-row { display: flex; gap: 15px; width: 100%; justify-content: center; }
 
@@ -148,6 +151,7 @@
 <body>
 
     <div id="status-indicator">Подключение к серверу...</div>
+    <button id="btn-global-reset" title="Тройной клик для сброса сайта">✖</button>
 
     <canvas id="particles-canvas"></canvas>
     <canvas id="eq-canvas"></canvas>
@@ -169,7 +173,6 @@
             <div id="admin-round-display">РАУНД 1 / 12</div>
             <div class="header-controls">
                 <button id="btn-toggle-mute" class="icon-btn" title="Включить/выключить звук на этом устройстве">🔊</button>
-                <button id="btn-emergency-close" class="icon-btn" title="Тройной клик для сброса">✖</button>
             </div>
         </div>
         <div class="admin-row">
@@ -197,7 +200,7 @@
         const centerCircle = document.getElementById('center-circle');
         const audio = document.getElementById('audio-player');
         const adminRoundDisplay = document.getElementById('admin-round-display');
-        const btnEmergencyClose = document.getElementById('btn-emergency-close');
+        const btnGlobalReset = document.getElementById('btn-global-reset');
         const btnToggleMute = document.getElementById('btn-toggle-mute');
         
         const btnStart = document.getElementById('btn-start');
@@ -210,33 +213,33 @@
         let fadeInterval = null;
         let isAdmin = false;
 
-        // Логика глушения звука на конкретном устройстве (для телефона ведущего)
+        // Выключение звука локально (для телефона ведущего)
         btnToggleMute.onclick = () => {
             audio.muted = !audio.muted;
             btnToggleMute.innerText = audio.muted ? '🔇' : '🔊';
         };
 
-        // Тройной клик по крестику для сброса
+        // Тройной клик по глобальному крестику
         let closeClicks = 0;
         let closeClickTimer = null;
 
-        btnEmergencyClose.onclick = () => {
+        btnGlobalReset.onclick = () => {
             closeClicks++;
             if (closeClicks === 1) {
-                btnEmergencyClose.innerText = '✖ (1/3)';
+                btnGlobalReset.innerText = '✖ (1/3)';
             } else if (closeClicks === 2) {
-                btnEmergencyClose.innerText = '✖ (2/3)';
+                btnGlobalReset.innerText = '✖ (2/3)';
             } else if (closeClicks >= 3) {
                 closeClicks = 0;
-                btnEmergencyClose.innerText = '✖';
-                socket.emit('admin_command', { action: 'end_game' });
+                btnGlobalReset.innerText = '✖';
+                socket.emit('request_reset');
                 return;
             }
 
             clearTimeout(closeClickTimer);
             closeClickTimer = setTimeout(() => {
                 closeClicks = 0;
-                btnEmergencyClose.innerText = '✖';
+                btnGlobalReset.innerText = '✖';
             }, 3000);
         };
 
@@ -375,7 +378,7 @@
                 if (state.trigger_animation) centerCircle.style.opacity = 0;
             }
 
-            // Анимация текста раунда
+            // Анимация номера раунда
             if (state.trigger_animation) {
                 centerCircle.style.opacity = 0;
                 centerCircle.style.transform = 'scale(1)';
@@ -451,7 +454,7 @@
         }
         animateParticles();
 
-        // --- КРУГОВОЙ ЭКВАЛАЙЗЕР НА 360° С ПУЛЬСАЦИЕЙ КРУГА ---
+        // --- ДИНАМИЧНЫЙ ЭКВАЛАЙЗЕР B ВРАЗНОБОЙ (360°) ---
         const canvasEq = document.getElementById('eq-canvas');
         const ctxEq = canvasEq.getContext('2d');
 
@@ -475,8 +478,15 @@
                 centerCircle.style.transform = `scale(${pulseScale})`;
 
                 for(let i=0; i<bars; i++) {
-                    let dataIdx = Math.floor((i / bars) * (dataArray.length / 2));
-                    let value = dataArray[dataIdx] * 0.65; 
+                    let dataIdx;
+                    // Перемешивание частот: чётные идут от 0 к верху, нечётные от верха к 0
+                    if (i % 2 === 0) {
+                        dataIdx = Math.floor((i / bars) * (dataArray.length * 0.45));
+                    } else {
+                        dataIdx = Math.floor(((bars - i) / bars) * (dataArray.length * 0.45));
+                    }
+
+                    let value = dataArray[dataIdx] * 0.7; // Высота всплесков
                     let angle = i * step;
 
                     let x1 = cx + Math.cos(angle) * radius;
@@ -487,7 +497,7 @@
                     ctxEq.beginPath(); 
                     ctxEq.moveTo(x1, y1); 
                     ctxEq.lineTo(x2, y2);
-                    ctxEq.strokeStyle = `rgba(0, 85, 255, ${Math.min(1, value/80 + 0.3)})`;
+                    ctxEq.strokeStyle = `rgba(0, 85, 255, ${Math.min(1, value/70 + 0.35)})`;
                     ctxEq.lineWidth = 4; 
                     ctxEq.lineCap = 'round'; 
                     ctxEq.stroke();
