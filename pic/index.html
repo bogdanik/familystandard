@@ -174,7 +174,7 @@
             perspective: 1400px;
         }
 
-        /* КАРТОЧКА: ПЛОТНО ОБЛЕГАЕТ ФОТОГРАФИЮ */
+        /* КАРТОЧКА: СТРОГО ОБЛЕГАЕТ ФОТОГРАФИЮ (fit-content) */
         .slide-card {
             position: absolute;
             top: 50%;
@@ -192,6 +192,7 @@
             backface-visibility: hidden;
             transform-style: preserve-3d;
             
+            /* Бесшовный плавный свайп по всему экрану */
             transition: transform 0.85s cubic-bezier(0.16, 1, 0.3, 1),
                         opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1),
                         filter 0.85s cubic-bezier(0.16, 1, 0.3, 1),
@@ -207,12 +208,14 @@
             height: auto;
             object-fit: contain;
             border-radius: 19px;
+            will-change: transform;
         }
 
-        /* ================= 3D-ПОЗИЦИИ КАРУСЕЛИ ================= */
+        /* ================= 3D-ПОЗИЦИИ APPLE SWIPE ================= */
 
-        /* 1. ЦЕНТРАЛЬНАЯ КАРТОЧКА: УВЕЛИЧИВАЕТСЯ ВСЯ РАМКА ЦЕЛИКОМ ДО 150% ЗА 10 СЕКУНД */
+        /* 1. ЦЕНТРАЛЬНАЯ КАРТОЧКА В ФОКУСЕ */
         .pos-center {
+            transform: translate3d(-50%, -50%, 0) scale3d(1, 1, 1) rotate(0deg);
             opacity: 1;
             z-index: 30;
             border-color: rgba(224, 169, 109, 0.95);
@@ -220,23 +223,27 @@
                 0 25px 60px -10px rgba(0, 0, 0, 0.9),
                 0 0 45px 10px rgba(224, 169, 109, 0.55);
             filter: brightness(1);
-            animation: frame150Zoom 10.5s linear forwards;
         }
 
-        @keyframes frame150Zoom {
+        /* ЗУМ ИЗОБРАЖЕНИЯ В ЦЕНТРЕ ДО 135% МАКСИМУМ ЗА 10 СЕКУНД */
+        .pos-center .slide-img {
+            animation: kenBurnsZoom135 10.5s linear forwards;
+        }
+
+        @keyframes kenBurnsZoom135 {
             0% {
-                transform: translate3d(-50%, -50%, 0) scale3d(1, 1, 1) rotate(0deg);
+                transform: scale3d(1, 1, 1);
             }
             100% {
-                transform: translate3d(-50%, -50%, 0) scale3d(1.5, 1.5, 1) rotate(0deg);
+                transform: scale3d(1.35, 1.35, 1);
             }
         }
 
-        /* 2. ЛЕВАЯ СТОПКА (STACK): ПРОЗРАЧНОСТЬ 50% -> 35% -> 20% */
+        /* 2. ЛЕВАЯ СТОПКА (STACK): СВАЙПНУТЫЕ КАРТОЧКИ С ИНДИВИДУАЛЬНЫМ НАКЛОНОМ */
         
-        /* Первое ушедшее фото влево */
+        /* 1-й слой стопки (только что свайпнутая) */
         .pos-stack-1 {
-            transform: translate3d(calc(-50% - 32vw), calc(-50% + 12px), -40px) scale3d(0.8, 0.8, 1) rotate(-4deg);
+            transform: translate3d(calc(-50% - 32vw), calc(-50% + 12px), -40px) scale3d(0.8, 0.8, 1) rotate(calc(var(--card-angle) - 4deg));
             opacity: 0.5; /* 50% прозрачности */
             z-index: 20;
             border-color: rgba(224, 169, 109, 0.4);
@@ -244,9 +251,9 @@
             filter: brightness(0.65);
         }
 
-        /* Второе фото в стопке */
+        /* 2-й слой стопки */
         .pos-stack-2 {
-            transform: translate3d(calc(-50% - 35vw), calc(-50% + 24px), -80px) scale3d(0.72, 0.72, 1) rotate(-8deg);
+            transform: translate3d(calc(-50% - 35vw), calc(-50% + 24px), -80px) scale3d(0.72, 0.72, 1) rotate(calc(var(--card-angle) - 8deg));
             opacity: 0.35; /* 35% прозрачности */
             z-index: 15;
             border-color: rgba(224, 169, 109, 0.25);
@@ -254,26 +261,26 @@
             filter: brightness(0.45);
         }
 
-        /* Третье крайнее фото в стопке */
+        /* 3-й дальний слой стопки */
         .pos-stack-3 {
-            transform: translate3d(calc(-50% - 38vw), calc(-50% + 36px), -120px) scale3d(0.64, 0.64, 1) rotate(-12deg);
+            transform: translate3d(calc(-50% - 38vw), calc(-50% + 36px), -120px) scale3d(0.64, 0.64, 1) rotate(calc(var(--card-angle) - 12deg));
             opacity: 0.20; /* 20% прозрачности */
             z-index: 10;
             border-color: rgba(224, 169, 109, 0.15);
             filter: brightness(0.25);
         }
 
-        /* Исчезающие за пределами стопки */
+        /* Уход за левый край */
         .pos-far-left {
-            transform: translate3d(calc(-50% - 50vw), calc(-50% + 50px), -200px) scale3d(0.5, 0.5, 1) rotate(-16deg);
+            transform: translate3d(calc(-50% - 60vw), calc(-50% + 50px), -200px) scale3d(0.5, 0.5, 1) rotate(-16deg);
             opacity: 0;
             z-index: 1;
             filter: brightness(0.1);
         }
 
-        /* 3. СПРАВА: СЛЕДУЮЩИЕ КАРТОЧКИ (50% И 30% ПРОЗРАЧНОСТИ) */
+        /* 3. СПРАВА: ПОДЛЕТАЮЩИЕ ФОТОГРАФИИ */
         .pos-right-1 {
-            transform: translate3d(calc(-50% + 34vw), -50%, -50px) scale3d(0.78, 0.78, 1) rotate(3deg);
+            transform: translate3d(calc(-50% + 34vw), -50%, -50px) scale3d(0.78, 0.78, 1) rotate(calc(var(--card-angle) + 3deg));
             opacity: 0.5; /* 50% прозрачности */
             z-index: 22;
             border-color: rgba(224, 169, 109, 0.35);
@@ -282,7 +289,7 @@
         }
 
         .pos-right-2 {
-            transform: translate3d(calc(-50% + 40vw), -50%, -90px) scale3d(0.70, 0.70, 1) rotate(6deg);
+            transform: translate3d(calc(-50% + 40vw), -50%, -90px) scale3d(0.70, 0.70, 1) rotate(calc(var(--card-angle) + 6deg));
             opacity: 0.3; /* 30% прозрачности */
             z-index: 18;
             border-color: rgba(224, 169, 109, 0.2);
@@ -483,7 +490,7 @@
         }
         requestAnimationFrame(animateCanvas);
 
-        // ПОДКЛЮЧЕНИЕ К СЕРВЕРУ И APPLE STACK МЕХАНИКА
+        // ПОДКЛЮЧЕНИЕ СЕРВЕРУ
         const socket = io("https://pic-jj29.onrender.com", {
             transports: ['polling', 'websocket'],
             upgrade: true
@@ -519,6 +526,12 @@
             }
         }
         preloadImages();
+
+        // Математически строго синхронизируемый случайный угол для каждой карточки
+        function getDeterministicAngle(num) {
+            const angles = [-3, 2, -5, 4, -2, 3, -4, 5, -1, 3];
+            return angles[num % angles.length];
+        }
 
         socket.on('init_state', (data) => {
             currentSlideIndex = data.current_slide;
@@ -564,7 +577,7 @@
             updateStackView(currentSlideIndex);
         });
 
-        // 3D APPLE STACK МЕХАНИКА
+        // ЛОГИКА БЕСШОВНОГО СВАЙПА В СТОПКУ
         function updateStackView(centerNum) {
             if (centerNum < 1) {
                 imageWrapper.innerHTML = '';
@@ -595,7 +608,7 @@
                 existingCards[num] = card;
             });
 
-            // 1. Убираем устаревшие карточки
+            // 1. Уводим устаревшие карточки
             Object.keys(existingCards).forEach(numStr => {
                 const num = parseInt(numStr, 10);
                 if (!neededMap[num]) {
@@ -611,7 +624,7 @@
                 }
             });
 
-            // 2. Выстраиваем слои стопки
+            // 2. Выстраиваем позиции и анимацию свайпа
             Object.keys(neededMap).forEach(numStr => {
                 const num = parseInt(numStr, 10);
                 const targetClass = neededMap[num];
@@ -622,6 +635,7 @@
                 } else {
                     card = document.createElement('div');
                     card.dataset.slide = num;
+                    card.style.setProperty('--card-angle', `${getDeterministicAngle(num)}deg`);
 
                     if (targetClass.includes('right')) {
                         card.className = 'slide-card pos-far-right';
@@ -643,6 +657,7 @@
                     card.appendChild(img);
                     imageWrapper.appendChild(card);
 
+                    // Reflow для включения плавных CSS-трансформаций
                     void card.offsetWidth;
 
                     card.className = `slide-card ${targetClass}`;
@@ -663,7 +678,7 @@
                 }
             } else {
                 splashScreen.classList.remove('hidden');
-                topCloseBtn.classList.remove('visible');
+                topCloseBtn.remove('visible');
                 adminPanel.classList.remove('visible');
                 imageWrapper.innerHTML = '';
             }
