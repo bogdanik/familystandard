@@ -2,321 +2,364 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AI Музыка - Винил</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.5/socket.io.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Music Interactive</title>
+    <!-- Подключаем Socket.IO -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.js"></script>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-tap-highlight-color: transparent; }
-        body, html { width: 100%; height: 100%; background: #050505; color: white; font-family: 'Segoe UI', Tahoma, sans-serif; overflow: hidden; }
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&display=swap');
         
-        #gatekeeper { position: fixed; inset: 0; z-index: 10000; background: rgba(5,5,5,0.95); display: flex; justify-content: center; align-items: center; cursor: pointer; backdrop-filter: blur(10px); }
-        .gate-btn { color: #d4af37; font-size: 1.5rem; font-weight: bold; text-transform: uppercase; letter-spacing: 4px; animation: pulse 2s infinite; text-align: center; border: 1px solid rgba(212,175,55,0.5); padding: 20px 40px; border-radius: 12px; background: rgba(212,175,55,0.1); }
-        @keyframes pulse { 0%, 100% { opacity: 0.7; box-shadow: 0 0 10px rgba(212,175,55,0.2); } 50% { opacity: 1; text-shadow: 0 0 20px #d4af37; box-shadow: 0 0 30px rgba(212,175,55,0.6); } }
+        body, html {
+            margin: 0; padding: 0;
+            width: 100%; height: 100%;
+            background-color: #0a0a0a;
+            font-family: 'Montserrat', sans-serif;
+            overflow: hidden;
+            color: white;
+        }
 
-        canvas#network-bg { position: fixed; inset: 0; z-index: 1; pointer-events: none; }
-        #main-stage { position: absolute; inset: 0; display: flex; justify-content: center; align-items: center; z-index: 5; padding-bottom: 90px; }
-        canvas#eq-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; pointer-events: none; }
+        /* Канвасы для графики (вопросики и эквалайзер) */
+        #particles-canvas, #eq-canvas {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+        #eq-canvas { z-index: 2; }
 
-        .vinyl-record { 
-            position: relative; z-index: 10; width: 230px; height: 230px; border-radius: 50%;
-            background: repeating-radial-gradient( #0a0a0a, #0a0a0a 4px, #161616 5px, #161616 6px );
-            border: 2px solid rgba(212, 175, 55, 0.4);
+        /* Экран входа */
+        #entry-screen {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #000;
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            z-index: 100;
+        }
+        #btn-hello {
+            padding: 20px 60px; font-size: 32px;
+            background: transparent; border: 3px solid white;
+            color: white; border-radius: 50px; cursor: pointer;
+            transition: all 0.3s ease; font-weight: bold;
+        }
+        #btn-hello:hover { background: white; color: black; }
+        
+        #btn-play-admin {
+            position: absolute;
+            bottom: 20px;
+            width: 30px; height: 30px;
+            background: transparent; border: 1px solid rgba(255,255,255,0.3);
+            color: rgba(255,255,255,0.3); border-radius: 50%;
+            cursor: pointer; font-size: 12px; display: flex;
+            justify-content: center; align-items: center;
+        }
+        #btn-play-admin:hover { border-color: white; color: white; box-shadow: 0 0 10px white; }
+
+        /* Главный экран */
+        #main-screen {
+            position: absolute; top: 0; left: 0;
+            width: 100%; height: 100%;
             display: flex; justify-content: center; align-items: center;
-            box-shadow: 0 0 20px rgba(212, 175, 55, 0.15), inset 0 0 20px rgba(0,0,0,1);
-            transition: box-shadow 0.4s ease, border-color 0.4s ease;
-            animation: spin 3s linear infinite; animation-play-state: paused;
+            z-index: 3; display: none;
         }
-        .vinyl-record.playing { 
-            animation-play-state: running; border-color: rgba(212, 175, 55, 0.9);
-            box-shadow: 0 0 60px rgba(212, 175, 55, 0.8), inset 0 0 20px rgba(0,0,0,1);
-        }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
 
-        .vinyl-label {
-            width: 85px; height: 85px; border-radius: 50%;
-            background: linear-gradient(135deg, #f3db74, #b8860b);
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            box-shadow: inset 0 0 15px rgba(0,0,0,0.5), 0 0 10px rgba(0,0,0,0.8); color: #000;
+        /* Центральная блямба */
+        #center-circle {
+            width: 200px; height: 200px;
+            background: #001f4d; /* Темно-синий */
+            border: 4px solid #0055ff;
+            border-radius: 50%;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 24px; font-weight: 900;
+            box-shadow: 0 0 40px #0055ff, inset 0 0 20px #0055ff;
+            text-align: center; line-height: 1.2;
+            text-transform: uppercase;
+            opacity: 0; transition: opacity 1s ease;
         }
-        .text-main { font-size: 2rem; font-weight: 900; line-height: 0.9; letter-spacing: 1px; }
-        .text-sub { font-size: 0.65rem; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; margin-top: 3px; }
 
-        #controls { position: fixed; bottom: 20px; left: 0; width: 100%; z-index: 50; display: flex; flex-direction: column; align-items: center; gap: 15px; }
-        .tracks-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; max-width: 420px; padding: 0 15px; }
-        .track-btn { 
-            width: 48px; height: 48px; border-radius: 50%; border: 1px solid rgba(212, 175, 55, 0.3);
-            background: rgba(10,10,10,0.8); color: #aaa; font-weight: bold; font-size: 1.2rem;
-            display: flex; justify-content: center; align-items: center; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        /* Анимация номера раунда */
+        #round-title {
+            position: absolute;
+            font-size: 8vw;
+            font-weight: 900;
+            text-shadow: 0 0 30px rgba(0, 85, 255, 0.8);
+            opacity: 0;
+            pointer-events: none;
+            z-index: 4;
         }
-        .track-btn.active { background: #d4af37; color: #000; border-color: #fff; box-shadow: 0 0 20px rgba(212, 175, 55, 0.8); transform: scale(1.1); }
+        
+        .animate-round {
+            animation: roundAnim 3s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+        }
+        
+        @keyframes roundAnim {
+            0% { transform: scale(2) translateZ(0); opacity: 0; }
+            20% { transform: scale(1) translateZ(0); opacity: 1; }
+            70% { transform: scale(0.9) translateZ(0); opacity: 1; }
+            100% { transform: scale(0.1) translateZ(0); opacity: 0; }
+        }
 
-        .action-row { display: flex; gap: 10px; padding: 0 15px; width: 100%; max-width: 420px; }
-        .action-btn { 
-            flex: 1; padding: 14px 0; border-radius: 12px; border: none; font-weight: 900; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; cursor: pointer;
-            background: rgba(20, 20, 20, 0.85); color: #fff; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 4px 15px rgba(0,0,0,0.5); transition: 0.1s;
+        /* Админ-панель */
+        #admin-panel {
+            position: absolute; bottom: 30px; left: 50%;
+            transform: translateX(-50%);
+            z-index: 10; display: none;
+            background: rgba(0,0,0,0.8);
+            padding: 15px 30px; border-radius: 20px;
+            border: 1px solid #333; gap: 15px; flex-wrap: wrap; justify-content: center;
         }
-        .action-btn:active { transform: scale(0.95); }
-        .btn-aim { color: #d4af37; border-color: rgba(212, 175, 55, 0.5); }
-        .btn-stop { color: #ff4444; border-color: rgba(255, 68, 68, 0.3); flex: 0.6; }
+        .admin-btn {
+            padding: 12px 24px; font-size: 16px; font-weight: bold;
+            cursor: pointer; border: none; border-radius: 8px;
+            color: white; text-transform: uppercase; transition: 0.2s;
+        }
+        #btn-ai { background: #0055ff; }
+        #btn-ai:hover { background: #3377ff; }
+        #btn-orig { background: #ffaa00; }
+        #btn-orig:hover { background: #ffcc33; }
+        #btn-next { background: #555; width: 100%; margin-top: 5px; }
+        #btn-next:hover { background: #777; }
+        
+        .active-btn { box-shadow: 0 0 20px currentColor; transform: scale(1.05); }
+
     </style>
 </head>
 <body>
 
-    <div id="gatekeeper" onclick="startSystem()">
-        <div class="gate-btn">Нажмите для старта</div>
+    <canvas id="particles-canvas"></canvas>
+    <canvas id="eq-canvas"></canvas>
+
+    <!-- ЭКРАН ВХОДА -->
+    <div id="entry-screen">
+        <button id="btn-hello">HELLO</button>
+        <button id="btn-play-admin">▶</button>
     </div>
 
-    <canvas id="network-bg"></canvas>
-
-    <div id="main-stage">
-        <canvas id="eq-canvas"></canvas>
-        <div class="vinyl-record" id="vinyl">
-            <div class="vinyl-label" id="vinyl-label">
-                <div class="text-main" id="text-main">АИ</div>
-                <div class="text-sub" id="text-sub">музыка</div>
-            </div>
-        </div>
+    <!-- ГЛАВНЫЙ ЭКРАН -->
+    <div id="main-screen">
+        <div id="round-title">РАУНД 1</div>
+        <div id="center-circle">AI<br>МУЗЫКА</div>
     </div>
 
-    <div id="controls">
-        <div class="tracks-grid" id="tracks-grid"></div>
-        <div class="action-row">
-            <button class="action-btn btn-aim" onclick="sendCommand('play_aim')">▶ Загадка</button>
-            <button class="action-btn" onclick="sendCommand('play_orig')">▶ Оригинал</button>
-            <button class="action-btn btn-stop" onclick="sendCommand('stop')">⏹ Стоп</button>
-        </div>
+    <!-- АДМИН ПАНЕЛЬ -->
+    <div id="admin-panel">
+        <button class="admin-btn" id="btn-ai">AI-музыка</button>
+        <button class="admin-btn" id="btn-orig">Оригинал</button>
+        <button class="admin-btn" id="btn-next">Следующий раунд</button>
     </div>
 
-    <!-- Атрибуты как в Event OS -->
-    <audio id="audio-player" crossorigin="anonymous" preload="auto"></audio>
+    <!-- Аудио плеер (crossorigin нужен для эквалайзера при работе с облаком R2) -->
+    <audio id="audio-player" crossorigin="anonymous"></audio>
 
     <script>
-        const CONFIG = {
-            baseUrl: 'https://pub-372ba5f717cf4a8694558f47682d65d9.r2.dev/',
-            tracks: Array.from({length: 12}, (_, i) => ({ aim: `aim${i + 1}.mp3`, orig: `m${i + 1}.mp3` }))
+        const CLOUD_URL = 'https://pub-372ba5f717cf4a8694558f47682d65d9.r2.dev/';
+        const RENDER_URL = 'https://aim-d8ck.onrender.com';
+        
+        // Подключение к серверу
+        const socket = io(RENDER_URL);
+
+        // UI Элементы
+        const entryScreen = document.getElementById('entry-screen');
+        const mainScreen = document.getElementById('main-screen');
+        const adminPanel = document.getElementById('admin-panel');
+        const roundTitle = document.getElementById('round-title');
+        const centerCircle = document.getElementById('center-circle');
+        const audio = document.getElementById('audio-player');
+        
+        const btnAi = document.getElementById('btn-ai');
+        const btnOrig = document.getElementById('btn-orig');
+
+        let isAdmin = false;
+        let audioContext, analyser, dataArray;
+        let localState = { round: 1, playing: false, track: null };
+
+        // Инициализация аудио-контекста (браузер требует клика от пользователя)
+        function initAudio() {
+            if(!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                analyser = audioContext.createAnalyser();
+                const source = audioContext.createMediaElementSource(audio);
+                source.connect(analyser);
+                analyser.connect(audioContext.destination);
+                analyser.fftSize = 256;
+                dataArray = new Uint8Array(analyser.frequencyBinCount);
+            }
+            if(audioContext.state === 'suspended') audioContext.resume();
+        }
+
+        // Вход Зрителя
+        document.getElementById('btn-hello').onclick = () => {
+            initAudio();
+            entryScreen.style.display = 'none';
+            mainScreen.style.display = 'flex';
         };
 
-        const socket = io("https://aim-d8ck.onrender.com", { transports: ['websocket', 'polling'] });
-        const audioEl = document.getElementById('audio-player');
-        const vinyl = document.getElementById('vinyl');
-        const tMain = document.getElementById('text-main');
-        const tSub = document.getElementById('text-sub');
-        
-        let currentTrack = 1;
-        let audioCtx, analyser, isInit = false;
-        
-        // --- УМНЫЙ АУДИО-МЕНЕДЖЕР (СПИЗЖЕНО ИЗ EVENT OS) ---
-        let targetVolume = 1.0;      
-        let isFadingToSeek = false;
-        let pendingSeekTime = 0;
-        let state_is_playing = false;
+        // Вход Администратора
+        document.getElementById('btn-play-admin').onclick = () => {
+            initAudio();
+            isAdmin = true;
+            entryScreen.style.display = 'none';
+            mainScreen.style.display = 'flex';
+            adminPanel.style.display = 'flex';
+        };
 
-        // Вратарь - логика один-в-один из submitAuth() Event OS
-        function startSystem() {
-            document.getElementById('gatekeeper').style.display = 'none';
-            
-            audioEl.src = CONFIG.baseUrl + CONFIG.tracks[0].aim;
-            audioEl.load();
-            audioEl.play().then(() => audioEl.pause()).catch(()=>{});
-            
-            if (!isInit) {
-                try {
-                    const AudioCtxClass = window.AudioContext || window.webkitAudioContext;
-                    audioCtx = new AudioCtxClass();
-                    analyser = audioCtx.createAnalyser();
-                    analyser.fftSize = 256; 
-                    let source = audioCtx.createMediaElementSource(audioEl);
-                    source.connect(analyser);
-                    analyser.connect(audioCtx.destination);
-                    isInit = true;
-                    startEq();
-                } catch (e) {}
-            }
-        }
+        // --- ЛОГИКА АДМИНА ---
+        btnAi.onclick = () => {
+            let action = (localState.playing && localState.track === 'aim') ? 'pause' : 'play';
+            socket.emit('admin_command', { action: action, track: 'aim' });
+        };
 
-        // Плавный фэйд на 25ms (Точная копия из Event OS)
-        setInterval(() => {
-            if (!audioEl) return;
+        btnOrig.onclick = () => {
+            let action = (localState.playing && localState.track === 'm') ? 'pause' : 'play';
+            socket.emit('admin_command', { action: action, track: 'm' });
+        };
 
-            let bgVolTarget = state_is_playing ? targetVolume : 0;
-            if (isFadingToSeek) bgVolTarget = 0;
+        document.getElementById('btn-next').onclick = () => {
+            socket.emit('admin_command', { action: 'next_round' });
+        };
 
-            let diffBg = bgVolTarget - audioEl.volume;
-            if (Math.abs(diffBg) > 0.02) {
-                audioEl.volume += Math.sign(diffBg) * 0.02; 
-            } else {
-                audioEl.volume = bgVolTarget;
-                if (bgVolTarget === 0) {
-                    if (isFadingToSeek) {
-                        audioEl.currentTime = pendingSeekTime; 
-                        isFadingToSeek = false; 
-                    } else if (!state_is_playing && !audioEl.paused) {
-                        audioEl.pause();
-                        vinyl.classList.remove('playing');
-                    }
-                }
-            }
-        }, 25);
+        // --- СИНХРОНИЗАЦИЯ С СЕРВЕРОМ ---
+        socket.on('state_update', (state) => {
+            const previousRound = localState.round;
+            localState = state;
 
-        // Генерация кнопок
-        const grid = document.getElementById('tracks-grid');
-        for (let i = 1; i <= 12; i++) {
-            let btn = document.createElement('div');
-            btn.className = `track-btn ${i === 1 ? 'active' : ''}`;
-            btn.innerText = i;
-            btn.onclick = () => { currentTrack = i; sendCommand('set_track'); };
-            grid.appendChild(btn);
-        }
-
-        function updateUI() {
-            document.querySelectorAll('.track-btn').forEach((b, idx) => {
-                b.classList.toggle('active', idx + 1 === currentTrack);
-            });
-        }
-
-        function sendCommand(action) {
-            if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
-            socket.emit('command', { action: action, track: currentTrack });
-        }
-
-        // Обновление стейта с сервера (Логика Event OS)
-        socket.on('state_update', state => {
-            currentTrack = state.track_id;
-            state_is_playing = state.is_playing;
-            updateUI();
-
-            if (!state.is_playing) {
-                tMain.innerText = 'АИ';
-                tSub.innerText = 'МУЗЫКА';
-                return;
-            } 
-            
-            // UI Обновление
-            if (state.track_type === 'aim') {
-                tMain.innerText = 'АИ';
-                tSub.innerText = 'МУЗЫКА';
-            } else {
-                tMain.innerText = '✓';
-                tSub.innerText = '';
+            // Обновляем визуал кнопок в админке
+            btnAi.classList.remove('active-btn');
+            btnOrig.classList.remove('active-btn');
+            if(state.playing) {
+                if(state.track === 'aim') btnAi.classList.add('active-btn');
+                if(state.track === 'm') btnOrig.classList.add('active-btn');
             }
 
-            // Логика подгрузки и перескока (Из Event OS: applyAudioState)
-            let url = CONFIG.baseUrl + (state.track_type === 'aim' ? CONFIG.tracks[currentTrack-1].aim : CONFIG.tracks[currentTrack-1].orig);
-            
-            if (!audioEl.src.endsWith(url)) {
-                audioEl.src = url;
-                audioEl.currentTime = state.seek_position;
-                if (state.is_playing) {
-                    audioEl.volume = 0;
-                    audioEl.play().then(() => vinyl.classList.add('playing')).catch(()=>{});
+            // Логика переключения треков
+            if(state.playing) {
+                let trackPrefix = state.track === 'aim' ? 'aim' : 'm';
+                let targetSrc = `${CLOUD_URL}${trackPrefix}${state.round}.mp3`;
+                
+                if (audio.src !== targetSrc) {
+                    audio.src = targetSrc;
                 }
+                audio.play().catch(e => console.log("Ждем жеста пользователя"));
+                centerCircle.style.opacity = 1;
             } else {
-                let needsSeek = Math.abs(audioEl.currentTime - state.seek_position) > 2.5;
-                if (needsSeek && state.is_playing) {
-                    isFadingToSeek = true;
-                    pendingSeekTime = state.seek_position;
-                } else if (state.is_playing && audioEl.paused) {
-                    audioEl.volume = 0; 
-                    audioEl.play().then(() => vinyl.classList.add('playing')).catch(()=>{});
-                }
+                audio.pause();
+                // Если сменился раунд - гасим блямбу, если просто пауза - оставляем
+                if(state.trigger_animation) centerCircle.style.opacity = 0;
+            }
+
+            // Запуск анимации смены раунда
+            if (state.trigger_animation) {
+                roundTitle.innerText = `РАУНД ${state.round}`;
+                roundTitle.classList.remove('animate-round');
+                void roundTitle.offsetWidth; // Магия для перезапуска CSS анимации
+                roundTitle.classList.add('animate-round');
+                
+                // Через 2.5 секунды (пока текст исчезает) плавно показываем центральный круг
+                setTimeout(() => {
+                    centerCircle.style.opacity = 1;
+                }, 2500);
             }
         });
 
-        // --- ЭКВАЛАЙЗЕР ---
-        let eqHeights = Array(80).fill(2); 
-        function startEq() {
-            const canvas = document.getElementById('eq-canvas');
-            const ctx = canvas.getContext('2d');
-            function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-            window.addEventListener('resize', resize); resize();
+        // --- ЧАСТИЦЫ: ЛЕТАЮЩИЕ ВОПРОСИКИ ---
+        const canvasP = document.getElementById('particles-canvas');
+        const ctxP = canvasP.getContext('2d');
+        let particles = [];
 
-            const dataArray = new Uint8Array(analyser.frequencyBinCount);
-            const bars = 80;
-            const angleStep = (Math.PI * 2) / bars;
+        function resizeCanvases() {
+            canvasP.width = window.innerWidth; canvasP.height = window.innerHeight;
+            const eqCanvas = document.getElementById('eq-canvas');
+            eqCanvas.width = window.innerWidth; eqCanvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvases);
+        resizeCanvases();
 
-            function draw() {
-                requestAnimationFrame(draw);
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvasP.width;
+                this.y = Math.random() * canvasP.height;
+                this.vx = (Math.random() - 0.5) * 1.5;
+                this.vy = (Math.random() - 0.5) * 1.5;
+            }
+            update() {
+                this.x += this.vx; this.y += this.vy;
+                if(this.x < 0 || this.x > canvasP.width) this.vx *= -1;
+                if(this.y < 0 || this.y > canvasP.height) this.vy *= -1;
+            }
+            draw() {
+                ctxP.fillStyle = 'rgba(255, 255, 255, 0.4)';
+                ctxP.font = "20px Montserrat";
+                ctxP.fillText("?", this.x, this.y);
+            }
+        }
+
+        for(let i=0; i<60; i++) particles.push(new Particle());
+
+        function animateParticles() {
+            ctxP.clearRect(0, 0, canvasP.width, canvasP.height);
+            for(let i=0; i<particles.length; i++) {
+                particles[i].update();
+                particles[i].draw();
+                // Соединение линиями
+                for(let j=i; j<particles.length; j++) {
+                    let dx = particles[i].x - particles[j].x;
+                    let dy = particles[i].y - particles[j].y;
+                    let dist = Math.sqrt(dx*dx + dy*dy);
+                    if(dist < 120) {
+                        ctxP.beginPath();
+                        ctxP.strokeStyle = `rgba(0, 85, 255, ${1 - dist/120})`;
+                        ctxP.lineWidth = 1;
+                        ctxP.moveTo(particles[i].x+5, particles[i].y-5);
+                        ctxP.lineTo(particles[j].x+5, particles[j].y-5);
+                        ctxP.stroke();
+                    }
+                }
+            }
+            requestAnimationFrame(animateParticles);
+        }
+        animateParticles();
+
+        // --- РАДИАЛЬНЫЙ ЭКВАЛАЙЗЕР ---
+        const canvasEq = document.getElementById('eq-canvas');
+        const ctxEq = canvasEq.getContext('2d');
+
+        function animateEqualizer() {
+            requestAnimationFrame(animateEqualizer);
+            ctxEq.clearRect(0, 0, canvasEq.width, canvasEq.height);
+
+            if(analyser && localState.playing) {
                 analyser.getByteFrequencyData(dataArray);
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
                 
-                let cx = canvas.width / 2;
-                let cy = canvas.height / 2 - 45; 
-                let baseRadius = 125; 
+                const cx = canvasEq.width / 2;
+                const cy = canvasEq.height / 2;
+                const radius = 120; // Чуть больше радиуса центральной блямбы (100px)
+                
+                const bars = 64; 
+                const step = (Math.PI * 2) / bars;
 
-                for (let i = 0; i < bars; i++) {
-                    let dataIndex = Math.floor(i * (dataArray.length * 0.5) / bars);
-                    let targetH = state_is_playing ? dataArray[dataIndex] * 0.6 : 0;
+                for(let i=0; i<bars; i++) {
+                    let value = dataArray[i * 2] / 2; // Берем частоты, уменьшаем масштаб выброса
+                    let angle = i * step;
+
+                    let x1 = cx + Math.cos(angle) * radius;
+                    let y1 = cy + Math.sin(angle) * radius;
                     
-                    eqHeights[i] += (targetH - eqHeights[i]) * 0.2;
-                    let h = Math.max(eqHeights[i], 3);
+                    let x2 = cx + Math.cos(angle) * (radius + value);
+                    let y2 = cy + Math.sin(angle) * (radius + value);
 
-                    let angle = i * angleStep - (Math.PI / 2);
-                    let x1 = cx + Math.cos(angle) * baseRadius;
-                    let y1 = cy + Math.sin(angle) * baseRadius;
-                    let x2 = cx + Math.cos(angle) * (baseRadius + h);
-                    let y2 = cy + Math.sin(angle) * (baseRadius + h);
-
-                    ctx.beginPath();
-                    ctx.moveTo(x1, y1);
-                    ctx.lineTo(x2, y2);
-                    ctx.lineWidth = 4;
-                    ctx.lineCap = 'round';
-                    
-                    if (tMain.innerText === '✓') {
-                        ctx.strokeStyle = `rgba(224, 224, 224, ${h/100 + 0.2})`;
-                    } else {
-                        ctx.strokeStyle = `rgba(212, 175, 55, ${h/100 + 0.2})`;
-                    }
-                    ctx.stroke();
+                    ctxEq.beginPath();
+                    ctxEq.moveTo(x1, y1);
+                    ctxEq.lineTo(x2, y2);
+                    ctxEq.strokeStyle = `rgba(0, 85, 255, ${value/100 + 0.3})`;
+                    ctxEq.lineWidth = 4;
+                    ctxEq.lineCap = 'round';
+                    ctxEq.stroke();
                 }
             }
-            draw();
         }
+        animateEqualizer();
 
-        // --- ЧАСТИЦЫ ---
-        const netCanvas = document.getElementById('network-bg');
-        const netCtx = netCanvas.getContext('2d');
-        let dots = [];
-        
-        function resizeNet() { netCanvas.width = window.innerWidth; netCanvas.height = window.innerHeight; }
-        window.addEventListener('resize', resizeNet); resizeNet();
-
-        for(let i=0; i<60; i++) {
-            dots.push({
-                x: Math.random() * netCanvas.width, y: Math.random() * netCanvas.height,
-                vx: (Math.random() - 0.5) * 1.5, vy: (Math.random() - 0.5) * 1.5, radius: Math.random() * 2 + 1
-            });
-        }
-
-        function drawNetwork() {
-            netCtx.clearRect(0, 0, netCanvas.width, netCanvas.height);
-            for(let i=0; i<dots.length; i++) {
-                let p = dots[i];
-                p.x += p.vx; p.y += p.vy;
-                if (p.x < 0 || p.x > netCanvas.width) p.vx *= -1;
-                if (p.y < 0 || p.y > netCanvas.height) p.vy *= -1;
-
-                netCtx.beginPath();
-                netCtx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-                netCtx.fillStyle = 'rgba(212, 175, 55, 0.6)';
-                netCtx.fill();
-
-                for(let j=i+1; j<dots.length; j++) {
-                    let p2 = dots[j];
-                    let dist = Math.sqrt((p.x - p2.x)**2 + (p.y - p2.y)**2);
-                    if (dist < 130) {
-                        netCtx.beginPath();
-                        netCtx.moveTo(p.x, p.y);
-                        netCtx.lineTo(p2.x, p2.y);
-                        netCtx.strokeStyle = `rgba(212, 175, 55, ${1 - dist/130})`;
-                        netCtx.lineWidth = 1;
-                        netCtx.stroke();
-                    }
-                }
-            }
-            requestAnimationFrame(drawNetwork);
-        }
-        drawNetwork();
     </script>
 </body>
 </html>
