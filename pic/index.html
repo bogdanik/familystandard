@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Интерактивное Шоу — Слайдшоу</title>
+    <title>Family Standard OS — Фото</title>
     <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
     <style>
         * {
@@ -18,10 +18,11 @@
             height: 100%;
             overflow: hidden;
             background-color: #05050a;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
             color: #ffffff;
         }
 
+        /* Canvas фон */
         #bgCanvas {
             position: absolute;
             top: 0;
@@ -31,6 +32,7 @@
             z-index: 1;
         }
 
+        /* Главный контейнер */
         .main-container {
             position: relative;
             z-index: 2;
@@ -42,22 +44,102 @@
             align-items: center;
         }
 
+        /* ================= СТАРТОВЫЙ ЭКРАН (ЗАСТАВКА) ================= */
+        .splash-screen {
+            position: absolute;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 40px 60px;
+            background: rgba(10, 12, 24, 0.75);
+            border: 1px solid rgba(0, 229, 255, 0.3);
+            border-radius: 28px;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 0 50px rgba(0, 229, 255, 0.2), inset 0 0 30px rgba(0, 0, 0, 0.8);
+            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .splash-screen.hidden {
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(0.85);
+            visibility: hidden;
+        }
+
+        .brand-title {
+            font-size: 2.5rem;
+            font-weight: 900;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            background: linear-gradient(135deg, #ffffff 30%, #00e5ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px rgba(0, 229, 255, 0.4);
+            margin-bottom: 6px;
+        }
+
+        .brand-subtitle {
+            font-size: 1.2rem;
+            font-weight: 600;
+            letter-spacing: 8px;
+            color: rgba(0, 229, 255, 0.8);
+            text-transform: uppercase;
+            margin-bottom: 35px;
+        }
+
+        /* Крупная кнопка СТАРТ */
+        .start-btn {
+            padding: 20px 64px;
+            font-size: 2rem;
+            font-weight: 800;
+            color: #fff;
+            background: linear-gradient(135deg, #00e5ff, #7b2cbf);
+            border: none;
+            border-radius: 60px;
+            cursor: pointer;
+            box-shadow: 0 0 35px rgba(0, 229, 255, 0.6);
+            transition: all 0.3s ease;
+            letter-spacing: 3px;
+        }
+
+        .start-btn:hover {
+            transform: scale(1.08);
+            box-shadow: 0 0 55px rgba(0, 229, 255, 0.9);
+        }
+
+        .start-btn:active {
+            transform: scale(0.98);
+        }
+
+        /* ================= РАМКА ДЛЯ КАРТИНОК (ПОЯВЛЯЕТСЯ ПОСЛЕ СТАРТА) ================= */
         .stage-frame {
             position: relative;
-            width: 80vw;
-            max-width: 900px;
-            height: 60vh;
-            max-height: 600px;
-            border-radius: 16px;
+            width: 92vw;
+            height: 82vh;
+            border-radius: 20px;
             border: 2px solid rgba(0, 229, 255, 0.4);
-            box-shadow: 0 0 35px rgba(0, 229, 255, 0.25), inset 0 0 20px rgba(0, 0, 0, 0.8);
+            box-shadow: 0 0 45px rgba(0, 229, 255, 0.25), inset 0 0 30px rgba(0, 0, 0, 0.85);
             background: rgba(10, 12, 24, 0.65);
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(12px);
             overflow: hidden;
             display: flex;
             justify-content: center;
             align-items: center;
-            transition: all 0.5s ease;
+
+            /* Изначально рамка скрыта */
+            opacity: 0;
+            transform: scale(0.95);
+            pointer-events: none;
+            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .stage-frame.visible {
+            opacity: 1;
+            transform: scale(1);
+            pointer-events: auto;
         }
 
         .image-wrapper {
@@ -71,68 +153,36 @@
             align-items: center;
         }
 
+        /* Адаптивные фотографии без искажения пропорций */
         .slide-img {
-            max-width: 100%;
-            max-height: 100%;
+            width: 100%;
+            height: 100%;
             object-fit: contain;
-            border-radius: 8px;
+            object-position: center;
+            border-radius: 12px;
             position: absolute;
             will-change: transform, opacity;
         }
 
-        .placeholder-text {
-            font-size: 1.5rem;
-            color: rgba(0, 229, 255, 0.6);
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            text-shadow: 0 0 10px rgba(0, 229, 255, 0.5);
-            text-align: center;
-            padding: 20px;
-        }
-
-        .start-btn {
-            position: absolute;
-            z-index: 10;
-            padding: 18px 48px;
-            font-size: 1.8rem;
-            font-weight: bold;
-            color: #fff;
-            background: linear-gradient(135deg, #00e5ff, #7b2cbf);
-            border: none;
-            border-radius: 50px;
-            cursor: pointer;
-            box-shadow: 0 0 25px rgba(0, 229, 255, 0.6);
-            transition: all 0.3s ease;
-            letter-spacing: 2px;
-        }
-
-        .start-btn:hover {
-            transform: scale(1.08);
-            box-shadow: 0 0 40px rgba(0, 229, 255, 0.9);
-        }
-
-        .start-btn.hidden {
-            opacity: 0;
-            pointer-events: none;
-            transform: scale(0.5);
-        }
-
+        /* ================= ПУЛЬТ ВЕДУЩЕГО ================= */
         .admin-panel {
             position: absolute;
-            bottom: 30px;
+            bottom: 25px;
             z-index: 10;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 12px;
-            background: rgba(15, 18, 35, 0.85);
-            border: 1px solid rgba(0, 229, 255, 0.3);
+            gap: 10px;
+            background: rgba(15, 18, 35, 0.9);
+            border: 1px solid rgba(0, 229, 255, 0.35);
             border-radius: 20px;
-            padding: 16px 28px;
-            backdrop-filter: blur(15px);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+            padding: 14px 24px;
+            backdrop-filter: blur(18px);
+            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.8);
+
+            /* Изначально скрыт */
             opacity: 0;
-            transform: translateY(50px);
+            transform: translateY(40px);
             pointer-events: none;
             transition: all 0.4s ease;
         }
@@ -150,12 +200,12 @@
             align-items: center;
             gap: 20px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            padding-bottom: 8px;
+            padding-bottom: 6px;
         }
 
         .slide-counter {
             font-size: 1.1rem;
-            font-weight: 600;
+            font-weight: 700;
             color: #00e5ff;
             letter-spacing: 1px;
         }
@@ -164,8 +214,8 @@
             background: rgba(255, 59, 48, 0.2);
             border: 1px solid #ff3b30;
             color: #ff3b30;
-            width: 32px;
-            height: 32px;
+            width: 30px;
+            height: 30px;
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -227,7 +277,7 @@
             display: block;
         }
 
-        /* Эффекты переходов */
+        /* ================= АНИМАЦИИ ПЕРЕХОДОВ ================= */
         .effect-a-out { animation: swipeLeftOut 0.7s forwards ease-in-out; }
         .effect-a-in { animation: swipeLeftIn 0.7s forwards ease-in-out; }
         @keyframes swipeLeftOut { 0% { transform: translateX(0) scale(1); opacity: 1; } 100% { transform: translateX(-100%) scale(0.7); opacity: 0; } }
@@ -246,16 +296,24 @@
 </head>
 <body>
 
+    <!-- Canvas фон с неоновыми частицами -->
     <canvas id="bgCanvas"></canvas>
 
     <div class="main-container">
-        <button id="startBtn" class="start-btn">СТАРТ</button>
 
+        <!-- 1. СТАРТОВЫЙ ЭКРАН С БРЕНДИНГОМ (Отображается до старта) -->
+        <div id="splashScreen" class="splash-screen">
+            <h1 class="brand-title">FAMILY STANDARD OS</h1>
+            <div class="brand-subtitle">ФОТО</div>
+            <button id="startBtn" class="start-btn">▶ СТАРТ</button>
+        </div>
+
+        <!-- 2. РАМКА СЦЕНЫ (Появляется плавно ТОЛЬКО после старта) -->
         <div id="stageFrame" class="stage-frame">
-            <div id="placeholderText" class="placeholder-text">Ожидание запуска шоу...</div>
             <div id="imageWrapper" class="image-wrapper"></div>
         </div>
 
+        <!-- 3. ПУЛЬТ ВЕДУЩЕГО -->
         <div id="adminPanel" class="admin-panel">
             <div class="panel-header">
                 <span id="slideIndicator" class="slide-counter">ФОТО 1 / 20</span>
@@ -269,10 +327,11 @@
                 <button id="endBtn" class="ctrl-btn end-btn">THE END</button>
             </div>
         </div>
+
     </div>
 
     <script>
-        // Анимированный Canvas фон
+        // ================= CANVAS ФОН =================
         const canvas = document.getElementById('bgCanvas');
         const ctx = canvas.getContext('2d');
         let particles = [];
@@ -339,7 +398,7 @@
         }
         animateCanvas();
 
-        // Сокеты и логика
+        // ================= СОКЕТЫ И ЛОГИКА ИНТЕРФЕЙСА =================
         const socket = io();
         const R2_BASE_URL = "https://pub-372ba5f717cf4a8694558f47682d65d9.r2.dev/";
 
@@ -350,8 +409,9 @@
         let isRandom = false;
         let autoPlayTimer = null;
 
+        const splashScreen = document.getElementById('splashScreen');
         const startBtn = document.getElementById('startBtn');
-        const placeholderText = document.getElementById('placeholderText');
+        const stageFrame = document.getElementById('stageFrame');
         const imageWrapper = document.getElementById('imageWrapper');
         const adminPanel = document.getElementById('adminPanel');
         const slideIndicator = document.getElementById('slideIndicator');
@@ -362,6 +422,7 @@
         const autoBtn = document.getElementById('autoBtn');
         const endBtn = document.getElementById('endBtn');
 
+        // Кэширование изображений
         function preloadImages() {
             for (let i = 1; i <= totalSlidesCount; i++) {
                 const img = new Image();
@@ -370,15 +431,21 @@
         }
         preloadImages();
 
+        // Получение состояния сервера при подключении
         socket.on('init_state', (data) => {
             currentSlideIndex = data.current_slide;
             totalSlidesCount = data.total_slides;
             isAdmin = data.is_admin;
             isAutoPlay = data.auto_play;
             isRandom = data.is_random;
+
             updateUI();
+            if (currentSlideIndex > 0) {
+                renderSlide(currentSlideIndex, 0);
+            }
         });
 
+        // Старт сессии по клику «СТАРТ»
         startBtn.addEventListener('click', () => {
             socket.emit('start_session');
         });
@@ -386,19 +453,21 @@
         socket.on('session_started', (data) => {
             currentSlideIndex = data.current_slide;
             if (socket.id === data.admin_sid) isAdmin = true;
+
             updateUI();
             renderSlide(currentSlideIndex, 0);
         });
 
+        // Переключение слайда
         socket.on('slide_updated', (data) => {
             currentSlideIndex = data.current_slide;
             updateUI();
             renderSlide(currentSlideIndex, data.effect_type);
         });
 
+        // Отрисовка фото в рамке
         function renderSlide(slideNum, effectType) {
             if (slideNum < 1) return;
-            placeholderText.style.display = 'none';
 
             const newImg = document.createElement('img');
             newImg.src = `${R2_BASE_URL}pic${slideNum}.jpg`;
@@ -421,24 +490,31 @@
             }
         }
 
+        // Обновление отображения панелей
         function updateUI() {
             if (currentSlideIndex > 0) {
-                startBtn.classList.add('hidden');
+                // Шоу запущенно: скрываем заставку, показываем рамку
+                splashScreen.classList.add('hidden');
+                stageFrame.classList.add('visible');
+
                 if (isAdmin) adminPanel.classList.add('visible');
                 slideIndicator.innerText = `ФОТО ${currentSlideIndex} / ${totalSlidesCount}`;
             } else {
-                startBtn.classList.remove('hidden');
+                // До старта или при сбросе: показываем заставку, скрываем рамку
+                splashScreen.classList.remove('hidden');
+                stageFrame.classList.remove('visible');
                 adminPanel.classList.remove('visible');
-                placeholderText.style.display = 'block';
                 imageWrapper.innerHTML = '';
             }
 
+            // Кнопка THE END на последнем слайде (если не включен рандом)
             if (currentSlideIndex === totalSlidesCount && !isRandom) {
                 endBtn.classList.add('visible');
             } else {
                 endBtn.classList.remove('visible');
             }
 
+            // Статусы кнопок
             if (isAutoPlay) autoBtn.classList.add('active');
             else autoBtn.classList.remove('active');
 
@@ -446,6 +522,7 @@
             else randomBtn.classList.remove('active');
         }
 
+        // Управление пультом
         prevBtn.addEventListener('click', () => {
             if (isAdmin) socket.emit('change_slide', { action: 'prev' });
         });
@@ -484,6 +561,7 @@
             }
         });
 
+        // Сброс тройным кликом
         let resetClickCount = 0;
         let resetTimer = null;
 
