@@ -3,15 +3,14 @@ import random
 from flask import Flask, render_template, request
 from flask_socketio import SocketIO, emit
 
-# template_folder='.' позволяет держать index.html прямо в корне проекта без подпапки templates
 app = Flask(__name__, template_folder='.', static_folder='.')
 app.config['SECRET_KEY'] = 'family_standard_chocolate_2026'
 socketio = SocketIO(app, cors_allowed_origins="*")
 
-# Состояние сессии
+# Глобальное состояние сессии
 state = {
     'admin_sid': None,
-    'current_slide': 0,    # 0 = Заставка (СТАРТ), 1..20 = Картинки
+    'current_slide': 0,    # 0 = Заставка (СТАРТ), 1..20 = Слайд-шоу
     'total_slides': 20,
     'auto_play': False,
     'is_random': False
@@ -33,8 +32,17 @@ def handle_connect():
         'is_random': state['is_random']
     })
 
+@socketio.on('disconnect')
+def handle_disconnect():
+    # Если отключился ведущий, очищаем права
+    if request.sid == state['admin_sid']:
+        state['admin_sid'] = None
+        # Уведомляем остальных, что ведущий ушел
+        emit('admin_status_changed', {'has_admin': False}, broadcast=True)
+
 @socketio.on('start_session')
 def handle_start():
+    # Назначаем ведущего и запускаем слайд-шоу
     if state['admin_sid'] is None or state['current_slide'] == 0:
         state['admin_sid'] = request.sid
         state['current_slide'] = 1
@@ -58,9 +66,20 @@ def handle_change_slide(data):
         else:
             if state['current_slide'] < state['total_slides']:
                 state['current_slide'] += 1
+            else:
+                state['current_slide'] = 1
+
     elif action == 'prev':
-        if state['current_slide'] > 1:
-            state['current_slide'] -= 1
+        if state['is_random']:
+            candidates = [i for i in range(1, state['total_slides'] + 1) if i != state['current_slide']]
+            if candidates:
+                state['current_slide'] = random.choice(candidates)
+        else:
+            if state['current_slide'] > 1:
+                state['current_slide'] -= 1
+            else:
+                state['current_slide'] = state['total_slides']
+
     elif isinstance(action, int) and 1 <= action <= state['total_slides']:
         state['current_slide'] = action
 
@@ -87,8 +106,7 @@ def handle_toggle_random(data):
 
 @socketio.on('reset_session')
 def handle_reset():
-    if request.sid != state['admin_sid']:
-        return
+    # Полный глобальный сброс сессии (доступен с любой кнопки закрытия)
     state['admin_sid'] = None
     state['current_slide'] = 0
     state['auto_play'] = False
