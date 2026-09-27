@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Family Standard OS — Royal Blue Edition</title>
+    <title>Family Standard OS — Metallic Edition</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
@@ -11,18 +11,16 @@
 
     <style>
         :root {
-            --bg-royal-deep: #000a1a;
-            --bg-card: rgba(8, 25, 55, 0.88);
-            --blue-glow: rgba(0, 119, 255, 0.45);
+            --bg-royal-deep: #000714;
+            --bg-card: rgba(6, 18, 42, 0.9);
             --gold-light: #fff5d6;
             --gold-main: #f59e0b;
             --gold-accent: #e2c067;
             --gold-glow: rgba(245, 158, 11, 0.5);
-            --glass-border: rgba(226, 192, 103, 0.35);
             --danger-red: #ef4444;
             --ios-font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Plus Jakarta Sans", sans-serif;
             --top-bar-height: 165px;
-            --bottom-bar-height: 105px;
+            --bottom-bar-height: 110px;
         }
 
         * {
@@ -41,10 +39,10 @@
             position: relative;
         }
 
-        /* КОРОЛЕВСКОЕ СВЕЧЕНИЕ */
+        /* ГЛУБОКИЙ ФОН */
         .bg-glow {
             position: fixed; inset: 0; z-index: 1;
-            background: radial-gradient(circle at 50% 50%, #001f4d 0%, #000a1a 100%);
+            background: radial-gradient(circle at 50% 50%, #001233 0%, #000714 100%);
             pointer-events: none;
         }
 
@@ -57,7 +55,7 @@
         .center-glow {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
             width: 80vw; height: 80vw;
-            background: radial-gradient(circle, rgba(0, 119, 255, 0.25) 0%, rgba(245, 158, 11, 0.12) 40%, transparent 70%);
+            background: radial-gradient(circle, rgba(0, 102, 255, 0.22) 0%, rgba(245, 158, 11, 0.1) 40%, transparent 70%);
             pointer-events: none; z-index: 2;
             animation: pulseRoyal 6s ease-in-out infinite;
         }
@@ -66,20 +64,89 @@
 
         /* БРЕНДИНГ */
         .footer-logo {
-            position: fixed; bottom: 10px; width: 100%; text-align: center;
-            color: rgba(226, 192, 103, 0.4); font-size: 0.75rem; font-weight: 800;
+            position: fixed; bottom: 8px; width: 100%; text-align: center;
+            color: rgba(226, 192, 103, 0.4); font-size: 0.72rem; font-weight: 800;
             letter-spacing: 3px; z-index: 100; pointer-events: none; text-transform: uppercase;
+        }
+
+        /* МЕТАЛЛИЧЕСКИЕ КНОПКИ С БЛИКАМИ И ТЕКСТУРОЙ */
+        .btn-metal {
+            position: relative; overflow: hidden;
+            border-radius: 12px; font-weight: 800; cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            text-transform: uppercase; letter-spacing: 1px;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.4);
+        }
+        .btn-metal::before {
+            content: ''; position: absolute; top: 0; left: -100%; width: 60%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent);
+            transform: skewX(-25deg); transition: 0.5s;
+        }
+        .btn-metal:hover::before { left: 150%; }
+        .btn-metal:active { transform: scale(0.94); box-shadow: 0 2px 8px rgba(0,0,0,0.8); }
+
+        /* Синий металл */
+        .btn-blue-metal {
+            background: linear-gradient(135deg, #0f2b5c 0%, #1d4ed8 50%, #1e40af 100%);
+            border: 1px solid #60a5fa; color: #ffffff;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+            box-shadow: 0 0 15px rgba(30, 64, 175, 0.4);
+        }
+
+        /* Красный металл */
+        .btn-red-metal {
+            background: linear-gradient(135deg, #5c0f0f 0%, #dc2626 50%, #991b1b 100%);
+            border: 1px solid #fca5a5; color: #ffffff;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+            box-shadow: 0 0 15px rgba(185, 28, 28, 0.4);
+        }
+
+        /* Золотой металл */
+        .btn-gold-metal {
+            background: linear-gradient(135deg, #5c3a0f 0%, #d97706 50%, #b45309 100%);
+            border: 1px solid #fef08a; color: #ffffff;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+            box-shadow: 0 0 18px rgba(245, 158, 11, 0.5);
+        }
+
+        /* Серебряный металл (SFX) */
+        .btn-silver-metal {
+            background: linear-gradient(135deg, #27272a 0%, #6b7280 50%, #374151 100%);
+            border: 1px solid #d1d5db; color: #f9fafb;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.9);
+            font-size: 0.9rem; font-weight: 900;
+        }
+
+        /* КНОПКИ ГРОМКОСТИ С ПОСТЕПЕННЫМ КРАСНЫМ НАРАСТАНИЕМ */
+        .vol-3 {
+            background: linear-gradient(135deg, #1f2937 0%, #374151 85%, #7f1d1d 100%);
+            border: 1px solid #6b7280; color: #e5e7eb;
+        }
+        .vol-10 {
+            background: linear-gradient(135deg, #1f2937 0%, #4b5563 65%, #991b1b 100%);
+            border: 1px solid #9ca3af; color: #f3f4f6;
+        }
+        .vol-30 {
+            background: linear-gradient(135deg, #374151 0%, #991b1b 60%, #b91c1c 100%);
+            border: 1px solid #fca5a5; color: #ffffff;
+        }
+        .vol-60 {
+            background: linear-gradient(135deg, #7f1d1d 0%, #dc2626 50%, #991b1b 100%);
+            border: 1px solid #f87171; color: #ffffff; box-shadow: 0 0 12px rgba(220, 38, 38, 0.4);
+        }
+        .vol-100 {
+            background: linear-gradient(135deg, #991b1b 0%, #ef4444 50%, #f87171 100%);
+            border: 1px solid #ffffff; color: #ffffff; box-shadow: 0 0 20px rgba(239, 68, 68, 0.8);
         }
 
         /* АВТОРИЗАЦИЯ */
         #auth-overlay { position: fixed; inset: 0; z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 20px; }
         .auth-card {
-            background: var(--bg-card);
-            border: 2px solid var(--glass-border);
+            background: var(--bg-card); border: 2px solid rgba(226, 192, 103, 0.4);
             padding: 40px 28px; border-radius: 28px; width: 100%; max-width: 370px; text-align: center;
             box-shadow: 0 20px 60px rgba(0,0,0,0.9), 0 0 50px var(--gold-glow);
-            backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
-            z-index: 10001;
+            backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); z-index: 10001;
         }
         .brand-header {
             font-family: 'Cinzel', serif; font-size: 2.3rem; font-weight: 900;
@@ -89,89 +156,60 @@
         }
         .auth-sub { color: var(--gold-accent); font-size: 0.8rem; font-weight: 700; margin: 8px 0 22px; letter-spacing: 2px; text-transform: uppercase; }
         .auth-input {
-            width: 100%; padding: 16px; border-radius: 14px; border: 1px solid var(--glass-border);
-            background: rgba(0, 10, 30, 0.85); color: #fff; text-align: center; font-size: 1.3rem; font-weight: 800;
+            width: 100%; padding: 16px; border-radius: 14px; border: 1px solid rgba(226, 192, 103, 0.3);
+            background: rgba(0, 7, 20, 0.85); color: #fff; text-align: center; font-size: 1.3rem; font-weight: 800;
             outline: none; letter-spacing: 3px; user-select: text; transition: all 0.3s ease;
         }
         .auth-input:focus { border-color: var(--gold-main); box-shadow: 0 0 25px var(--gold-glow); }
-        .btn-gold {
-            width: 100%; padding: 16px; border-radius: 14px; border: none;
-            background: linear-gradient(135deg, var(--gold-main), var(--gold-accent));
-            color: #000d26; font-weight: 900; font-size: 1rem; cursor: pointer; margin-top: 18px;
-            letter-spacing: 2px; box-shadow: 0 8px 25px rgba(245, 158, 11, 0.4);
-            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        .btn-gold:active { transform: scale(0.96); }
-
-        /* АНИМИРОВАННЫЕ КНОПКИ ПУЛЬТА */
-        .btn-anim {
-            position: relative; overflow: hidden;
-            border-radius: 12px; border: 1px solid var(--glass-border);
-            background: rgba(8, 25, 55, 0.75); color: #ffffff;
-            font-weight: 800; cursor: pointer; transition: all 0.25s ease;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
-        }
-        .btn-anim::before {
-            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
-            background: linear-gradient(45deg, transparent, rgba(245, 158, 11, 0.25), transparent);
-            transform: rotate(45deg); transition: 0.5s; opacity: 0;
-        }
-        .btn-anim:hover::before { opacity: 1; left: 100%; }
-        .btn-anim:active { transform: scale(0.94); }
 
         /* ПУЛЬТ ВЕДУЩЕГО: ВЕРХ */
         #host-top-bar {
             display: none; position: fixed; top: 0; left: 0; right: 0;
             height: var(--top-bar-height); z-index: 500;
-            background: rgba(0, 15, 40, 0.95);
-            border-bottom: 1px solid var(--glass-border);
+            background: rgba(0, 10, 30, 0.96);
+            border-bottom: 2px solid rgba(226, 192, 103, 0.3);
             padding: 10px 14px; flex-direction: column; gap: 8px; justify-content: center;
             backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.9);
         }
 
         .host-eq-wrapper {
             width: 100%; height: 18px; position: relative; border-radius: 8px; overflow: hidden;
-            background: rgba(0, 5, 20, 0.6); border: 1px solid var(--glass-border);
+            background: rgba(0, 5, 15, 0.7); border: 1px solid rgba(226, 192, 103, 0.25);
             display: flex; align-items: center; justify-content: center;
         }
         #host-eq-canvas { width: 100%; height: 100%; display: block; }
 
         .control-row { display: flex; justify-content: space-between; gap: 8px; align-items: center; }
         .btn-control { flex: 1; height: 36px; font-size: 0.82rem; }
-        .btn-control.active {
-            background: linear-gradient(135deg, var(--gold-main), var(--gold-accent));
-            color: #000a1a; border-color: #ffffff; box-shadow: 0 0 20px var(--gold-glow);
-        }
+        .btn-control.active { border-color: #ffffff; box-shadow: 0 0 20px var(--gold-glow); }
 
         .seek-btn {
-            flex: 1; height: 42px; border-radius: 12px; background: rgba(8, 25, 55, 0.85);
-            color: #fff; font-size: 1.3rem; border: 1px solid var(--glass-border);
-            display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer;
+            flex: 1; height: 42px; font-size: 1.1rem;
         }
         .play-btn {
-            flex: 1.6; background: rgba(245, 158, 11, 0.2); color: var(--gold-light);
-            border-color: var(--gold-main); box-shadow: 0 0 20px rgba(245, 158, 11, 0.3);
+            flex: 1.6;
         }
-        .play-time { font-size: 0.65rem; font-weight: 800; color: var(--gold-main); margin-top: 2px; }
+        .play-time { font-size: 0.65rem; font-weight: 800; color: var(--gold-light); margin-top: 2px; }
 
         /* ПУЛЬТ ВЕДУЩЕГО: НИЗ */
         #host-bottom-bar {
             display: none; position: fixed; bottom: 0; left: 0; right: 0;
             height: var(--bottom-bar-height); z-index: 500;
-            background: rgba(0, 15, 40, 0.96);
-            border-top: 1px solid var(--glass-border);
+            background: rgba(0, 10, 30, 0.97);
+            border-top: 2px solid rgba(226, 192, 103, 0.3);
             padding: 8px 14px; flex-direction: column; gap: 8px; justify-content: center;
             backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            box-shadow: 0 -10px 30px rgba(0,0,0,0.8);
+            box-shadow: 0 -10px 30px rgba(0,0,0,0.9);
         }
         .btn-action { flex: 1; height: 38px; font-size: 0.8rem; letter-spacing: 0.5px; }
-        .btn-action.gold { background: rgba(245, 158, 11, 0.22); color: var(--gold-light); border-color: var(--gold-main); }
-        .btn-action.red { background: rgba(239, 68, 68, 0.22); color: #fca5a5; border-color: var(--danger-red); }
+        .btn-small { flex: 0.65 !important; font-size: 0.75rem !important; }
+        .btn-med { flex: 0.9 !important; font-size: 0.78rem !important; }
+
+        .sfx-btn { flex: 1; height: 40px; }
         .sfx-active {
-            background: rgba(245, 158, 11, 0.5) !important;
-            border-color: var(--gold-main) !important;
-            box-shadow: 0 0 25px var(--gold-glow);
+            background: linear-gradient(135deg, #d97706 0%, #f59e0b 50%, #b45309 100%) !important;
+            border-color: #ffffff !important; box-shadow: 0 0 25px var(--gold-glow) !important;
         }
 
         /* ЭКРАН ПРОЕКТОРА */
@@ -193,22 +231,22 @@
         }
         #module-iframe.active-module { z-index: 15; opacity: 1; pointer-events: auto; }
 
-        #main-display-content { text-align: center; z-index: 10; transition: opacity 1s ease; opacity: 1; }
+        #main-display-content { text-align: center; z-index: 10; transition: opacity 1s ease; opacity: 1; padding: 0 20px; }
         
-        /* КРУПНЫЙ ВЕЛИЧЕСТВЕННЫЙ ТЕКСТ */
+        /* КРУПНЫЙ ТЕКСТ */
         .shimmer-title {
             font-family: 'Cinzel', serif;
-            font-size: 5vw; min-size: 3.8rem; font-weight: 900;
+            font-size: 4.5vw; min-size: 3.2rem; font-weight: 900;
             background: linear-gradient(90deg, #ffffff 0%, var(--gold-light) 30%, var(--gold-main) 60%, #ffffff 100%);
             background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
             animation: shine 5s linear infinite; text-shadow: 0 0 45px rgba(245, 158, 11, 0.5);
-            letter-spacing: 2px; line-height: 1.1;
+            letter-spacing: 2px; line-height: 1.15; text-transform: uppercase;
         }
         @keyframes shine { to { background-position: 200% center; } }
         
         .subtitle-text {
-            color: var(--gold-accent); font-size: 2vw; min-size: 1.6rem; font-weight: 700;
-            margin-top: 16px; letter-spacing: 4px; text-transform: uppercase;
+            color: var(--gold-accent); font-size: 2vw; min-size: 1.5rem; font-weight: 700;
+            margin-top: 18px; letter-spacing: 4px; text-transform: uppercase;
             text-shadow: 0 0 20px rgba(226, 192, 103, 0.4);
         }
 
@@ -231,19 +269,17 @@
         /* МОДАЛКИ */
         .modal-overlay {
             display: none; position: fixed; inset: 0; z-index: 20000;
-            background: rgba(0, 5, 20, 0.88); align-items: center; justify-content: center; padding: 20px;
+            background: rgba(0, 5, 15, 0.9); align-items: center; justify-content: center; padding: 20px;
             backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
         }
         .modal-card {
             background: var(--bg-card); padding: 28px; border-radius: 24px; width: 100%; max-width: 400px;
-            border: 2px solid var(--glass-border); text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.9);
+            border: 2px solid rgba(226, 192, 103, 0.35); text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.9);
         }
-        .mod-btn {
-            width: 100%; padding: 14px; margin-top: 10px; font-size: 0.95rem;
-        }
+        .mod-btn { width: 100%; padding: 14px; margin-top: 10px; font-size: 0.95rem; }
         
         /* СЦЕНАРИЙ ДЛЯ ВЕДУЩЕГО */
-        #script-iframe { width: 100%; height: 70vh; border: none; border-radius: 16px; background: #0b0d12; }
+        #script-iframe { width: 100%; height: 70vh; border: none; border-radius: 16px; background: #000714; }
         .modal-card.large { max-width: 650px; width: 100%; padding: 16px; }
 
         .prompt-desc { font-size: 0.85rem; color: var(--gold-light); margin-top: 12px; text-align: left; font-weight: 600; }
@@ -261,7 +297,7 @@
             <div class="brand-header">FAMILY STANDARD</div>
             <p class="auth-sub">EVENT OS • ПУЛЬТ ВЕДУЩЕГО</p>
             <input type="password" id="auth-input" class="auth-input" placeholder="КОД ДОСТУПА" autocomplete="off" onkeydown="if(event.key==='Enter') submitAuth()">
-            <button onclick="submitAuth()" class="btn-gold">ВОЙТИ В СИСТЕМУ</button>
+            <button onclick="submitAuth()" class="btn-metal btn-gold-metal" style="width: 100%; padding: 16px; margin-top: 18px;">ВОЙТИ В СИСТЕМУ</button>
         </div>
     </div>
 
@@ -272,26 +308,26 @@
         </div>
 
         <div class="control-row">
-            <button class="btn-anim btn-control" onclick="setVol(0.03, this)">3%</button>
-            <button class="btn-anim btn-control" onclick="setVol(0.1, this)">10%</button>
-            <button class="btn-anim btn-control active" onclick="setVol(0.3, this)">30%</button>
-            <button class="btn-anim btn-control" onclick="setVol(0.6, this)">60%</button>
-            <button class="btn-anim btn-control" onclick="setVol(1.0, this)">100%</button>
+            <button class="btn-metal vol-3 btn-control" onclick="setVol(0.03, this)">3%</button>
+            <button class="btn-metal vol-10 btn-control" onclick="setVol(0.1, this)">10%</button>
+            <button class="btn-metal vol-30 btn-control active" onclick="setVol(0.3, this)">30%</button>
+            <button class="btn-metal vol-60 btn-control" onclick="setVol(0.6, this)">60%</button>
+            <button class="btn-metal vol-100 btn-control" onclick="setVol(1.0, this)">100%</button>
         </div>
         
         <div class="control-row">
-            <button class="btn-anim btn-control" onclick="openMoodSelector('lounge')">🍃 Лаундж</button>
-            <button class="btn-anim btn-control" onclick="openMoodSelector('active')">🕺 Банкет</button>
-            <button class="btn-anim btn-control" onclick="openMoodSelector('party')">🎉 Движ</button>
+            <button class="btn-metal btn-blue-metal btn-control" onclick="openMoodSelector('lounge')">ЛАУНДЖ</button>
+            <button class="btn-metal btn-blue-metal btn-control" onclick="openMoodSelector('active')">БАНКЕТ</button>
+            <button class="btn-metal btn-blue-metal btn-control" onclick="openMoodSelector('party')">ДВИЖ</button>
         </div>
 
         <div class="control-row">
-            <div class="seek-btn btn-anim" onclick="seekRelative(-60)">⏪</div>
-            <div class="seek-btn play-btn btn-anim" id="btn-play-toggle" onclick="togglePlay()">
+            <div class="seek-btn btn-metal btn-blue-metal" onclick="seekRelative(-60)">◄◄ -60</div>
+            <div class="seek-btn play-btn btn-metal btn-gold-metal" id="btn-play-toggle" onclick="togglePlay()">
                 <span id="play-icon" style="font-size: 1.1rem; line-height: 1;">⏯</span>
                 <span class="play-time" id="play-time">00:00 / 00:00</span>
             </div>
-            <div class="seek-btn btn-anim" onclick="seekRelative(60)">⏩</div>
+            <div class="seek-btn btn-metal btn-blue-metal" onclick="seekRelative(60)">+60 ►►</div>
         </div>
     </div>
 
@@ -304,8 +340,8 @@
         <iframe id="module-iframe" src="about:blank"></iframe>
         
         <div id="main-display-content">
-            <h1 class="shimmer-title" id="display-title">ЦОЙ ИГОРЬ ГРИГОРЬЕВИЧ</h1>
-            <p class="subtitle-text" id="display-subtitle">С ДНЕМ РОЖДЕНИЯ</p>
+            <h1 class="shimmer-title" id="display-title">НУ ЧТО, КАКОЙ СЕГОДНЯ ПРАЗДНИК ПРАЗДНУЕМ?</h1>
+            <p class="subtitle-text" id="display-subtitle">РАССКАЖИ О НЁМ ПОДРОБНЕЕ</p>
         </div>
         
         <div class="footer-logo">FAMILY STANDARD OS 2026</div>
@@ -314,16 +350,17 @@
     <!-- ПУЛЬТ ВЕДУЩЕГО: НИЗ -->
     <div id="host-bottom-bar">
         <div class="control-row">
-            <button class="btn-anim btn-action gold" onclick="openModal('launcher-modal')">ИНТЕРАКТИВЫ</button>
-            <button class="btn-anim btn-action gold" onclick="openScriptModal()">СЦЕНАРИЙ</button>
-            <button class="btn-anim btn-action red" onclick="handleCloseClick()">ЗАКРЫТЬ</button>
-            <button class="btn-anim btn-action gold" onclick="socket.emit('add_timer_15s')" style="flex: 0.6;">+15 СЕК</button>
+            <button class="btn-metal btn-blue-metal btn-action" onclick="openModal('launcher-modal')">ИНТЕРАКТИВЫ</button>
+            <button class="btn-metal btn-red-metal btn-action" onclick="handleCloseClick()">ЗАКРЫТЬ</button>
+            <button class="btn-metal btn-red-metal btn-action btn-small" onclick="socket.emit('add_timer_15s')">+15 СЕК</button>
+            <button class="btn-metal btn-gold-metal btn-action btn-med" onclick="openScriptModal()">СЦЕНАРИЙ</button>
         </div>
         <div class="control-row">
-            <button class="seek-btn btn-anim" id="btn-jingle" onclick="socket.emit('host_toggle_jingle')" style="font-size:1.2rem">🎁</button>
-            <button class="seek-btn btn-anim" onclick="triggerSfx('applause')" style="font-size:1.2rem">👏</button>
-            <button class="seek-btn btn-anim" onclick="triggerSfx('correct')" style="font-size:1.2rem">✅</button>
-            <button class="seek-btn btn-anim" onclick="triggerSfx('wrong')" style="font-size:1.2rem">❌</button>
+            <button class="sfx-btn btn-metal btn-silver-metal" id="btn-jingle" onclick="socket.emit('host_toggle_jingle')">ДЖН</button>
+            <button class="sfx-btn btn-metal btn-silver-metal" onclick="triggerSfx('applause')">АПЛ</button>
+            <button class="sfx-btn btn-metal btn-silver-metal" onclick="triggerSfx('fanfare')">ФНФ</button>
+            <button class="sfx-btn btn-metal btn-silver-metal" onclick="triggerSfx('correct')">ВЕР</button>
+            <button class="sfx-btn btn-metal btn-silver-metal" onclick="triggerSfx('wrong')">НЕВ</button>
         </div>
     </div>
 
@@ -332,7 +369,7 @@
         <div class="modal-card">
             <h3 style="color: var(--gold-light); font-family: 'Cinzel', serif;" id="mood-modal-title">Выбор трека</h3>
             <div id="mood-tracks-list"></div>
-            <button onclick="closeModal('mood-selector-modal')" class="btn-anim mod-btn" style="background: transparent; color: #94a3b8; border: none; margin-top: 15px;">Отмена</button>
+            <button onclick="closeModal('mood-selector-modal')" class="btn-metal mod-btn" style="background: transparent; color: #94a3b8; border: none; margin-top: 15px;">Отмена</button>
         </div>
     </div>
 
@@ -341,7 +378,7 @@
         <div class="modal-card large">
             <h3 style="color: var(--gold-light); font-family: 'Cinzel', serif; margin-bottom: 10px;">Сценарий мероприятия</h3>
             <iframe id="script-iframe" src="about:blank"></iframe>
-            <button onclick="closeModal('script-modal')" class="btn-anim mod-btn btn-gold" style="margin-top: 10px;">Закрыть сценарий</button>
+            <button onclick="closeModal('script-modal')" class="btn-metal btn-gold-metal mod-btn" style="margin-top: 10px;">Закрыть сценарий</button>
         </div>
     </div>
 
@@ -350,24 +387,24 @@
         <div class="modal-card">
             <h3 style="color: var(--gold-light); font-family: 'Cinzel', serif;">Интерактивы</h3>
             <div id="modules-list-box"></div>
-            <button class="btn-anim mod-btn" style="border-color: var(--gold-main); background: rgba(245,158,11,0.2); margin-top: 14px;" onclick="openEditEventModal()">✏️ Изменить заголовок</button>
+            <button class="btn-metal btn-blue-metal mod-btn" style="margin-top: 14px;" onclick="openEditEventModal()">✏️ Изменить заголовок</button>
             <button onclick="closeModal('launcher-modal')" style="background: transparent; color: #94a3b8; border: none; margin-top: 15px; font-weight: bold; cursor: pointer;">Отмена</button>
         </div>
     </div>
 
-    <!-- МОДАЛКА ИЗМЕНЕНИЯ ЗАГОЛОВКА С ПОДСКАЗКАМИ -->
+    <!-- МОДАЛКА ИЗМЕНЕНИЯ ЗАГОЛОВКА -->
     <div class="modal-overlay" id="edit-event-modal">
         <div class="modal-card">
             <h3 style="color: var(--gold-light); font-family: 'Cinzel', serif;">Настройка праздника</h3>
             
             <div class="prompt-desc">Ну что, какой праздник празднуем сегодня?</div>
-            <input type="text" id="edit-title-input" class="auth-input" style="font-size: 1rem; letter-spacing: 1px; margin-top: 5px;" placeholder="Имя / Заголовок события">
+            <input type="text" id="edit-title-input" class="auth-input" style="font-size: 1rem; letter-spacing: 1px; margin-top: 5px;" placeholder="Заголовок события">
             
             <div class="prompt-desc">Расскажи поподробнее:</div>
             <input type="text" id="edit-subtitle-input" class="auth-input" style="font-size: 0.9rem; letter-spacing: 1px; margin-top: 5px;" placeholder="Подзаголовок / Повод">
             
             <div style="display: flex; gap: 10px; margin-top: 20px;">
-                <button onclick="saveEventInfo()" class="btn-anim btn-gold" style="margin: 0; flex: 1;">Сохранить</button>
+                <button onclick="saveEventInfo()" class="btn-metal btn-gold-metal" style="margin: 0; flex: 1; padding: 14px;">Сохранить</button>
                 <button onclick="closeModal('edit-event-modal')" style="flex: 1; border: 1px solid rgba(255,255,255,0.2); background: transparent; color: #fff; border-radius: 14px;">Отмена</button>
             </div>
         </div>
@@ -377,13 +414,13 @@
         <div class="modal-card">
             <h3 style="color: var(--gold-light); font-family: 'Cinzel', serif;">Завершить праздник?</h3>
             <div style="display: flex; gap: 10px; margin-top: 20px;">
-                <button onclick="confirmEnd()" class="btn-anim btn-gold" style="margin: 0; background: var(--danger-red); color: #fff;">Завершить</button>
+                <button onclick="confirmEnd()" class="btn-metal btn-red-metal" style="margin: 0; flex: 1; padding: 14px;">Завершить</button>
                 <button onclick="closeModal('end-event-modal')" style="flex: 1; border: 1px solid rgba(255,255,255,0.2); background: transparent; color: #fff; border-radius: 14px;">Отмена</button>
             </div>
         </div>
     </div>
 
-    <!-- АУДИОСИСТЕМА C CROSSORIGIN="ANONYMOUS" ДЛЯ РАБОТЫ WEB AUDIO API -->
+    <!-- АУДИОСИСТЕМА -->
     <audio id="bg-audio" crossorigin="anonymous" loop></audio>
     <audio id="sfx-audio" crossorigin="anonymous"></audio>
 
@@ -437,7 +474,7 @@
         window.addEventListener('click', initAudioContext);
         window.addEventListener('touchstart', initAudioContext);
 
-        // --- 1. ФИЗИКА ЧАСТИЦ С КОЛЛИЗИЯМИ И СПУТНИКАМИ ---
+        // --- ФИЗИКА ЧАСТИЦ С КОЛЛИЗИЯМИ И СПУТНИКАМИ ---
         const pCanvas = document.getElementById('particles-canvas');
         const pCtx = pCanvas.getContext('2d');
         let particles = [];
@@ -477,7 +514,6 @@
                 pCtx.shadowColor = '#f59e0b';
                 pCtx.fill();
 
-                // Окружающие сателлиты
                 let satX = this.x + Math.cos(this.satAngle) * (this.r + 10);
                 let satY = this.y + Math.sin(this.satAngle) * (this.r + 10);
                 pCtx.beginPath();
@@ -497,7 +533,6 @@
                     let dist = Math.sqrt(dx * dx + dy * dy);
 
                     if (dist < p1.r + p2.r) {
-                        // Рассчёт коллизии
                         let normalX = dx / dist, normalY = dy / dist;
                         let relativeVelocityX = p1.vx - p2.vx, relativeVelocityY = p1.vy - p2.vy;
                         let speed = relativeVelocityX * normalX + relativeVelocityY * normalY;
@@ -509,7 +544,6 @@
                             p2.vx += impulse * p1.mass * normalX;
                             p2.vy += impulse * p1.mass * normalY;
 
-                            // Смещение центрального эллипса от коллизии
                             ellipseWobble.vx += normalX * 0.15;
                             ellipseWobble.vy += normalY * 0.15;
                         }
@@ -524,7 +558,6 @@
 
             particles.forEach(p => { p.update(); p.draw(); });
 
-            // Отрисовка центрального реактивного эллипса
             ellipseWobble.x += ellipseWobble.vx;
             ellipseWobble.y += ellipseWobble.vy;
             ellipseWobble.vx *= 0.92;
@@ -543,7 +576,7 @@
         }
         animateParticles();
 
-        // --- 2. ОВАЛЬНЫЙ ЭКВАЛАЙЗЕР ОТ ЦЕНТРА С ЭФФЕКТОМ БОКЕ ---
+        // --- ОВАЛЬНЫЙ ЭКВАЛАЙЗЕР ОТ ЦЕНТРА ---
         const eqCanvas = document.getElementById('eq-canvas');
         const eqCtx = eqCanvas.getContext('2d');
         function resizeEqCanvas() { eqCanvas.width = window.innerWidth; eqCanvas.height = window.innerHeight; }
@@ -556,8 +589,8 @@
 
             const cx = eqCanvas.width / 2;
             const cy = eqCanvas.height / 2;
-            const rx = 160; // Радиус овала по X
-            const ry = 100; // Радиус овала по Y
+            const rx = 170;
+            const ry = 105;
             const bars = 64;
 
             if (analyser && eqIsPlaying) {
@@ -654,7 +687,7 @@
             box.innerHTML = '';
             (data.modules || []).forEach(m => {
                 const btn = document.createElement('button');
-                btn.className = 'btn-anim mod-btn btn-gold';
+                btn.className = 'btn-metal btn-gold-metal mod-btn';
                 btn.innerText = m.name;
                 btn.onclick = () => { socket.emit('switch_module', { module: m.path }); closeModal('launcher-modal'); };
                 box.appendChild(btn);
@@ -795,7 +828,6 @@
                         timerInterval = setInterval(() => {
                             const currentRemain = state.timer.end_time - (Date.now() / 1000);
                             
-                            // ЗВУК ЗА 0.5 СЕКУНДЫ ДО КОНЦА ТАЙМЕРА (СИНХРОННО)
                             if (currentRemain <= 0.5 && !fanfareFiredForTimer && overlayState === 'TIMER') {
                                 fanfareFiredForTimer = true;
                                 if (myRole === 'SCREEN') { socket.emit('host_trigger_sfx', { sfx: 'fanfare' }); }
@@ -849,15 +881,15 @@
 
         // УПРАВЛЕНИЕ ВЕДУЩЕГО И ВЫБОР ИЗ 5 ТРЕКОВ
         function openMoodSelector(mood) {
-            const names = { lounge: '🍃 Лаундж', active: '🕺 Банкет', party: '🎉 Движ' };
+            const names = { lounge: 'ЛАУНДЖ', active: 'БАНКЕТ', party: 'ДВИЖ' };
             document.getElementById('mood-modal-title').innerText = names[mood];
             const box = document.getElementById('mood-tracks-list');
             box.innerHTML = '';
 
             for (let i = 1; i <= 5; i++) {
                 const btn = document.createElement('button');
-                btn.className = 'btn-anim mod-btn btn-gold';
-                btn.innerText = `${names[mood]} — Трек ${i}`;
+                btn.className = 'btn-metal btn-gold-metal mod-btn';
+                btn.innerText = `${names[mood]} — ТРЕК ${i}`;
                 btn.onclick = () => {
                     socket.emit('host_audio_control', { track_file: `${mood}${i}.mp3` });
                     closeModal('mood-selector-modal');
