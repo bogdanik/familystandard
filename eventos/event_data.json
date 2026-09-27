@@ -1,7 +1,7 @@
 {
   "_description": "ЦЕНТРАЛЬНЫЙ КОНФИГУРАТОР МЕРОПРИЯТИЯ (EVENT OS HOST DATA)",
-  "event_title": "ЦОЙ ИГОРЬ ГРИГОРЬЕВИЧ",
-  "event_subtitle": "С ДНЕМ РОЖДЕНИЯ",
+  "event_title": "НУ ЧТО, КАКОЙ СЕГОДНЯ ПРАЗДНИК ПРАЗДНУЕМ?",
+  "event_subtitle": "РАССКАЖИ О НЁМ ПОДРОБНЕЕ",
   "event_title_prompt": "Ну что, какой праздник празднуем сегодня?",
   "event_subtitle_prompt": "Расскажи поподробнее",
   "host_name": "Богдан",
