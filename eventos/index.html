@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Family Standard OS — Liquid Glass Edition</title>
+    <title>Family Standard OS — Neon Vortex Edition</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
@@ -11,27 +11,32 @@
 
     <style>
         :root {
-            --bg-obsidian: #030712;
-            --glass-base: rgba(255, 255, 255, 0.05);
-            --glass-border-light: rgba(255, 255, 255, 0.22);
-            --glass-border-top: rgba(255, 255, 255, 0.45);
-            --gold-light: #fff5d6;
-            --gold-main: #f59e0b;
-            --gold-glow: rgba(245, 158, 11, 0.35);
-            --danger-red: #ef4444;
-            --ios-font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Plus Jakarta Sans", sans-serif;
+            --bg-deep: #02040a;
+            --neon-cyan: #00f3ff;
+            --neon-gold: #ffb700;
+            --neon-red: #ff0055;
+            --neon-cyan-glow: rgba(0, 243, 255, 0.4);
+            --neon-gold-glow: rgba(255, 183, 0, 0.4);
+            --neon-red-glow: rgba(255, 0, 85, 0.4);
+            --ios-font: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif;
             --top-bar-height: 170px;
             --bottom-bar-height: 115px;
         }
 
-        /* КАСТОМНЫЙ КУРСОР В ВИДЕ БЕЛОЙ ТОЧКИ */
-        body, html {
+        /* ГЛОБАЛЬНЫЙ КУРСОР В ВИДЕ ТОЧКИ НА ВСЁМ ЭКРАНЕ */
+        *, *::before, *::after, html, body, button, input, iframe, a, div, span, h1, p {
             cursor: none !important;
-            background: var(--bg-obsidian);
+        }
+
+        body, html {
+            background: var(--bg-deep);
             color: #ffffff;
             min-height: 100vh;
             overflow: hidden;
             position: relative;
+            font-family: var(--ios-font);
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
 
         #custom-cursor {
@@ -42,190 +47,194 @@
             border-radius: 50%;
             pointer-events: none;
             z-index: 999999;
-            box-shadow: 0 0 12px #ffffff, 0 0 24px rgba(255,255,255,0.8);
+            box-shadow: 0 0 10px #ffffff, 0 0 20px #00f3ff, 0 0 30px #ffb700;
             transform: translate(-50%, -50%);
-            transition: transform 0.04s ease-out;
+            transition: transform 0.02s linear;
         }
 
-        /* ГЛУБОКИЙ ЖИВОЙ ФОН */
+        /* ТЕМНЫЙ ФОН И МИКРО-ТОЧКА СВЕТА В ЦЕНТРЕ */
         .bg-glow {
             position: fixed; inset: 0; z-index: 1;
-            background: radial-gradient(circle at 50% 50%, #030b1e 0%, #030712 100%);
+            background: radial-gradient(circle at 50% 50%, #040a17 0%, #02040a 100%);
             pointer-events: none;
         }
 
-        @keyframes pulseRoyal {
-            0% { transform: translate(-50%, -50%) scale(1); opacity: 0.8; }
-            50% { transform: translate(-50%, -50%) scale(1.08); opacity: 0.45; }
-            100% { transform: translate(-50%, -50%) scale(1); opacity: 0.8; }
+        /* ЦЕНТРАЛЬНЫЙ МИКРО-ИСТОЧНИК СВЕТА, НА ВЕСЬ ЭКРАН */
+        .center-light-point {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 6px; height: 6px; background: #ffffff; border-radius: 50%;
+            box-shadow: 0 0 15px #ffffff, 0 0 40px var(--neon-cyan), 0 0 80px var(--neon-gold);
+            z-index: 2; pointer-events: none;
         }
 
-        .center-glow {
+        .center-glow-cone {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 85vw; height: 85vw;
-            background: radial-gradient(circle, rgba(0, 102, 255, 0.18) 0%, rgba(245, 158, 11, 0.08) 40%, transparent 70%);
+            width: 90vw; height: 90vw; border-radius: 50%;
+            background: radial-gradient(circle, rgba(255, 183, 0, 0.15) 0%, rgba(0, 243, 255, 0.08) 35%, transparent 70%);
             pointer-events: none; z-index: 2;
-            animation: pulseRoyal 6s ease-in-out infinite;
+            transition: transform 0.08s ease-out, opacity 0.08s ease-out;
         }
 
         #particles-canvas { position: fixed; inset: 0; z-index: 3; pointer-events: none; }
 
         .footer-logo {
             position: fixed; bottom: 8px; width: 100%; text-align: center;
-            color: rgba(255, 255, 255, 0.25); font-size: 0.72rem; font-weight: 800;
-            letter-spacing: 3px; z-index: 100; pointer-events: none; text-transform: uppercase;
+            color: rgba(0, 243, 255, 0.3); font-size: 0.72rem; font-weight: 800;
+            letter-spacing: 4px; z-index: 100; pointer-events: none; text-transform: uppercase;
+            text-shadow: 0 0 8px var(--neon-cyan);
         }
 
-        /* УНИВЕРСАЛЬНАЯ ОПТИКА ЖИВОГО СТЕКЛА (GLASSMORPHISM 120 FPS) */
-        .btn-glass {
+        /* НЕОНОВЫЙ СТИЛЬ КНОПОК (NEON GLASS) */
+        .btn-neon {
             position: relative;
-            background: rgba(255, 255, 255, 0.06);
-            backdrop-filter: blur(25px) saturate(190%);
-            -webkit-backdrop-filter: blur(25px) saturate(190%);
-            border: 1px solid var(--glass-border-light);
-            border-top: 1px solid var(--glass-border-top);
-            border-radius: 16px;
+            background: rgba(2, 8, 20, 0.6);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
             color: #ffffff;
             font-weight: 700;
-            letter-spacing: 0.8px;
+            font-size: 0.78rem;
+            letter-spacing: 1.5px;
             text-transform: uppercase;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
-            cursor: none !important;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.35), inset 0 1px 1px 0 rgba(255, 255, 255, 0.3);
-            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: all 0.2s ease;
             overflow: hidden;
+            box-shadow: 0 0 10px rgba(0,0,0,0.8);
         }
 
-        /* Преломление света на поверхности */
-        .btn-glass::before {
-            content: ''; position: absolute; inset: 0;
-            background: linear-gradient(135deg, rgba(255,255,255,0.18) 0%, transparent 50%);
-            pointer-events: none; border-radius: inherit;
+        .btn-neon:active {
+            transform: scale(0.95);
         }
 
-        .btn-glass:active {
-            transform: scale(0.96);
-            background: rgba(255, 255, 255, 0.12);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+        /* НЕОНОВЫЙ ЦИАН */
+        .neon-cyan {
+            border-color: var(--neon-cyan);
+            color: var(--neon-cyan);
+            box-shadow: 0 0 12px var(--neon-cyan-glow), inset 0 0 8px rgba(0, 243, 255, 0.15);
+            text-shadow: 0 0 8px var(--neon-cyan);
+        }
+        .neon-cyan:active {
+            background: rgba(0, 243, 255, 0.15);
+            box-shadow: 0 0 22px var(--neon-cyan);
         }
 
-        /* Оттенки стекла */
-        .glass-blue {
-            background: rgba(0, 102, 255, 0.12);
-            border-color: rgba(96, 165, 250, 0.35);
-            border-top-color: rgba(147, 197, 253, 0.6);
+        /* НЕОНОВОЕ ЗОЛОТО */
+        .neon-gold {
+            border-color: var(--neon-gold);
+            color: var(--neon-gold);
+            box-shadow: 0 0 12px var(--neon-gold-glow), inset 0 0 8px rgba(255, 183, 0, 0.15);
+            text-shadow: 0 0 8px var(--neon-gold);
         }
-        .glass-blue:active { background: rgba(0, 102, 255, 0.25); }
-
-        .glass-red {
-            background: rgba(239, 68, 68, 0.14);
-            border-color: rgba(248, 113, 113, 0.35);
-            border-top-color: rgba(252, 165, 165, 0.6);
-            color: #fca5a5;
+        .neon-gold:active {
+            background: rgba(255, 183, 0, 0.15);
+            box-shadow: 0 0 22px var(--neon-gold);
         }
-        .glass-red:active { background: rgba(239, 68, 68, 0.28); }
 
-        .glass-gold {
-            background: rgba(245, 158, 11, 0.16);
-            border-color: rgba(252, 211, 77, 0.4);
-            border-top-color: rgba(254, 240, 138, 0.75);
-            color: var(--gold-light);
-            box-shadow: 0 8px 30px rgba(245, 158, 11, 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.5);
+        /* НЕОНОВЫЙ РУБИН */
+        .neon-red {
+            border-color: var(--neon-red);
+            color: var(--neon-red);
+            box-shadow: 0 0 12px var(--neon-red-glow), inset 0 0 8px rgba(255, 0, 85, 0.15);
+            text-shadow: 0 0 8px var(--neon-red);
         }
-        .glass-gold:active { background: rgba(245, 158, 11, 0.3); }
+        .neon-red:active {
+            background: rgba(255, 0, 85, 0.15);
+            box-shadow: 0 0 22px var(--neon-red);
+        }
 
-        /* ГРОМКОСТЬ: ДЫМЧАТОЕ СТЕКЛО -> ВНУТРЕННИЙ РУБИНОВЫЙ СВЕТ */
-        .vol-3 { background: rgba(255, 255, 255, 0.04); border-color: rgba(255, 255, 255, 0.15); }
-        .vol-10 { background: rgba(239, 68, 68, 0.08); border-color: rgba(248, 113, 113, 0.25); }
-        .vol-30 { background: rgba(239, 68, 68, 0.16); border-color: rgba(248, 113, 113, 0.35); }
-        .vol-60 { background: rgba(239, 68, 68, 0.28); border-color: rgba(239, 68, 68, 0.5); box-shadow: 0 0 20px rgba(239, 68, 68, 0.3); }
+        /* НЕОНОВАЯ ШКАЛА ГРОМКОСТИ */
+        .vol-3 { border-color: rgba(0, 243, 255, 0.2); color: rgba(0, 243, 255, 0.6); }
+        .vol-10 { border-color: rgba(0, 243, 255, 0.5); color: #00f3ff; box-shadow: 0 0 8px var(--neon-cyan-glow); }
+        .vol-30 { border-color: rgba(255, 183, 0, 0.6); color: #ffb700; box-shadow: 0 0 10px var(--neon-gold-glow); }
+        .vol-60 { border-color: rgba(255, 0, 85, 0.7); color: #ff0055; box-shadow: 0 0 14px var(--neon-red-glow); }
         .vol-100 {
-            background: rgba(239, 68, 68, 0.45);
-            border-color: rgba(255, 255, 255, 0.8);
-            box-shadow: 0 0 28px rgba(239, 68, 68, 0.6), inset 0 0 15px rgba(255, 255, 255, 0.4);
+            border-color: #ff0055; color: #ffffff; background: rgba(255, 0, 85, 0.25);
+            box-shadow: 0 0 22px var(--neon-red), inset 0 0 10px var(--neon-red);
+            text-shadow: 0 0 10px #ffffff;
         }
 
         /* АВТОРИЗАЦИЯ */
         #auth-overlay { position: fixed; inset: 0; z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 20px; }
         .auth-card {
-            background: rgba(10, 18, 38, 0.7); border: 1px solid var(--glass-border-top);
-            padding: 40px 28px; border-radius: 32px; width: 100%; max-width: 370px; text-align: center;
-            box-shadow: 0 30px 70px rgba(0,0,0,0.8), 0 0 40px rgba(245, 158, 11, 0.2);
-            backdrop-filter: blur(30px) saturate(200%); -webkit-backdrop-filter: blur(30px) saturate(200%); z-index: 10001;
+            background: rgba(2, 6, 16, 0.8); border: 1px solid var(--neon-cyan);
+            padding: 40px 28px; border-radius: 28px; width: 100%; max-width: 370px; text-align: center;
+            box-shadow: 0 0 35px var(--neon-cyan-glow);
+            backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); z-index: 10001;
         }
         .brand-header {
-            font-family: 'Cinzel', serif; font-size: 2.3rem; font-weight: 900;
-            background: linear-gradient(135deg, #ffffff 10%, var(--gold-light) 40%, var(--gold-main) 100%);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 30px rgba(245, 158, 11, 0.3);
+            font-family: 'Cinzel', serif; font-size: 2.2rem; font-weight: 900;
+            color: #ffffff; text-shadow: 0 0 20px var(--neon-gold), 0 0 40px var(--neon-gold);
         }
-        .auth-sub { color: var(--gold-main); font-size: 0.8rem; font-weight: 700; margin: 8px 0 22px; letter-spacing: 2px; text-transform: uppercase; }
+        .auth-sub { color: var(--neon-cyan); font-size: 0.78rem; font-weight: 700; margin: 8px 0 22px; letter-spacing: 3px; text-shadow: 0 0 8px var(--neon-cyan); }
         .auth-input {
-            width: 100%; padding: 16px; border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.2);
-            background: rgba(0, 0, 0, 0.4); color: #fff; text-align: center; font-size: 1.3rem; font-weight: 800;
+            width: 100%; padding: 16px; border-radius: 14px; border: 1px solid var(--neon-cyan);
+            background: rgba(0, 0, 0, 0.6); color: #fff; text-align: center; font-size: 1.3rem; font-weight: 800;
             outline: none; letter-spacing: 3px; user-select: text; transition: all 0.3s ease;
+            box-shadow: inset 0 0 10px var(--neon-cyan-glow);
         }
-        .auth-input:focus { border-color: var(--gold-main); box-shadow: 0 0 25px var(--gold-glow); }
+        .auth-input:focus { border-color: var(--neon-gold); box-shadow: 0 0 20px var(--neon-gold-glow); }
 
         /* ПУЛЬТ ВЕДУЩЕГО: ВЕРХ */
         #host-top-bar {
             display: none; position: fixed; top: 0; left: 0; right: 0;
             height: var(--top-bar-height); z-index: 500;
-            background: rgba(3, 11, 26, 0.82);
-            border-bottom: 1px solid var(--glass-border-light);
+            background: rgba(2, 5, 12, 0.85);
+            border-bottom: 1px solid rgba(0, 243, 255, 0.2);
             padding: 10px 14px; flex-direction: column; gap: 8px; justify-content: center;
-            backdrop-filter: blur(25px) saturate(180%); -webkit-backdrop-filter: blur(25px) saturate(180%);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
         }
 
         .host-eq-wrapper {
-            width: 100%; height: 18px; position: relative; border-radius: 10px; overflow: hidden;
-            background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.15);
-            display: flex; align-items: center; justify-content: center;
+            width: 100%; height: 14px; position: relative; border-radius: 6px; overflow: hidden;
+            background: rgba(0, 0, 0, 0.6); border: 1px solid rgba(0, 243, 255, 0.2);
         }
         #host-eq-canvas { width: 100%; height: 100%; display: block; }
 
         .control-row { display: flex; justify-content: space-between; gap: 8px; align-items: center; }
-        .btn-control { flex: 1; height: 38px; font-size: 0.82rem; }
+        .btn-control { flex: 1; height: 38px; font-size: 0.8rem; }
         .btn-control.active {
             border-color: #ffffff !important;
-            box-shadow: 0 0 20px rgba(255,255,255,0.4), inset 0 0 10px rgba(255,255,255,0.2);
+            box-shadow: 0 0 18px #ffffff, inset 0 0 10px #ffffff !important;
+            color: #ffffff !important;
         }
 
-        /* КНОПКА PLAY И ОТСТУПЫ */
-        .seek-btn { flex: 1; height: 44px; font-size: 1.1rem; }
+        /* КНОПКА PLAY С БОЛЬШИМ ОТСТУПОМ ОТ ЦИФР */
+        .seek-btn { flex: 1; height: 44px; font-size: 0.95rem; }
         .play-btn {
-            flex: 2.2 !important;
-            padding: 0 20px !important;
-            gap: 12px !important;
+            flex: 2.4 !important;
+            padding: 0 24px !important;
+            gap: 14px !important;
         }
         .play-time {
-            font-size: 0.75rem; font-weight: 800; color: #ffffff;
-            letter-spacing: 1px; margin-left: 8px; font-family: var(--ios-font);
+            font-size: 0.78rem; font-weight: 800; color: var(--neon-gold);
+            letter-spacing: 1.5px; margin-left: 10px;
+            text-shadow: 0 0 8px var(--neon-gold);
         }
 
         /* ПУЛЬТ ВЕДУЩЕГО: НИЗ */
         #host-bottom-bar {
             display: none; position: fixed; bottom: 0; left: 0; right: 0;
             height: var(--bottom-bar-height); z-index: 500;
-            background: rgba(3, 11, 26, 0.85);
-            border-top: 1px solid var(--glass-border-light);
+            background: rgba(2, 5, 12, 0.88);
+            border-top: 1px solid rgba(0, 243, 255, 0.2);
             padding: 8px 14px; flex-direction: column; gap: 8px; justify-content: center;
-            backdrop-filter: blur(25px) saturate(180%); -webkit-backdrop-filter: blur(25px) saturate(180%);
-            box-shadow: 0 -10px 30px rgba(0,0,0,0.6);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            box-shadow: 0 -10px 30px rgba(0,0,0,0.8);
         }
-        .btn-action { flex: 1; height: 40px; font-size: 0.8rem; letter-spacing: 0.5px; }
+        .btn-action { flex: 1; height: 40px; font-size: 0.78rem; letter-spacing: 1px; }
         .btn-small { flex: 0.65 !important; font-size: 0.75rem !important; }
         .btn-med { flex: 0.95 !important; font-size: 0.78rem !important; }
 
         .sfx-btn { flex: 1; height: 40px; font-size: 1.25rem; }
         .sfx-active {
-            background: rgba(245, 158, 11, 0.35) !important;
+            background: rgba(255, 183, 0, 0.2) !important;
             border-color: #ffffff !important;
-            box-shadow: 0 0 25px var(--gold-glow) !important;
+            box-shadow: 0 0 25px var(--neon-gold) !important;
         }
 
         /* ЭКРАН ПРОЕКТОРА */
@@ -249,21 +258,17 @@
 
         #main-display-content { text-align: center; z-index: 10; transition: opacity 1s ease; opacity: 1; padding: 0 20px; }
         
-        /* КРУПНЫЙ ВЕЛИЧЕСТВЕННЫЙ ТЕКСТ */
         .shimmer-title {
             font-family: 'Cinzel', serif;
-            font-size: 4.5vw; min-size: 3.2rem; font-weight: 900;
-            background: linear-gradient(90deg, #ffffff 0%, var(--gold-light) 30%, var(--gold-main) 60%, #ffffff 100%);
-            background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            animation: shine 5s linear infinite; text-shadow: 0 0 45px rgba(245, 158, 11, 0.5);
+            font-size: 4.2vw; min-size: 3rem; font-weight: 900;
+            color: #ffffff; text-shadow: 0 0 20px var(--neon-gold), 0 0 40px var(--neon-gold);
             letter-spacing: 2px; line-height: 1.15; text-transform: uppercase;
         }
-        @keyframes shine { to { background-position: 200% center; } }
         
         .subtitle-text {
-            color: var(--gold-main); font-size: 2vw; min-size: 1.5rem; font-weight: 700;
+            color: var(--neon-cyan); font-size: 1.8vw; min-size: 1.3rem; font-weight: 700;
             margin-top: 18px; letter-spacing: 4px; text-transform: uppercase;
-            text-shadow: 0 0 20px rgba(245, 158, 11, 0.4);
+            text-shadow: 0 0 15px var(--neon-cyan);
         }
 
         #full-screen-timer {
@@ -272,41 +277,44 @@
         }
         .timer-huge-text {
             font-family: 'Cinzel', serif; font-size: 24vw; font-weight: 900; color: #ffffff;
-            text-shadow: 0 0 60px var(--gold-glow), 0 0 25px var(--gold-main);
+            text-shadow: 0 0 60px var(--neon-gold), 0 0 30px var(--neon-red);
         }
 
-        /* 4-КВАДРАНТНЫЙ ЭКВАЛАЙЗЕР И ЗОЛОТОЕ БОКЕ */
+        /* КРУГОВОЙ ЭКВАЛАЙЗЕР СО СВЕТЯЩИМИСЯ ЧЁРНЫМИ ПОЛОСАМИ */
         #eq-canvas {
             position: absolute; inset: 0; width: 100%; height: 100%;
-            z-index: 5; pointer-events: none; opacity: 0.92; transition: opacity 0.5s;
+            z-index: 5; pointer-events: none; opacity: 0.95; transition: opacity 0.5s;
         }
 
-        /* МОДАЛКИ ИЗ ПРОЗРАЧНОГО СТЕКЛА */
+        /* МОДАЛКИ */
         .modal-overlay {
             display: none; position: fixed; inset: 0; z-index: 20000;
-            background: rgba(3, 7, 18, 0.85); align-items: center; justify-content: center; padding: 20px;
+            background: rgba(2, 4, 10, 0.88); align-items: center; justify-content: center; padding: 20px;
             backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
         }
         .modal-card {
-            background: rgba(10, 20, 40, 0.7); padding: 28px; border-radius: 28px; width: 100%; max-width: 400px;
-            border: 1px solid var(--glass-border-top); text-align: center;
-            box-shadow: 0 30px 60px rgba(0,0,0,0.8); backdrop-filter: blur(25px);
+            background: rgba(4, 10, 24, 0.85); padding: 28px; border-radius: 28px; width: 100%; max-width: 400px;
+            border: 1px solid var(--neon-cyan); text-align: center;
+            box-shadow: 0 0 30px var(--neon-cyan-glow); backdrop-filter: blur(25px);
         }
-        .mod-btn { width: 100%; padding: 14px; margin-top: 10px; font-size: 0.95rem; }
+        .mod-btn { width: 100%; padding: 14px; margin-top: 10px; font-size: 0.9rem; }
         
-        #script-iframe { width: 100%; height: 70vh; border: none; border-radius: 20px; background: #030712; }
+        #script-iframe { width: 100%; height: 70vh; border: none; border-radius: 20px; background: #02040a; }
         .modal-card.large { max-width: 650px; width: 100%; padding: 16px; }
 
-        .prompt-desc { font-size: 0.85rem; color: var(--gold-light); margin-top: 12px; text-align: left; font-weight: 600; }
+        .prompt-desc { font-size: 0.85rem; color: var(--neon-gold); margin-top: 12px; text-align: left; font-weight: 600; text-shadow: 0 0 8px var(--neon-gold-glow); }
     </style>
 </head>
 <body>
 
-    <!-- ТОЧКА-КУРСОР -->
+    <!-- КУРСОР-ТОЧКА ДЛЯ ВСЕХ ЭЛЕМЕНТОВ -->
     <div id="custom-cursor"></div>
 
     <div class="bg-glow"></div>
-    <div class="center-glow"></div>
+    <!-- МИКРО-ТОЧКА И ОГРОМНЫЙ КОНУС СВЕТА В ЦЕНТРЕ -->
+    <div class="center-light-point"></div>
+    <div class="center-glow-cone" id="center-light-cone"></div>
+    
     <canvas id="particles-canvas"></canvas>
 
     <!-- АВТОРИЗАЦИЯ -->
@@ -315,7 +323,7 @@
             <div class="brand-header">FAMILY STANDARD</div>
             <p class="auth-sub">EVENT OS • ПУЛЬТ ВЕДУЩЕГО</p>
             <input type="password" id="auth-input" class="auth-input" placeholder="КОД ДОСТУПА" autocomplete="off" onkeydown="if(event.key==='Enter') submitAuth()">
-            <button onclick="submitAuth()" class="btn-glass glass-gold" style="width: 100%; padding: 16px; margin-top: 18px;">ВОЙТИ В СИСТЕМУ</button>
+            <button onclick="submitAuth()" class="btn-neon neon-gold" style="width: 100%; padding: 16px; margin-top: 18px;">ВОЙТИ В СИСТЕМУ</button>
         </div>
     </div>
 
@@ -326,32 +334,32 @@
         </div>
 
         <div class="control-row">
-            <button class="btn-glass vol-3 btn-control" onclick="setVol(0.03, this)">3%</button>
-            <button class="btn-glass vol-10 btn-control" onclick="setVol(0.1, this)">10%</button>
-            <button class="btn-glass vol-30 btn-control active" onclick="setVol(0.3, this)">30%</button>
-            <button class="btn-glass vol-60 btn-control" onclick="setVol(0.6, this)">60%</button>
-            <button class="btn-glass vol-100 btn-control" onclick="setVol(1.0, this)">100%</button>
+            <button class="btn-neon vol-3 btn-control" onclick="setVol(0.03, this)">3%</button>
+            <button class="btn-neon vol-10 btn-control" onclick="setVol(0.1, this)">10%</button>
+            <button class="btn-neon vol-30 btn-control active" onclick="setVol(0.3, this)">30%</button>
+            <button class="btn-neon vol-60 btn-control" onclick="setVol(0.6, this)">60%</button>
+            <button class="btn-neon vol-100 btn-control" onclick="setVol(1.0, this)">100%</button>
         </div>
         
         <div class="control-row">
-            <button class="btn-glass glass-blue btn-control" onclick="openMoodSelector('lounge')">ЛАУНДЖ</button>
-            <button class="btn-glass glass-blue btn-control" onclick="openMoodSelector('active')">БАНКЕТ</button>
-            <button class="btn-glass glass-blue btn-control" onclick="openMoodSelector('party')">ДВИЖ</button>
+            <button class="btn-neon neon-cyan btn-control" onclick="openMoodSelector('lounge')">ЛАУНДЖ</button>
+            <button class="btn-neon neon-cyan btn-control" onclick="openMoodSelector('active')">БАНКЕТ</button>
+            <button class="btn-neon neon-cyan btn-control" onclick="openMoodSelector('party')">ДВИЖ</button>
         </div>
 
         <div class="control-row">
-            <div class="seek-btn btn-glass glass-blue" onclick="seekRelative(-60)">◄◄ -60</div>
-            <div class="seek-btn play-btn btn-glass glass-gold" id="btn-play-toggle" onclick="togglePlay()">
-                <span id="play-icon" style="font-size: 1.25rem; line-height: 1;">⏯</span>
+            <div class="seek-btn btn-neon neon-cyan" onclick="seekRelative(-60)">◄◄ -60</div>
+            <div class="seek-btn play-btn btn-neon neon-gold" id="btn-play-toggle" onclick="togglePlay()">
+                <span id="play-icon" style="font-size: 1.2rem; line-height: 1;">⏯</span>
                 <span class="play-time" id="play-time">00:00 / 00:00</span>
             </div>
-            <div class="seek-btn btn-glass glass-blue" onclick="seekRelative(60)">+60 ►►</div>
+            <div class="seek-btn btn-neon neon-cyan" onclick="seekRelative(60)">+60 ►►</div>
         </div>
     </div>
 
     <!-- ЭКРАН ПРОЕКТОРА -->
     <div id="main-viewport">
-        <!-- РАДИАЛЬНЫЙ 4-КВАДРАНТНЫЙ ЭКВАЛАЙЗЕР И ЗОЛОТОЕ БОКЕ -->
+        <!-- КРУГОВОЙ ЭКВАЛАЙЗЕР ИЗ ЦЕНТРАЛЬНОГО КРУГА -->
         <canvas id="eq-canvas"></canvas>
         <div id="full-screen-timer"><div class="timer-huge-text" id="timer-val">00:00</div></div>
         
@@ -365,85 +373,73 @@
         <div class="footer-logo">FAMILY STANDARD OS 2026</div>
     </div>
 
-    <!-- ПУЛЬТ ВЕДУЩЕГО: НИЗ (СНЕЖНОЕ СТЕКЛО И НЕСТАНДАРТНЫЕ ЭМОДЗИ) -->
+    <!-- ПУЛЬТ ВЕДУЩЕГО: НИЗ -->
     <div id="host-bottom-bar">
         <div class="control-row">
-            <button class="btn-glass glass-blue btn-action" onclick="openModal('launcher-modal')">ИНТЕРАКТИВЫ</button>
-            <button class="btn-glass glass-red btn-action" onclick="handleCloseClick()">ЗАКРЫТЬ</button>
-            <button class="btn-glass glass-red btn-action btn-small" onclick="socket.emit('add_timer_15s')">+15 СЕК</button>
-            <button class="btn-glass glass-gold btn-action btn-med" onclick="openScriptModal()">СЦЕНАРИЙ</button>
+            <button class="btn-neon neon-cyan btn-action" onclick="openModal('launcher-modal')">ИНТЕРАКТИВЫ</button>
+            <button class="btn-neon neon-red btn-action" onclick="handleCloseClick()">ЗАКРЫТЬ</button>
+            <button class="btn-neon neon-red btn-action btn-small" onclick="socket.emit('add_timer_15s')">+15 СЕК</button>
+            <button class="btn-neon neon-gold btn-action btn-med" onclick="openScriptModal()">СЦЕНАРИЙ</button>
         </div>
         <div class="control-row">
-            <!-- ДЖИНГЛ (МАГИЯ / ПОДАРОК) -->
-            <button class="sfx-btn btn-glass" id="btn-jingle" onclick="socket.emit('host_toggle_jingle')" title="Джингл">🪄</button>
-            <!-- АПЛОДИСМЕНТЫ (ОВАЦИИ) -->
-            <button class="sfx-btn btn-glass" onclick="triggerSfx('applause')" title="Аплодисменты">🙌</button>
-            <!-- ФАНФАРЫ (ГОРН) -->
-            <button class="sfx-btn btn-glass" onclick="triggerSfx('fanfare')" title="Фанфары">📯</button>
-            <!-- ВЕРНО (КРИСТАЛЛ) -->
-            <button class="sfx-btn btn-glass" onclick="triggerSfx('correct')" title="Верно">💎</button>
-            <!-- НЕВЕРНО (МОЛНИЯ) -->
-            <button class="sfx-btn btn-glass" onclick="triggerSfx('wrong')" title="Неверно">⚡</button>
+            <button class="sfx-btn btn-neon neon-cyan" id="btn-jingle" onclick="socket.emit('host_toggle_jingle')" title="Джингл">🪄</button>
+            <button class="sfx-btn btn-neon neon-cyan" onclick="triggerSfx('applause')" title="Аплодисменты">🙌</button>
+            <button class="sfx-btn btn-neon neon-cyan" onclick="triggerSfx('fanfare')" title="Фанфары">📯</button>
+            <button class="sfx-btn btn-neon neon-cyan" onclick="triggerSfx('correct')" title="Верно">💎</button>
+            <button class="sfx-btn btn-neon neon-cyan" onclick="triggerSfx('wrong')" title="Неверно">⚡</button>
         </div>
     </div>
 
-    <!-- МОДАЛКА ВЫБОРА ТРЕКОВ (1-5) -->
+    <!-- МОДАЛКИ -->
     <div class="modal-overlay" id="mood-selector-modal">
         <div class="modal-card">
-            <h3 style="color: var(--gold-light); font-family: 'Cinzel', serif;" id="mood-modal-title">Выбор трека</h3>
+            <h3 style="color: var(--neon-gold); font-family: 'Cinzel', serif;" id="mood-modal-title">Выбор трека</h3>
             <div id="mood-tracks-list"></div>
-            <button onclick="closeModal('mood-selector-modal')" class="btn-glass mod-btn" style="background: transparent; color: #94a3b8; border: none; margin-top: 15px;">Отмена</button>
+            <button onclick="closeModal('mood-selector-modal')" class="btn-neon mod-btn" style="background: transparent; color: #94a3b8; border: none; margin-top: 15px;">Отмена</button>
         </div>
     </div>
 
-    <!-- МОДАЛКА СЦЕНАРИЯ (ТОЛЬКО ДЛЯ ВЕДУЩЕГО) -->
     <div class="modal-overlay" id="script-modal">
         <div class="modal-card large">
-            <h3 style="color: var(--gold-light); font-family: 'Cinzel', serif; margin-bottom: 10px;">Сценарий мероприятия</h3>
+            <h3 style="color: var(--neon-gold); font-family: 'Cinzel', serif; margin-bottom: 10px;">Сценарий мероприятия</h3>
             <iframe id="script-iframe" src="about:blank"></iframe>
-            <button onclick="closeModal('script-modal')" class="btn-glass glass-gold mod-btn" style="margin-top: 10px;">Закрыть сценарий</button>
+            <button onclick="closeModal('script-modal')" class="btn-neon neon-gold mod-btn" style="margin-top: 10px;">Закрыть сценарий</button>
         </div>
     </div>
 
-    <!-- МОДАЛКА ИНТЕРАКТИВОВ -->
     <div class="modal-overlay" id="launcher-modal">
         <div class="modal-card">
-            <h3 style="color: var(--gold-light); font-family: 'Cinzel', serif;">Интерактивы</h3>
+            <h3 style="color: var(--neon-gold); font-family: 'Cinzel', serif;">Интерактивы</h3>
             <div id="modules-list-box"></div>
-            <button class="btn-glass glass-blue mod-btn" style="margin-top: 14px;" onclick="openEditEventModal()">✏️ Изменить заголовок</button>
-            <button onclick="closeModal('launcher-modal')" style="background: transparent; color: #94a3b8; border: none; margin-top: 15px; font-weight: bold; cursor: pointer;">Отмена</button>
+            <button class="btn-neon neon-cyan mod-btn" style="margin-top: 14px;" onclick="openEditEventModal()">✏️ Изменить заголовок</button>
+            <button onclick="closeModal('launcher-modal')" style="background: transparent; color: #94a3b8; border: none; margin-top: 15px; font-weight: bold;">Отмена</button>
         </div>
     </div>
 
-    <!-- МОДАЛКА ИЗМЕНЕНИЯ ЗАГОЛОВКА -->
     <div class="modal-overlay" id="edit-event-modal">
         <div class="modal-card">
-            <h3 style="color: var(--gold-light); font-family: 'Cinzel', serif;">Настройка праздника</h3>
-            
+            <h3 style="color: var(--neon-gold); font-family: 'Cinzel', serif;">Настройка праздника</h3>
             <div class="prompt-desc">Ну что, какой праздник празднуем сегодня?</div>
             <input type="text" id="edit-title-input" class="auth-input" style="font-size: 1rem; letter-spacing: 1px; margin-top: 5px;" placeholder="Заголовок события">
-            
             <div class="prompt-desc">Расскажи поподробнее:</div>
             <input type="text" id="edit-subtitle-input" class="auth-input" style="font-size: 0.9rem; letter-spacing: 1px; margin-top: 5px;" placeholder="Подзаголовок / Повод">
-            
             <div style="display: flex; gap: 10px; margin-top: 20px;">
-                <button onclick="saveEventInfo()" class="btn-glass glass-gold" style="margin: 0; flex: 1; padding: 14px;">Сохранить</button>
-                <button onclick="closeModal('edit-event-modal')" style="flex: 1; border: 1px solid rgba(255,255,255,0.2); background: transparent; color: #fff; border-radius: 16px;">Отмена</button>
+                <button onclick="saveEventInfo()" class="btn-neon neon-gold" style="margin: 0; flex: 1; padding: 14px;">Сохранить</button>
+                <button onclick="closeModal('edit-event-modal')" style="flex: 1; border: 1px solid rgba(255,255,255,0.2); background: transparent; color: #fff; border-radius: 14px;">Отмена</button>
             </div>
         </div>
     </div>
 
     <div class="modal-overlay" id="end-event-modal">
         <div class="modal-card">
-            <h3 style="color: var(--gold-light); font-family: 'Cinzel', serif;">Завершить праздник?</h3>
+            <h3 style="color: var(--neon-gold); font-family: 'Cinzel', serif;">Завершить праздник?</h3>
             <div style="display: flex; gap: 10px; margin-top: 20px;">
-                <button onclick="confirmEnd()" class="btn-glass glass-red" style="margin: 0; flex: 1; padding: 14px;">Завершить</button>
-                <button onclick="closeModal('end-event-modal')" style="flex: 1; border: 1px solid rgba(255,255,255,0.2); background: transparent; color: #fff; border-radius: 16px;">Отмена</button>
+                <button onclick="confirmEnd()" class="btn-neon neon-red" style="margin: 0; flex: 1; padding: 14px;">Завершить</button>
+                <button onclick="closeModal('end-event-modal')" style="flex: 1; border: 1px solid rgba(255,255,255,0.2); background: transparent; color: #fff; border-radius: 14px;">Отмена</button>
             </div>
         </div>
     </div>
 
-    <!-- АУДИОСИСТЕМА С CROSSORIGIN="ANONYMOUS" -->
     <audio id="bg-audio" crossorigin="anonymous" loop></audio>
     <audio id="sfx-audio" crossorigin="anonymous"></audio>
 
@@ -477,7 +473,7 @@
         let hostTrackDuration = 0;
         let state_is_playing = false;
 
-        // --- ДВИЖЕНИЕ КАСТОМНОГО КУРСОР-ТОЧКИ ---
+        // --- ДВИЖЕНИЕ КУРСОР-ТОЧКИ ПО ВСЕМУ ЭКРАНУ ---
         const cursor = document.getElementById('custom-cursor');
         window.addEventListener('mousemove', (e) => {
             cursor.style.left = e.clientX + 'px';
@@ -504,7 +500,7 @@
         window.addEventListener('click', initAudioContext);
         window.addEventListener('touchstart', initAudioContext);
 
-        // --- ФИЗИКА ЧАСТИЦ С КОЛЛИЗИЯМИ И СПУТНИКАМИ ---
+        // --- ЧАСТИЦИ С ОРБИТАЛЬНЫМ ВРАЩЕНИЕМ И УСКОРЕНИЕМ В ВОРОНКУ ---
         const pCanvas = document.getElementById('particles-canvas');
         const pCtx = pCanvas.getContext('2d');
         let particles = [];
@@ -515,144 +511,136 @@
 
         class Particle {
             constructor() {
-                this.r = Math.random() * 3 + 2;
-                this.x = Math.random() * (pCanvas.width - this.r * 2) + this.r;
-                this.y = Math.random() * (pCanvas.height - this.r * 2) + this.r;
-                this.vx = (Math.random() - 0.5) * 1.2;
-                this.vy = (Math.random() - 0.5) * 1.2;
-                this.mass = this.r;
-                this.satAngle = Math.random() * Math.PI * 2;
-                this.satSpeed = (Math.random() - 0.5) * 0.05;
+                this.reset(true);
+            }
+
+            reset(initial = false) {
+                const cx = pCanvas.width / 2;
+                const cy = pCanvas.height / 2;
+                const angle = Math.random() * Math.PI * 2;
+                const maxDist = Math.max(cx, cy);
+                const dist = initial ? (Math.random() * maxDist * 0.8 + 40) : (maxDist + 50);
+
+                this.x = cx + Math.cos(angle) * dist;
+                this.y = cy + Math.sin(angle) * dist;
+
+                // Вектор по кругу (касательная скорость влево/вправо)
+                const spinDir = Math.random() > 0.5 ? 1 : -1;
+                const tangentSpeed = Math.random() * 2.5 + 1.5;
+
+                this.vx = -Math.sin(angle) * spinDir * tangentSpeed;
+                this.vy = Math.cos(angle) * spinDir * tangentSpeed;
+
+                this.r = Math.random() * 2.2 + 1.2;
+                this.color = Math.random() > 0.4 ? '#00f3ff' : '#ffb700';
             }
 
             update() {
-                this.x += this.vx; this.y += this.vy;
-                this.satAngle += this.satSpeed;
+                const cx = pCanvas.width / 2;
+                const cy = pCanvas.height / 2;
+                const dx = cx - this.x;
+                const dy = cy - this.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
 
-                if (this.x - this.r < 0) { this.x = this.r; this.vx *= -1; }
-                if (this.x + this.r > pCanvas.width) { this.x = pCanvas.width - this.r; this.vx *= -1; }
-                if (this.y - this.r < 0) { this.y = this.r; this.vy *= -1; }
-                if (this.y + this.r > pCanvas.height) { this.y = pCanvas.height - this.r; this.vy *= -1; }
+                if (dist < 12 || dist > Math.max(pCanvas.width, pCanvas.height) * 1.5) {
+                    this.reset();
+                    return;
+                }
+
+                // Гравитационное притяжение к центру (ускоряется ближе к точке)
+                const pull = 160 / (dist + 30);
+                this.vx += (dx / dist) * pull * 0.12;
+                this.vy += (dy / dist) * pull * 0.12;
+
+                // Легкая амортизация для орбитальной устойчивости
+                this.vx *= 0.985;
+                this.vy *= 0.985;
+
+                this.x += this.vx;
+                this.y += this.vy;
             }
 
             draw() {
                 pCtx.beginPath();
                 pCtx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
-                pCtx.fillStyle = 'rgba(245, 158, 11, 0.75)';
+                pCtx.fillStyle = this.color;
                 pCtx.shadowBlur = 10;
-                pCtx.shadowColor = '#f59e0b';
-                pCtx.fill();
-
-                let satX = this.x + Math.cos(this.satAngle) * (this.r + 10);
-                let satY = this.y + Math.sin(this.satAngle) * (this.r + 10);
-                pCtx.beginPath();
-                pCtx.arc(satX, satY, 1.2, 0, Math.PI * 2);
-                pCtx.fillStyle = 'rgba(226, 192, 103, 0.9)';
+                pCtx.shadowColor = this.color;
                 pCtx.fill();
             }
         }
 
-        for (let i = 0; i < 45; i++) particles.push(new Particle());
-
-        function handleCollisions() {
-            for (let i = 0; i < particles.length; i++) {
-                for (let j = i + 1; j < particles.length; j++) {
-                    let p1 = particles[i], p2 = particles[j];
-                    let dx = p2.x - p1.x, dy = p2.y - p1.y;
-                    let dist = Math.sqrt(dx * dx + dy * dy);
-
-                    if (dist < p1.r + p2.r) {
-                        let normalX = dx / dist, normalY = dy / dist;
-                        let relativeVelocityX = p1.vx - p2.vx, relativeVelocityY = p1.vy - p2.vy;
-                        let speed = relativeVelocityX * normalX + relativeVelocityY * normalY;
-
-                        if (speed > 0) {
-                            let impulse = 2 * speed / (p1.mass + p2.mass);
-                            p1.vx -= impulse * p2.mass * normalX;
-                            p1.vy -= impulse * p2.mass * normalY;
-                            p2.vx += impulse * p1.mass * normalX;
-                            p2.vy += impulse * p1.mass * normalY;
-                        }
-                    }
-                }
-            }
-        }
+        for (let i = 0; i < 70; i++) particles.push(new Particle());
 
         function animateParticles() {
             pCtx.clearRect(0, 0, pCanvas.width, pCanvas.height);
-            handleCollisions();
             particles.forEach(p => { p.update(); p.draw(); });
             requestAnimationFrame(animateParticles);
         }
         animateParticles();
 
-        // --- РАДИАЛЬНЫЙ 4-КВАДРАНТНЫЙ ЭКВАЛАЙЗЕР С ЗОЛОТЫМ БОКЕ ---
+        // --- КРУГОВОЙ ЭКВАЛАЙЗЕР ИЗ ЦЕНТРАЛЬНОГО КРУГА (СВЕТЯЩИЙСЯ ЧЁРНЫЙ) ---
         const eqCanvas = document.getElementById('eq-canvas');
         const eqCtx = eqCanvas.getContext('2d');
         function resizeEqCanvas() { eqCanvas.width = window.innerWidth; eqCanvas.height = window.innerHeight; }
         window.addEventListener('resize', resizeEqCanvas);
         resizeEqCanvas();
 
-        function drawRadial4QuadrantEqualizer() {
-            requestAnimationFrame(drawRadial4QuadrantEqualizer);
+        function drawCircularEqualizer() {
+            requestAnimationFrame(drawCircularEqualizer);
             eqCtx.clearRect(0, 0, eqCanvas.width, eqCanvas.height);
 
             const cx = eqCanvas.width / 2;
             const cy = eqCanvas.height / 2;
-            const radius = Math.min(eqCanvas.width, eqCanvas.height) * 0.22;
-            const bars = 80;
+            const baseRadius = Math.min(eqCanvas.width, eqCanvas.height) * 0.2; // Радиус центрального круга
+            const bars = 72;
             const step = (Math.PI * 2) / bars;
+            const cone = document.getElementById('center-light-cone');
 
             if (analyser && eqIsPlaying) {
                 analyser.getByteFrequencyData(dataArray);
             }
 
+            // РАСЧЕТ БАСОВ ДЛЯ ПУЛЬСАЦИИ ЦЕНТРАЛЬНОГО СВЕТА
             let avgBass = 0;
             if (dataArray && eqIsPlaying) {
-                let bassSum = 0;
-                for (let k = 0; k < 10; k++) bassSum += dataArray[k];
-                avgBass = bassSum / 10;
+                let sum = 0;
+                for (let k = 0; k < 10; k++) sum += dataArray[k];
+                avgBass = sum / 10;
             }
-            let pulseRadius = radius * (1 + (avgBass / 255) * 0.18);
 
-            let grad = eqCtx.createRadialGradient(cx, cy, 0, cx, cy, pulseRadius * 1.4);
-            grad.addColorStop(0, 'rgba(245, 158, 11, 0.45)');
-            grad.addColorStop(0.5, 'rgba(226, 192, 103, 0.18)');
-            grad.addColorStop(1, 'rgba(3, 7, 18, 0)');
-            eqCtx.beginPath();
-            eqCtx.arc(cx, cy, pulseRadius * 1.4, 0, Math.PI * 2);
-            eqCtx.fillStyle = grad;
-            eqCtx.fill();
+            if (cone) {
+                let scale = 1 + (avgBass / 255) * 0.4;
+                let opacity = 0.4 + (avgBass / 255) * 0.6;
+                cone.style.transform = `translate(-50%, -50%) scale(${scale})`;
+                cone.style.opacity = opacity;
+            }
 
+            // РЕНДЕР КРУГОВОГО ЭКВАЛАЙЗЕРА (СВЕТЯЩИЕСЯ ЧЁРНЫЕ ПОЛОСЫ)
             for (let i = 0; i < bars; i++) {
-                let qPos = i % 20;
-                let q = Math.floor(i / 20);
-                let normPos = (q % 2 === 0) ? qPos : (19 - qPos);
-
-                let val = 0;
-                if (dataArray && eqIsPlaying) {
-                    let dataIdx = Math.floor((normPos / 20) * (dataArray.length * 0.42));
-                    val = (dataArray[dataIdx] || 0) * 0.9;
-                } else {
-                    val = 2;
-                }
-
+                let rawVal = (dataArray && eqIsPlaying) ? (dataArray[i % dataArray.length] || 0) : 4;
+                let barLen = rawVal * 1.2;
                 let angle = i * step;
-                let x1 = cx + Math.cos(angle) * pulseRadius;
-                let y1 = cy + Math.sin(angle) * pulseRadius;
-                let x2 = cx + Math.cos(angle) * (pulseRadius + val * 1.4);
-                let y2 = cy + Math.sin(angle) * (pulseRadius + val * 1.4);
+
+                let x1 = cx + Math.cos(angle) * baseRadius;
+                let y1 = cy + Math.sin(angle) * baseRadius;
+                let x2 = cx + Math.cos(angle) * (baseRadius + barLen);
+                let y2 = cy + Math.sin(angle) * (baseRadius + barLen);
 
                 eqCtx.beginPath();
                 eqCtx.moveTo(x1, y1);
                 eqCtx.lineTo(x2, y2);
-                eqCtx.strokeStyle = `rgba(245, 158, 11, ${Math.min(1, val / 75 + 0.3)})`;
+                
+                // Светящийся чёрный: тёмный насыщенный сердечник + яркая неоновая тень
+                eqCtx.strokeStyle = 'rgba(0, 5, 15, 0.95)';
                 eqCtx.lineWidth = 4;
                 eqCtx.lineCap = 'round';
+                eqCtx.shadowBlur = 12;
+                eqCtx.shadowColor = (i % 2 === 0) ? '#00f3ff' : '#ffb700';
                 eqCtx.stroke();
             }
         }
-        drawRadial4QuadrantEqualizer();
+        drawCircularEqualizer();
 
         // --- ЭКВАЛАЙЗЕР ДЛЯ ПУЛЬТА ВЕДУЩЕГО ---
         const hostEqCanvas = document.getElementById('host-eq-canvas');
@@ -675,7 +663,7 @@
                     let targetH = eqIsPlaying ? (Math.random() * hostEqCanvas.height * (eqVolume + 0.2)) : 1.5;
                     hostBars[i] += (targetH - hostBars[i]) * 0.25;
                     let h = hostBars[i];
-                    hostEqCtx.fillStyle = `rgba(245, 158, 11, ${Math.min(1, h / 10 + 0.3)})`;
+                    hostEqCtx.fillStyle = '#00f3ff';
                     hostEqCtx.fillRect(i * barWidth + 1, hostEqCanvas.height - h, barWidth - 2, h);
                 }
             }
@@ -683,7 +671,7 @@
         }
         drawHostEq();
 
-        // --- АВТОРИЗАЦИЯ ---
+        // --- АВТОРИЗАЦИЯ И ЛОГИКА СИСТЕМЫ ---
         function submitAuth() {
             const val = document.getElementById('auth-input').value.trim();
             if(!val) return;
@@ -724,7 +712,7 @@
             box.innerHTML = '';
             (data.modules || []).forEach(m => {
                 const btn = document.createElement('button');
-                btn.className = 'btn-glass glass-gold mod-btn';
+                btn.className = 'btn-neon neon-gold mod-btn';
                 btn.innerText = m.name;
                 btn.onclick = () => { socket.emit('switch_module', { module: m.path }); closeModal('launcher-modal'); };
                 box.appendChild(btn);
@@ -924,7 +912,7 @@
 
             for (let i = 1; i <= 5; i++) {
                 const btn = document.createElement('button');
-                btn.className = 'btn-glass glass-gold mod-btn';
+                btn.className = 'btn-neon neon-gold mod-btn';
                 btn.innerText = `${names[mood]} — ТРЕК ${i}`;
                 btn.onclick = () => {
                     socket.emit('host_audio_control', { track_file: `${mood}${i}.mp3` });
