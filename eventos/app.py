@@ -5,7 +5,7 @@ from flask import Flask, render_template, send_from_directory, request, jsonify
 from flask_socketio import SocketIO, emit
 
 app = Flask(__name__, template_folder='.', static_folder='.')
-app.config['SECRET_KEY'] = 'event-os-secret-2026'
+app.config['SECRET_KEY'] = 'event-os-royal-blue-2026'
 
 socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
 
@@ -16,11 +16,14 @@ def load_config():
     except Exception as e:
         print(f"Error loading event_data.json: {e}")
         return {
-            "event_title": "FAMILY STANDARD OS",
-            "event_subtitle": "С праздником!",
+            "event_title": "ЦОЙ ИГОРЬ ГРИГОРЬЕВИЧ",
+            "event_subtitle": "С ДНЕМ РОЖДЕНИЯ",
+            "event_title_prompt": "Ну что, какой праздник празднуем сегодня?",
+            "event_subtitle_prompt": "Расскажи поподробнее",
             "host_name": "Богдан",
             "host_pin": "111",
             "screen_pin": "222",
+            "script_url": "script.html",
             "cdn_base_url": "https://pub-372ba5f717cf4a8694558f47682d65d9.r2.dev/",
             "modules": []
         }
@@ -28,12 +31,15 @@ def load_config():
 def save_config():
     try:
         config_to_save = {
-            "_description": "ЦЕНТРАЛЬНЫЙ КОНФИГУРАТОР МЕРОПРИЯТИЯ (EVENT OS HOST DATA). Используется для хранения названия и типа праздника, имени ведущего (host_name), паролей доступа пульта (host_pin) и главного экрана (screen_pin), динамической ссылки на облачный CDN ресурсов и списка подключаемых интерактивов.",
+            "_description": "ЦЕНТРАЛЬНЫЙ КОНФИГУРАТОР МЕРОПРИЯТИЯ (EVENT OS HOST DATA)",
             "event_title": system_state.get("event_title", "FAMILY STANDARD OS"),
             "event_subtitle": system_state.get("event_subtitle", "С праздником!"),
+            "event_title_prompt": config.get("event_title_prompt", "Ну что, какой праздник празднуем сегодня?"),
+            "event_subtitle_prompt": config.get("event_subtitle_prompt", "Расскажи поподробнее"),
             "host_name": system_state.get("host_name", "Богдан"),
             "host_pin": config.get("host_pin", "111"),
             "screen_pin": config.get("screen_pin", "222"),
+            "script_url": config.get("script_url", "script.html"),
             "cdn_base_url": system_state.get("cdn_base_url", "https://pub-372ba5f717cf4a8694558f47682d65d9.r2.dev/"),
             "modules": config.get("modules", [])
         }
@@ -47,17 +53,20 @@ config = load_config()
 sfx_counters = {"jingle": 0, "fanfare": 0, "applause": 0, "correct": 0, "wrong": 0}
 sfx_max = {"jingle": 4, "fanfare": 3, "applause": 3, "correct": 3, "wrong": 3}
 
-track_positions = {"lounge.mp3": 0.0, "active.mp3": 0.0, "party.mp3": 0.0}
+track_positions = {}
 
 system_state = {
     "active_module": "",
-    "event_title": config.get("event_title", "FAMILY STANDARD OS"),
-    "event_subtitle": config.get("event_subtitle", "С праздником!"),
+    "event_title": config.get("event_title", "ЦОЙ ИГОРЬ ГРИГОРЬЕВИЧ"),
+    "event_subtitle": config.get("event_subtitle", "С ДНЕМ РОЖДЕНИЯ"),
+    "event_title_prompt": config.get("event_title_prompt", "Ну что, какой праздник празднуем сегодня?"),
+    "event_subtitle_prompt": config.get("event_subtitle_prompt", "Расскажи поподробнее"),
     "host_name": config.get("host_name", "Богдан"),
+    "script_url": config.get("script_url", "script.html"),
     "cdn_base_url": config.get("cdn_base_url", "https://pub-372ba5f717cf4a8694558f47682d65d9.r2.dev/"),
     "audio_volume": 0.3,
     "current_mood": "lounge",
-    "current_track": "lounge.mp3",
+    "current_track": "lounge1.mp3",
     "is_playing": False,
     "seek_position": 0.0,
     "track_duration": 0.0,
@@ -83,7 +92,10 @@ def serve_file(filename): return send_from_directory('.', filename)
 def handle_connect():
     clean_timer_state()
     emit('state_update', system_state)
-    emit('modules_config_update', config.get('modules', []))
+    emit('modules_config_update', {
+        'modules': config.get('modules', []),
+        'script_url': config.get('script_url', 'script.html')
+    })
 
 @socketio.on('login')
 def handle_login(data):
@@ -146,11 +158,11 @@ def audio_control(data):
 
     if 'toggle_play' in data: system_state['is_playing'] = not system_state['is_playing']
 
-    if 'mood' in data:
-        system_state['current_mood'] = data['mood']
-        system_state['current_track'] = f"{data['mood']}.mp3"
+    if 'track_file' in data:
+        track_file = data['track_file']
+        system_state['current_track'] = track_file
         system_state['is_playing'] = True
-        system_state['seek_position'] = track_positions.get(f"{data['mood']}.mp3", 0.0)
+        system_state['seek_position'] = track_positions.get(track_file, 0.0)
 
     socketio.emit('state_update', system_state)
 
