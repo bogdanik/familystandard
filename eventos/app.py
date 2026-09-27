@@ -5,7 +5,7 @@ from flask import Flask, render_template, send_from_directory, request, jsonify
 from flask_socketio import SocketIO, emit
 
 app = Flask(__name__, template_folder='.', static_folder='.')
-app.config['SECRET_KEY'] = 'event-os-royal-blue-2026'
+app.config['SECRET_KEY'] = 'event-os-metallic-2026'
 
 socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
 
@@ -16,8 +16,8 @@ def load_config():
     except Exception as e:
         print(f"Error loading event_data.json: {e}")
         return {
-            "event_title": "ЦОЙ ИГОРЬ ГРИГОРЬЕВИЧ",
-            "event_subtitle": "С ДНЕМ РОЖДЕНИЯ",
+            "event_title": "НУ ЧТО, КАКОЙ СЕГОДНЯ ПРАЗДНИК ПРАЗДНУЕМ?",
+            "event_subtitle": "РАССКАЖИ О НЁМ ПОДРОБНЕЕ",
             "event_title_prompt": "Ну что, какой праздник празднуем сегодня?",
             "event_subtitle_prompt": "Расскажи поподробнее",
             "host_name": "Богдан",
@@ -32,8 +32,8 @@ def save_config():
     try:
         config_to_save = {
             "_description": "ЦЕНТРАЛЬНЫЙ КОНФИГУРАТОР МЕРОПРИЯТИЯ (EVENT OS HOST DATA)",
-            "event_title": system_state.get("event_title", "FAMILY STANDARD OS"),
-            "event_subtitle": system_state.get("event_subtitle", "С праздником!"),
+            "event_title": system_state.get("event_title", "НУ ЧТО, КАКОЙ СЕГОДНЯ ПРАЗДНИК ПРАЗДНУЕМ?"),
+            "event_subtitle": system_state.get("event_subtitle", "РАССКАЖИ О НЁМ ПОДРОБНЕЕ"),
             "event_title_prompt": config.get("event_title_prompt", "Ну что, какой праздник празднуем сегодня?"),
             "event_subtitle_prompt": config.get("event_subtitle_prompt", "Расскажи поподробнее"),
             "host_name": system_state.get("host_name", "Богдан"),
@@ -57,8 +57,8 @@ track_positions = {}
 
 system_state = {
     "active_module": "",
-    "event_title": config.get("event_title", "ЦОЙ ИГОРЬ ГРИГОРЬЕВИЧ"),
-    "event_subtitle": config.get("event_subtitle", "С ДНЕМ РОЖДЕНИЯ"),
+    "event_title": config.get("event_title", "НУ ЧТО, КАКОЙ СЕГОДНЯ ПРАЗДНИК ПРАЗДНУЕМ?"),
+    "event_subtitle": config.get("event_subtitle", "РАССКАЖИ О НЁМ ПОДРОБНЕЕ"),
     "event_title_prompt": config.get("event_title_prompt", "Ну что, какой праздник празднуем сегодня?"),
     "event_subtitle_prompt": config.get("event_subtitle_prompt", "Расскажи поподробнее"),
     "host_name": config.get("host_name", "Богдан"),
