@@ -1,20 +1,23 @@
 {
-  "_description": "ЦЕНТРАЛЬНЫЙ КОНФИГУРАТОР МЕРОПРИЯТИЯ (EVENT OS HOST DATA). Используется для хранения названия и типа праздника, имени ведущего (host_name), паролей доступа пульта (host_pin) и главного экрана (screen_pin), динамической ссылки на облачный CDN ресурсов и списка подключаемых интерактивов.",
+  "_description": "ЦЕНТРАЛЬНЫЙ КОНФИГУРАТОР МЕРОПРИЯТИЯ (EVENT OS HOST DATA)",
   "event_title": "ЦОЙ ИГОРЬ ГРИГОРЬЕВИЧ",
   "event_subtitle": "С ДНЕМ РОЖДЕНИЯ",
+  "event_title_prompt": "Ну что, какой праздник празднуем сегодня?",
+  "event_subtitle_prompt": "Расскажи поподробнее",
   "host_name": "Богдан",
   "host_pin": "111",
   "screen_pin": "222",
+  "script_url": "script.html",
   "cdn_base_url": "https://pub-372ba5f717cf4a8694558f47682d65d9.r2.dev/",
   "modules": [
     {
       "id": "quiz",
-      "name": "ai-m",
+      "name": "AI-Музыка (aim)",
       "path": "https://familystandard.uz/aim/"
     },
     {
       "id": "bunker",
-      "name": "фото",
+      "name": "Фотогалерея (pic)",
       "path": "https://familystandard.uz/pic/"
     }
   ]
