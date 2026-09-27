@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Family Standard OS</title>
+    <title>Family Standard OS — Event Control System</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
@@ -11,63 +11,181 @@
 
     <style>
         :root {
-            --bg-black: #030712; --gold-light: #fffbeb; --gold-main: #f59e0b;
-            --gold-glow: rgba(245, 158, 11, 0.4); --glass-card: rgba(15, 23, 42, 0.95);
-            --glass-border: rgba(229, 231, 235, 0.2); --danger-red: #ef4444;
+            --bg-obsidian: #080503;
+            --bg-card: rgba(22, 13, 8, 0.88);
+            --gold-light: #fceade;
+            --gold-main: #e0a96d;
+            --gold-accent: #f59e0b;
+            --bronze-dark: #8c4227;
+            --gold-glow: rgba(224, 169, 109, 0.45);
+            --glass-border: rgba(224, 169, 109, 0.28);
+            --danger-red: #ef4444;
             --ios-font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Plus Jakarta Sans", sans-serif;
-            --top-bar-height: 145px; --bottom-bar-height: 95px;
+            --top-bar-height: 160px;
+            --bottom-bar-height: 100px;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: var(--ios-font); user-select: none; }
-        body { background: var(--bg-black); color: #f8fafc; min-height: 100vh; overflow: hidden; position: relative; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: var(--ios-font);
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: var(--bg-obsidian);
+            color: var(--gold-light);
+            min-height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
 
         /* ПУЛЬСИРУЮЩЕЕ СВЕЧЕНИЕ И ФОН */
-        .bg-glow { position: fixed; inset: 0; z-index: 1; background: #000000; pointer-events: none; }
+        .bg-glow {
+            position: fixed;
+            inset: 0;
+            z-index: 1;
+            background: var(--bg-obsidian);
+            pointer-events: none;
+        }
         
         @keyframes pulseGlow {
             0% { transform: translate(-50%, -50%) scale(1); opacity: 0.8; }
-            50% { transform: translate(-50%, -50%) scale(1.05); opacity: 0.4; }
+            50% { transform: translate(-50%, -50%) scale(1.08); opacity: 0.45; }
             100% { transform: translate(-50%, -50%) scale(1); opacity: 0.8; }
         }
+
         .center-glow { 
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 80vw; height: 80vw; 
-            background: radial-gradient(circle, rgba(245, 158, 11, 0.35) 0%, rgba(245, 158, 11, 0.08) 40%, transparent 70%); 
+            width: 85vw; height: 85vw; 
+            background: radial-gradient(circle, rgba(224, 169, 109, 0.25) 0%, rgba(140, 66, 39, 0.08) 45%, transparent 75%); 
             pointer-events: none; z-index: 2; 
-            animation: pulseGlow 5s ease-in-out infinite;
+            animation: pulseGlow 6s ease-in-out infinite;
         }
         #particles-canvas { position: fixed; inset: 0; z-index: 3; pointer-events: none; }
 
         /* БРЕНДИНГ */
-        .footer-logo { position: fixed; bottom: 12px; width: 100%; text-align: center; color: rgba(255,255,255,0.25); font-size: 0.7rem; font-weight: 800; letter-spacing: 3px; z-index: 100; pointer-events: none; }
+        .footer-logo {
+            position: fixed; bottom: 10px; width: 100%; text-align: center;
+            color: rgba(224, 169, 109, 0.35); font-size: 0.7rem; font-weight: 800;
+            letter-spacing: 3px; z-index: 100; pointer-events: none;
+            text-transform: uppercase;
+        }
 
         /* АВТОРИЗАЦИЯ */
         #auth-overlay { position: fixed; inset: 0; z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 20px; }
-        .auth-card { background: var(--glass-card); border: 1px solid var(--glass-border); padding: 36px 26px; border-radius: 24px; width: 100%; max-width: 360px; text-align: center; box-shadow: 0 0 50px var(--gold-glow); z-index: 10001; }
-        .brand-header { font-family: 'Cinzel', serif; font-size: 2.2rem; font-weight: 900; background: linear-gradient(135deg, #ffffff 0%, #fffbeb 30%, #e5e7eb 65%, #f59e0b 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .auth-sub { color: #94a3b8; font-size: 0.8rem; font-weight: 600; margin: 8px 0 20px; letter-spacing: 1px; }
-        .auth-input { width: 100%; padding: 16px; border-radius: 12px; border: 1px solid var(--glass-border); background: rgba(3, 7, 18, 0.85); color: #fff; text-align: center; font-size: 1.2rem; font-weight: 800; outline: none; letter-spacing: 2px; user-select: text; }
-        .btn-gold { width: 100%; padding: 16px; border-radius: 12px; border: none; background: linear-gradient(135deg, #ffffff 0%, var(--gold-light) 40%, var(--gold-main) 100%); color: #000; font-weight: 800; cursor: pointer; margin-top: 15px; }
+        .auth-card {
+            background: var(--bg-card);
+            border: 1px solid var(--glass-border);
+            padding: 40px 28px; border-radius: 28px; width: 100%; max-width: 370px; text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.8), 0 0 40px var(--gold-glow);
+            backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+            z-index: 10001;
+        }
+        .brand-header {
+            font-family: 'Cinzel', serif; font-size: 2.3rem; font-weight: 900;
+            background: linear-gradient(135deg, #ffffff 20%, var(--gold-main) 60%, var(--bronze-dark) 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 25px rgba(224, 169, 109, 0.3);
+        }
+        .auth-sub { color: var(--gold-main); font-size: 0.8rem; font-weight: 700; margin: 8px 0 22px; letter-spacing: 2px; text-transform: uppercase; }
+        .auth-input {
+            width: 100%; padding: 16px; border-radius: 14px; border: 1px solid var(--glass-border);
+            background: rgba(10, 5, 3, 0.85); color: #fff; text-align: center; font-size: 1.3rem; font-weight: 800;
+            outline: none; letter-spacing: 3px; user-select: text; transition: all 0.3s ease;
+        }
+        .auth-input:focus { border-color: var(--gold-main); box-shadow: 0 0 20px var(--gold-glow); }
+        .btn-gold {
+            width: 100%; padding: 16px; border-radius: 14px; border: none;
+            background: linear-gradient(135deg, var(--gold-main), var(--bronze-dark));
+            color: #fff; font-weight: 800; font-size: 1rem; cursor: pointer; margin-top: 18px;
+            letter-spacing: 2px; box-shadow: 0 8px 25px rgba(140, 66, 39, 0.5);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .btn-gold:active { transform: scale(0.97); }
 
-        /* ПУЛЬТ: ВЕРХ */
-        #host-top-bar { display: none; position: fixed; top: 0; left: 0; right: 0; height: var(--top-bar-height); z-index: 500; background: rgba(15, 23, 42, 0.97); border-bottom: 1px solid var(--glass-border); padding: 12px; flex-direction: column; gap: 10px; justify-content: center; }
+        /* ПУЛЬТ ВЕДУЩЕГО: ВЕРХНЯЯ ПАНЕЛЬ */
+        #host-top-bar {
+            display: none; position: fixed; top: 0; left: 0; right: 0;
+            height: var(--top-bar-height); z-index: 500;
+            background: rgba(18, 9, 5, 0.94);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 10px 14px; flex-direction: column; gap: 8px; justify-content: center;
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+        }
+
+        /* ЭКВАЛАЙЗЕР НА ПУЛЬТЕ ВЕДУЩЕГО */
+        .host-eq-wrapper {
+            width: 100%; height: 18px; position: relative; border-radius: 6px; overflow: hidden;
+            background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(224, 169, 109, 0.15);
+            display: flex; align-items: center; justify-content: center;
+        }
+        #host-eq-canvas { width: 100%; height: 100%; display: block; }
+
         .control-row { display: flex; justify-content: space-between; gap: 8px; align-items: center; }
-        .btn-control { flex: 1; height: 36px; border-radius: 8px; border: 1px solid rgba(229, 231, 235, 0.18); background: rgba(30, 41, 59, 0.7); color: #ffffff; font-size: 0.85rem; font-weight: 800; cursor: pointer; transition: all 0.2s; }
-        .btn-control.active { background: linear-gradient(135deg, #ffffff 0%, var(--gold-main) 100%); color: #000; border-color: #ffffff; }
+        .btn-control {
+            flex: 1; height: 36px; border-radius: 10px; border: 1px solid rgba(224, 169, 109, 0.2);
+            background: rgba(35, 18, 11, 0.7); color: var(--gold-light); font-size: 0.82rem; font-weight: 700;
+            cursor: pointer; transition: all 0.25s ease;
+        }
+        .btn-control.active {
+            background: linear-gradient(135deg, var(--gold-main), var(--bronze-dark));
+            color: #ffffff; border-color: var(--gold-main); box-shadow: 0 0 15px var(--gold-glow);
+        }
+        .btn-control:active { transform: scale(0.95); }
         
-        .seek-btn { flex: 1; height: 44px; border-radius: 10px; background: rgba(30, 41, 59, 0.85); color: #fff; font-size: 1.4rem; border: 1px solid var(--glass-border); display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; }
-        .play-btn { flex: 1.5; background: rgba(245, 158, 11, 0.2); color: var(--gold-light); border-color: var(--gold-main); }
-        .play-time { font-size: 0.65rem; font-weight: 800; opacity: 0.8; margin-top: 2px; letter-spacing: 0.5px; font-family: var(--ios-font); }
+        .seek-btn {
+            flex: 1; height: 42px; border-radius: 12px; background: rgba(35, 18, 11, 0.85);
+            color: #fff; font-size: 1.3rem; border: 1px solid var(--glass-border);
+            display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .seek-btn:active { transform: scale(0.94); }
+        .play-btn {
+            flex: 1.6; background: rgba(224, 169, 109, 0.18); color: var(--gold-light);
+            border-color: var(--gold-main); box-shadow: 0 0 15px rgba(224, 169, 109, 0.2);
+        }
+        .play-time {
+            font-size: 0.65rem; font-weight: 800; color: var(--gold-main);
+            margin-top: 2px; letter-spacing: 0.5px; font-family: var(--ios-font);
+        }
 
-        /* ПУЛЬТ: НИЗ */
-        #host-bottom-bar { display: none; position: fixed; bottom: 0; left: 0; right: 0; height: var(--bottom-bar-height); z-index: 500; background: rgba(15, 23, 42, 0.98); border-top: 1px solid var(--glass-border); padding: 8px 12px; flex-direction: column; gap: 8px; justify-content: center; }
-        .btn-action { flex: 1; height: 36px; border-radius: 8px; border: 1px solid var(--glass-border); font-weight: 800; font-size: 0.78rem; cursor: pointer; }
-        .btn-action.gold { background: rgba(245, 158, 11, 0.2); color: var(--gold-light); border-color: var(--gold-main); }
-        .btn-action.red { background: rgba(239, 68, 68, 0.2); color: #fca5a5; border-color: var(--danger-red); }
-        .sfx-active { background: rgba(245, 158, 11, 0.4) !important; border-color: var(--gold-main) !important; box-shadow: 0 0 15px var(--gold-glow); }
+        /* ПУЛЬТ ВЕДУЩЕГО: НИЖНЯЯ ПАНЕЛЬ */
+        #host-bottom-bar {
+            display: none; position: fixed; bottom: 0; left: 0; right: 0;
+            height: var(--bottom-bar-height); z-index: 500;
+            background: rgba(18, 9, 5, 0.96);
+            border-top: 1px solid var(--glass-border);
+            padding: 8px 14px; flex-direction: column; gap: 8px; justify-content: center;
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            box-shadow: 0 -10px 30px rgba(0,0,0,0.7);
+        }
+        .btn-action {
+            flex: 1; height: 38px; border-radius: 10px; border: 1px solid var(--glass-border);
+            font-weight: 800; font-size: 0.8rem; cursor: pointer; transition: all 0.25s ease;
+            letter-spacing: 0.5px;
+        }
+        .btn-action.gold {
+            background: rgba(224, 169, 109, 0.18); color: var(--gold-light); border-color: var(--gold-main);
+        }
+        .btn-action.red {
+            background: rgba(239, 68, 68, 0.18); color: #fca5a5; border-color: var(--danger-red);
+        }
+        .btn-action:active { transform: scale(0.95); }
+        .sfx-active {
+            background: rgba(224, 169, 109, 0.45) !important;
+            border-color: var(--gold-main) !important;
+            box-shadow: 0 0 20px var(--gold-glow);
+        }
 
-        /* ЭКРАН (IFRAME ОГРАНИЧЕН МЕЖДУ ПАНЕЛЯМИ) */
-        #main-viewport { display: none; position: fixed; inset: 0; z-index: 10; flex-direction: column; align-items: center; justify-content: center; }
+        /* ОСНОВНОЙ ВЬЮПОРТ (Экран Проектора) */
+        #main-viewport {
+            display: none; position: fixed; inset: 0; z-index: 10;
+            flex-direction: column; align-items: center; justify-content: center;
+        }
         
         body.is-host #module-iframe { 
             top: var(--top-bar-height) !important; 
@@ -75,24 +193,59 @@
             bottom: auto !important; 
         }
         
-        #module-iframe { display: none; position: fixed; inset: 0; width: 100vw; height: 100vh; border: none; z-index: 15; background: #000; opacity: 0; transition: opacity 1s ease-in-out; }
+        #module-iframe {
+            display: block; position: fixed; inset: 0; width: 100vw; height: 100vh;
+            border: none; z-index: 1; background: transparent; opacity: 0; pointer-events: none;
+            transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        #module-iframe.active-module {
+            z-index: 15; opacity: 1; pointer-events: auto;
+        }
         
-        #main-display-content { text-align: center; z-index: 10; transition: opacity 1s ease-in-out; opacity: 1; }
-        .shimmer-title { font-family: 'Cinzel', serif; font-size: 3.2rem; font-weight: 900; background: linear-gradient(90deg, #ffffff 0%, #fffbeb 25%, #f59e0b 50%, #e5e7eb 75%, #ffffff 100%); background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: shine 4s linear infinite; }
+        #main-display-content {
+            text-align: center; z-index: 10; transition: opacity 1s ease-in-out; opacity: 1;
+        }
+        .shimmer-title {
+            font-family: 'Cinzel', serif; font-size: 3.4rem; font-weight: 900;
+            background: linear-gradient(90deg, #ffffff 0%, var(--gold-light) 25%, var(--gold-main) 50%, var(--bronze-dark) 75%, #ffffff 100%);
+            background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            animation: shine 5s linear infinite; text-shadow: 0 0 35px rgba(224, 169, 109, 0.3);
+        }
         @keyframes shine { to { background-position: 200% center; } }
-        .subtitle-text { color: #94a3b8; font-size: 1.15rem; font-weight: 600; margin-top: 10px; }
+        .subtitle-text { color: var(--gold-main); font-size: 1.2rem; font-weight: 600; margin-top: 12px; letter-spacing: 2px; }
 
         /* ТАЙМЕР */
-        #full-screen-timer { display: none; position: fixed; inset: 0; z-index: 900; align-items: center; justify-content: center; transition: opacity 1s ease-in-out; opacity: 0; }
-        .timer-huge-text { font-family: 'Cinzel', serif; font-size: 22vw; font-weight: 900; color: #ffffff; text-shadow: 0 0 40px var(--gold-glow); }
+        #full-screen-timer {
+            display: none; position: fixed; inset: 0; z-index: 900; align-items: center; justify-content: center;
+            transition: opacity 1s ease-in-out; opacity: 0;
+        }
+        .timer-huge-text {
+            font-family: 'Cinzel', serif; font-size: 22vw; font-weight: 900; color: #ffffff;
+            text-shadow: 0 0 50px var(--gold-glow), 0 0 20px var(--gold-main);
+        }
 
-        /* ЭКВАЛАЙЗЕР */
-        #eq-canvas { position: absolute; bottom: 0; left: 0; width: 100%; height: 180px; z-index: 5; pointer-events: none; opacity: 0.8; transition: opacity 0.5s; }
+        /* ЭКВАЛАЙЗЕР ЭКРАНА */
+        #eq-canvas {
+            position: absolute; bottom: 0; left: 0; width: 100%; height: 200px;
+            z-index: 5; pointer-events: none; opacity: 0.8; transition: opacity 0.5s;
+        }
 
-        /* МОДАЛКИ */
-        .modal-overlay { display: none; position: fixed; inset: 0; z-index: 20000; background: rgba(0,0,0,0.85); align-items: center; justify-content: center; padding: 20px; }
-        .modal-card { background: var(--glass-card); padding: 24px; border-radius: 20px; width: 100%; max-width: 360px; border: 1px solid var(--glass-border); text-align: center; }
-        .mod-btn { width: 100%; padding: 14px; border-radius: 12px; border: 1px solid var(--glass-border); background: rgba(30, 41, 59, 0.8); color: #fff; font-weight: 800; margin-top: 8px; cursor: pointer; }
+        /* МОДАЛЬНЫЕ ОКНА */
+        .modal-overlay {
+            display: none; position: fixed; inset: 0; z-index: 20000;
+            background: rgba(5, 2, 1, 0.85); align-items: center; justify-content: center; padding: 20px;
+            backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+        }
+        .modal-card {
+            background: var(--bg-card); padding: 28px; border-radius: 24px; width: 100%; max-width: 370px;
+            border: 1px solid var(--glass-border); text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+        }
+        .mod-btn {
+            width: 100%; padding: 14px; border-radius: 14px; border: 1px solid var(--glass-border);
+            background: rgba(35, 18, 11, 0.8); color: #fff; font-weight: 800; margin-top: 10px; cursor: pointer;
+            transition: all 0.25s ease;
+        }
+        .mod-btn:active { transform: scale(0.96); }
     </style>
 </head>
 <body>
@@ -101,17 +254,23 @@
     <div class="center-glow"></div>
     <canvas id="particles-canvas"></canvas>
 
+    <!-- АВТОРИЗАЦИЯ -->
     <div id="auth-overlay">
         <div class="auth-card" id="auth-card">
-            <div class="brand-header">EVENT OS</div>
-            <p class="auth-sub">СИСТЕМА УПРАВЛЕНИЯ</p>
+            <div class="brand-header">FAMILY STANDARD</div>
+            <p class="auth-sub">EVENT OS • ПУЛЬТ УПРАВЛЕНИЯ</p>
             <input type="password" id="auth-input" class="auth-input" placeholder="КОД ДОСТУПА" autocomplete="off" onkeydown="if(event.key==='Enter') submitAuth()">
-            <button onclick="submitAuth()" class="btn-gold">ВОЙТИ</button>
+            <button onclick="submitAuth()" class="btn-gold">ВОЙТИ В СИСТЕМУ</button>
         </div>
     </div>
 
-    <!-- ПУЛЬТ ВЕДУЩЕГО -->
+    <!-- ПУЛЬТ ВЕДУЩЕГО: ВЕРХ -->
     <div id="host-top-bar">
+        <!-- ЖИВОЙ ЭКВАЛАЙЗЕР ПУЛЬТА -->
+        <div class="host-eq-wrapper">
+            <canvas id="host-eq-canvas"></canvas>
+        </div>
+
         <div class="control-row">
             <button class="btn-control" onclick="setVol(0.03, this)">3%</button>
             <button class="btn-control" onclick="setVol(0.1, this)">10%</button>
@@ -151,10 +310,10 @@
         <div class="footer-logo">FAMILY STANDARD OS 2026</div>
     </div>
 
-    <!-- НИЖНЯЯ ПАНЕЛЬ -->
+    <!-- ПУЛЬТ ВЕДУЩЕГО: НИЗ -->
     <div id="host-bottom-bar">
         <div class="control-row">
-            <button class="btn-action gold" onclick="openModal('launcher-modal')">ИНТЕРАКТИВ</button>
+            <button class="btn-action gold" onclick="openModal('launcher-modal')">ИНТЕРАКТИВЫ</button>
             <button class="btn-action red" onclick="handleCloseClick()">ЗАКРЫТЬ</button>
             <button class="btn-action gold" onclick="socket.emit('add_timer_15s')" style="flex: 0.6;">+15 СЕК</button>
         </div>
@@ -169,31 +328,31 @@
     <!-- МОДАЛКИ -->
     <div class="modal-overlay" id="launcher-modal">
         <div class="modal-card">
-            <h3 style="color: var(--gold-light);">Интерактивы</h3>
+            <h3 style="color: var(--gold-light); font-family: 'Cinzel', serif;">Выбор интерактива</h3>
             <div id="modules-list-box"></div>
-            <button class="mod-btn" style="border-color: var(--gold-main); background: rgba(245,158,11,0.15); margin-top: 12px;" onclick="openEditEventModal()">✏️ Изменить заголовок</button>
+            <button class="mod-btn" style="border-color: var(--gold-main); background: rgba(224,169,109,0.15); margin-top: 14px;" onclick="openEditEventModal()">✏️ Изменить заголовок</button>
             <button onclick="closeModal('launcher-modal')" style="background: transparent; color: #94a3b8; border: none; margin-top: 15px; font-weight: bold; cursor: pointer;">Отмена</button>
         </div>
     </div>
 
     <div class="modal-overlay" id="edit-event-modal">
         <div class="modal-card">
-            <h3 style="color: var(--gold-light);">Название праздника</h3>
+            <h3 style="color: var(--gold-light); font-family: 'Cinzel', serif;">Название праздника</h3>
             <input type="text" id="edit-title-input" class="auth-input" style="font-size: 1rem; letter-spacing: 1px; margin-top: 15px;" placeholder="Заголовок события">
             <input type="text" id="edit-subtitle-input" class="auth-input" style="font-size: 0.9rem; letter-spacing: 1px; margin-top: 10px;" placeholder="Подзаголовок">
             <div style="display: flex; gap: 10px; margin-top: 20px;">
                 <button onclick="saveEventInfo()" class="btn-gold" style="margin: 0; flex: 1;">Сохранить</button>
-                <button onclick="closeModal('edit-event-modal')" style="flex: 1; border: 1px solid rgba(255,255,255,0.2); background: transparent; color: #fff; border-radius: 12px;">Отмена</button>
+                <button onclick="closeModal('edit-event-modal')" style="flex: 1; border: 1px solid rgba(255,255,255,0.2); background: transparent; color: #fff; border-radius: 14px;">Отмена</button>
             </div>
         </div>
     </div>
 
     <div class="modal-overlay" id="end-event-modal">
         <div class="modal-card">
-            <h3 style="color: var(--gold-light);">Завершить праздник?</h3>
+            <h3 style="color: var(--gold-light); font-family: 'Cinzel', serif;">Завершить праздник?</h3>
             <div style="display: flex; gap: 10px; margin-top: 20px;">
                 <button onclick="confirmEnd()" class="btn-gold" style="margin: 0; background: var(--danger-red); color: #fff;">Завершить</button>
-                <button onclick="closeModal('end-event-modal')" style="flex: 1; border: 1px solid rgba(255,255,255,0.2); background: transparent; color: #fff; border-radius: 12px;">Отмена</button>
+                <button onclick="closeModal('end-event-modal')" style="flex: 1; border: 1px solid rgba(255,255,255,0.2); background: transparent; color: #fff; border-radius: 14px;">Отмена</button>
             </div>
         </div>
     </div>
@@ -221,7 +380,6 @@
         const sfxAudio = document.getElementById('sfx-audio');
         
         let targetVolume = 0.3;      
-        let actualVolumeTarget = 0;  
         let isFadingToSeek = false;
         let pendingSeekTime = 0;
         
@@ -235,7 +393,7 @@
         let hostTrackDuration = 0;
         let state_is_playing = false;
 
-        // --- ЧАСТИЦЫ ---
+        // --- ЧАСТИЦЫ ФОНА ---
         const pCanvas = document.getElementById('particles-canvas');
         const pCtx = pCanvas.getContext('2d');
         let particles = [];
@@ -244,15 +402,61 @@
         resizePCanvas();
         class Particle {
             constructor() { this.reset(); }
-            reset() { this.x = Math.random() * pCanvas.width; this.y = Math.random() * pCanvas.height; this.size = Math.random() * 2.5 + 0.5; this.speedX = (Math.random() - 0.5) * 0.4; this.speedY = (Math.random() - 0.5) * 0.4; this.alpha = Math.random() * 0.7 + 0.1; }
-            update() { this.x += this.speedX; this.y += this.speedY; if (this.x < 0 || this.x > pCanvas.width || this.y < 0 || this.y > pCanvas.height) this.reset(); }
-            draw() { pCtx.fillStyle = `rgba(245, 158, 11, ${this.alpha})`; pCtx.beginPath(); pCtx.arc(this.x, this.y, this.size, 0, Math.PI * 2); pCtx.fill(); }
+            reset() {
+                this.x = Math.random() * pCanvas.width;
+                this.y = Math.random() * pCanvas.height;
+                this.size = Math.random() * 2.5 + 0.8;
+                this.speedX = (Math.random() - 0.5) * 0.35;
+                this.speedY = (Math.random() - 0.5) * 0.35;
+                this.alpha = Math.random() * 0.65 + 0.15;
+            }
+            update() {
+                this.x += this.speedX; this.y += this.speedY;
+                if (this.x < 0 || this.x > pCanvas.width || this.y < 0 || this.y > pCanvas.height) this.reset();
+            }
+            draw() {
+                pCtx.fillStyle = `rgba(224, 169, 109, ${this.alpha})`;
+                pCtx.beginPath(); pCtx.arc(this.x, this.y, this.size, 0, Math.PI * 2); pCtx.fill();
+            }
         }
-        for (let i = 0; i < 110; i++) particles.push(new Particle());
-        function animateParticles() { pCtx.clearRect(0, 0, pCanvas.width, pCanvas.height); particles.forEach(p => { p.update(); p.draw(); }); requestAnimationFrame(animateParticles); }
+        for (let i = 0; i < 90; i++) particles.push(new Particle());
+        function animateParticles() {
+            pCtx.clearRect(0, 0, pCanvas.width, pCanvas.height);
+            particles.forEach(p => { p.update(); p.draw(); });
+            requestAnimationFrame(animateParticles);
+        }
         requestAnimationFrame(animateParticles);
 
-        // --- ЭКВАЛАЙЗЕР ---
+        // --- ЭКВАЛАЙЗЕР ДЛЯ ПУЛЬТА ВЕДУЩЕГО ---
+        const hostEqCanvas = document.getElementById('host-eq-canvas');
+        const hostEqCtx = hostEqCanvas.getContext('2d');
+        function resizeHostEq() {
+            if (hostEqCanvas.parentNode) {
+                hostEqCanvas.width = hostEqCanvas.parentNode.clientWidth;
+                hostEqCanvas.height = hostEqCanvas.parentNode.clientHeight;
+            }
+        }
+        window.addEventListener('resize', resizeHostEq);
+        setTimeout(resizeHostEq, 500);
+
+        let hostBars = Array.from({length: 45}, () => Math.random());
+        function drawHostEq() {
+            if (myRole === 'HOST' && hostEqCanvas.width > 0) {
+                hostEqCtx.clearRect(0, 0, hostEqCanvas.width, hostEqCanvas.height);
+                const barWidth = hostEqCanvas.width / hostBars.length;
+                for (let i = 0; i < hostBars.length; i++) {
+                    let targetH = eqIsPlaying ? (Math.random() * hostEqCanvas.height * (eqVolume + 0.2)) : 1.5;
+                    hostBars[i] += (targetH - hostBars[i]) * 0.25;
+                    let h = hostBars[i];
+                    hostEqCtx.fillStyle = `rgba(224, 169, 109, ${Math.min(1, h / 12 + 0.3)})`;
+                    hostEqCtx.fillRect(i * barWidth + 1, hostEqCanvas.height - h, barWidth - 2, h);
+                }
+            }
+            requestAnimationFrame(drawHostEq);
+        }
+        drawHostEq();
+
+        // --- ЭКВАЛАЙЗЕР ГЛАВНОГО ЭКРАНА ---
         const eqCanvas = document.getElementById('eq-canvas');
         const eqCtx = eqCanvas.getContext('2d');
         function resizeEqCanvas() { eqCanvas.width = window.innerWidth; }
@@ -266,7 +470,7 @@
                 let targetH = eqIsPlaying ? (Math.random() * 250 * (eqVolume + 0.2)) : 2;
                 eqBars[i] += (targetH - eqBars[i]) * 0.2; 
                 let h = eqBars[i];
-                eqCtx.fillStyle = 'rgba(245, 158, 11, 0.4)';
+                eqCtx.fillStyle = 'rgba(224, 169, 109, 0.42)';
                 eqCtx.fillRect(i * barWidth + 1, eqCanvas.height - h, barWidth - 2, h);
             }
             setTimeout(() => requestAnimationFrame(drawEq), 40);
@@ -294,6 +498,7 @@
                     document.body.classList.add('is-host');
                     document.getElementById('host-top-bar').style.display = 'flex';
                     document.getElementById('host-bottom-bar').style.display = 'flex';
+                    resizeHostEq();
                     bgAudio.remove(); sfxAudio.remove(); 
                 } else if (myRole === 'SCREEN') {
                     document.body.classList.add('is-screen');
@@ -448,28 +653,23 @@
                 document.getElementById('eq-canvas').style.opacity = '0.8';
             }
 
+            // БЕРЕЖНОЕ УПРАВЛЕНИЕ IFRAME ("НЕ УБИВАЙ ЖИВОЙ ЗВУК")
             if (isModule) {
                 overlayState = 'MODULE';
                 clearTimeout(timerDelayTimeout);
                 
                 dContent.style.opacity = '0';
-                setTimeout(() => dContent.style.display = 'none', 1000);
+                setTimeout(() => dContent.style.display = 'none', 800);
                 tContainer.style.opacity = '0';
-                setTimeout(() => tContainer.style.display = 'none', 1000);
+                setTimeout(() => tContainer.style.display = 'none', 800);
 
                 if(!iframe.src.includes(state.active_module)) {
                     iframe.src = state.active_module.startsWith('http') ? state.active_module : `/${state.active_module}`;
                 }
-                if (iframe.style.display !== 'block') {
-                    iframe.style.display = 'block';
-                    void iframe.offsetWidth;
-                    iframe.style.opacity = '1';
-                }
+                iframe.classList.add('active-module');
             } else if (isTimer && remain > 0) {
-                if (iframe.style.opacity === '1') {
-                    iframe.style.opacity = '0';
-                    setTimeout(() => { iframe.style.display = 'none'; iframe.src = 'about:blank'; }, 1000);
-                }
+                // Плавный сон iframe
+                iframe.classList.remove('active-module');
 
                 if (overlayState === 'TITLE') {
                     fanfareFiredForTimer = false;
@@ -521,18 +721,15 @@
                     }
                 }
             } else {
-                if (iframe.style.opacity === '1') {
-                    iframe.style.opacity = '0';
-                    setTimeout(() => { iframe.style.display = 'none'; iframe.src = 'about:blank'; }, 1000);
-                }
-
+                // Сон iframe вместо уничтожения
+                iframe.classList.remove('active-module');
                 clearTimeout(timerDelayTimeout);
                 
                 if (overlayState !== 'TITLE' && overlayState !== 'FADING_TIMER') {
                     overlayState = 'TITLE';
                     if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
                     tContainer.style.opacity = '0';
-                    setTimeout(() => tContainer.style.display = 'none', 1000);
+                    setTimeout(() => tContainer.style.display = 'none', 800);
                     
                     dContent.style.display = 'block';
                     void dContent.offsetWidth;
@@ -557,7 +754,7 @@
 
         // УПРАВЛЕНИЕ ВЕДУЩЕГО
         function setVol(v, btn) {
-            document.querySelectorAll('.control-row:first-child .btn-control').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.control-row:nth-child(2) .btn-control').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             socket.emit('host_audio_control', { volume: v });
         }
