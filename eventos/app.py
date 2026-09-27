@@ -13,8 +13,34 @@ def load_config():
     try:
         with open('event_data.json', 'r', encoding='utf-8') as f:
             return json.load(f)
-    except:
-        return {"cdn_base_url": "https://pub-372ba5f717cf4a8694558f47682d65d9.r2.dev/", "modules": []}
+    except Exception as e:
+        print(f"Error loading event_data.json: {e}")
+        return {
+            "event_title": "FAMILY STANDARD OS",
+            "event_subtitle": "С праздником!",
+            "host_name": "Богдан",
+            "host_pin": "111",
+            "screen_pin": "222",
+            "cdn_base_url": "https://pub-372ba5f717cf4a8694558f47682d65d9.r2.dev/",
+            "modules": []
+        }
+
+def save_config():
+    try:
+        config_to_save = {
+            "_description": "ЦЕНТРАЛЬНЫЙ КОНФИГУРАТОР МЕРОПРИЯТИЯ (EVENT OS HOST DATA). Используется для хранения названия и типа праздника, имени ведущего (host_name), паролей доступа пульта (host_pin) и главного экрана (screen_pin), динамической ссылки на облачный CDN ресурсов и списка подключаемых интерактивов.",
+            "event_title": system_state.get("event_title", "FAMILY STANDARD OS"),
+            "event_subtitle": system_state.get("event_subtitle", "С праздником!"),
+            "host_name": system_state.get("host_name", "Богдан"),
+            "host_pin": config.get("host_pin", "111"),
+            "screen_pin": config.get("screen_pin", "222"),
+            "cdn_base_url": system_state.get("cdn_base_url", "https://pub-372ba5f717cf4a8694558f47682d65d9.r2.dev/"),
+            "modules": config.get("modules", [])
+        }
+        with open('event_data.json', 'w', encoding='utf-8') as f:
+            json.dump(config_to_save, f, ensure_ascii=False, indent=2)
+    except Exception as e:
+        print(f"Error saving event_data.json: {e}")
 
 config = load_config()
 
@@ -27,6 +53,8 @@ system_state = {
     "active_module": "",
     "event_title": config.get("event_title", "FAMILY STANDARD OS"),
     "event_subtitle": config.get("event_subtitle", "С праздником!"),
+    "host_name": config.get("host_name", "Богдан"),
+    "cdn_base_url": config.get("cdn_base_url", "https://pub-372ba5f717cf4a8694558f47682d65d9.r2.dev/"),
     "audio_volume": 0.3,
     "current_mood": "lounge",
     "current_track": "lounge.mp3",
@@ -67,6 +95,17 @@ def handle_login(data):
     else:
         emit('login_response', {'success': False, 'message': 'Неверный КОД ДОСТУПА'})
 
+@socketio.on('update_event_info')
+def update_event_info(data):
+    if 'event_title' in data:
+        system_state['event_title'] = data['event_title']
+    if 'event_subtitle' in data:
+        system_state['event_subtitle'] = data['event_subtitle']
+    if 'host_name' in data:
+        system_state['host_name'] = data['host_name']
+    save_config()
+    socketio.emit('state_update', system_state)
+
 @socketio.on('switch_module')
 def switch_module(data):
     clean_timer_state()
@@ -97,7 +136,6 @@ def audio_control(data):
 
     if 'volume' in data: system_state['audio_volume'] = float(data['volume'])
     
-    # ПЕРЕМОТКА 60 СЕКУНД (1 минута)
     if 'seek_relative' in data:
         new_seek = system_state['seek_position'] + float(data['seek_relative'])
         if new_seek < 0: new_seek = 0
