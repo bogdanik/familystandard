@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Family Standard OS — Metallic Radial Edition</title>
+    <title>Family Standard OS — Liquid Glass Edition</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
@@ -11,30 +11,23 @@
 
     <style>
         :root {
-            --bg-royal-deep: #000714;
-            --bg-card: rgba(6, 18, 42, 0.92);
+            --bg-obsidian: #030712;
+            --glass-base: rgba(255, 255, 255, 0.05);
+            --glass-border-light: rgba(255, 255, 255, 0.22);
+            --glass-border-top: rgba(255, 255, 255, 0.45);
             --gold-light: #fff5d6;
             --gold-main: #f59e0b;
-            --gold-accent: #e2c067;
-            --gold-glow: rgba(245, 158, 11, 0.5);
+            --gold-glow: rgba(245, 158, 11, 0.35);
             --danger-red: #ef4444;
             --ios-font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Plus Jakarta Sans", sans-serif;
             --top-bar-height: 170px;
             --bottom-bar-height: 115px;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0; padding: 0;
-            font-family: var(--ios-font);
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
-        }
-
         /* КАСТОМНЫЙ КУРСОР В ВИДЕ БЕЛОЙ ТОЧКИ */
         body, html {
             cursor: none !important;
-            background: var(--bg-royal-deep);
+            background: var(--bg-obsidian);
             color: #ffffff;
             min-height: 100vh;
             overflow: hidden;
@@ -49,28 +42,28 @@
             border-radius: 50%;
             pointer-events: none;
             z-index: 999999;
-            box-shadow: 0 0 10px #ffffff, 0 0 20px var(--gold-glow);
+            box-shadow: 0 0 12px #ffffff, 0 0 24px rgba(255,255,255,0.8);
             transform: translate(-50%, -50%);
-            transition: transform 0.05s ease-out;
+            transition: transform 0.04s ease-out;
         }
 
-        /* ГЛУБОКИЙ ФОН И СВЕЧЕНИЕ */
+        /* ГЛУБОКИЙ ЖИВОЙ ФОН */
         .bg-glow {
             position: fixed; inset: 0; z-index: 1;
-            background: radial-gradient(circle at 50% 50%, #001233 0%, #000714 100%);
+            background: radial-gradient(circle at 50% 50%, #030b1e 0%, #030712 100%);
             pointer-events: none;
         }
 
         @keyframes pulseRoyal {
-            0% { transform: translate(-50%, -50%) scale(1); opacity: 0.85; }
-            50% { transform: translate(-50%, -50%) scale(1.1); opacity: 0.55; }
-            100% { transform: translate(-50%, -50%) scale(1); opacity: 0.85; }
+            0% { transform: translate(-50%, -50%) scale(1); opacity: 0.8; }
+            50% { transform: translate(-50%, -50%) scale(1.08); opacity: 0.45; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 0.8; }
         }
 
         .center-glow {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 80vw; height: 80vw;
-            background: radial-gradient(circle, rgba(0, 102, 255, 0.22) 0%, rgba(245, 158, 11, 0.12) 40%, transparent 70%);
+            width: 85vw; height: 85vw;
+            background: radial-gradient(circle, rgba(0, 102, 255, 0.18) 0%, rgba(245, 158, 11, 0.08) 40%, transparent 70%);
             pointer-events: none; z-index: 2;
             animation: pulseRoyal 6s ease-in-out infinite;
         }
@@ -79,97 +72,100 @@
 
         .footer-logo {
             position: fixed; bottom: 8px; width: 100%; text-align: center;
-            color: rgba(226, 192, 103, 0.4); font-size: 0.72rem; font-weight: 800;
+            color: rgba(255, 255, 255, 0.25); font-size: 0.72rem; font-weight: 800;
             letter-spacing: 3px; z-index: 100; pointer-events: none; text-transform: uppercase;
         }
 
-        /* МЕТАЛЛИЧЕСКАЯ ТЕКСТУРА КНОПОК C МНОГОСЛОЙНЫМИ БЛИКАМИ И ОБЪЕМОМ */
-        .btn-metal {
-            position: relative; overflow: hidden;
-            border-radius: 12px; font-weight: 800; cursor: none !important;
-            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-            text-transform: uppercase; letter-spacing: 1px;
-            display: flex; align-items: center; justify-content: center; gap: 8px;
-            box-shadow: 
-                0 6px 15px rgba(0,0,0,0.7),
-                inset 0 1px 1px rgba(255,255,255,0.7),
-                inset 0 -2px 3px rgba(0,0,0,0.6);
-        }
-        .btn-metal:active { transform: scale(0.94); box-shadow: 0 2px 8px rgba(0,0,0,0.9); }
-
-        /* Синий металл */
-        .btn-blue-metal {
-            background: linear-gradient(180deg, #2563eb 0%, #1d4ed8 25%, #1e40af 50%, #0f172a 75%, #1e3a8a 100%);
-            border: 1px solid #93c5fd; color: #ffffff;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.8);
-            box-shadow: 0 4px 15px rgba(30, 64, 175, 0.5), inset 0 1px 0 rgba(255,255,255,0.6);
-        }
-
-        /* Красный металл */
-        .btn-red-metal {
-            background: linear-gradient(180deg, #ef4444 0%, #dc2626 25%, #991b1b 50%, #450a0a 75%, #7f1d1d 100%);
-            border: 1px solid #fca5a5; color: #ffffff;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.8);
-            box-shadow: 0 4px 15px rgba(185, 28, 28, 0.5), inset 0 1px 0 rgba(255,255,255,0.6);
+        /* УНИВЕРСАЛЬНАЯ ОПТИКА ЖИВОГО СТЕКЛА (GLASSMORPHISM 120 FPS) */
+        .btn-glass {
+            position: relative;
+            background: rgba(255, 255, 255, 0.06);
+            backdrop-filter: blur(25px) saturate(190%);
+            -webkit-backdrop-filter: blur(25px) saturate(190%);
+            border: 1px solid var(--glass-border-light);
+            border-top: 1px solid var(--glass-border-top);
+            border-radius: 16px;
+            color: #ffffff;
+            font-weight: 700;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            cursor: none !important;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.35), inset 0 1px 1px 0 rgba(255, 255, 255, 0.3);
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            overflow: hidden;
         }
 
-        /* Золотой металл */
-        .btn-gold-metal {
-            background: linear-gradient(180deg, #fde047 0%, #eab308 25%, #ca8a04 50%, #422006 75%, #854d0e 100%);
-            border: 1px solid #fef08a; color: #ffffff;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.9);
-            box-shadow: 0 4px 18px rgba(245, 158, 11, 0.6), inset 0 1px 0 rgba(255,255,255,0.8);
+        /* Преломление света на поверхности */
+        .btn-glass::before {
+            content: ''; position: absolute; inset: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.18) 0%, transparent 50%);
+            pointer-events: none; border-radius: inherit;
         }
 
-        /* Серебряный металл */
-        .btn-silver-metal {
-            background: linear-gradient(180deg, #f3f4f6 0%, #d1d5db 25%, #9ca3af 50%, #374151 75%, #6b7280 100%);
-            border: 1px solid #ffffff; color: #111827;
-            text-shadow: 0 1px 0 rgba(255,255,255,0.5);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.9);
+        .btn-glass:active {
+            transform: scale(0.96);
+            background: rgba(255, 255, 255, 0.12);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.4);
         }
-        .btn-silver-metal svg { fill: #111827; width: 18px; height: 18px; }
 
-        /* КНОПКИ ГРОМКОСТИ С НАРАСТАЮЩИМ КРАСНЫМ ГРАДИЕНТОМ */
-        .vol-3 {
-            background: linear-gradient(180deg, #e5e7eb 0%, #9ca3af 30%, #4b5563 70%, #1f2937 100%);
-            border: 1px solid #d1d5db; color: #f9fafb;
+        /* Оттенки стекла */
+        .glass-blue {
+            background: rgba(0, 102, 255, 0.12);
+            border-color: rgba(96, 165, 250, 0.35);
+            border-top-color: rgba(147, 197, 253, 0.6);
         }
-        .vol-10 {
-            background: linear-gradient(180deg, #e5e7eb 0%, #9ca3af 20%, #6b7280 50%, #7f1d1d 100%);
-            border: 1px solid #fca5a5; color: #ffffff;
+        .glass-blue:active { background: rgba(0, 102, 255, 0.25); }
+
+        .glass-red {
+            background: rgba(239, 68, 68, 0.14);
+            border-color: rgba(248, 113, 113, 0.35);
+            border-top-color: rgba(252, 165, 165, 0.6);
+            color: #fca5a5;
         }
-        .vol-30 {
-            background: linear-gradient(180deg, #fca5a5 0%, #ef4444 30%, #b91c1c 65%, #450a0a 100%);
-            border: 1px solid #f87171; color: #ffffff;
+        .glass-red:active { background: rgba(239, 68, 68, 0.28); }
+
+        .glass-gold {
+            background: rgba(245, 158, 11, 0.16);
+            border-color: rgba(252, 211, 77, 0.4);
+            border-top-color: rgba(254, 240, 138, 0.75);
+            color: var(--gold-light);
+            box-shadow: 0 8px 30px rgba(245, 158, 11, 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.5);
         }
-        .vol-60 {
-            background: linear-gradient(180deg, #f87171 0%, #dc2626 30%, #991b1b 65%, #450a0a 100%);
-            border: 1px solid #ef4444; color: #ffffff; box-shadow: 0 0 12px rgba(220, 38, 38, 0.5);
-        }
+        .glass-gold:active { background: rgba(245, 158, 11, 0.3); }
+
+        /* ГРОМКОСТЬ: ДЫМЧАТОЕ СТЕКЛО -> ВНУТРЕННИЙ РУБИНОВЫЙ СВЕТ */
+        .vol-3 { background: rgba(255, 255, 255, 0.04); border-color: rgba(255, 255, 255, 0.15); }
+        .vol-10 { background: rgba(239, 68, 68, 0.08); border-color: rgba(248, 113, 113, 0.25); }
+        .vol-30 { background: rgba(239, 68, 68, 0.16); border-color: rgba(248, 113, 113, 0.35); }
+        .vol-60 { background: rgba(239, 68, 68, 0.28); border-color: rgba(239, 68, 68, 0.5); box-shadow: 0 0 20px rgba(239, 68, 68, 0.3); }
         .vol-100 {
-            background: linear-gradient(180deg, #ffffff 0%, #ef4444 25%, #dc2626 50%, #7f1d1d 100%);
-            border: 1px solid #ffffff; color: #ffffff; box-shadow: 0 0 22px rgba(239, 68, 68, 0.9);
+            background: rgba(239, 68, 68, 0.45);
+            border-color: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 0 28px rgba(239, 68, 68, 0.6), inset 0 0 15px rgba(255, 255, 255, 0.4);
         }
 
         /* АВТОРИЗАЦИЯ */
         #auth-overlay { position: fixed; inset: 0; z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 20px; }
         .auth-card {
-            background: var(--bg-card); border: 2px solid rgba(226, 192, 103, 0.4);
-            padding: 40px 28px; border-radius: 28px; width: 100%; max-width: 370px; text-align: center;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.9), 0 0 50px var(--gold-glow);
-            backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); z-index: 10001;
+            background: rgba(10, 18, 38, 0.7); border: 1px solid var(--glass-border-top);
+            padding: 40px 28px; border-radius: 32px; width: 100%; max-width: 370px; text-align: center;
+            box-shadow: 0 30px 70px rgba(0,0,0,0.8), 0 0 40px rgba(245, 158, 11, 0.2);
+            backdrop-filter: blur(30px) saturate(200%); -webkit-backdrop-filter: blur(30px) saturate(200%); z-index: 10001;
         }
         .brand-header {
             font-family: 'Cinzel', serif; font-size: 2.3rem; font-weight: 900;
             background: linear-gradient(135deg, #ffffff 10%, var(--gold-light) 40%, var(--gold-main) 100%);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 30px rgba(245, 158, 11, 0.4);
+            text-shadow: 0 0 30px rgba(245, 158, 11, 0.3);
         }
-        .auth-sub { color: var(--gold-accent); font-size: 0.8rem; font-weight: 700; margin: 8px 0 22px; letter-spacing: 2px; text-transform: uppercase; }
+        .auth-sub { color: var(--gold-main); font-size: 0.8rem; font-weight: 700; margin: 8px 0 22px; letter-spacing: 2px; text-transform: uppercase; }
         .auth-input {
-            width: 100%; padding: 16px; border-radius: 14px; border: 1px solid rgba(226, 192, 103, 0.3);
-            background: rgba(0, 7, 20, 0.85); color: #fff; text-align: center; font-size: 1.3rem; font-weight: 800;
+            width: 100%; padding: 16px; border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(0, 0, 0, 0.4); color: #fff; text-align: center; font-size: 1.3rem; font-weight: 800;
             outline: none; letter-spacing: 3px; user-select: text; transition: all 0.3s ease;
         }
         .auth-input:focus { border-color: var(--gold-main); box-shadow: 0 0 25px var(--gold-glow); }
@@ -178,54 +174,58 @@
         #host-top-bar {
             display: none; position: fixed; top: 0; left: 0; right: 0;
             height: var(--top-bar-height); z-index: 500;
-            background: rgba(0, 10, 30, 0.96);
-            border-bottom: 2px solid rgba(226, 192, 103, 0.3);
+            background: rgba(3, 11, 26, 0.82);
+            border-bottom: 1px solid var(--glass-border-light);
             padding: 10px 14px; flex-direction: column; gap: 8px; justify-content: center;
-            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.9);
+            backdrop-filter: blur(25px) saturate(180%); -webkit-backdrop-filter: blur(25px) saturate(180%);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
         }
 
         .host-eq-wrapper {
-            width: 100%; height: 18px; position: relative; border-radius: 8px; overflow: hidden;
-            background: rgba(0, 5, 15, 0.7); border: 1px solid rgba(226, 192, 103, 0.25);
+            width: 100%; height: 18px; position: relative; border-radius: 10px; overflow: hidden;
+            background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.15);
             display: flex; align-items: center; justify-content: center;
         }
         #host-eq-canvas { width: 100%; height: 100%; display: block; }
 
         .control-row { display: flex; justify-content: space-between; gap: 8px; align-items: center; }
-        .btn-control { flex: 1; height: 36px; font-size: 0.82rem; }
-        .btn-control.active { border-color: #ffffff; box-shadow: 0 0 20px var(--gold-glow); }
+        .btn-control { flex: 1; height: 38px; font-size: 0.82rem; }
+        .btn-control.active {
+            border-color: #ffffff !important;
+            box-shadow: 0 0 20px rgba(255,255,255,0.4), inset 0 0 10px rgba(255,255,255,0.2);
+        }
 
-        /* РАССТОЯНИЕ И ОСТУПЫ КНОПКИ PLAY */
+        /* КНОПКА PLAY И ОТСТУПЫ */
         .seek-btn { flex: 1; height: 44px; font-size: 1.1rem; }
         .play-btn {
-            flex: 2 !important;
+            flex: 2.2 !important;
             padding: 0 20px !important;
             gap: 12px !important;
         }
         .play-time {
-            font-size: 0.72rem; font-weight: 800; color: #ffffff;
-            letter-spacing: 1px; margin-left: 6px;
+            font-size: 0.75rem; font-weight: 800; color: #ffffff;
+            letter-spacing: 1px; margin-left: 8px; font-family: var(--ios-font);
         }
 
         /* ПУЛЬТ ВЕДУЩЕГО: НИЗ */
         #host-bottom-bar {
             display: none; position: fixed; bottom: 0; left: 0; right: 0;
             height: var(--bottom-bar-height); z-index: 500;
-            background: rgba(0, 10, 30, 0.97);
-            border-top: 2px solid rgba(226, 192, 103, 0.3);
+            background: rgba(3, 11, 26, 0.85);
+            border-top: 1px solid var(--glass-border-light);
             padding: 8px 14px; flex-direction: column; gap: 8px; justify-content: center;
-            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            box-shadow: 0 -10px 30px rgba(0,0,0,0.9);
+            backdrop-filter: blur(25px) saturate(180%); -webkit-backdrop-filter: blur(25px) saturate(180%);
+            box-shadow: 0 -10px 30px rgba(0,0,0,0.6);
         }
         .btn-action { flex: 1; height: 40px; font-size: 0.8rem; letter-spacing: 0.5px; }
         .btn-small { flex: 0.65 !important; font-size: 0.75rem !important; }
         .btn-med { flex: 0.95 !important; font-size: 0.78rem !important; }
 
-        .sfx-btn { flex: 1; height: 40px; }
+        .sfx-btn { flex: 1; height: 40px; font-size: 1.25rem; }
         .sfx-active {
-            background: linear-gradient(180deg, #fde047 0%, #f59e0b 50%, #b45309 100%) !important;
-            border-color: #ffffff !important; box-shadow: 0 0 25px var(--gold-glow) !important;
+            background: rgba(245, 158, 11, 0.35) !important;
+            border-color: #ffffff !important;
+            box-shadow: 0 0 25px var(--gold-glow) !important;
         }
 
         /* ЭКРАН ПРОЕКТОРА */
@@ -249,6 +249,7 @@
 
         #main-display-content { text-align: center; z-index: 10; transition: opacity 1s ease; opacity: 1; padding: 0 20px; }
         
+        /* КРУПНЫЙ ВЕЛИЧЕСТВЕННЫЙ ТЕКСТ */
         .shimmer-title {
             font-family: 'Cinzel', serif;
             font-size: 4.5vw; min-size: 3.2rem; font-weight: 900;
@@ -260,9 +261,9 @@
         @keyframes shine { to { background-position: 200% center; } }
         
         .subtitle-text {
-            color: var(--gold-accent); font-size: 2vw; min-size: 1.5rem; font-weight: 700;
+            color: var(--gold-main); font-size: 2vw; min-size: 1.5rem; font-weight: 700;
             margin-top: 18px; letter-spacing: 4px; text-transform: uppercase;
-            text-shadow: 0 0 20px rgba(226, 192, 103, 0.4);
+            text-shadow: 0 0 20px rgba(245, 158, 11, 0.4);
         }
 
         #full-screen-timer {
@@ -274,25 +275,26 @@
             text-shadow: 0 0 60px var(--gold-glow), 0 0 25px var(--gold-main);
         }
 
-        /* 4-КВАДРАНТНЫЙ РАДИАЛЬНЫЙ ЭКВАЛАЙЗЕР И ЦЕНТРАЛЬНОЕ БОКЕ */
+        /* 4-КВАДРАНТНЫЙ ЭКВАЛАЙЗЕР И ЗОЛОТОЕ БОКЕ */
         #eq-canvas {
             position: absolute; inset: 0; width: 100%; height: 100%;
             z-index: 5; pointer-events: none; opacity: 0.92; transition: opacity 0.5s;
         }
 
-        /* МОДАЛКИ */
+        /* МОДАЛКИ ИЗ ПРОЗРАЧНОГО СТЕКЛА */
         .modal-overlay {
             display: none; position: fixed; inset: 0; z-index: 20000;
-            background: rgba(0, 5, 15, 0.9); align-items: center; justify-content: center; padding: 20px;
-            backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            background: rgba(3, 7, 18, 0.85); align-items: center; justify-content: center; padding: 20px;
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
         }
         .modal-card {
-            background: var(--bg-card); padding: 28px; border-radius: 24px; width: 100%; max-width: 400px;
-            border: 2px solid rgba(226, 192, 103, 0.35); text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.9);
+            background: rgba(10, 20, 40, 0.7); padding: 28px; border-radius: 28px; width: 100%; max-width: 400px;
+            border: 1px solid var(--glass-border-top); text-align: center;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.8); backdrop-filter: blur(25px);
         }
         .mod-btn { width: 100%; padding: 14px; margin-top: 10px; font-size: 0.95rem; }
         
-        #script-iframe { width: 100%; height: 70vh; border: none; border-radius: 16px; background: #000714; }
+        #script-iframe { width: 100%; height: 70vh; border: none; border-radius: 20px; background: #030712; }
         .modal-card.large { max-width: 650px; width: 100%; padding: 16px; }
 
         .prompt-desc { font-size: 0.85rem; color: var(--gold-light); margin-top: 12px; text-align: left; font-weight: 600; }
@@ -313,7 +315,7 @@
             <div class="brand-header">FAMILY STANDARD</div>
             <p class="auth-sub">EVENT OS • ПУЛЬТ ВЕДУЩЕГО</p>
             <input type="password" id="auth-input" class="auth-input" placeholder="КОД ДОСТУПА" autocomplete="off" onkeydown="if(event.key==='Enter') submitAuth()">
-            <button onclick="submitAuth()" class="btn-metal btn-gold-metal" style="width: 100%; padding: 16px; margin-top: 18px;">ВОЙТИ В СИСТЕМУ</button>
+            <button onclick="submitAuth()" class="btn-glass glass-gold" style="width: 100%; padding: 16px; margin-top: 18px;">ВОЙТИ В СИСТЕМУ</button>
         </div>
     </div>
 
@@ -324,26 +326,26 @@
         </div>
 
         <div class="control-row">
-            <button class="btn-metal vol-3 btn-control" onclick="setVol(0.03, this)">3%</button>
-            <button class="btn-metal vol-10 btn-control" onclick="setVol(0.1, this)">10%</button>
-            <button class="btn-metal vol-30 btn-control active" onclick="setVol(0.3, this)">30%</button>
-            <button class="btn-metal vol-60 btn-control" onclick="setVol(0.6, this)">60%</button>
-            <button class="btn-metal vol-100 btn-control" onclick="setVol(1.0, this)">100%</button>
+            <button class="btn-glass vol-3 btn-control" onclick="setVol(0.03, this)">3%</button>
+            <button class="btn-glass vol-10 btn-control" onclick="setVol(0.1, this)">10%</button>
+            <button class="btn-glass vol-30 btn-control active" onclick="setVol(0.3, this)">30%</button>
+            <button class="btn-glass vol-60 btn-control" onclick="setVol(0.6, this)">60%</button>
+            <button class="btn-glass vol-100 btn-control" onclick="setVol(1.0, this)">100%</button>
         </div>
         
         <div class="control-row">
-            <button class="btn-metal btn-blue-metal btn-control" onclick="openMoodSelector('lounge')">ЛАУНДЖ</button>
-            <button class="btn-metal btn-blue-metal btn-control" onclick="openMoodSelector('active')">БАНКЕТ</button>
-            <button class="btn-metal btn-blue-metal btn-control" onclick="openMoodSelector('party')">ДВИЖ</button>
+            <button class="btn-glass glass-blue btn-control" onclick="openMoodSelector('lounge')">ЛАУНДЖ</button>
+            <button class="btn-glass glass-blue btn-control" onclick="openMoodSelector('active')">БАНКЕТ</button>
+            <button class="btn-glass glass-blue btn-control" onclick="openMoodSelector('party')">ДВИЖ</button>
         </div>
 
         <div class="control-row">
-            <div class="seek-btn btn-metal btn-blue-metal" onclick="seekRelative(-60)">◄◄ -60</div>
-            <div class="seek-btn play-btn btn-metal btn-gold-metal" id="btn-play-toggle" onclick="togglePlay()">
-                <span id="play-icon" style="font-size: 1.2rem; line-height: 1;">⏯</span>
+            <div class="seek-btn btn-glass glass-blue" onclick="seekRelative(-60)">◄◄ -60</div>
+            <div class="seek-btn play-btn btn-glass glass-gold" id="btn-play-toggle" onclick="togglePlay()">
+                <span id="play-icon" style="font-size: 1.25rem; line-height: 1;">⏯</span>
                 <span class="play-time" id="play-time">00:00 / 00:00</span>
             </div>
-            <div class="seek-btn btn-metal btn-blue-metal" onclick="seekRelative(60)">+60 ►►</div>
+            <div class="seek-btn btn-glass glass-blue" onclick="seekRelative(60)">+60 ►►</div>
         </div>
     </div>
 
@@ -363,35 +365,25 @@
         <div class="footer-logo">FAMILY STANDARD OS 2026</div>
     </div>
 
-    <!-- ПУЛЬТ ВЕДУЩЕГО: НИЗ (С МЕТАЛЛИЧЕСКИМИ КНОПКАМИ И SVG ИКОНКАМИ) -->
+    <!-- ПУЛЬТ ВЕДУЩЕГО: НИЗ (СНЕЖНОЕ СТЕКЛО И НЕСТАНДАРТНЫЕ ЭМОДЗИ) -->
     <div id="host-bottom-bar">
         <div class="control-row">
-            <button class="btn-metal btn-blue-metal btn-action" onclick="openModal('launcher-modal')">ИНТЕРАКТИВЫ</button>
-            <button class="btn-metal btn-red-metal btn-action" onclick="handleCloseClick()">ЗАКРЫТЬ</button>
-            <button class="btn-metal btn-red-metal btn-action btn-small" onclick="socket.emit('add_timer_15s')">+15 СЕК</button>
-            <button class="btn-metal btn-gold-metal btn-action btn-med" onclick="openScriptModal()">СЦЕНАРИЙ</button>
+            <button class="btn-glass glass-blue btn-action" onclick="openModal('launcher-modal')">ИНТЕРАКТИВЫ</button>
+            <button class="btn-glass glass-red btn-action" onclick="handleCloseClick()">ЗАКРЫТЬ</button>
+            <button class="btn-glass glass-red btn-action btn-small" onclick="socket.emit('add_timer_15s')">+15 СЕК</button>
+            <button class="btn-glass glass-gold btn-action btn-med" onclick="openScriptModal()">СЦЕНАРИЙ</button>
         </div>
         <div class="control-row">
-            <!-- ДЖИНГЛ (ПОДАРОК) -->
-            <button class="sfx-btn btn-metal btn-silver-metal" id="btn-jingle" onclick="socket.emit('host_toggle_jingle')" title="Джингл">
-                <svg viewBox="0 0 24 24"><path d="M20 6h-3.17c.07-.32.17-.63.17-1 0-2.21-1.79-4-4-4-1.1 0-2.09.45-2.81 1.17C9.47 1.45 8.48 1 7.38 1 5.17 1 3.38 2.79 3.38 5c0 .37.1.68.17 1H1v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V6h-3zm-9-3c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2zm-5.62 2c0-1.1.9-2 2-2s2 .9 2 2-.9 2-2 2-2-.9-2-2zM19 20H5V8h14v12z"/></svg>
-            </button>
-            <!-- АПЛОДИСМЕНТЫ (ЛАДОНИ) -->
-            <button class="sfx-btn btn-metal btn-silver-metal" onclick="triggerSfx('applause')" title="Аплодисменты">
-                <svg viewBox="0 0 24 24"><path d="M18 11.03F17.52 11 17 11.24 17 11.75V15h-1v-4.25c0-.51-.52-.75-1-.75s-1 .24-1 .75V15h-1v-3.25c0-.51-.52-.75-1-.75s-1 .24-1 .75V16.5l-2.88-2.88c-.39-.39-1.02-.39-1.41 0-.39.39-.39 1.02 0 1.41L12.12 20c.56.56 1.33.88 2.13.88H18c1.66 0 3-1.34 3-3v-4.85c0-.51-.52-.75-1-.75zM11 4c0-1.1-.9-2-2-2s-2 .9-2 2v5.5L4.88 7.38c-.39-.39-1.02-.39-1.41 0-.39.39-.39 1.02 0 1.41L7.59 13H11V4z"/></svg>
-            </button>
-            <!-- ФАНФАРЫ (ТРУБА / ТРОМБОН) -->
-            <button class="sfx-btn btn-metal btn-silver-metal" onclick="triggerSfx('fanfare')" title="Фанфары">
-                <svg viewBox="0 0 24 24"><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 8h14v-2H7v2zm0-4h14v-2H7v2zm0-8v2h14V5H7zm16 4.5l-3-2v6l3-2z"/></svg>
-            </button>
-            <!-- ВЕРНО (ГАЛОЧКА) -->
-            <button class="sfx-btn btn-metal btn-silver-metal" onclick="triggerSfx('correct')" title="Верно">
-                <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
-            </button>
-            <!-- НЕВЕРНО (КРЕСТИК) -->
-            <button class="sfx-btn btn-metal btn-silver-metal" onclick="triggerSfx('wrong')" title="Неверно">
-                <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
-            </button>
+            <!-- ДЖИНГЛ (МАГИЯ / ПОДАРОК) -->
+            <button class="sfx-btn btn-glass" id="btn-jingle" onclick="socket.emit('host_toggle_jingle')" title="Джингл">🪄</button>
+            <!-- АПЛОДИСМЕНТЫ (ОВАЦИИ) -->
+            <button class="sfx-btn btn-glass" onclick="triggerSfx('applause')" title="Аплодисменты">🙌</button>
+            <!-- ФАНФАРЫ (ГОРН) -->
+            <button class="sfx-btn btn-glass" onclick="triggerSfx('fanfare')" title="Фанфары">📯</button>
+            <!-- ВЕРНО (КРИСТАЛЛ) -->
+            <button class="sfx-btn btn-glass" onclick="triggerSfx('correct')" title="Верно">💎</button>
+            <!-- НЕВЕРНО (МОЛНИЯ) -->
+            <button class="sfx-btn btn-glass" onclick="triggerSfx('wrong')" title="Неверно">⚡</button>
         </div>
     </div>
 
@@ -400,7 +392,7 @@
         <div class="modal-card">
             <h3 style="color: var(--gold-light); font-family: 'Cinzel', serif;" id="mood-modal-title">Выбор трека</h3>
             <div id="mood-tracks-list"></div>
-            <button onclick="closeModal('mood-selector-modal')" class="btn-metal mod-btn" style="background: transparent; color: #94a3b8; border: none; margin-top: 15px;">Отмена</button>
+            <button onclick="closeModal('mood-selector-modal')" class="btn-glass mod-btn" style="background: transparent; color: #94a3b8; border: none; margin-top: 15px;">Отмена</button>
         </div>
     </div>
 
@@ -409,7 +401,7 @@
         <div class="modal-card large">
             <h3 style="color: var(--gold-light); font-family: 'Cinzel', serif; margin-bottom: 10px;">Сценарий мероприятия</h3>
             <iframe id="script-iframe" src="about:blank"></iframe>
-            <button onclick="closeModal('script-modal')" class="btn-metal btn-gold-metal mod-btn" style="margin-top: 10px;">Закрыть сценарий</button>
+            <button onclick="closeModal('script-modal')" class="btn-glass glass-gold mod-btn" style="margin-top: 10px;">Закрыть сценарий</button>
         </div>
     </div>
 
@@ -418,7 +410,7 @@
         <div class="modal-card">
             <h3 style="color: var(--gold-light); font-family: 'Cinzel', serif;">Интерактивы</h3>
             <div id="modules-list-box"></div>
-            <button class="btn-metal btn-blue-metal mod-btn" style="margin-top: 14px;" onclick="openEditEventModal()">✏️ Изменить заголовок</button>
+            <button class="btn-glass glass-blue mod-btn" style="margin-top: 14px;" onclick="openEditEventModal()">✏️ Изменить заголовок</button>
             <button onclick="closeModal('launcher-modal')" style="background: transparent; color: #94a3b8; border: none; margin-top: 15px; font-weight: bold; cursor: pointer;">Отмена</button>
         </div>
     </div>
@@ -435,8 +427,8 @@
             <input type="text" id="edit-subtitle-input" class="auth-input" style="font-size: 0.9rem; letter-spacing: 1px; margin-top: 5px;" placeholder="Подзаголовок / Повод">
             
             <div style="display: flex; gap: 10px; margin-top: 20px;">
-                <button onclick="saveEventInfo()" class="btn-metal btn-gold-metal" style="margin: 0; flex: 1; padding: 14px;">Сохранить</button>
-                <button onclick="closeModal('edit-event-modal')" style="flex: 1; border: 1px solid rgba(255,255,255,0.2); background: transparent; color: #fff; border-radius: 14px;">Отмена</button>
+                <button onclick="saveEventInfo()" class="btn-glass glass-gold" style="margin: 0; flex: 1; padding: 14px;">Сохранить</button>
+                <button onclick="closeModal('edit-event-modal')" style="flex: 1; border: 1px solid rgba(255,255,255,0.2); background: transparent; color: #fff; border-radius: 16px;">Отмена</button>
             </div>
         </div>
     </div>
@@ -445,8 +437,8 @@
         <div class="modal-card">
             <h3 style="color: var(--gold-light); font-family: 'Cinzel', serif;">Завершить праздник?</h3>
             <div style="display: flex; gap: 10px; margin-top: 20px;">
-                <button onclick="confirmEnd()" class="btn-metal btn-red-metal" style="margin: 0; flex: 1; padding: 14px;">Завершить</button>
-                <button onclick="closeModal('end-event-modal')" style="flex: 1; border: 1px solid rgba(255,255,255,0.2); background: transparent; color: #fff; border-radius: 14px;">Отмена</button>
+                <button onclick="confirmEnd()" class="btn-glass glass-red" style="margin: 0; flex: 1; padding: 14px;">Завершить</button>
+                <button onclick="closeModal('end-event-modal')" style="flex: 1; border: 1px solid rgba(255,255,255,0.2); background: transparent; color: #fff; border-radius: 16px;">Отмена</button>
             </div>
         </div>
     </div>
@@ -615,7 +607,6 @@
                 analyser.getByteFrequencyData(dataArray);
             }
 
-            // РАСЧЕТ БАСА ДЛЯ ПУЛЬСАЦИИ СВЕТЯЩЕГОСЯ ДИСКА БОКЕ
             let avgBass = 0;
             if (dataArray && eqIsPlaying) {
                 let bassSum = 0;
@@ -624,20 +615,18 @@
             }
             let pulseRadius = radius * (1 + (avgBass / 255) * 0.18);
 
-            // ОТРИСОВКА ЦЕНТРАЛЬНОГО ЗОЛОТОГО БОКЕ-ДИСКА
             let grad = eqCtx.createRadialGradient(cx, cy, 0, cx, cy, pulseRadius * 1.4);
             grad.addColorStop(0, 'rgba(245, 158, 11, 0.45)');
             grad.addColorStop(0.5, 'rgba(226, 192, 103, 0.18)');
-            grad.addColorStop(1, 'rgba(0, 7, 20, 0)');
+            grad.addColorStop(1, 'rgba(3, 7, 18, 0)');
             eqCtx.beginPath();
             eqCtx.arc(cx, cy, pulseRadius * 1.4, 0, Math.PI * 2);
             eqCtx.fillStyle = grad;
             eqCtx.fill();
 
-            // РЕНДЕР 4 ЗЕРКАЛЬНЫХ КВАДРАНТОВ ЭКВАЛАЙЗЕРА
             for (let i = 0; i < bars; i++) {
-                let qPos = i % 20; // 0-19 в квадранте
-                let q = Math.floor(i / 20); // 0, 1, 2, 3
+                let qPos = i % 20;
+                let q = Math.floor(i / 20);
                 let normPos = (q % 2 === 0) ? qPos : (19 - qPos);
 
                 let val = 0;
@@ -735,7 +724,7 @@
             box.innerHTML = '';
             (data.modules || []).forEach(m => {
                 const btn = document.createElement('button');
-                btn.className = 'btn-metal btn-gold-metal mod-btn';
+                btn.className = 'btn-glass glass-gold mod-btn';
                 btn.innerText = m.name;
                 btn.onclick = () => { socket.emit('switch_module', { module: m.path }); closeModal('launcher-modal'); };
                 box.appendChild(btn);
@@ -935,7 +924,7 @@
 
             for (let i = 1; i <= 5; i++) {
                 const btn = document.createElement('button');
-                btn.className = 'btn-metal btn-gold-metal mod-btn';
+                btn.className = 'btn-glass glass-gold mod-btn';
                 btn.innerText = `${names[mood]} — ТРЕК ${i}`;
                 btn.onclick = () => {
                     socket.emit('host_audio_control', { track_file: `${mood}${i}.mp3` });
