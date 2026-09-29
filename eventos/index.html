@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Family Standard OS — Neon Vortex Edition</title>
+    <title>Family Standard OS</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
@@ -11,237 +11,63 @@
 
     <style>
         :root {
-            --bg-deep: #02040a;
-            --neon-cyan: #00f3ff;
-            --neon-gold: #ffb700;
-            --neon-red: #ff0055;
-            --neon-cyan-glow: rgba(0, 243, 255, 0.4);
-            --neon-gold-glow: rgba(255, 183, 0, 0.4);
-            --neon-red-glow: rgba(255, 0, 85, 0.4);
-            --ios-font: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif;
-            --top-bar-height: 170px;
-            --bottom-bar-height: 115px;
+            --bg-black: #030712; --gold-light: #fffbeb; --gold-main: #f59e0b;
+            --gold-glow: rgba(245, 158, 11, 0.4); --glass-card: rgba(15, 23, 42, 0.95);
+            --glass-border: rgba(229, 231, 235, 0.2); --danger-red: #ef4444;
+            --ios-font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Plus Jakarta Sans", sans-serif;
+            --top-bar-height: 145px; --bottom-bar-height: 95px;
         }
 
-        /* ГЛОБАЛЬНЫЙ КУРСОР В ВИДЕ ТОЧКИ НА ВСЁМ ЭКРАНЕ */
-        *, *::before, *::after, html, body, button, input, iframe, a, div, span, h1, p {
-            cursor: none !important;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: var(--ios-font); user-select: none; }
+        body { background: var(--bg-black); color: #f8fafc; min-height: 100vh; overflow: hidden; position: relative; }
 
-        body, html {
-            background: var(--bg-deep);
-            color: #ffffff;
-            min-height: 100vh;
-            overflow: hidden;
-            position: relative;
-            font-family: var(--ios-font);
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
+        /* ПУЛЬСИРУЮЩЕЕ СВЕЧЕНИЕ И ФОН */
+        .bg-glow { position: fixed; inset: 0; z-index: 1; background: #000000; pointer-events: none; }
+        
+        @keyframes pulseGlow {
+            0% { transform: translate(-50%, -50%) scale(1); opacity: 0.8; }
+            50% { transform: translate(-50%, -50%) scale(1.05); opacity: 0.4; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 0.8; }
         }
-
-        #custom-cursor {
-            position: fixed;
-            width: 8px;
-            height: 8px;
-            background: #ffffff;
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: 999999;
-            box-shadow: 0 0 10px #ffffff, 0 0 20px #00f3ff, 0 0 30px #ffb700;
-            transform: translate(-50%, -50%);
-            transition: transform 0.02s linear;
-        }
-
-        /* ТЕМНЫЙ ФОН И МИКРО-ТОЧКА СВЕТА В ЦЕНТРЕ */
-        .bg-glow {
-            position: fixed; inset: 0; z-index: 1;
-            background: radial-gradient(circle at 50% 50%, #040a17 0%, #02040a 100%);
-            pointer-events: none;
-        }
-
-        /* ЦЕНТРАЛЬНЫЙ МИКРО-ИСТОЧНИК СВЕТА, НА ВЕСЬ ЭКРАН */
-        .center-light-point {
+        .center-glow { 
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 6px; height: 6px; background: #ffffff; border-radius: 50%;
-            box-shadow: 0 0 15px #ffffff, 0 0 40px var(--neon-cyan), 0 0 80px var(--neon-gold);
-            z-index: 2; pointer-events: none;
+            width: 80vw; height: 80vw; 
+            background: radial-gradient(circle, rgba(245, 158, 11, 0.35) 0%, rgba(245, 158, 11, 0.08) 40%, transparent 70%); 
+            pointer-events: none; z-index: 2; 
+            animation: pulseGlow 5s ease-in-out infinite;
         }
-
-        .center-glow-cone {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 90vw; height: 90vw; border-radius: 50%;
-            background: radial-gradient(circle, rgba(255, 183, 0, 0.15) 0%, rgba(0, 243, 255, 0.08) 35%, transparent 70%);
-            pointer-events: none; z-index: 2;
-            transition: transform 0.08s ease-out, opacity 0.08s ease-out;
-        }
-
         #particles-canvas { position: fixed; inset: 0; z-index: 3; pointer-events: none; }
 
-        .footer-logo {
-            position: fixed; bottom: 8px; width: 100%; text-align: center;
-            color: rgba(0, 243, 255, 0.3); font-size: 0.72rem; font-weight: 800;
-            letter-spacing: 4px; z-index: 100; pointer-events: none; text-transform: uppercase;
-            text-shadow: 0 0 8px var(--neon-cyan);
-        }
-
-        /* НЕОНОВЫЙ СТИЛЬ КНОПОК (NEON GLASS) */
-        .btn-neon {
-            position: relative;
-            background: rgba(2, 8, 20, 0.6);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 12px;
-            color: #ffffff;
-            font-weight: 700;
-            font-size: 0.78rem;
-            letter-spacing: 1.5px;
-            text-transform: uppercase;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            transition: all 0.2s ease;
-            overflow: hidden;
-            box-shadow: 0 0 10px rgba(0,0,0,0.8);
-        }
-
-        .btn-neon:active {
-            transform: scale(0.95);
-        }
-
-        /* НЕОНОВЫЙ ЦИАН */
-        .neon-cyan {
-            border-color: var(--neon-cyan);
-            color: var(--neon-cyan);
-            box-shadow: 0 0 12px var(--neon-cyan-glow), inset 0 0 8px rgba(0, 243, 255, 0.15);
-            text-shadow: 0 0 8px var(--neon-cyan);
-        }
-        .neon-cyan:active {
-            background: rgba(0, 243, 255, 0.15);
-            box-shadow: 0 0 22px var(--neon-cyan);
-        }
-
-        /* НЕОНОВОЕ ЗОЛОТО */
-        .neon-gold {
-            border-color: var(--neon-gold);
-            color: var(--neon-gold);
-            box-shadow: 0 0 12px var(--neon-gold-glow), inset 0 0 8px rgba(255, 183, 0, 0.15);
-            text-shadow: 0 0 8px var(--neon-gold);
-        }
-        .neon-gold:active {
-            background: rgba(255, 183, 0, 0.15);
-            box-shadow: 0 0 22px var(--neon-gold);
-        }
-
-        /* НЕОНОВЫЙ РУБИН */
-        .neon-red {
-            border-color: var(--neon-red);
-            color: var(--neon-red);
-            box-shadow: 0 0 12px var(--neon-red-glow), inset 0 0 8px rgba(255, 0, 85, 0.15);
-            text-shadow: 0 0 8px var(--neon-red);
-        }
-        .neon-red:active {
-            background: rgba(255, 0, 85, 0.15);
-            box-shadow: 0 0 22px var(--neon-red);
-        }
-
-        /* НЕОНОВАЯ ШКАЛА ГРОМКОСТИ */
-        .vol-3 { border-color: rgba(0, 243, 255, 0.2); color: rgba(0, 243, 255, 0.6); }
-        .vol-10 { border-color: rgba(0, 243, 255, 0.5); color: #00f3ff; box-shadow: 0 0 8px var(--neon-cyan-glow); }
-        .vol-30 { border-color: rgba(255, 183, 0, 0.6); color: #ffb700; box-shadow: 0 0 10px var(--neon-gold-glow); }
-        .vol-60 { border-color: rgba(255, 0, 85, 0.7); color: #ff0055; box-shadow: 0 0 14px var(--neon-red-glow); }
-        .vol-100 {
-            border-color: #ff0055; color: #ffffff; background: rgba(255, 0, 85, 0.25);
-            box-shadow: 0 0 22px var(--neon-red), inset 0 0 10px var(--neon-red);
-            text-shadow: 0 0 10px #ffffff;
-        }
+        /* БРЕНДИНГ */
+        .footer-logo { position: fixed; bottom: 12px; width: 100%; text-align: center; color: rgba(255,255,255,0.25); font-size: 0.7rem; font-weight: 800; letter-spacing: 3px; z-index: 100; pointer-events: none; }
 
         /* АВТОРИЗАЦИЯ */
         #auth-overlay { position: fixed; inset: 0; z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 20px; }
-        .auth-card {
-            background: rgba(2, 6, 16, 0.8); border: 1px solid var(--neon-cyan);
-            padding: 40px 28px; border-radius: 28px; width: 100%; max-width: 370px; text-align: center;
-            box-shadow: 0 0 35px var(--neon-cyan-glow);
-            backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); z-index: 10001;
-        }
-        .brand-header {
-            font-family: 'Cinzel', serif; font-size: 2.2rem; font-weight: 900;
-            color: #ffffff; text-shadow: 0 0 20px var(--neon-gold), 0 0 40px var(--neon-gold);
-        }
-        .auth-sub { color: var(--neon-cyan); font-size: 0.78rem; font-weight: 700; margin: 8px 0 22px; letter-spacing: 3px; text-shadow: 0 0 8px var(--neon-cyan); }
-        .auth-input {
-            width: 100%; padding: 16px; border-radius: 14px; border: 1px solid var(--neon-cyan);
-            background: rgba(0, 0, 0, 0.6); color: #fff; text-align: center; font-size: 1.3rem; font-weight: 800;
-            outline: none; letter-spacing: 3px; user-select: text; transition: all 0.3s ease;
-            box-shadow: inset 0 0 10px var(--neon-cyan-glow);
-        }
-        .auth-input:focus { border-color: var(--neon-gold); box-shadow: 0 0 20px var(--neon-gold-glow); }
+        .auth-card { background: var(--glass-card); border: 1px solid var(--glass-border); padding: 36px 26px; border-radius: 24px; width: 100%; max-width: 360px; text-align: center; box-shadow: 0 0 50px var(--gold-glow); z-index: 10001; }
+        .brand-header { font-family: 'Cinzel', serif; font-size: 2.2rem; font-weight: 900; background: linear-gradient(135deg, #ffffff 0%, #fffbeb 30%, #e5e7eb 65%, #f59e0b 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .auth-sub { color: #94a3b8; font-size: 0.8rem; font-weight: 600; margin: 8px 0 20px; letter-spacing: 1px; }
+        .auth-input { width: 100%; padding: 16px; border-radius: 12px; border: 1px solid var(--glass-border); background: rgba(3, 7, 18, 0.85); color: #fff; text-align: center; font-size: 1.2rem; font-weight: 800; outline: none; letter-spacing: 2px; user-select: text; }
+        .btn-gold { width: 100%; padding: 16px; border-radius: 12px; border: none; background: linear-gradient(135deg, #ffffff 0%, var(--gold-light) 40%, var(--gold-main) 100%); color: #000; font-weight: 800; cursor: pointer; margin-top: 15px; }
 
-        /* ПУЛЬТ ВЕДУЩЕГО: ВЕРХ */
-        #host-top-bar {
-            display: none; position: fixed; top: 0; left: 0; right: 0;
-            height: var(--top-bar-height); z-index: 500;
-            background: rgba(2, 5, 12, 0.85);
-            border-bottom: 1px solid rgba(0, 243, 255, 0.2);
-            padding: 10px 14px; flex-direction: column; gap: 8px; justify-content: center;
-            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-        }
-
-        .host-eq-wrapper {
-            width: 100%; height: 14px; position: relative; border-radius: 6px; overflow: hidden;
-            background: rgba(0, 0, 0, 0.6); border: 1px solid rgba(0, 243, 255, 0.2);
-        }
-        #host-eq-canvas { width: 100%; height: 100%; display: block; }
-
+        /* ПУЛЬТ: ВЕРХ */
+        #host-top-bar { display: none; position: fixed; top: 0; left: 0; right: 0; height: var(--top-bar-height); z-index: 500; background: rgba(15, 23, 42, 0.97); border-bottom: 1px solid var(--glass-border); padding: 12px; flex-direction: column; gap: 10px; justify-content: center; }
         .control-row { display: flex; justify-content: space-between; gap: 8px; align-items: center; }
-        .btn-control { flex: 1; height: 38px; font-size: 0.8rem; }
-        .btn-control.active {
-            border-color: #ffffff !important;
-            box-shadow: 0 0 18px #ffffff, inset 0 0 10px #ffffff !important;
-            color: #ffffff !important;
-        }
+        .btn-control { flex: 1; height: 36px; border-radius: 8px; border: 1px solid rgba(229, 231, 235, 0.18); background: rgba(30, 41, 59, 0.7); color: #ffffff; font-size: 0.85rem; font-weight: 800; cursor: pointer; transition: all 0.2s; }
+        .btn-control.active { background: linear-gradient(135deg, #ffffff 0%, var(--gold-main) 100%); color: #000; border-color: #ffffff; }
+        
+        .seek-btn { flex: 1; height: 44px; border-radius: 10px; background: rgba(30, 41, 59, 0.85); color: #fff; font-size: 1.4rem; border: 1px solid var(--glass-border); display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; }
+        .play-btn { flex: 1.5; background: rgba(245, 158, 11, 0.2); color: var(--gold-light); border-color: var(--gold-main); }
+        .play-time { font-size: 0.65rem; font-weight: 800; opacity: 0.8; margin-top: 2px; letter-spacing: 0.5px; font-family: var(--ios-font); }
 
-        /* КНОПКА PLAY С БОЛЬШИМ ОТСТУПОМ ОТ ЦИФР */
-        .seek-btn { flex: 1; height: 44px; font-size: 0.95rem; }
-        .play-btn {
-            flex: 2.4 !important;
-            padding: 0 24px !important;
-            gap: 14px !important;
-        }
-        .play-time {
-            font-size: 0.78rem; font-weight: 800; color: var(--neon-gold);
-            letter-spacing: 1.5px; margin-left: 10px;
-            text-shadow: 0 0 8px var(--neon-gold);
-        }
+        /* ПУЛЬТ: НИЗ */
+        #host-bottom-bar { display: none; position: fixed; bottom: 0; left: 0; right: 0; height: var(--bottom-bar-height); z-index: 500; background: rgba(15, 23, 42, 0.98); border-top: 1px solid var(--glass-border); padding: 8px 12px; flex-direction: column; gap: 8px; justify-content: center; }
+        .btn-action { flex: 1; height: 36px; border-radius: 8px; border: 1px solid var(--glass-border); font-weight: 800; font-size: 0.78rem; cursor: pointer; }
+        .btn-action.gold { background: rgba(245, 158, 11, 0.2); color: var(--gold-light); border-color: var(--gold-main); }
+        .btn-action.red { background: rgba(239, 68, 68, 0.2); color: #fca5a5; border-color: var(--danger-red); }
+        .sfx-active { background: rgba(245, 158, 11, 0.4) !important; border-color: var(--gold-main) !important; box-shadow: 0 0 15px var(--gold-glow); }
 
-        /* ПУЛЬТ ВЕДУЩЕГО: НИЗ */
-        #host-bottom-bar {
-            display: none; position: fixed; bottom: 0; left: 0; right: 0;
-            height: var(--bottom-bar-height); z-index: 500;
-            background: rgba(2, 5, 12, 0.88);
-            border-top: 1px solid rgba(0, 243, 255, 0.2);
-            padding: 8px 14px; flex-direction: column; gap: 8px; justify-content: center;
-            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            box-shadow: 0 -10px 30px rgba(0,0,0,0.8);
-        }
-        .btn-action { flex: 1; height: 40px; font-size: 0.78rem; letter-spacing: 1px; }
-        .btn-small { flex: 0.65 !important; font-size: 0.75rem !important; }
-        .btn-med { flex: 0.95 !important; font-size: 0.78rem !important; }
-
-        .sfx-btn { flex: 1; height: 40px; font-size: 1.25rem; }
-        .sfx-active {
-            background: rgba(255, 183, 0, 0.2) !important;
-            border-color: #ffffff !important;
-            box-shadow: 0 0 25px var(--neon-gold) !important;
-        }
-
-        /* ЭКРАН ПРОЕКТОРА */
-        #main-viewport {
-            display: none; position: fixed; inset: 0; z-index: 10;
-            flex-direction: column; align-items: center; justify-content: center;
-        }
+        /* ЭКРАН (IFRAME ОГРАНИЧЕН МЕЖДУ ПАНЕЛЯМИ) */
+        #main-viewport { display: none; position: fixed; inset: 0; z-index: 10; flex-direction: column; align-items: center; justify-content: center; }
         
         body.is-host #module-iframe { 
             top: var(--top-bar-height) !important; 
@@ -249,199 +75,132 @@
             bottom: auto !important; 
         }
         
-        #module-iframe {
-            display: block; position: fixed; inset: 0; width: 100vw; height: 100vh;
-            border: none; z-index: 1; background: transparent; opacity: 0; pointer-events: none;
-            transition: opacity 0.8s ease;
-        }
-        #module-iframe.active-module { z-index: 15; opacity: 1; pointer-events: auto; }
-
-        #main-display-content { text-align: center; z-index: 10; transition: opacity 1s ease; opacity: 1; padding: 0 20px; }
+        #module-iframe { display: none; position: fixed; inset: 0; width: 100vw; height: 100vh; border: none; z-index: 15; background: #000; opacity: 0; transition: opacity 1s ease-in-out; }
         
-        .shimmer-title {
-            font-family: 'Cinzel', serif;
-            font-size: 4.2vw; min-size: 3rem; font-weight: 900;
-            color: #ffffff; text-shadow: 0 0 20px var(--neon-gold), 0 0 40px var(--neon-gold);
-            letter-spacing: 2px; line-height: 1.15; text-transform: uppercase;
-        }
-        
-        .subtitle-text {
-            color: var(--neon-cyan); font-size: 1.8vw; min-size: 1.3rem; font-weight: 700;
-            margin-top: 18px; letter-spacing: 4px; text-transform: uppercase;
-            text-shadow: 0 0 15px var(--neon-cyan);
-        }
+        #main-display-content { text-align: center; z-index: 10; transition: opacity 1s ease-in-out; opacity: 1; }
+        .shimmer-title { font-family: 'Cinzel', serif; font-size: 3.2rem; font-weight: 900; background: linear-gradient(90deg, #ffffff 0%, #fffbeb 25%, #f59e0b 50%, #e5e7eb 75%, #ffffff 100%); background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: shine 4s linear infinite; }
+        @keyframes shine { to { background-position: 200% center; } }
+        .subtitle-text { color: #94a3b8; font-size: 1.15rem; font-weight: 600; margin-top: 10px; }
 
-        #full-screen-timer {
-            display: none; position: fixed; inset: 0; z-index: 900; align-items: center; justify-content: center;
-            transition: opacity 1s ease; opacity: 0;
-        }
-        .timer-huge-text {
-            font-family: 'Cinzel', serif; font-size: 24vw; font-weight: 900; color: #ffffff;
-            text-shadow: 0 0 60px var(--neon-gold), 0 0 30px var(--neon-red);
-        }
+        /* ТАЙМЕР */
+        #full-screen-timer { display: none; position: fixed; inset: 0; z-index: 900; align-items: center; justify-content: center; transition: opacity 1s ease-in-out; opacity: 0; }
+        .timer-huge-text { font-family: 'Cinzel', serif; font-size: 22vw; font-weight: 900; color: #ffffff; text-shadow: 0 0 40px var(--gold-glow); }
 
-        /* КРУГОВОЙ ЭКВАЛАЙЗЕР СО СВЕТЯЩИМИСЯ ЧЁРНЫМИ ПОЛОСАМИ */
-        #eq-canvas {
-            position: absolute; inset: 0; width: 100%; height: 100%;
-            z-index: 5; pointer-events: none; opacity: 0.95; transition: opacity 0.5s;
-        }
+        /* ЭКВАЛАЙЗЕР */
+        #eq-canvas { position: absolute; bottom: 0; left: 0; width: 100%; height: 180px; z-index: 5; pointer-events: none; opacity: 0.8; transition: opacity 0.5s; }
 
         /* МОДАЛКИ */
-        .modal-overlay {
-            display: none; position: fixed; inset: 0; z-index: 20000;
-            background: rgba(2, 4, 10, 0.88); align-items: center; justify-content: center; padding: 20px;
-            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-        }
-        .modal-card {
-            background: rgba(4, 10, 24, 0.85); padding: 28px; border-radius: 28px; width: 100%; max-width: 400px;
-            border: 1px solid var(--neon-cyan); text-align: center;
-            box-shadow: 0 0 30px var(--neon-cyan-glow); backdrop-filter: blur(25px);
-        }
-        .mod-btn { width: 100%; padding: 14px; margin-top: 10px; font-size: 0.9rem; }
-        
-        #script-iframe { width: 100%; height: 70vh; border: none; border-radius: 20px; background: #02040a; }
-        .modal-card.large { max-width: 650px; width: 100%; padding: 16px; }
-
-        .prompt-desc { font-size: 0.85rem; color: var(--neon-gold); margin-top: 12px; text-align: left; font-weight: 600; text-shadow: 0 0 8px var(--neon-gold-glow); }
+        .modal-overlay { display: none; position: fixed; inset: 0; z-index: 20000; background: rgba(0,0,0,0.85); align-items: center; justify-content: center; padding: 20px; }
+        .modal-card { background: var(--glass-card); padding: 24px; border-radius: 20px; width: 100%; max-width: 360px; border: 1px solid var(--glass-border); text-align: center; }
+        .mod-btn { width: 100%; padding: 14px; border-radius: 12px; border: 1px solid var(--glass-border); background: rgba(30, 41, 59, 0.8); color: #fff; font-weight: 800; margin-top: 8px; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <!-- КУРСОР-ТОЧКА ДЛЯ ВСЕХ ЭЛЕМЕНТОВ -->
-    <div id="custom-cursor"></div>
-
     <div class="bg-glow"></div>
-    <!-- МИКРО-ТОЧКА И ОГРОМНЫЙ КОНУС СВЕТА В ЦЕНТРЕ -->
-    <div class="center-light-point"></div>
-    <div class="center-glow-cone" id="center-light-cone"></div>
-    
+    <div class="center-glow"></div>
     <canvas id="particles-canvas"></canvas>
 
-    <!-- АВТОРИЗАЦИЯ -->
     <div id="auth-overlay">
-        <div class="auth-card">
-            <div class="brand-header">FAMILY STANDARD</div>
-            <p class="auth-sub">EVENT OS • ПУЛЬТ ВЕДУЩЕГО</p>
+        <div class="auth-card" id="auth-card">
+            <div class="brand-header">EVENT OS</div>
+            <p class="auth-sub">СИСТЕМА УПРАВЛЕНИЯ</p>
             <input type="password" id="auth-input" class="auth-input" placeholder="КОД ДОСТУПА" autocomplete="off" onkeydown="if(event.key==='Enter') submitAuth()">
-            <button onclick="submitAuth()" class="btn-neon neon-gold" style="width: 100%; padding: 16px; margin-top: 18px;">ВОЙТИ В СИСТЕМУ</button>
+            <button onclick="submitAuth()" class="btn-gold">ВОЙТИ</button>
         </div>
     </div>
 
-    <!-- ПУЛЬТ ВЕДУЩЕГО: ВЕРХ -->
+    <!-- ПУЛЬТ ВЕДУЩЕГО -->
     <div id="host-top-bar">
-        <div class="host-eq-wrapper">
-            <canvas id="host-eq-canvas"></canvas>
-        </div>
-
         <div class="control-row">
-            <button class="btn-neon vol-3 btn-control" onclick="setVol(0.03, this)">3%</button>
-            <button class="btn-neon vol-10 btn-control" onclick="setVol(0.1, this)">10%</button>
-            <button class="btn-neon vol-30 btn-control active" onclick="setVol(0.3, this)">30%</button>
-            <button class="btn-neon vol-60 btn-control" onclick="setVol(0.6, this)">60%</button>
-            <button class="btn-neon vol-100 btn-control" onclick="setVol(1.0, this)">100%</button>
+            <button class="btn-control" onclick="setVol(0.03, this)">3%</button>
+            <button class="btn-control" onclick="setVol(0.1, this)">10%</button>
+            <button class="btn-control active" onclick="setVol(0.3, this)">30%</button>
+            <button class="btn-control" onclick="setVol(0.6, this)">60%</button>
+            <button class="btn-control" onclick="setVol(1.0, this)">100%</button>
         </div>
         
         <div class="control-row">
-            <button class="btn-neon neon-cyan btn-control" onclick="openMoodSelector('lounge')">ЛАУНДЖ</button>
-            <button class="btn-neon neon-cyan btn-control" onclick="openMoodSelector('active')">БАНКЕТ</button>
-            <button class="btn-neon neon-cyan btn-control" onclick="openMoodSelector('party')">ДВИЖ</button>
+            <button class="btn-control" onclick="setMood('lounge')">🍃 Лаундж</button>
+            <button class="btn-control" onclick="setMood('active')">🕺 Банкет</button>
+            <button class="btn-control" onclick="setMood('party')">🎉 Движ</button>
         </div>
 
         <div class="control-row">
-            <div class="seek-btn btn-neon neon-cyan" onclick="seekRelative(-60)">◄◄ -60</div>
-            <div class="seek-btn play-btn btn-neon neon-gold" id="btn-play-toggle" onclick="togglePlay()">
-                <span id="play-icon" style="font-size: 1.2rem; line-height: 1;">⏯</span>
+            <div class="seek-btn" onclick="seekRelative(-60)">⏪</div>
+            <div class="seek-btn play-btn" id="btn-play-toggle" onclick="togglePlay()">
+                <span id="play-icon" style="font-size: 1.1rem; line-height: 1;">⏯</span>
                 <span class="play-time" id="play-time">00:00 / 00:00</span>
             </div>
-            <div class="seek-btn btn-neon neon-cyan" onclick="seekRelative(60)">+60 ►►</div>
+            <div class="seek-btn" onclick="seekRelative(60)">⏩</div>
         </div>
     </div>
 
     <!-- ЭКРАН ПРОЕКТОРА -->
     <div id="main-viewport">
-        <!-- КРУГОВОЙ ЭКВАЛАЙЗЕР ИЗ ЦЕНТРАЛЬНОГО КРУГА -->
         <canvas id="eq-canvas"></canvas>
         <div id="full-screen-timer"><div class="timer-huge-text" id="timer-val">00:00</div></div>
         
         <iframe id="module-iframe" src="about:blank"></iframe>
         
         <div id="main-display-content">
-            <h1 class="shimmer-title" id="display-title">НУ ЧТО, КАКОЙ СЕГОДНЯ ПРАЗДНИК ПРАЗДНУЕМ?</h1>
-            <p class="subtitle-text" id="display-subtitle">РАССКАЖИ О НЁМ ПОДРОБНЕЕ</p>
+            <h1 class="shimmer-title" id="display-title">FAMILY STANDARD OS</h1>
+            <p class="subtitle-text" id="display-subtitle">С праздником!</p>
         </div>
         
         <div class="footer-logo">FAMILY STANDARD OS 2026</div>
     </div>
 
-    <!-- ПУЛЬТ ВЕДУЩЕГО: НИЗ -->
+    <!-- НИЖНЯЯ ПАНЕЛЬ -->
     <div id="host-bottom-bar">
         <div class="control-row">
-            <button class="btn-neon neon-cyan btn-action" onclick="openModal('launcher-modal')">ИНТЕРАКТИВЫ</button>
-            <button class="btn-neon neon-red btn-action" onclick="handleCloseClick()">ЗАКРЫТЬ</button>
-            <button class="btn-neon neon-red btn-action btn-small" onclick="socket.emit('add_timer_15s')">+15 СЕК</button>
-            <button class="btn-neon neon-gold btn-action btn-med" onclick="openScriptModal()">СЦЕНАРИЙ</button>
+            <button class="btn-action gold" onclick="openModal('launcher-modal')">ИНТЕРАКТИВ</button>
+            <button class="btn-action red" onclick="handleCloseClick()">ЗАКРЫТЬ</button>
+            <button class="btn-action gold" onclick="socket.emit('add_timer_15s')" style="flex: 0.6;">+15 СЕК</button>
         </div>
         <div class="control-row">
-            <button class="sfx-btn btn-neon neon-cyan" id="btn-jingle" onclick="socket.emit('host_toggle_jingle')" title="Джингл">🪄</button>
-            <button class="sfx-btn btn-neon neon-cyan" onclick="triggerSfx('applause')" title="Аплодисменты">🙌</button>
-            <button class="sfx-btn btn-neon neon-cyan" onclick="triggerSfx('fanfare')" title="Фанфары">📯</button>
-            <button class="sfx-btn btn-neon neon-cyan" onclick="triggerSfx('correct')" title="Верно">💎</button>
-            <button class="sfx-btn btn-neon neon-cyan" onclick="triggerSfx('wrong')" title="Неверно">⚡</button>
+            <button class="seek-btn" id="btn-jingle" onclick="socket.emit('host_toggle_jingle')" style="font-size:1.2rem">🎁</button>
+            <button class="seek-btn" onclick="triggerSfx('applause')" style="font-size:1.2rem">👏</button>
+            <button class="seek-btn" onclick="triggerSfx('correct')" style="font-size:1.2rem">✅</button>
+            <button class="seek-btn" onclick="triggerSfx('wrong')" style="font-size:1.2rem">❌</button>
         </div>
     </div>
 
     <!-- МОДАЛКИ -->
-    <div class="modal-overlay" id="mood-selector-modal">
-        <div class="modal-card">
-            <h3 style="color: var(--neon-gold); font-family: 'Cinzel', serif;" id="mood-modal-title">Выбор трека</h3>
-            <div id="mood-tracks-list"></div>
-            <button onclick="closeModal('mood-selector-modal')" class="btn-neon mod-btn" style="background: transparent; color: #94a3b8; border: none; margin-top: 15px;">Отмена</button>
-        </div>
-    </div>
-
-    <div class="modal-overlay" id="script-modal">
-        <div class="modal-card large">
-            <h3 style="color: var(--neon-gold); font-family: 'Cinzel', serif; margin-bottom: 10px;">Сценарий мероприятия</h3>
-            <iframe id="script-iframe" src="about:blank"></iframe>
-            <button onclick="closeModal('script-modal')" class="btn-neon neon-gold mod-btn" style="margin-top: 10px;">Закрыть сценарий</button>
-        </div>
-    </div>
-
     <div class="modal-overlay" id="launcher-modal">
         <div class="modal-card">
-            <h3 style="color: var(--neon-gold); font-family: 'Cinzel', serif;">Интерактивы</h3>
+            <h3 style="color: var(--gold-light);">Интерактивы</h3>
             <div id="modules-list-box"></div>
-            <button class="btn-neon neon-cyan mod-btn" style="margin-top: 14px;" onclick="openEditEventModal()">✏️ Изменить заголовок</button>
-            <button onclick="closeModal('launcher-modal')" style="background: transparent; color: #94a3b8; border: none; margin-top: 15px; font-weight: bold;">Отмена</button>
+            <button class="mod-btn" style="border-color: var(--gold-main); background: rgba(245,158,11,0.15); margin-top: 12px;" onclick="openEditEventModal()">✏️ Изменить заголовок</button>
+            <button onclick="closeModal('launcher-modal')" style="background: transparent; color: #94a3b8; border: none; margin-top: 15px; font-weight: bold; cursor: pointer;">Отмена</button>
         </div>
     </div>
 
     <div class="modal-overlay" id="edit-event-modal">
         <div class="modal-card">
-            <h3 style="color: var(--neon-gold); font-family: 'Cinzel', serif;">Настройка праздника</h3>
-            <div class="prompt-desc">Ну что, какой праздник празднуем сегодня?</div>
-            <input type="text" id="edit-title-input" class="auth-input" style="font-size: 1rem; letter-spacing: 1px; margin-top: 5px;" placeholder="Заголовок события">
-            <div class="prompt-desc">Расскажи поподробнее:</div>
-            <input type="text" id="edit-subtitle-input" class="auth-input" style="font-size: 0.9rem; letter-spacing: 1px; margin-top: 5px;" placeholder="Подзаголовок / Повод">
+            <h3 style="color: var(--gold-light);">Название праздника</h3>
+            <input type="text" id="edit-title-input" class="auth-input" style="font-size: 1rem; letter-spacing: 1px; margin-top: 15px;" placeholder="Заголовок события">
+            <input type="text" id="edit-subtitle-input" class="auth-input" style="font-size: 0.9rem; letter-spacing: 1px; margin-top: 10px;" placeholder="Подзаголовок">
             <div style="display: flex; gap: 10px; margin-top: 20px;">
-                <button onclick="saveEventInfo()" class="btn-neon neon-gold" style="margin: 0; flex: 1; padding: 14px;">Сохранить</button>
-                <button onclick="closeModal('edit-event-modal')" style="flex: 1; border: 1px solid rgba(255,255,255,0.2); background: transparent; color: #fff; border-radius: 14px;">Отмена</button>
+                <button onclick="saveEventInfo()" class="btn-gold" style="margin: 0; flex: 1;">Сохранить</button>
+                <button onclick="closeModal('edit-event-modal')" style="flex: 1; border: 1px solid rgba(255,255,255,0.2); background: transparent; color: #fff; border-radius: 12px;">Отмена</button>
             </div>
         </div>
     </div>
 
     <div class="modal-overlay" id="end-event-modal">
         <div class="modal-card">
-            <h3 style="color: var(--neon-gold); font-family: 'Cinzel', serif;">Завершить праздник?</h3>
+            <h3 style="color: var(--gold-light);">Завершить праздник?</h3>
             <div style="display: flex; gap: 10px; margin-top: 20px;">
-                <button onclick="confirmEnd()" class="btn-neon neon-red" style="margin: 0; flex: 1; padding: 14px;">Завершить</button>
-                <button onclick="closeModal('end-event-modal')" style="flex: 1; border: 1px solid rgba(255,255,255,0.2); background: transparent; color: #fff; border-radius: 14px;">Отмена</button>
+                <button onclick="confirmEnd()" class="btn-gold" style="margin: 0; background: var(--danger-red); color: #fff;">Завершить</button>
+                <button onclick="closeModal('end-event-modal')" style="flex: 1; border: 1px solid rgba(255,255,255,0.2); background: transparent; color: #fff; border-radius: 12px;">Отмена</button>
             </div>
         </div>
     </div>
 
-    <audio id="bg-audio" crossorigin="anonymous" loop></audio>
-    <audio id="sfx-audio" crossorigin="anonymous"></audio>
+    <!-- АУДИО -->
+    <audio id="bg-audio" loop></audio>
+    <audio id="sfx-audio"></audio>
 
     <script>
         const socket = io("https://event-os-wqoa.onrender.com", { transports: ['websocket', 'polling'] });
@@ -451,18 +210,21 @@
         let timerInterval = null;
         let timerDelayTimeout = null;
         let overlayState = 'TITLE'; 
-        let scriptUrl = 'script.html';
-
+        
         let closeClickCount = 0;
         let closeClickTimer = null;
+
         let fanfareFiredForTimer = false;
 
+        // --- УМНЫЙ АУДИО-МЕНЕДЖЕР ---
         const bgAudio = document.getElementById('bg-audio');
         const sfxAudio = document.getElementById('sfx-audio');
         
         let targetVolume = 0.3;      
+        let actualVolumeTarget = 0;  
         let isFadingToSeek = false;
         let pendingSeekTime = 0;
+        
         let isSfxActive = false; 
         let sfxTargetVol = 0;
 
@@ -473,210 +235,50 @@
         let hostTrackDuration = 0;
         let state_is_playing = false;
 
-        // --- ДВИЖЕНИЕ КУРСОР-ТОЧКИ ПО ВСЕМУ ЭКРАНУ ---
-        const cursor = document.getElementById('custom-cursor');
-        window.addEventListener('mousemove', (e) => {
-            cursor.style.left = e.clientX + 'px';
-            cursor.style.top = e.clientY + 'px';
-        });
-
-        // --- WEB AUDIO API & ANALYSER ---
-        let audioCtx, analyser, dataArray;
-        function initAudioContext() {
-            if (!audioCtx) {
-                try {
-                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                    analyser = audioCtx.createAnalyser();
-                    analyser.fftSize = 256;
-                    dataArray = new Uint8Array(analyser.frequencyBinCount);
-                    const source = audioCtx.createMediaElementSource(bgAudio);
-                    source.connect(analyser);
-                    analyser.connect(audioCtx.destination);
-                } catch(e) { console.error("Web Audio API error:", e); }
-            }
-            if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
-        }
-
-        window.addEventListener('click', initAudioContext);
-        window.addEventListener('touchstart', initAudioContext);
-
-        // --- ЧАСТИЦИ С ОРБИТАЛЬНЫМ ВРАЩЕНИЕМ И УСКОРЕНИЕМ В ВОРОНКУ ---
+        // --- ЧАСТИЦЫ ---
         const pCanvas = document.getElementById('particles-canvas');
         const pCtx = pCanvas.getContext('2d');
         let particles = [];
-
         function resizePCanvas() { pCanvas.width = window.innerWidth; pCanvas.height = window.innerHeight; }
         window.addEventListener('resize', resizePCanvas);
         resizePCanvas();
-
         class Particle {
-            constructor() {
-                this.reset(true);
-            }
-
-            reset(initial = false) {
-                const cx = pCanvas.width / 2;
-                const cy = pCanvas.height / 2;
-                const angle = Math.random() * Math.PI * 2;
-                const maxDist = Math.max(cx, cy);
-                const dist = initial ? (Math.random() * maxDist * 0.8 + 40) : (maxDist + 50);
-
-                this.x = cx + Math.cos(angle) * dist;
-                this.y = cy + Math.sin(angle) * dist;
-
-                // Вектор по кругу (касательная скорость влево/вправо)
-                const spinDir = Math.random() > 0.5 ? 1 : -1;
-                const tangentSpeed = Math.random() * 2.5 + 1.5;
-
-                this.vx = -Math.sin(angle) * spinDir * tangentSpeed;
-                this.vy = Math.cos(angle) * spinDir * tangentSpeed;
-
-                this.r = Math.random() * 2.2 + 1.2;
-                this.color = Math.random() > 0.4 ? '#00f3ff' : '#ffb700';
-            }
-
-            update() {
-                const cx = pCanvas.width / 2;
-                const cy = pCanvas.height / 2;
-                const dx = cx - this.x;
-                const dy = cy - this.y;
-                const dist = Math.sqrt(dx * dx + dy * dy);
-
-                if (dist < 12 || dist > Math.max(pCanvas.width, pCanvas.height) * 1.5) {
-                    this.reset();
-                    return;
-                }
-
-                // Гравитационное притяжение к центру (ускоряется ближе к точке)
-                const pull = 160 / (dist + 30);
-                this.vx += (dx / dist) * pull * 0.12;
-                this.vy += (dy / dist) * pull * 0.12;
-
-                // Легкая амортизация для орбитальной устойчивости
-                this.vx *= 0.985;
-                this.vy *= 0.985;
-
-                this.x += this.vx;
-                this.y += this.vy;
-            }
-
-            draw() {
-                pCtx.beginPath();
-                pCtx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
-                pCtx.fillStyle = this.color;
-                pCtx.shadowBlur = 10;
-                pCtx.shadowColor = this.color;
-                pCtx.fill();
-            }
+            constructor() { this.reset(); }
+            reset() { this.x = Math.random() * pCanvas.width; this.y = Math.random() * pCanvas.height; this.size = Math.random() * 2.5 + 0.5; this.speedX = (Math.random() - 0.5) * 0.4; this.speedY = (Math.random() - 0.5) * 0.4; this.alpha = Math.random() * 0.7 + 0.1; }
+            update() { this.x += this.speedX; this.y += this.speedY; if (this.x < 0 || this.x > pCanvas.width || this.y < 0 || this.y > pCanvas.height) this.reset(); }
+            draw() { pCtx.fillStyle = `rgba(245, 158, 11, ${this.alpha})`; pCtx.beginPath(); pCtx.arc(this.x, this.y, this.size, 0, Math.PI * 2); pCtx.fill(); }
         }
+        for (let i = 0; i < 110; i++) particles.push(new Particle());
+        function animateParticles() { pCtx.clearRect(0, 0, pCanvas.width, pCanvas.height); particles.forEach(p => { p.update(); p.draw(); }); requestAnimationFrame(animateParticles); }
+        requestAnimationFrame(animateParticles);
 
-        for (let i = 0; i < 70; i++) particles.push(new Particle());
-
-        function animateParticles() {
-            pCtx.clearRect(0, 0, pCanvas.width, pCanvas.height);
-            particles.forEach(p => { p.update(); p.draw(); });
-            requestAnimationFrame(animateParticles);
-        }
-        animateParticles();
-
-        // --- КРУГОВОЙ ЭКВАЛАЙЗЕР ИЗ ЦЕНТРАЛЬНОГО КРУГА (СВЕТЯЩИЙСЯ ЧЁРНЫЙ) ---
+        // --- ЭКВАЛАЙЗЕР ---
         const eqCanvas = document.getElementById('eq-canvas');
         const eqCtx = eqCanvas.getContext('2d');
-        function resizeEqCanvas() { eqCanvas.width = window.innerWidth; eqCanvas.height = window.innerHeight; }
+        function resizeEqCanvas() { eqCanvas.width = window.innerWidth; }
         window.addEventListener('resize', resizeEqCanvas);
         resizeEqCanvas();
-
-        function drawCircularEqualizer() {
-            requestAnimationFrame(drawCircularEqualizer);
+        let eqBars = Array.from({length: 80}, () => Math.random());
+        function drawEq() {
             eqCtx.clearRect(0, 0, eqCanvas.width, eqCanvas.height);
-
-            const cx = eqCanvas.width / 2;
-            const cy = eqCanvas.height / 2;
-            const baseRadius = Math.min(eqCanvas.width, eqCanvas.height) * 0.2; // Радиус центрального круга
-            const bars = 72;
-            const step = (Math.PI * 2) / bars;
-            const cone = document.getElementById('center-light-cone');
-
-            if (analyser && eqIsPlaying) {
-                analyser.getByteFrequencyData(dataArray);
+            const barWidth = eqCanvas.width / eqBars.length;
+            for(let i = 0; i < eqBars.length; i++) {
+                let targetH = eqIsPlaying ? (Math.random() * 250 * (eqVolume + 0.2)) : 2;
+                eqBars[i] += (targetH - eqBars[i]) * 0.2; 
+                let h = eqBars[i];
+                eqCtx.fillStyle = 'rgba(245, 158, 11, 0.4)';
+                eqCtx.fillRect(i * barWidth + 1, eqCanvas.height - h, barWidth - 2, h);
             }
-
-            // РАСЧЕТ БАСОВ ДЛЯ ПУЛЬСАЦИИ ЦЕНТРАЛЬНОГО СВЕТА
-            let avgBass = 0;
-            if (dataArray && eqIsPlaying) {
-                let sum = 0;
-                for (let k = 0; k < 10; k++) sum += dataArray[k];
-                avgBass = sum / 10;
-            }
-
-            if (cone) {
-                let scale = 1 + (avgBass / 255) * 0.4;
-                let opacity = 0.4 + (avgBass / 255) * 0.6;
-                cone.style.transform = `translate(-50%, -50%) scale(${scale})`;
-                cone.style.opacity = opacity;
-            }
-
-            // РЕНДЕР КРУГОВОГО ЭКВАЛАЙЗЕРА (СВЕТЯЩИЕСЯ ЧЁРНЫЕ ПОЛОСЫ)
-            for (let i = 0; i < bars; i++) {
-                let rawVal = (dataArray && eqIsPlaying) ? (dataArray[i % dataArray.length] || 0) : 4;
-                let barLen = rawVal * 1.2;
-                let angle = i * step;
-
-                let x1 = cx + Math.cos(angle) * baseRadius;
-                let y1 = cy + Math.sin(angle) * baseRadius;
-                let x2 = cx + Math.cos(angle) * (baseRadius + barLen);
-                let y2 = cy + Math.sin(angle) * (baseRadius + barLen);
-
-                eqCtx.beginPath();
-                eqCtx.moveTo(x1, y1);
-                eqCtx.lineTo(x2, y2);
-                
-                // Светящийся чёрный: тёмный насыщенный сердечник + яркая неоновая тень
-                eqCtx.strokeStyle = 'rgba(0, 5, 15, 0.95)';
-                eqCtx.lineWidth = 4;
-                eqCtx.lineCap = 'round';
-                eqCtx.shadowBlur = 12;
-                eqCtx.shadowColor = (i % 2 === 0) ? '#00f3ff' : '#ffb700';
-                eqCtx.stroke();
-            }
+            setTimeout(() => requestAnimationFrame(drawEq), 40);
         }
-        drawCircularEqualizer();
+        drawEq();
 
-        // --- ЭКВАЛАЙЗЕР ДЛЯ ПУЛЬТА ВЕДУЩЕГО ---
-        const hostEqCanvas = document.getElementById('host-eq-canvas');
-        const hostEqCtx = hostEqCanvas.getContext('2d');
-        function resizeHostEq() {
-            if (hostEqCanvas.parentNode) {
-                hostEqCanvas.width = hostEqCanvas.parentNode.clientWidth;
-                hostEqCanvas.height = hostEqCanvas.parentNode.clientHeight;
-            }
-        }
-        window.addEventListener('resize', resizeHostEq);
-        setTimeout(resizeHostEq, 500);
-
-        let hostBars = Array.from({length: 40}, () => Math.random());
-        function drawHostEq() {
-            if (myRole === 'HOST' && hostEqCanvas.width > 0) {
-                hostEqCtx.clearRect(0, 0, hostEqCanvas.width, hostEqCanvas.height);
-                const barWidth = hostEqCanvas.width / hostBars.length;
-                for (let i = 0; i < hostBars.length; i++) {
-                    let targetH = eqIsPlaying ? (Math.random() * hostEqCanvas.height * (eqVolume + 0.2)) : 1.5;
-                    hostBars[i] += (targetH - hostBars[i]) * 0.25;
-                    let h = hostBars[i];
-                    hostEqCtx.fillStyle = '#00f3ff';
-                    hostEqCtx.fillRect(i * barWidth + 1, hostEqCanvas.height - h, barWidth - 2, h);
-                }
-            }
-            requestAnimationFrame(drawHostEq);
-        }
-        drawHostEq();
-
-        // --- АВТОРИЗАЦИЯ И ЛОГИКА СИСТЕМЫ ---
+        // --- АВТОРИЗАЦИЯ ---
         function submitAuth() {
             const val = document.getElementById('auth-input').value.trim();
             if(!val) return;
-            initAudioContext();
-            bgAudio.load(); sfxAudio.load();
+            bgAudio.load();
+            sfxAudio.load();
             bgAudio.play().then(()=>bgAudio.pause()).catch(()=>{});
             sfxAudio.play().then(()=>sfxAudio.pause()).catch(()=>{});
             socket.emit('login', { pin: val });
@@ -692,7 +294,6 @@
                     document.body.classList.add('is-host');
                     document.getElementById('host-top-bar').style.display = 'flex';
                     document.getElementById('host-bottom-bar').style.display = 'flex';
-                    resizeHostEq();
                     bgAudio.remove(); sfxAudio.remove(); 
                 } else if (myRole === 'SCREEN') {
                     document.body.classList.add('is-screen');
@@ -703,16 +304,17 @@
                         }
                     }, 1000);
                 }
-            } else { alert('Неверный КОД ДОСТУПА'); }
+            } else {
+                alert('Неверный КОД ДОСТУПА');
+            }
         });
 
-        socket.on('modules_config_update', (data) => {
-            if (data.script_url) scriptUrl = data.script_url;
+        socket.on('modules_config_update', (modules) => {
             const box = document.getElementById('modules-list-box');
             box.innerHTML = '';
-            (data.modules || []).forEach(m => {
+            modules.forEach(m => {
                 const btn = document.createElement('button');
-                btn.className = 'btn-neon neon-gold mod-btn';
+                btn.className = 'mod-btn';
                 btn.innerText = m.name;
                 btn.onclick = () => { socket.emit('switch_module', { module: m.path }); closeModal('launcher-modal'); };
                 box.appendChild(btn);
@@ -736,7 +338,8 @@
 
         if (sfxAudio) {
             sfxAudio.onended = () => {
-                isSfxActive = false; sfxTargetVol = 0;
+                isSfxActive = false;
+                sfxTargetVol = 0;
                 socket.emit('sfx_ended'); 
             };
         }
@@ -746,23 +349,33 @@
 
             let desiredBgVol = state_is_playing ? targetVolume : 0;
             let bgVolTarget = (isSfxActive || sfxAudio.volume > 0.05) && state_is_playing ? 0.03 : desiredBgVol;
+            
             if (isFadingToSeek) bgVolTarget = 0;
 
             let diffBg = bgVolTarget - bgAudio.volume;
-            if (Math.abs(diffBg) > 0.02) { bgAudio.volume += Math.sign(diffBg) * 0.02; }
-            else {
+            if (Math.abs(diffBg) > 0.02) {
+                bgAudio.volume += Math.sign(diffBg) * 0.02; 
+            } else {
                 bgAudio.volume = bgVolTarget;
                 if (bgVolTarget === 0) {
-                    if (isFadingToSeek) { bgAudio.currentTime = pendingSeekTime; isFadingToSeek = false; }
-                    else if (!eqIsPlaying && !bgAudio.paused) { bgAudio.pause(); }
+                    if (isFadingToSeek) {
+                        bgAudio.currentTime = pendingSeekTime; 
+                        isFadingToSeek = false;
+                    } else if (!eqIsPlaying && !bgAudio.paused) {
+                        bgAudio.pause();
+                    }
                 }
             }
 
             let diffSfx = sfxTargetVol - sfxAudio.volume;
-            if (Math.abs(diffSfx) > 0.03) { sfxAudio.volume += Math.sign(diffSfx) * 0.03; }
-            else {
+            if (Math.abs(diffSfx) > 0.03) {
+                sfxAudio.volume += Math.sign(diffSfx) * 0.03; 
+            } else {
                 sfxAudio.volume = sfxTargetVol;
-                if (sfxTargetVol === 0 && !sfxAudio.paused) { sfxAudio.pause(); socket.emit('sfx_ended'); }
+                if (sfxTargetVol === 0 && !sfxAudio.paused) {
+                    sfxAudio.pause();
+                    socket.emit('sfx_ended');
+                }
             }
         }, 25);
 
@@ -771,19 +384,31 @@
             state_is_playing = state.is_playing;
             let needsSeek = Math.abs(bgAudio.currentTime - state.seek_position) > 2.5;
 
-            if (needsSeek && state.is_playing) { isFadingToSeek = true; pendingSeekTime = state.seek_position; }
-            else if (state.is_playing && bgAudio.paused) { bgAudio.volume = 0; bgAudio.play().catch(()=>{}); }
+            if (needsSeek && state.is_playing) {
+                isFadingToSeek = true;
+                pendingSeekTime = state.seek_position;
+            } else if (state.is_playing && bgAudio.paused) {
+                bgAudio.volume = 0; 
+                bgAudio.play().catch(()=>{});
+            }
         }
 
         socket.on('play_sfx_stream', (data) => {
             if (myRole === 'SCREEN') {
                 sfxAudio.src = CDN + data.file;
-                sfxAudio.volume = 0; sfxAudio.play().catch(()=>{});
-                isSfxActive = true; sfxTargetVol = 0.6; 
+                sfxAudio.volume = 0; 
+                sfxAudio.play().catch(()=>{});
+                isSfxActive = true;
+                sfxTargetVol = 0.6; 
             }
         });
 
-        socket.on('stop_sfx', () => { if (myRole === 'SCREEN') { isSfxActive = false; sfxTargetVol = 0; } });
+        socket.on('stop_sfx', () => {
+            if (myRole === 'SCREEN') {
+                isSfxActive = false;
+                sfxTargetVol = 0; 
+            }
+        });
 
         socket.on('state_update', (state) => {
             if (state.cdn_base_url) CDN = state.cdn_base_url;
@@ -817,20 +442,34 @@
             const tContainer = document.getElementById('full-screen-timer');
             const iframe = document.getElementById('module-iframe');
 
+            if (isModule && myRole === 'SCREEN') {
+                document.getElementById('eq-canvas').style.opacity = '0';
+            } else if (myRole === 'SCREEN') {
+                document.getElementById('eq-canvas').style.opacity = '0.8';
+            }
+
             if (isModule) {
                 overlayState = 'MODULE';
                 clearTimeout(timerDelayTimeout);
+                
                 dContent.style.opacity = '0';
-                setTimeout(() => dContent.style.display = 'none', 800);
+                setTimeout(() => dContent.style.display = 'none', 1000);
                 tContainer.style.opacity = '0';
-                setTimeout(() => tContainer.style.display = 'none', 800);
+                setTimeout(() => tContainer.style.display = 'none', 1000);
 
                 if(!iframe.src.includes(state.active_module)) {
                     iframe.src = state.active_module.startsWith('http') ? state.active_module : `/${state.active_module}`;
                 }
-                iframe.classList.add('active-module');
+                if (iframe.style.display !== 'block') {
+                    iframe.style.display = 'block';
+                    void iframe.offsetWidth;
+                    iframe.style.opacity = '1';
+                }
             } else if (isTimer && remain > 0) {
-                iframe.classList.remove('active-module');
+                if (iframe.style.opacity === '1') {
+                    iframe.style.opacity = '0';
+                    setTimeout(() => { iframe.style.display = 'none'; iframe.src = 'about:blank'; }, 1000);
+                }
 
                 if (overlayState === 'TITLE') {
                     fanfareFiredForTimer = false;
@@ -853,9 +492,11 @@
                         timerInterval = setInterval(() => {
                             const currentRemain = state.timer.end_time - (Date.now() / 1000);
                             
-                            if (currentRemain <= 0.5 && !fanfareFiredForTimer && overlayState === 'TIMER') {
+                            if (currentRemain <= 2.2 && !fanfareFiredForTimer && overlayState === 'TIMER') {
                                 fanfareFiredForTimer = true;
-                                if (myRole === 'SCREEN') { socket.emit('host_trigger_sfx', { sfx: 'fanfare' }); }
+                                if (myRole === 'SCREEN') {
+                                    socket.emit('host_trigger_sfx', { sfx: 'fanfare' });
+                                }
                             }
                             
                             if (currentRemain <= 0 && overlayState === 'TIMER') {
@@ -870,6 +511,7 @@
                                     dContent.style.display = 'block';
                                     void dContent.offsetWidth;
                                     dContent.style.opacity = '1'; 
+                                    
                                     if (myRole === 'SCREEN') socket.emit('timer_done');
                                 }, 1500); 
                             } else if (currentRemain > 0) {
@@ -879,14 +521,18 @@
                     }
                 }
             } else {
-                iframe.classList.remove('active-module');
+                if (iframe.style.opacity === '1') {
+                    iframe.style.opacity = '0';
+                    setTimeout(() => { iframe.style.display = 'none'; iframe.src = 'about:blank'; }, 1000);
+                }
+
                 clearTimeout(timerDelayTimeout);
                 
                 if (overlayState !== 'TITLE' && overlayState !== 'FADING_TIMER') {
                     overlayState = 'TITLE';
                     if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
                     tContainer.style.opacity = '0';
-                    setTimeout(() => tContainer.style.display = 'none', 800);
+                    setTimeout(() => tContainer.style.display = 'none', 1000);
                     
                     dContent.style.display = 'block';
                     void dContent.offsetWidth;
@@ -899,41 +545,23 @@
                 if (!bgAudio.src.endsWith(state.current_track)) {
                     bgAudio.src = trackUrl;
                     bgAudio.currentTime = state.seek_position;
-                    if (state.is_playing) { bgAudio.volume = 0; bgAudio.play().catch(()=>{}); }
-                } else { applyAudioState(state); }
+                    if (state.is_playing) {
+                        bgAudio.volume = 0;
+                        bgAudio.play().catch(()=>{});
+                    }
+                } else {
+                    applyAudioState(state);
+                }
             }
         });
 
-        function openMoodSelector(mood) {
-            const names = { lounge: 'ЛАУНДЖ', active: 'БАНКЕТ', party: 'ДВИЖ' };
-            document.getElementById('mood-modal-title').innerText = names[mood];
-            const box = document.getElementById('mood-tracks-list');
-            box.innerHTML = '';
-
-            for (let i = 1; i <= 5; i++) {
-                const btn = document.createElement('button');
-                btn.className = 'btn-neon neon-gold mod-btn';
-                btn.innerText = `${names[mood]} — ТРЕК ${i}`;
-                btn.onclick = () => {
-                    socket.emit('host_audio_control', { track_file: `${mood}${i}.mp3` });
-                    closeModal('mood-selector-modal');
-                };
-                box.appendChild(btn);
-            }
-            openModal('mood-selector-modal');
-        }
-
-        function openScriptModal() {
-            document.getElementById('script-iframe').src = scriptUrl;
-            openModal('script-modal');
-        }
-
+        // УПРАВЛЕНИЕ ВЕДУЩЕГО
         function setVol(v, btn) {
-            document.querySelectorAll('.control-row:nth-child(2) .btn-control').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.control-row:first-child .btn-control').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             socket.emit('host_audio_control', { volume: v });
         }
-
+        function setMood(m) { socket.emit('host_audio_control', { mood: m }); }
         function togglePlay() { socket.emit('host_audio_control', { toggle_play: true }); }
         function seekRelative(sec) { socket.emit('host_audio_control', { seek_relative: sec }); }
         function triggerSfx(type) { socket.emit('host_trigger_sfx', { sfx: type }); }
@@ -956,7 +584,9 @@
         function saveEventInfo() {
             const title = document.getElementById('edit-title-input').value.trim();
             const subtitle = document.getElementById('edit-subtitle-input').value.trim();
-            if (title) { socket.emit('update_event_info', { event_title: title, event_subtitle: subtitle }); }
+            if (title) {
+                socket.emit('update_event_info', { event_title: title, event_subtitle: subtitle });
+            }
             closeModal('edit-event-modal');
         }
 
