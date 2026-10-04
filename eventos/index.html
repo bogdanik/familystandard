@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Family Standard OS</title>
+    <link rel="icon" href="data:,">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
@@ -38,8 +39,20 @@
         }
         #particles-canvas { position: fixed; inset: 0; z-index: 3; pointer-events: none; }
 
-        /* БРЕНДИНГ */
-        .footer-logo { position: fixed; bottom: 12px; width: 100%; text-align: center; color: rgba(255,255,255,0.25); font-size: 0.7rem; font-weight: 800; letter-spacing: 3px; z-index: 100; pointer-events: none; }
+        /* БРЕНДИНГ (УВЕЛИЧЕННЫЙ ШРИФТ) */
+        .footer-logo { 
+            position: fixed; 
+            bottom: 14px; 
+            width: 100%; 
+            text-align: center; 
+            color: rgba(255, 255, 255, 0.4); 
+            font-size: 1.3rem; 
+            font-weight: 800; 
+            letter-spacing: 4px; 
+            z-index: 100; 
+            pointer-events: none; 
+            text-shadow: 0 0 10px rgba(0,0,0,0.8);
+        }
 
         /* АВТОРИЗАЦИЯ */
         #auth-overlay { position: fixed; inset: 0; z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 20px; }
@@ -82,7 +95,7 @@
             transition: opacity 0.5s ease-in-out; 
         }
 
-        /* КОМПАКТНЫЙ И УДОБНЫЙ ФРЕЙМ В РЕЖИМЕ ВЕДУЩЕГО (ОТСТУПЫ ОТ ПАНЕЛЕЙ) */
+        /* КОМПАКТНЫЙ И УДОБНЫЙ ФРЕЙМ В РЕЖИМЕ ВЕДУЩЕГО */
         body.is-host #module-iframe { 
             top: calc(var(--top-bar-height) + 8px) !important; 
             height: calc(100vh - var(--top-bar-height) - var(--bottom-bar-height) - 16px) !important; 
@@ -121,6 +134,7 @@
         @media (max-width: 768px) {
             .shimmer-title { font-size: 2.8rem; }
             .subtitle-text { font-size: 1.2rem; }
+            .footer-logo { font-size: 1rem; bottom: 10px; }
         }
 
         /* ТАЙМЕР */
@@ -213,7 +227,7 @@
         <div class="modal-card">
             <h3 style="color: var(--gold-light);">Интерактивы</h3>
             <div id="modules-list-box"></div>
-            <button class="mod-btn" style="border-color: var(--gold-main); background: rgba(245,158,11,0.15); margin-top: 12px;" onclick="openEditEventModal()">✏️ Настройки праздника</button>
+            <button class="mod-btn" style="border-color: var(--gold-main); background: rgba(245,158,11,0.15); margin-top: 12px;" onclick="openEditEventModal()">✏️️ Настройки праздника</button>
             <button onclick="closeModal('launcher-modal')" style="background: transparent; color: #94a3b8; border: none; margin-top: 15px; font-weight: bold; cursor: pointer;">Отмена</button>
         </div>
     </div>
@@ -297,7 +311,7 @@
         function animateParticles() { pCtx.clearRect(0, 0, pCanvas.width, pCanvas.height); particles.forEach(p => { p.update(); p.draw(); }); requestAnimationFrame(animateParticles); }
         requestAnimationFrame(animateParticles);
 
-        // --- НАСТОЯЩИЙ ЗЕРКАЛЬНЫЙ ЭКВАЛАЙЗЕР (ОТ ЦЕНТРА К КРАЯМ) ---
+        // --- НАСТОЯЩИЙ ЭКВАЛАЙЗЕР (ОТ КРАЁВ К ЦЕНТРУ: БАСЫ ПО КРАЯМ) ---
         const eqCanvas = document.getElementById('eq-canvas');
         const eqCtx = eqCanvas.getContext('2d');
         function resizeEqCanvas() { eqCanvas.width = window.innerWidth; eqCanvas.height = 200; }
@@ -308,7 +322,6 @@
         let analyser = null;
         let dataArray = null;
         
-        // 32 полосы для правой половины и 32 для левой половины
         const halfBars = 32;
         let eqBars = new Array(halfBars).fill(2);
 
@@ -348,7 +361,6 @@
             if (!eqCanvas.width) return;
 
             const barWidth = (eqCanvas.width / 2) / halfBars;
-            const centerX = eqCanvas.width / 2;
             let isAudioActive = state_is_playing || isSfxActive || eqIsPlaying;
 
             if (analyser && dataArray && isAudioActive) {
@@ -358,8 +370,8 @@
             for (let k = 0; k < halfBars; k++) {
                 let val = 0;
                 if (analyser && dataArray && isAudioActive) {
-                    // k = 0 — басовые частоты (центр)
-                    // k = halfBars - 1 — высокие частоты (края)
+                    // k = 0 — Басовые частоты (рисуются на самых крайних боках)
+                    // k = halfBars - 1 — Высокие частоты (сходятся в центре)
                     let sampleIndex = Math.floor(k * (dataArray.length * 0.65) / halfBars);
                     val = dataArray[sampleIndex] || 0;
                 }
@@ -377,13 +389,13 @@
 
                 eqCtx.fillStyle = gradient;
 
-                // Правая половина (от центра вправо)
-                let xRight = centerX + k * barWidth;
-                eqCtx.fillRect(xRight + 1, eqCanvas.height - h, barWidth - 2, h);
-
-                // Левая половина (от центра влево)
-                let xLeft = centerX - (k + 1) * barWidth;
+                // Левая сторона: от левого края (x = 0) к центру
+                let xLeft = k * barWidth;
                 eqCtx.fillRect(xLeft + 1, eqCanvas.height - h, barWidth - 2, h);
+
+                // Правая сторона: от правого края (x = width) к центру
+                let xRight = eqCanvas.width - (k + 1) * barWidth;
+                eqCtx.fillRect(xRight + 1, eqCanvas.height - h, barWidth - 2, h);
             }
         }
         drawEq();
