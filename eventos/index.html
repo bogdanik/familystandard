@@ -66,16 +66,33 @@
         .btn-action.red { background: rgba(239, 68, 68, 0.2); color: #fca5a5; border-color: var(--danger-red); }
         .sfx-active { background: rgba(245, 158, 11, 0.4) !important; border-color: var(--gold-main) !important; box-shadow: 0 0 15px var(--gold-glow); }
 
-        /* ЭКРАН (IFRAME ОГРАНИЧЕН МЕЖДУ ПАНЕЛЯМИ) */
+        /* ЭКРАН И ОГРАНИЧЕННЫЙ ФРЕЙМ СЦЕНАРИЯ / ИНТЕРАКТИВА */
         #main-viewport { display: none; position: fixed; inset: 0; z-index: 10; flex-direction: column; align-items: center; justify-content: center; }
         
+        #module-iframe { 
+            display: none; 
+            position: fixed; 
+            inset: 0; 
+            width: 100vw; 
+            height: 100vh; 
+            border: none; 
+            z-index: 15; 
+            background: #000; 
+            opacity: 0; 
+            transition: opacity 0.5s ease-in-out; 
+        }
+
+        /* КОМПАКТНЫЙ И УДОБНЫЙ ФРЕЙМ В РЕЖИМЕ ВЕДУЩЕГО (ОТСТУПЫ ОТ ПАНЕЛЕЙ) */
         body.is-host #module-iframe { 
-            top: var(--top-bar-height) !important; 
-            height: calc(100vh - var(--top-bar-height) - var(--bottom-bar-height)) !important; 
+            top: calc(var(--top-bar-height) + 8px) !important; 
+            height: calc(100vh - var(--top-bar-height) - var(--bottom-bar-height) - 16px) !important; 
+            left: 10px !important;
+            width: calc(100vw - 20px) !important;
+            border-radius: 16px !important;
+            border: 1px solid var(--glass-border) !important;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6) !important;
             bottom: auto !important; 
         }
-        
-        #module-iframe { display: none; position: fixed; inset: 0; width: 100vw; height: 100vh; border: none; z-index: 15; background: #000; opacity: 0; transition: opacity 0.5s ease-in-out; }
         
         #main-display-content { text-align: center; z-index: 10; transition: opacity 0.5s ease-in-out; opacity: 1; padding: 0 20px; }
         
@@ -280,7 +297,7 @@
         function animateParticles() { pCtx.clearRect(0, 0, pCanvas.width, pCanvas.height); particles.forEach(p => { p.update(); p.draw(); }); requestAnimationFrame(animateParticles); }
         requestAnimationFrame(animateParticles);
 
-        // --- НАСТОЯЩИЙ ЭКВАЛАЙЗЕР (WEB AUDIO API) ---
+        // --- НАСТОЯЩИЙ ЗЕРКАЛЬНЫЙ ЭКВАЛАЙЗЕР (ОТ ЦЕНТРА К КРАЯМ) ---
         const eqCanvas = document.getElementById('eq-canvas');
         const eqCtx = eqCanvas.getContext('2d');
         function resizeEqCanvas() { eqCanvas.width = window.innerWidth; eqCanvas.height = 200; }
@@ -290,7 +307,10 @@
         let audioCtx = null;
         let analyser = null;
         let dataArray = null;
-        let eqBars = new Array(64).fill(2);
+        
+        // 32 полосы для правой половины и 32 для левой половины
+        const halfBars = 32;
+        let eqBars = new Array(halfBars).fill(2);
 
         function initWebAudio() {
             if (audioCtx) {
@@ -327,34 +347,43 @@
             eqCtx.clearRect(0, 0, eqCanvas.width, eqCanvas.height);
             if (!eqCanvas.width) return;
 
-            const barsCount = 64;
-            const barWidth = eqCanvas.width / barsCount;
+            const barWidth = (eqCanvas.width / 2) / halfBars;
+            const centerX = eqCanvas.width / 2;
             let isAudioActive = state_is_playing || isSfxActive || eqIsPlaying;
 
             if (analyser && dataArray && isAudioActive) {
                 analyser.getByteFrequencyData(dataArray);
             }
 
-            for (let i = 0; i < barsCount; i++) {
+            for (let k = 0; k < halfBars; k++) {
                 let val = 0;
                 if (analyser && dataArray && isAudioActive) {
-                    let sampleIndex = Math.floor(i * (dataArray.length * 0.7) / barsCount);
+                    // k = 0 — басовые частоты (центр)
+                    // k = halfBars - 1 — высокие частоты (края)
+                    let sampleIndex = Math.floor(k * (dataArray.length * 0.65) / halfBars);
                     val = dataArray[sampleIndex] || 0;
                 }
 
                 let targetH = (val / 255) * (eqCanvas.height * 0.85);
                 if (targetH < 2) targetH = 2;
 
-                eqBars[i] += (targetH - eqBars[i]) * 0.25;
-                let h = eqBars[i];
+                eqBars[k] += (targetH - eqBars[k]) * 0.25;
+                let h = eqBars[k];
 
                 let gradient = eqCtx.createLinearGradient(0, eqCanvas.height, 0, eqCanvas.height - h);
-                gradient.addColorStop(0, 'rgba(245, 158, 11, 0.4)');
+                gradient.addColorStop(0, 'rgba(245, 158, 11, 0.3)');
                 gradient.addColorStop(0.5, 'rgba(245, 158, 11, 0.7)');
-                gradient.addColorStop(1, 'rgba(255, 251, 235, 0.9)');
+                gradient.addColorStop(1, 'rgba(255, 251, 235, 0.95)');
 
                 eqCtx.fillStyle = gradient;
-                eqCtx.fillRect(i * barWidth + 1, eqCanvas.height - h, barWidth - 2, h);
+
+                // Правая половина (от центра вправо)
+                let xRight = centerX + k * barWidth;
+                eqCtx.fillRect(xRight + 1, eqCanvas.height - h, barWidth - 2, h);
+
+                // Левая половина (от центра влево)
+                let xLeft = centerX - (k + 1) * barWidth;
+                eqCtx.fillRect(xLeft + 1, eqCanvas.height - h, barWidth - 2, h);
             }
         }
         drawEq();
