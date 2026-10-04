@@ -68,6 +68,10 @@ def clean_timer_state():
 def index(): 
     return render_template('index.html')
 
+@app.route('/favicon.ico')
+def favicon():
+    return '', 204
+
 @app.route('/ping')
 def ping(): 
     return jsonify({"status": "ok", "system": "Event OS Core Active"}), 200
