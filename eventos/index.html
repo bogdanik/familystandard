@@ -61,7 +61,7 @@
 
         /* ПУЛЬТ: НИЗ */
         #host-bottom-bar { display: none; position: fixed; bottom: 0; left: 0; right: 0; height: var(--bottom-bar-height); z-index: 500; background: rgba(15, 23, 42, 0.98); border-top: 1px solid var(--glass-border); padding: 8px 12px; flex-direction: column; gap: 8px; justify-content: center; }
-        .btn-action { flex: 1; height: 36px; border-radius: 8px; border: 1px solid var(--glass-border); font-weight: 800; font-size: 0.78rem; cursor: pointer; }
+        .btn-action { flex: 1; height: 36px; border-radius: 8px; border: 1px solid var(--glass-border); font-weight: 800; font-size: 0.78rem; cursor: pointer; transition: all 0.2s; }
         .btn-action.gold { background: rgba(245, 158, 11, 0.2); color: var(--gold-light); border-color: var(--gold-main); }
         .btn-action.red { background: rgba(239, 68, 68, 0.2); color: #fca5a5; border-color: var(--danger-red); }
         .sfx-active { background: rgba(245, 158, 11, 0.4) !important; border-color: var(--gold-main) !important; box-shadow: 0 0 15px var(--gold-glow); }
@@ -75,11 +75,10 @@
             bottom: auto !important; 
         }
         
-        #module-iframe { display: none; position: fixed; inset: 0; width: 100vw; height: 100vh; border: none; z-index: 15; background: #000; opacity: 0; transition: opacity 1s ease-in-out; }
+        #module-iframe { display: none; position: fixed; inset: 0; width: 100vw; height: 100vh; border: none; z-index: 15; background: #000; opacity: 0; transition: opacity 0.5s ease-in-out; }
         
-        #main-display-content { text-align: center; z-index: 10; transition: opacity 1s ease-in-out; opacity: 1; padding: 0 20px; }
+        #main-display-content { text-align: center; z-index: 10; transition: opacity 0.5s ease-in-out; opacity: 1; padding: 0 20px; }
         
-        /* УВЕЛИЧЕННЫЙ ЗАГОЛОВОК И ПОДЗАГОЛОВОК НА ГЛАВНОМ ЭКРАНЕ */
         .shimmer-title { 
             font-family: 'Cinzel', serif; 
             font-size: 5rem; 
@@ -161,7 +160,7 @@
         </div>
     </div>
 
-    <!-- ЭКРАН ПРОЕКТОРА -->
+    <!-- ЭКРАН ПРОЕКТОРА / ЦЕНТРАЛЬНАЯ ЗОНА -->
     <div id="main-viewport">
         <canvas id="eq-canvas"></canvas>
         <div id="full-screen-timer"><div class="timer-huge-text" id="timer-val">00:00</div></div>
@@ -181,7 +180,7 @@
         <div class="control-row">
             <button class="btn-action gold" onclick="openModal('launcher-modal')">ИНТЕРАКТИВ</button>
             <button class="btn-action red" onclick="handleCloseClick()">ЗАКРЫТЬ</button>
-            <button class="btn-action gold" onclick="openScenarioUrl()" id="btn-scenario" style="flex: 0.8;">📜 СЦЕНАРИЙ</button>
+            <button class="btn-action gold" onclick="toggleScenario()" id="btn-scenario" style="flex: 0.8;">📜 СЦЕНАРИЙ</button>
             <button class="btn-action gold" onclick="socket.emit('add_timer_15s')" style="flex: 0.6;">+15 СЕК</button>
         </div>
         <div class="control-row">
@@ -243,6 +242,7 @@
 
         let fanfareFiredForTimer = false;
         let scenarioUrl = "";
+        let isScenarioOpen = false;
 
         // --- УМНЫЙ АУДИО-МЕНЕДЖЕР ---
         const bgAudio = document.getElementById('bg-audio');
@@ -537,13 +537,14 @@
             }
 
             if (isModule) {
+                if (isScenarioOpen) closeScenario();
                 overlayState = 'MODULE';
                 clearTimeout(timerDelayTimeout);
                 
                 dContent.style.opacity = '0';
-                setTimeout(() => dContent.style.display = 'none', 1000);
+                setTimeout(() => dContent.style.display = 'none', 500);
                 tContainer.style.opacity = '0';
-                setTimeout(() => tContainer.style.display = 'none', 1000);
+                setTimeout(() => tContainer.style.display = 'none', 500);
 
                 if(!iframe.src.includes(state.active_module)) {
                     iframe.src = state.active_module.startsWith('http') ? state.active_module : `/${state.active_module}`;
@@ -554,9 +555,9 @@
                     iframe.style.opacity = '1';
                 }
             } else if (isTimer && remain > 0) {
-                if (iframe.style.opacity === '1') {
+                if (!isScenarioOpen && iframe.style.opacity === '1') {
                     iframe.style.opacity = '0';
-                    setTimeout(() => { iframe.style.display = 'none'; iframe.src = 'about:blank'; }, 1000);
+                    setTimeout(() => { if (!isScenarioOpen) { iframe.style.display = 'none'; iframe.src = 'about:blank'; } }, 500);
                 }
 
                 if (overlayState === 'TITLE') {
@@ -596,10 +597,11 @@
                                 setTimeout(() => {
                                     tContainer.style.display = 'none';
                                     overlayState = 'TITLE';
-                                    dContent.style.display = 'block';
-                                    void dContent.offsetWidth;
-                                    dContent.style.opacity = '1'; 
-                                    
+                                    if (!isScenarioOpen) {
+                                        dContent.style.display = 'block';
+                                        void dContent.offsetWidth;
+                                        dContent.style.opacity = '1'; 
+                                    }
                                     if (myRole === 'SCREEN') socket.emit('timer_done');
                                 }, 1500); 
                             } else if (currentRemain > 0) {
@@ -609,9 +611,9 @@
                     }
                 }
             } else {
-                if (iframe.style.opacity === '1') {
+                if (!isScenarioOpen && iframe.style.opacity === '1') {
                     iframe.style.opacity = '0';
-                    setTimeout(() => { iframe.style.display = 'none'; iframe.src = 'about:blank'; }, 1000);
+                    setTimeout(() => { if (!isScenarioOpen) { iframe.style.display = 'none'; iframe.src = 'about:blank'; } }, 500);
                 }
 
                 clearTimeout(timerDelayTimeout);
@@ -620,11 +622,13 @@
                     overlayState = 'TITLE';
                     if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
                     tContainer.style.opacity = '0';
-                    setTimeout(() => tContainer.style.display = 'none', 1000);
+                    setTimeout(() => tContainer.style.display = 'none', 500);
                     
-                    dContent.style.display = 'block';
-                    void dContent.offsetWidth;
-                    dContent.style.opacity = '1';
+                    if (!isScenarioOpen) {
+                        dContent.style.display = 'block';
+                        void dContent.offsetWidth;
+                        dContent.style.opacity = '1';
+                    }
                 }
             }
 
@@ -654,15 +658,55 @@
         function seekRelative(sec) { socket.emit('host_audio_control', { seek_relative: sec }); }
         function triggerSfx(type) { socket.emit('host_trigger_sfx', { sfx: type }); }
 
-        function openScenarioUrl() {
-            if (scenarioUrl) {
-                window.open(scenarioUrl, '_blank');
-            } else {
+        // УПРАВЛЕНИЕ СЦЕНАРИЕМ (ЛОКАЛЬНЫЙ IFRAME)
+        function toggleScenario() {
+            if (!scenarioUrl) {
                 alert("Ссылка на сценарий не настроена в event_data.json");
+                return;
+            }
+
+            const iframe = document.getElementById('module-iframe');
+            const btnScenario = document.getElementById('btn-scenario');
+            const dContent = document.getElementById('main-display-content');
+
+            if (!isScenarioOpen) {
+                isScenarioOpen = true;
+                iframe.src = scenarioUrl;
+                iframe.style.display = 'block';
+                void iframe.offsetWidth;
+                iframe.style.opacity = '1';
+                dContent.style.opacity = '0';
+                setTimeout(() => { if (isScenarioOpen) dContent.style.display = 'none'; }, 500);
+                btnScenario.classList.add('sfx-active');
+            } else {
+                closeScenario();
             }
         }
 
+        function closeScenario() {
+            const iframe = document.getElementById('module-iframe');
+            const btnScenario = document.getElementById('btn-scenario');
+            const dContent = document.getElementById('main-display-content');
+
+            isScenarioOpen = false;
+            iframe.style.opacity = '0';
+            btnScenario.classList.remove('sfx-active');
+            
+            setTimeout(() => {
+                if (!isScenarioOpen) {
+                    iframe.style.display = 'none';
+                    iframe.src = 'about:blank';
+                    dContent.style.display = 'block';
+                    void dContent.offsetWidth;
+                    dContent.style.opacity = '1';
+                }
+            }, 500);
+        }
+
         function handleCloseClick() {
+            if (isScenarioOpen) {
+                closeScenario();
+            }
             socket.emit('switch_module', { module: '' });
             closeClickCount++;
             clearTimeout(closeClickTimer);
