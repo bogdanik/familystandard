@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Юбилей Натальи Николаевны — Event OS</title>
+  <style>
+    :root {
+      --bg: #08090d;
+      --card-bg: rgba(20, 22, 31, 0.90);
+      --border: #282b3a;
+      --accent: #dfb251;
+      --accent-light: #fbecc1;
+      --text: #f0f0f5;
+      --text-muted: #8e92a4;
+      --btn-bg: #1a1d28;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      max-width: 620px;
+      margin: 0 auto;
+      padding: 14px;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    #bg-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    header {
+      padding: 10px 0;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(8px);
+    }
+
+    header h1 {
+      font-size: 1.15rem;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 700;
+    }
+
+    .nav-bar {
+      margin: 10px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .step-indicator {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    select.step-select {
+      background: var(--btn-bg);
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      outline: none;
+    }
+
+    .progress-bar {
+      height: 4px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 2px;
+      margin-bottom: 14px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 12.5%;
+      background: linear-gradient(90deg, #d4af37, #f3e5ab);
+      transition: width 0.3s ease;
+    }
+
+    .main-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 18px;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+      backdrop-filter: blur(12px);
+    }
+
+    .stage-time {
+      display: inline-block;
+      font-size: 0.8rem;
+      color: var(--accent);
+      background: rgba(223, 178, 81, 0.12);
+      padding: 3px 10px;
+      border-radius: 6px;
+      font-weight: bold;
+      align-self: flex-start;
+      margin-bottom: 10px;
+    }
+
+    .stage-title {
+      font-size: 1.25rem;
+      margin-bottom: 12px;
+      color: #ffffff;
+      line-height: 1.3;
+    }
+
+    .content-block {
+      font-size: 0.92rem;
+      line-height: 1.5;
+      color: #d8d8e5;
+    }
+
+    .speech-box {
+      background: rgba(10, 11, 15, 0.85);
+      border-left: 3px solid var(--accent);
+      padding: 12px 14px;
+      margin: 12px 0;
+      border-radius: 0 8px 8px 0;
+      font-style: italic;
+      color: var(--accent-light);
+    }
+
+    .mechanics-box {
+      background: rgba(223, 178, 81, 0.08);
+      border: 1px solid rgba(223, 178, 81, 0.25);
+      padding: 12px;
+      border-radius: 10px;
+      margin: 10px 0;
+      font-size: 0.88rem;
+    }
+
+    .mechanics-box strong {
+      color: var(--accent);
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .task-item {
+      background: rgba(26, 29, 40, 0.7);
+      border: 1px solid var(--border);
+      padding: 12px;
+      border-radius: 10px;
+      margin-bottom: 10px;
+    }
+
+    .task-item .person {
+      color: var(--accent);
+      font-weight: bold;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .q-card {
+      background: rgba(18, 21, 30, 0.88);
+      border-left: 3px solid #3b82f6;
+      padding: 11px 13px;
+      margin-bottom: 10px;
+      border-radius: 0 8px 8px 0;
+      font-size: 0.9rem;
+    }
+
+    .q-card .ans {
+      color: #10b981;
+      font-weight: bold;
+      margin-top: 6px;
+      display: block;
+    }
+
+    .controls {
+      display: flex;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .btn {
+      flex: 1;
+      padding: 14px;
+      border: none;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      background: var(--btn-bg);
+      color: var(--text);
+      border: 1px solid var(--border);
+      transition: all 0.2s;
+    }
+
+    .btn-next {
+      background: var(--accent);
+      color: #08090d;
+      border: none;
+    }
+
+    .btn:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body>
+
+  <canvas id="bg-canvas"></canvas>
+
+  <header>
+    <h1>Наталья Николаевна • 60 лет</h1>
+  </header>
+
+  <div class="nav-bar">
+    <span class="step-indicator" id="step-indicator">Шаг 1 из 8</span>
+    <select class="step-select" id="step-select" onchange="jumpToStep(this.value)">
+      <option value="1">1. Старт и Приветствие</option>
+      <option value="2">2. Тост Мамы</option>
+      <option value="3">3. Блок Семьи</option>
+      <option value="4">4. Эксперты по Наталье</option>
+      <option value="5">5. Соратники и Друзья</option>
+      <option value="6">6. Коды Эпохи (Квиз)</option>
+      <option value="7">7. Музыкальная Пауза</option>
+      <option value="8">8. Кульминация и Торт</option>
+    </select>
+  </div>
+
+  <div class="progress-bar">
+    <div class="progress-fill" id="progress-fill"></div>
+  </div>
+
+  <div class="main-card" id="card-container">
+    <!-- Шаги подгружаются через JS -->
+  </div>
+
+  <div class="controls">
+    <button class="btn" id="btn-prev" onclick="prevStep()">◀ Назад</button>
+    <button class="btn btn-next" id="btn-next" onclick="nextStep()">Дальше ▶</button>
+  </div>
+
+  <script>
+    /* ================= СЦЕНАРИЙ МЕРОПРИЯТИЯ ================= */
+    const stepsData = [
+      {
+        time: "15:00 – 15:20",
+        title: "1. Вход и Задаем Понятийный Вектор",
+        content: `
+          <div class="content-block">
+            <p><strong>Замысел:</strong> Фиксация статуса события. Спокойная, уважительная подача без суеты.</p>
+            <div class="speech-box">
+              «Добрый день, дорогие и самые близкие люди! Сегодня замечательный обеденный час, когда мы собрались по очень личному и сильному поводу — 60-летний юбилей нашей потрясающей Натальи Николаевны! Сегодня мы не будем никуда спешить. Наша задача — вкусно пообедать, насладиться общением и прожить этот день в максимальном уюте. С праздником, Наталья Николаевна!»
+            </div>
+            <p><strong>Действие:</strong> Первый общий тост. Фиксируем паузу 10-15 минут на трапезу.</p>
+          </div>
+        `
+      },
+      {
+        time: "15:20 – 15:30",
+        title: "2. Главное Слово — Мама",
+        content: `
+          <div class="content-block">
+            <div class="mechanics-box">
+              <strong>Объектное правило:</strong> Полное отсутствие любых модерационных барьеров или вопросов. Только прямой доступ к слову.
+            </div>
+            <div class="task-item">
+              <span class="person">Мама: Татьяна Федоровна</span>
+              <p><em>Подводка:</em> «Есть в жизни источник, из которого берет начало всё самое светлое. Человек, чья любовь и забота создали ту Наталью Николаевну, которую мы сегодня знаем и любим. Татьяна Федоровна, вам самое главное и первое слово!»</p>
+            </div>
+          </div>
+        `
+      },
+      {
+        time: "15:30 – 16:00",
+        title: "3. Блок Семьи (Муж и Дети)",
+        content: `
+          <div class="content-block">
+            <div class="mechanics-box">
+              <strong>Задача модерации:</strong> Ввести тостующих через конкретную смысловую зацепку (не избитый стих, а личностный факт).
+            </div>
+
+            <div class="task-item">
+              <span class="person">1. Муж — Григорий Анатольевич</span>
+              <p><strong>Вводный вектор:</strong> «Григорий Анатольевич, охарактеризуйте Наталью Николаевну ровно тремя словами, с которыми вы засыпаете и просыпаетесь последние годы?»</p>
+            </div>
+
+            <div class="task-item">
+              <span class="person">2. Сын Александр и Дочь Маргарита</span>
+              <p><strong>Вводный вектор:</strong> «Ребята, вспомните одну главную мамину фразу или воспитательное правило из детства, которое вы забрали в свою взрослую жизнь?»</p>
+            </div>
+          </div>
+        `
+      },
+      {
+        time: "16:00 – 16:20",
+        title: "4. Интерактив «Эксперты по Наталье»",
+        content: `
+          <div class="content-block">
+            <div class="mechanics-box">
+              <strong>ПОЛНЫЙ АЛГОРИТМ ПРОВЕДЕНИЯ:</strong><br>
+              1. Наталья Николаевна держит 2-й микрофон и выступает верховным арбитром.<br>
+              2. Ведущий задает вопрос в зал.<br>
+              3. Зал дает 2-3 версии с мест.<br>
+              4. Наталья указывает на автора самой точной версии, после чего сама кратко раскрывает реальную историю.
+            </div>
+
+            <div class="q-card"><strong>Вопрос 1:</strong> Какая фирменная привычка или коронное выражение Натальи мгновенно выдает её настроение?</div>
+            <div class="q-card"><strong>Вопрос 2:</strong> Какой самый неожиданный или авантюрный поступок совершила Наталья в своей жизни?</div>
+            <div class="q-card"><strong>Вопрос 3:</strong> Назовите поступок или решение Натальи, после которого вы подумали: «Вот это характер! Вот это сила!»?</div>
+            <div class="q-card"><strong>Вопрос 4:</strong> Если бы голливудский режиссер снимал байопик про жизнь Натальи, какая известная актриса сыграла бы её в главной роли, и как назывался бы этот фильм?</div>
+            <div class="q-card"><strong>Вопрос 5:</strong> Какое фирменное блюдо в исполнении Натальи Николаевны является её абсолютной визитной карточкой?</div>
+            <div class="q-card"><strong>Вопрос 6:</strong> Какая суперспособность есть у Натальи, о которой знают только самые близкие?</div>
+            <div class="q-card"><strong>Вопрос 7:</strong> Что гарантированно поднимает настроение Наталье, даже если день выдался непростым?</div>
+          </div>
+        `
+      },
+      {
+        time: "16:20 – 17:00",
+        title: "5. Блок Соратников, Подруг и Одноклассницы",
+        content: `
+          <div class="content-block">
+            <div class="mechanics-box">
+              <strong>Фокус внимания:</strong> Связь между объектом праздника (Натальей) и людьми, с которыми пройдены годы.
+            </div>
+
+            <div class="task-item">
+              <span class="person">1. Собит Тулянович и Ольга Алексеевна (Соратники)</span>
+              <p><strong>Подводка:</strong> «Собит Тулянович, Ольга Алексеевна, вы знаете Наталью Николаевну сквозь годы. Какое её главное человеческое качество делает её партнером и другом, на которого всегда можно положиться?»</p>
+            </div>
+
+            <div class="task-item">
+              <span class="person">2. Ирина и Елена (Подруги)</span>
+              <p><strong>Подводка:</strong> «Ирина, Елена, вспомните самый теплый или душевный момент вашей женской дружбы с Натальей, который лучше всего характеризует её отношение к людям?»</p>
+            </div>
+
+            <div class="task-item">
+              <span class="person">3. Татьяна (Одноклассница)</span>
+              <p><strong>Подводка:</strong> «Татьяна, какой Наталья была за школьной партой — тихой наблюдательницей или человеком, вокруг которого кипела вся жизнь класса?»</p>
+            </div>
+          </div>
+        `
+      },
+      {
+        time: "17:00 – 17:25",
+        title: "6. Концептуальный Блок «Коды Эпохи»",
+        content: `
+          <div class="content-block">
+            <div class="mechanics-box">
+              <strong>ПОНЯТИЙНАЯ МЕХАНИКА:</strong><br>
+              Мы исследуем не банальные ценники, а <strong>культурные коды, социальные явления и ритуалы</strong> эпохи юности Натальи Николаевны. Столы наперегонки разгадывают объёмный образ.
+            </div>
+
+            <div class="q-card">
+              <strong>Раунд 1 (Объект статуса и уюта):</strong> Предмет советского быта, который висел на стене, являлся главным звукопоглотителем, фоном для всех семейных снимков и индикатором достатка?<br>
+              <span class="ans">Ответ: Настенный ковер.</span>
+            </div>
+
+            <div class="q-card">
+              <strong>Раунд 2 (Социальный хаб):</strong> Место встречи и главный информационный центр двора эпохи 70-80-х, где без интернета и мобильных принимались важнейшие решения и обсуждались все новости?<br>
+              <span class="ans">Ответ: Скамейка у подъезда / Кухня 6 кв.м.</span>
+            </div>
+
+            <div class="q-card">
+              <strong>Раунд 3 (Ритуал добычи контента):</strong> Что нужно было сделать человеку в 80-е, чтобы записать любимую песню с радио, и о чем суеверно молились в этот момент?<br>
+              <span class="ans">Ответ: Успеть нажать RECORD на кассетнике и молиться, чтобы ведущий радио не заговорил поверх музыки.</span>
+            </div>
+
+            <div class="q-card">
+              <strong>Раунд 4 (Формула массового единения):</strong> Главная телепрограмма воскресного утра, которая объединяла всю страну у экранов и задавала музыкальный ритм на всю неделю?<br>
+              <span class="ans">Ответ: «Утренняя почта».</span>
+            </div>
+
+            <div class="q-card">
+              <strong>Раунд 5 (Праздничный ритуал):</strong> Кулинарный процесс, который за сутки до праздника превращался в семейный «субботник» с использованием самых больших эмалированных тазиков в доме?<br>
+              <span class="ans">Ответ: Заготовка салатов (Оливье / Селедка под шубой) на всю компанию.</span>
+            </div>
+          </div>
+        `
+      },
+      {
+        time: "17:25 – 18:00",
+        title: "7. Музыкально-Лаунжевая Пауза",
+        content: `
+          <div class="content-block">
+            <div class="mechanics-box">
+              <strong>Стратегия ведущего:</strong> Никаких насильственных призывов к танцам. Даем фоновую качественную ретро-эстраду, легкий диско-ритм и пространство для свободного общения.
+            </div>
+            <p>• Гости общаются, пьют кофе, фотографируются.<br>
+               • Модерация в мягком режиме — работа у столиков без микрофонного давления.</p>
+          </div>
+        `
+      },
+      {
+        time: "18:00 – 18:30",
+        title: "8. Финальный Торт и Торжественное Резюме",
+        content: `
+          <div class="content-block">
+            <p><strong>Кульминация:</strong> Вынос юбилейного торта, зажжение свечей, финальные аплодисменты.</p>
+            <div class="speech-box">
+              «Дорогие друзья! Сегодняшний день доказал главное: 60 лет — это не просто возраст, это статус богатой, любимой и гармоничной жизни. Давайте еще раз громко поаплодируем нашей замечательной Наталье Николаевне! Здоровья, тепла и пусть вокруг всегда будут самые близкие люди!»
+            </div>
+          </div>
+        `
+      }
+    ];
+
+    let currentStep = 0;
+
+    function renderStep() {
+      const step = stepsData[currentStep];
+      const container = document.getElementById('card-container');
+      
+      container.innerHTML = `
+        <span class="stage-time">${step.time}</span>
+        <h2 class="stage-title">${step.title}</h2>
+        ${step.content}
+      `;
+
+      document.getElementById('step-indicator').textContent = `Шаг ${currentStep + 1} из ${stepsData.length}`;
+      document.getElementById('step-select').value = currentStep + 1;
+      
+      const fillPercentage = ((currentStep + 1) / stepsData.length) * 100;
+      document.getElementById('progress-fill').style.width = `${fillPercentage}%`;
+
+      document.getElementById('btn-prev').disabled = currentStep === 0;
+      document.getElementById('btn-next').disabled = currentStep === stepsData.length - 1;
+    }
+
+    function nextStep() {
+      if (currentStep < stepsData.length - 1) {
+        currentStep++;
+        renderStep();
+      }
+    }
+
+    function prevStep() {
+      if (currentStep > 0) {
+        currentStep--;
+        renderStep();
+      }
+    }
+
+    function jumpToStep(stepNum) {
+      currentStep = parseInt(stepNum) - 1;
+      renderStep();
+    }
+
+    /* ================= АНИМАЦИЯ ФОНА (ЧАСТИЦЫ + СВЕЧЕНИЕ) ================= */
+    const canvas = document.getElementById('bg-canvas');
+    const ctx = canvas.getContext('2d');
+
+    let width, height;
+    function resize() {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    // Частицы
+    const particleCount = 40;
+    const particles = [];
+
+    for (let i = 0; i < particleCount; i++) {
+      particles.push({
+        x: Math.random() * width,
+        y: Math.random() * height,
+        radius: Math.random() * 2 + 1,
+        vx: (Math.random() - 0.5) * 0.35,
+        vy: (Math.random() - 0.5) * 0.35,
+        alpha: Math.random() * 0.6 + 0.2
+      });
+    }
+
+    let pulseAngle = 0;
+
+    function animate() {
+      ctx.clearRect(0, 0, width, height);
+
+      // 1. Пульсирующее мерцающее свечение из центра
+      pulseAngle += 0.02;
+      const pulseOpacity = 0.20 + Math.sin(pulseAngle) * 0.07;
+      const centerX = width / 2 + Math.cos(pulseAngle * 0.4) * 15;
+      const centerY = height / 2 + Math.sin(pulseAngle * 0.3) * 15;
+
+      const gradient = ctx.createRadialGradient(
+        centerX, centerY, 10,
+        centerX, centerY, Math.max(width, height) * 0.55
+      );
+      gradient.addColorStop(0, `rgba(223, 178, 81, ${pulseOpacity})`);
+      gradient.addColorStop(0.5, `rgba(160, 110, 35, ${pulseOpacity * 0.35})`);
+      gradient.addColorStop(1, 'rgba(8, 9, 13, 0)');
+
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, width, height);
+
+      // 2. Движение золотистых частиц
+      ctx.fillStyle = 'rgba(251, 236, 193, 0.85)';
+      for (let p of particles) {
+        p.x += p.vx;
+        p.y += p.vy;
+
+        if (p.x < 0) p.x = width;
+        if (p.x > width) p.x = 0;
+        if (p.y < 0) p.y = height;
+        if (p.y > height) p.y = 0;
+
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.globalAlpha = p.alpha;
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1.0;
+
+      requestAnimationFrame(animate);
+    }
+
+    // Запуск
+    renderStep();
+    animate();
+  </script>
+</body>
+</html>
