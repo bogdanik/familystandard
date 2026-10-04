@@ -39,7 +39,7 @@
         }
         #particles-canvas { position: fixed; inset: 0; z-index: 3; pointer-events: none; }
 
-        /* БРЕНДИНГ */
+        /* БРЕНДИНГ (УВЕЛИЧЕННЫЙ ШРИФТ) */
         .footer-logo { 
             position: fixed; 
             bottom: 14px; 
@@ -79,7 +79,7 @@
         .btn-action.red { background: rgba(239, 68, 68, 0.2); color: #fca5a5; border-color: var(--danger-red); }
         .sfx-active { background: rgba(245, 158, 11, 0.4) !important; border-color: var(--gold-main) !important; box-shadow: 0 0 15px var(--gold-glow); }
 
-        /* ЭКРАН И ФРЕЙМ */
+        /* ЭКРАН И ОГРАНИЧЕННЫЙ ФРЕЙМ СЦЕНАРИЯ / ИНТЕРАКТИВА */
         #main-viewport { display: none; position: fixed; inset: 0; z-index: 10; flex-direction: column; align-items: center; justify-content: center; }
         
         #module-iframe { 
@@ -95,6 +95,7 @@
             transition: opacity 0.5s ease-in-out; 
         }
 
+        /* КОМПАКТНЫЙ И УДОБНЫЙ ФРЕЙМ В РЕЖИМЕ ВЕДУЩЕГО */
         body.is-host #module-iframe { 
             top: calc(var(--top-bar-height) + 8px) !important; 
             height: calc(100vh - var(--top-bar-height) - var(--bottom-bar-height) - 16px) !important; 
@@ -141,7 +142,7 @@
         .timer-huge-text { font-family: 'Cinzel', serif; font-size: 22vw; font-weight: 900; color: #ffffff; text-shadow: 0 0 40px var(--gold-glow); }
 
         /* ЭКВАЛАЙЗЕР */
-        #eq-canvas { position: absolute; bottom: 0; left: 0; width: 100%; height: 220px; z-index: 5; pointer-events: none; opacity: 0.9; transition: opacity 0.5s; }
+        #eq-canvas { position: absolute; bottom: 0; left: 0; width: 100%; height: 200px; z-index: 5; pointer-events: none; opacity: 0.85; transition: opacity 0.5s; }
 
         /* МОДАЛКИ */
         .modal-overlay { display: none; position: fixed; inset: 0; z-index: 20000; background: rgba(0,0,0,0.85); align-items: center; justify-content: center; padding: 20px; }
@@ -205,7 +206,7 @@
         <div class="footer-logo">FAMILY STANDARD OS 2026</div>
     </div>
 
-    <!-- НИЖНЯЯ ПАНЕЛЬ -->
+    <!-- НИЖНЯЯ ПАНЕЛЬ (ТОЛЬКО ДЛЯ ВЕДУЩЕГО / HOST) -->
     <div id="host-bottom-bar">
         <div class="control-row">
             <button class="btn-action gold" onclick="openModal('launcher-modal')">ИНТЕРАКТИВ</button>
@@ -226,7 +227,7 @@
         <div class="modal-card">
             <h3 style="color: var(--gold-light);">Интерактивы</h3>
             <div id="modules-list-box"></div>
-            <button class="mod-btn" style="border-color: var(--gold-main); background: rgba(245,158,11,0.15); margin-top: 12px;" onclick="openEditEventModal()">✏️ Настройки праздника</button>
+            <button class="mod-btn" style="border-color: var(--gold-main); background: rgba(245,158,11,0.15); margin-top: 12px;" onclick="openEditEventModal()">✏️️ Настройки праздника</button>
             <button onclick="closeModal('launcher-modal')" style="background: transparent; color: #94a3b8; border: none; margin-top: 15px; font-weight: bold; cursor: pointer;">Отмена</button>
         </div>
     </div>
@@ -310,10 +311,10 @@
         function animateParticles() { pCtx.clearRect(0, 0, pCanvas.width, pCanvas.height); particles.forEach(p => { p.update(); p.draw(); }); requestAnimationFrame(animateParticles); }
         requestAnimationFrame(animateParticles);
 
-        // --- ЭКВАЛАЙЗЕР C ЗАКРУГЛЕНИЯМИ, ЗАМИРАЮЩИМИ ТОЧКАМИ И ВСПЫШКОЙ БАСА ---
+        // --- НАСТОЯЩИЙ ЭКВАЛАЙЗЕР (ОТ КРАЁВ К ЦЕНТРУ: БАСЫ ПО КРАЯМ) ---
         const eqCanvas = document.getElementById('eq-canvas');
         const eqCtx = eqCanvas.getContext('2d');
-        function resizeEqCanvas() { eqCanvas.width = window.innerWidth; eqCanvas.height = 220; }
+        function resizeEqCanvas() { eqCanvas.width = window.innerWidth; eqCanvas.height = 200; }
         window.addEventListener('resize', resizeEqCanvas);
         resizeEqCanvas();
 
@@ -321,13 +322,8 @@
         let analyser = null;
         let dataArray = null;
         
-        const halfBars = 28;
+        const halfBars = 32;
         let eqBars = new Array(halfBars).fill(2);
-        let peakBars = new Array(halfBars).fill(0);
-        let peakHold = new Array(halfBars).fill(0);
-
-        let prevBassEnergy = 0;
-        let bassFlashOpacity = 0;
 
         function initWebAudio() {
             if (audioCtx) {
@@ -359,27 +355,6 @@
             }
         }
 
-        function drawEqBar(x, y, width, height, radius) {
-            if (height <= 0) return;
-            eqCtx.beginPath();
-            if (typeof eqCtx.roundRect === 'function') {
-                eqCtx.roundRect(x, y, width, height, [radius, radius, 2, 2]);
-            } else {
-                eqCtx.rect(x, y, width, height);
-            }
-            eqCtx.fill();
-        }
-
-        function drawEqDot(x, y, width, height) {
-            eqCtx.beginPath();
-            if (typeof eqCtx.roundRect === 'function') {
-                eqCtx.roundRect(x, y, width, height, 2);
-            } else {
-                eqCtx.rect(x, y, width, height);
-            }
-            eqCtx.fill();
-        }
-
         function drawEq() {
             requestAnimationFrame(drawEq);
             eqCtx.clearRect(0, 0, eqCanvas.width, eqCanvas.height);
@@ -390,88 +365,37 @@
 
             if (analyser && dataArray && isAudioActive) {
                 analyser.getByteFrequencyData(dataArray);
-
-                // Детектор удара баса (0..3 бины)
-                let currentBassEnergy = (dataArray[0] + dataArray[1] + dataArray[2] + dataArray[3]) / 4;
-                if (currentBassEnergy > 160 && (currentBassEnergy - prevBassEnergy) > 18) {
-                    bassFlashOpacity = Math.min(0.7, (currentBassEnergy - prevBassEnergy) / 45);
-                }
-                prevBassEnergy = currentBassEnergy;
-            } else {
-                bassFlashOpacity *= 0.9;
-            }
-
-            // Отрисовка вспышки от удара баса
-            if (bassFlashOpacity > 0.01) {
-                let flashGlow = eqCtx.createRadialGradient(
-                    eqCanvas.width / 2, eqCanvas.height, 10,
-                    eqCanvas.width / 2, eqCanvas.height, eqCanvas.width / 1.5
-                );
-                flashGlow.addColorStop(0, `rgba(245, 158, 11, ${bassFlashOpacity * 0.45})`);
-                flashGlow.addColorStop(0.6, `rgba(245, 158, 11, ${bassFlashOpacity * 0.12})`);
-                flashGlow.addColorStop(1, 'rgba(0, 0, 0, 0)');
-                
-                eqCtx.fillStyle = flashGlow;
-                eqCtx.fillRect(0, 0, eqCanvas.width, eqCanvas.height);
-                bassFlashOpacity *= 0.88; 
             }
 
             for (let k = 0; k < halfBars; k++) {
                 let val = 0;
                 if (analyser && dataArray && isAudioActive) {
+                    // k = 0 — Басовые частоты (рисуются на самых крайних боках)
+                    // k = halfBars - 1 — Высокие частоты (сходятся в центре)
                     let sampleIndex = Math.floor(k * (dataArray.length * 0.65) / halfBars);
                     val = dataArray[sampleIndex] || 0;
                 }
 
-                let targetH = (val / 255) * (eqCanvas.height * 0.82);
+                let targetH = (val / 255) * (eqCanvas.height * 0.85);
                 if (targetH < 2) targetH = 2;
 
-                eqBars[k] += (targetH - eqBars[k]) * 0.28;
+                eqBars[k] += (targetH - eqBars[k]) * 0.25;
                 let h = eqBars[k];
 
-                // Логика замирающих и падающих точек (Peak Dots)
-                if (h > peakBars[k]) {
-                    peakBars[k] = h;
-                    peakHold[k] = 12; // Кадры удержания вверху
-                } else {
-                    if (peakHold[k] > 0) {
-                        peakHold[k]--;
-                    } else {
-                        peakBars[k] -= 1.8; // Плавное падение
-                        if (peakBars[k] < 2) peakBars[k] = 2;
-                    }
-                }
-
-                // Градиент для островков
                 let gradient = eqCtx.createLinearGradient(0, eqCanvas.height, 0, eqCanvas.height - h);
-                gradient.addColorStop(0, 'rgba(245, 158, 11, 0.25)');
-                gradient.addColorStop(0.5, 'rgba(245, 158, 11, 0.65)');
+                gradient.addColorStop(0, 'rgba(245, 158, 11, 0.3)');
+                gradient.addColorStop(0.5, 'rgba(245, 158, 11, 0.7)');
                 gradient.addColorStop(1, 'rgba(255, 251, 235, 0.95)');
 
                 eqCtx.fillStyle = gradient;
 
-                let gap = Math.max(2, barWidth * 0.18);
-                let actualWidth = barWidth - gap;
-                let cornerRadius = Math.min(8, actualWidth / 2);
+                // Левая сторона: от левого края (x = 0) к центру
+                let xLeft = k * barWidth;
+                eqCtx.fillRect(xLeft + 1, eqCanvas.height - h, barWidth - 2, h);
 
-                // Левая сторона (басы по краю)
-                let xLeft = k * barWidth + gap / 2;
-                drawEqBar(xLeft, eqCanvas.height - h, actualWidth, h, cornerRadius);
-
-                // Правая сторона (басы по краю)
-                let xRight = eqCanvas.width - (k + 1) * barWidth + gap / 2;
-                drawEqBar(xRight, eqCanvas.height - h, actualWidth, h, cornerRadius);
-
-                // Отрисовка висящих точек над островками
-                eqCtx.fillStyle = 'rgba(255, 251, 235, 0.95)';
-                let dotHeight = 3;
-                let dotOffset = 5;
-
-                let peakYLeft = eqCanvas.height - peakBars[k] - dotOffset;
-                let peakYRight = eqCanvas.height - peakBars[k] - dotOffset;
-
-                drawEqDot(xLeft, peakYLeft, actualWidth, dotHeight);
-                drawEqDot(xRight, peakYRight, actualWidth, dotHeight);
+                // Правая сторона: от правого края (x = width) к центру
+                let xRight = eqCanvas.width - (k + 1) * barWidth;
+                eqCtx.fillRect(xRight + 1, eqCanvas.height - h, barWidth - 2, h);
             }
         }
         drawEq();
@@ -650,7 +574,7 @@
             if (isModule && myRole === 'SCREEN') {
                 document.getElementById('eq-canvas').style.opacity = '0';
             } else if (myRole === 'SCREEN') {
-                document.getElementById('eq-canvas').style.opacity = '0.9';
+                document.getElementById('eq-canvas').style.opacity = '0.85';
             }
 
             if (isModule) {
@@ -775,7 +699,7 @@
         function seekRelative(sec) { socket.emit('host_audio_control', { seek_relative: sec }); }
         function triggerSfx(type) { socket.emit('host_trigger_sfx', { sfx: type }); }
 
-        // УПРАВЛЕНИЕ СЦЕНАРИЕМ
+        // УПРАВЛЕНИЕ СЦЕНАРИЕМ (ЛОКАЛЬНЫЙ IFRAME)
         function toggleScenario() {
             if (!scenarioUrl) {
                 alert("Ссылка на сценарий не настроена в event_data.json");
