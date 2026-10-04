@@ -77,17 +77,42 @@
         
         #module-iframe { display: none; position: fixed; inset: 0; width: 100vw; height: 100vh; border: none; z-index: 15; background: #000; opacity: 0; transition: opacity 1s ease-in-out; }
         
-        #main-display-content { text-align: center; z-index: 10; transition: opacity 1s ease-in-out; opacity: 1; }
-        .shimmer-title { font-family: 'Cinzel', serif; font-size: 3.2rem; font-weight: 900; background: linear-gradient(90deg, #ffffff 0%, #fffbeb 25%, #f59e0b 50%, #e5e7eb 75%, #ffffff 100%); background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: shine 4s linear infinite; }
+        #main-display-content { text-align: center; z-index: 10; transition: opacity 1s ease-in-out; opacity: 1; padding: 0 20px; }
+        
+        /* УВЕЛИЧЕННЫЙ ЗАГОЛОВОК И ПОДЗАГОЛОВОК НА ГЛАВНОМ ЭКРАНЕ */
+        .shimmer-title { 
+            font-family: 'Cinzel', serif; 
+            font-size: 5rem; 
+            font-weight: 900; 
+            background: linear-gradient(90deg, #ffffff 0%, #fffbeb 25%, #f59e0b 50%, #e5e7eb 75%, #ffffff 100%); 
+            background-size: 200% auto; 
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent; 
+            animation: shine 4s linear infinite; 
+            line-height: 1.1;
+            letter-spacing: 2px;
+        }
         @keyframes shine { to { background-position: 200% center; } }
-        .subtitle-text { color: #94a3b8; font-size: 1.15rem; font-weight: 600; margin-top: 10px; }
+        
+        .subtitle-text { 
+            color: #cbd5e1; 
+            font-size: 2rem; 
+            font-weight: 700; 
+            margin-top: 20px; 
+            letter-spacing: 1.5px;
+        }
+
+        @media (max-width: 768px) {
+            .shimmer-title { font-size: 2.8rem; }
+            .subtitle-text { font-size: 1.2rem; }
+        }
 
         /* ТАЙМЕР */
         #full-screen-timer { display: none; position: fixed; inset: 0; z-index: 900; align-items: center; justify-content: center; transition: opacity 1s ease-in-out; opacity: 0; }
         .timer-huge-text { font-family: 'Cinzel', serif; font-size: 22vw; font-weight: 900; color: #ffffff; text-shadow: 0 0 40px var(--gold-glow); }
 
         /* ЭКВАЛАЙЗЕР */
-        #eq-canvas { position: absolute; bottom: 0; left: 0; width: 100%; height: 180px; z-index: 5; pointer-events: none; opacity: 0.8; transition: opacity 0.5s; }
+        #eq-canvas { position: absolute; bottom: 0; left: 0; width: 100%; height: 200px; z-index: 5; pointer-events: none; opacity: 0.85; transition: opacity 0.5s; }
 
         /* МОДАЛКИ */
         .modal-overlay { display: none; position: fixed; inset: 0; z-index: 20000; background: rgba(0,0,0,0.85); align-items: center; justify-content: center; padding: 20px; }
@@ -151,11 +176,12 @@
         <div class="footer-logo">FAMILY STANDARD OS 2026</div>
     </div>
 
-    <!-- НИЖНЯЯ ПАНЕЛЬ -->
+    <!-- НИЖНЯЯ ПАНЕЛЬ (ТОЛЬКО ДЛЯ ВЕДУЩЕГО / HOST) -->
     <div id="host-bottom-bar">
         <div class="control-row">
             <button class="btn-action gold" onclick="openModal('launcher-modal')">ИНТЕРАКТИВ</button>
             <button class="btn-action red" onclick="handleCloseClick()">ЗАКРЫТЬ</button>
+            <button class="btn-action gold" onclick="openScenarioUrl()" id="btn-scenario" style="flex: 0.8;">📜 СЦЕНАРИЙ</button>
             <button class="btn-action gold" onclick="socket.emit('add_timer_15s')" style="flex: 0.6;">+15 СЕК</button>
         </div>
         <div class="control-row">
@@ -171,16 +197,17 @@
         <div class="modal-card">
             <h3 style="color: var(--gold-light);">Интерактивы</h3>
             <div id="modules-list-box"></div>
-            <button class="mod-btn" style="border-color: var(--gold-main); background: rgba(245,158,11,0.15); margin-top: 12px;" onclick="openEditEventModal()">✏️ Изменить заголовок</button>
+            <button class="mod-btn" style="border-color: var(--gold-main); background: rgba(245,158,11,0.15); margin-top: 12px;" onclick="openEditEventModal()">✏️ Настройки праздника</button>
             <button onclick="closeModal('launcher-modal')" style="background: transparent; color: #94a3b8; border: none; margin-top: 15px; font-weight: bold; cursor: pointer;">Отмена</button>
         </div>
     </div>
 
     <div class="modal-overlay" id="edit-event-modal">
         <div class="modal-card">
-            <h3 style="color: var(--gold-light);">Название праздника</h3>
+            <h3 style="color: var(--gold-light);">Настройки праздника</h3>
             <input type="text" id="edit-title-input" class="auth-input" style="font-size: 1rem; letter-spacing: 1px; margin-top: 15px;" placeholder="Заголовок события">
             <input type="text" id="edit-subtitle-input" class="auth-input" style="font-size: 0.9rem; letter-spacing: 1px; margin-top: 10px;" placeholder="Подзаголовок">
+            <input type="text" id="edit-scenario-input" class="auth-input" style="font-size: 0.9rem; letter-spacing: 1px; margin-top: 10px;" placeholder="Ссылка на сценарий (URL)">
             <div style="display: flex; gap: 10px; margin-top: 20px;">
                 <button onclick="saveEventInfo()" class="btn-gold" style="margin: 0; flex: 1;">Сохранить</button>
                 <button onclick="closeModal('edit-event-modal')" style="flex: 1; border: 1px solid rgba(255,255,255,0.2); background: transparent; color: #fff; border-radius: 12px;">Отмена</button>
@@ -199,8 +226,8 @@
     </div>
 
     <!-- АУДИО -->
-    <audio id="bg-audio" loop></audio>
-    <audio id="sfx-audio"></audio>
+    <audio id="bg-audio" loop crossorigin="anonymous"></audio>
+    <audio id="sfx-audio" crossorigin="anonymous"></audio>
 
     <script>
         const socket = io("https://event-os-wqoa.onrender.com", { transports: ['websocket', 'polling'] });
@@ -215,6 +242,7 @@
         let closeClickTimer = null;
 
         let fanfareFiredForTimer = false;
+        let scenarioUrl = "";
 
         // --- УМНЫЙ АУДИО-МЕНЕДЖЕР ---
         const bgAudio = document.getElementById('bg-audio');
@@ -252,24 +280,82 @@
         function animateParticles() { pCtx.clearRect(0, 0, pCanvas.width, pCanvas.height); particles.forEach(p => { p.update(); p.draw(); }); requestAnimationFrame(animateParticles); }
         requestAnimationFrame(animateParticles);
 
-        // --- ЭКВАЛАЙЗЕР ---
+        // --- НАСТОЯЩИЙ ЭКВАЛАЙЗЕР (WEB AUDIO API) ---
         const eqCanvas = document.getElementById('eq-canvas');
         const eqCtx = eqCanvas.getContext('2d');
-        function resizeEqCanvas() { eqCanvas.width = window.innerWidth; }
+        function resizeEqCanvas() { eqCanvas.width = window.innerWidth; eqCanvas.height = 200; }
         window.addEventListener('resize', resizeEqCanvas);
         resizeEqCanvas();
-        let eqBars = Array.from({length: 80}, () => Math.random());
+
+        let audioCtx = null;
+        let analyser = null;
+        let dataArray = null;
+        let eqBars = new Array(64).fill(2);
+
+        function initWebAudio() {
+            if (audioCtx) {
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+                return;
+            }
+            try {
+                const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+                audioCtx = new AudioContextClass();
+                analyser = audioCtx.createAnalyser();
+                analyser.fftSize = 256; 
+                const bufferLength = analyser.frequencyBinCount;
+                dataArray = new Uint8Array(bufferLength);
+
+                if (bgAudio) {
+                    const sourceBg = audioCtx.createMediaElementSource(bgAudio);
+                    sourceBg.connect(analyser);
+                }
+                if (sfxAudio) {
+                    const sourceSfx = audioCtx.createMediaElementSource(sfxAudio);
+                    sourceSfx.connect(analyser);
+                }
+
+                analyser.connect(audioCtx.destination);
+            } catch (e) {
+                console.warn("Web Audio Init Exception:", e);
+            }
+        }
+
         function drawEq() {
+            requestAnimationFrame(drawEq);
             eqCtx.clearRect(0, 0, eqCanvas.width, eqCanvas.height);
-            const barWidth = eqCanvas.width / eqBars.length;
-            for(let i = 0; i < eqBars.length; i++) {
-                let targetH = eqIsPlaying ? (Math.random() * 250 * (eqVolume + 0.2)) : 2;
-                eqBars[i] += (targetH - eqBars[i]) * 0.2; 
+            if (!eqCanvas.width) return;
+
+            const barsCount = 64;
+            const barWidth = eqCanvas.width / barsCount;
+            let isAudioActive = state_is_playing || isSfxActive || eqIsPlaying;
+
+            if (analyser && dataArray && isAudioActive) {
+                analyser.getByteFrequencyData(dataArray);
+            }
+
+            for (let i = 0; i < barsCount; i++) {
+                let val = 0;
+                if (analyser && dataArray && isAudioActive) {
+                    let sampleIndex = Math.floor(i * (dataArray.length * 0.7) / barsCount);
+                    val = dataArray[sampleIndex] || 0;
+                }
+
+                let targetH = (val / 255) * (eqCanvas.height * 0.85);
+                if (targetH < 2) targetH = 2;
+
+                eqBars[i] += (targetH - eqBars[i]) * 0.25;
                 let h = eqBars[i];
-                eqCtx.fillStyle = 'rgba(245, 158, 11, 0.4)';
+
+                let gradient = eqCtx.createLinearGradient(0, eqCanvas.height, 0, eqCanvas.height - h);
+                gradient.addColorStop(0, 'rgba(245, 158, 11, 0.4)');
+                gradient.addColorStop(0.5, 'rgba(245, 158, 11, 0.7)');
+                gradient.addColorStop(1, 'rgba(255, 251, 235, 0.9)');
+
+                eqCtx.fillStyle = gradient;
                 eqCtx.fillRect(i * barWidth + 1, eqCanvas.height - h, barWidth - 2, h);
             }
-            setTimeout(() => requestAnimationFrame(drawEq), 40);
         }
         drawEq();
 
@@ -277,6 +363,7 @@
         function submitAuth() {
             const val = document.getElementById('auth-input').value.trim();
             if(!val) return;
+            initWebAudio();
             bgAudio.load();
             sfxAudio.load();
             bgAudio.play().then(()=>bgAudio.pause()).catch(()=>{});
@@ -412,6 +499,7 @@
 
         socket.on('state_update', (state) => {
             if (state.cdn_base_url) CDN = state.cdn_base_url;
+            if (state.scenario_url) scenarioUrl = state.scenario_url;
 
             document.getElementById('display-title').innerText = state.event_title;
             document.getElementById('display-subtitle').innerText = state.event_subtitle;
@@ -445,7 +533,7 @@
             if (isModule && myRole === 'SCREEN') {
                 document.getElementById('eq-canvas').style.opacity = '0';
             } else if (myRole === 'SCREEN') {
-                document.getElementById('eq-canvas').style.opacity = '0.8';
+                document.getElementById('eq-canvas').style.opacity = '0.85';
             }
 
             if (isModule) {
@@ -566,6 +654,14 @@
         function seekRelative(sec) { socket.emit('host_audio_control', { seek_relative: sec }); }
         function triggerSfx(type) { socket.emit('host_trigger_sfx', { sfx: type }); }
 
+        function openScenarioUrl() {
+            if (scenarioUrl) {
+                window.open(scenarioUrl, '_blank');
+            } else {
+                alert("Ссылка на сценарий не настроена в event_data.json");
+            }
+        }
+
         function handleCloseClick() {
             socket.emit('switch_module', { module: '' });
             closeClickCount++;
@@ -578,14 +674,16 @@
             closeModal('launcher-modal');
             document.getElementById('edit-title-input').value = document.getElementById('display-title').innerText;
             document.getElementById('edit-subtitle-input').value = document.getElementById('display-subtitle').innerText;
+            document.getElementById('edit-scenario-input').value = scenarioUrl || '';
             openModal('edit-event-modal');
         }
 
         function saveEventInfo() {
             const title = document.getElementById('edit-title-input').value.trim();
             const subtitle = document.getElementById('edit-subtitle-input').value.trim();
+            const scenario = document.getElementById('edit-scenario-input').value.trim();
             if (title) {
-                socket.emit('update_event_info', { event_title: title, event_subtitle: subtitle });
+                socket.emit('update_event_info', { event_title: title, event_subtitle: subtitle, scenario_url: scenario });
             }
             closeModal('edit-event-modal');
         }
