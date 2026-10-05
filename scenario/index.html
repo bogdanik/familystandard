@@ -3,542 +3,583 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Юбилей Натальи Николаевны — Event OS</title>
+  <title>DEMO: Сценарий Фарфоровой Свадьбы — Татьяна и Константин</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #08090d;
-      --card-bg: rgba(20, 22, 31, 0.90);
-      --border: #282b3a;
-      --accent: #dfb251;
-      --accent-light: #fbecc1;
-      --text: #f0f0f5;
-      --text-muted: #8e92a4;
-      --btn-bg: #1a1d28;
+      --bg-dark: #0a0d12;
+      --card-bg: rgba(18, 24, 36, 0.9);
+      --accent-gold: #e2c055;
+      --accent-gold-light: #f7e7a9;
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+      --border-color: rgba(226, 192, 85, 0.3);
+      --shadow-gold: rgba(226, 192, 85, 0.15);
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    }
-
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      background-color: var(--bg);
-      color: var(--text);
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-      max-width: 620px;
-      margin: 0 auto;
-      padding: 14px;
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: 'Montserrat', sans-serif;
+      line-height: 1.6;
       position: relative;
+      min-height: 100vh;
       overflow-x: hidden;
     }
 
-    #bg-canvas {
+    /* Particles Canvas */
+    #canvas-particles {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      z-index: -1;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      z-index: 0;
       pointer-events: none;
     }
 
-    header {
-      padding: 10px 0;
+    /* Modal Overlay */
+    .demo-modal-overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(5, 7, 10, 0.95);
+      backdrop-filter: blur(12px);
+      z-index: 1000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: opacity 0.5s ease, visibility 0.5s ease;
+    }
+    .demo-modal-overlay.hidden {
+      opacity: 0;
+      visibility: hidden;
+    }
+    .demo-card {
+      background: linear-gradient(145deg, #161c27, #0d1118);
+      border: 1px solid var(--accent-gold);
+      box-shadow: 0 0 50px rgba(226, 192, 85, 0.25);
+      border-radius: 20px;
+      padding: 40px;
+      max-width: 520px;
+      width: 90%;
       text-align: center;
-      border-bottom: 1px solid var(--border);
-      backdrop-filter: blur(8px);
+    }
+    .demo-icon {
+      font-size: 3.5rem;
+      color: var(--accent-gold);
+      margin-bottom: 15px;
+    }
+    .demo-card h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.2rem;
+      color: var(--accent-gold-light);
+      margin-bottom: 10px;
+    }
+    .demo-card p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      margin-bottom: 25px;
+    }
+    .btn-enter {
+      background: linear-gradient(135deg, #e2c055, #b89327);
+      color: #000;
+      font-weight: 600;
+      font-size: 1rem;
+      padding: 14px 32px;
+      border: none;
+      border-radius: 30px;
+      cursor: pointer;
+      box-shadow: 0 5px 20px rgba(226, 192, 85, 0.4);
+      transition: all 0.3s ease;
+    }
+    .btn-enter:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(226, 192, 85, 0.6);
     }
 
+    /* Top Sticky Status Bar */
+    .top-demo-bar {
+      background: linear-gradient(90deg, rgba(226, 192, 85, 0.15), rgba(226, 192, 85, 0.05));
+      border-bottom: 1px solid var(--border-color);
+      color: var(--accent-gold-light);
+      text-align: center;
+      padding: 8px;
+      font-size: 0.85rem;
+      letter-spacing: 1px;
+      position: relative;
+      z-index: 10;
+      text-transform: uppercase;
+    }
+
+    /* Main Container */
+    .app-container {
+      position: relative;
+      z-index: 1;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 30px 20px 60px;
+    }
+
+    header {
+      text-align: center;
+      padding-bottom: 30px;
+      border-bottom: 1px solid var(--border-color);
+      margin-bottom: 35px;
+    }
     header h1 {
-      font-size: 1.15rem;
-      color: var(--accent);
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 3rem;
+      color: var(--accent-gold);
+      letter-spacing: 1px;
+    }
+    header .subtitle {
+      color: var(--text-muted);
+      font-size: 1.05rem;
+      margin-top: 8px;
+    }
+    header .meta-info {
+      display: inline-flex;
+      gap: 15px;
+      margin-top: 15px;
+      background: rgba(255, 255, 255, 0.03);
+      padding: 6px 18px;
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      font-size: 0.85rem;
+      color: var(--accent-gold-light);
+    }
+
+    /* Cards & Single Block View */
+    .block-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 30px;
+      margin-bottom: 25px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      display: none; /* Controlled by JS step pagination */
+      animation: fadeIn 0.4s ease-in-out;
+    }
+    .block-card.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .block-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      border-bottom: 1px solid rgba(226, 192, 85, 0.15);
+      padding-bottom: 12px;
+    }
+    .block-title-group h3 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.8rem;
+      color: var(--accent-gold-light);
+    }
+    .time-badge {
+      background: var(--accent-gold);
+      color: #000;
+      font-weight: 700;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+    }
+
+    .badge-tag {
+      display: inline-block;
+      font-size: 0.75rem;
       text-transform: uppercase;
       letter-spacing: 1px;
-      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 6px;
+      margin-bottom: 15px;
+      font-weight: 600;
     }
+    .tag-food { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
+    .tag-interactive { background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); }
+    .tag-dj { background: rgba(234, 179, 8, 0.15); color: #facc15; border: 1px solid rgba(234, 179, 8, 0.3); }
+    .tag-speech { background: rgba(168, 85, 247, 0.15); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.3); }
+    .tag-cake { background: rgba(236, 72, 153, 0.15); color: #f472b6; border: 1px solid rgba(236, 72, 153, 0.3); }
 
-    .nav-bar {
-      margin: 10px 0;
+    .content-box {
+      margin-bottom: 15px;
+      font-size: 0.95rem;
+      color: var(--text-main);
+    }
+    .content-box strong { color: var(--accent-gold-light); }
+
+    .vibe-box {
+      background: rgba(226, 192, 85, 0.06);
+      border-left: 3px solid var(--accent-gold);
+      padding: 12px 16px;
+      border-radius: 0 8px 8px 0;
+      margin: 15px 0;
+      font-size: 0.9rem;
+    }
+    .vibe-box h5 { color: var(--accent-gold); margin-bottom: 4px; }
+
+    /* Navigation Controls */
+    .controls-bar {
       display: flex;
-      align-items: center;
       justify-content: space-between;
-      gap: 10px;
+      align-items: center;
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
     }
-
+    .btn-nav {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: all 0.2s ease;
+    }
+    .btn-nav:hover:not(:disabled) {
+      background: var(--accent-gold);
+      color: #000;
+      font-weight: 600;
+    }
+    .btn-nav:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
     .step-indicator {
       font-size: 0.85rem;
       color: var(--text-muted);
-      font-weight: 600;
     }
 
-    select.step-select {
-      background: var(--btn-bg);
-      color: var(--text);
-      border: 1px solid var(--border);
-      padding: 6px 10px;
-      border-radius: 8px;
-      font-size: 0.85rem;
-      outline: none;
-    }
-
-    .progress-bar {
-      height: 4px;
-      background: rgba(255,255,255,0.08);
-      border-radius: 2px;
-      margin-bottom: 14px;
-      overflow: hidden;
-    }
-
-    .progress-fill {
-      height: 100%;
-      width: 12.5%;
-      background: linear-gradient(90deg, #d4af37, #f3e5ab);
-      transition: width 0.3s ease;
-    }
-
-    .main-card {
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 18px;
-      flex-grow: 1;
-      display: flex;
-      flex-direction: column;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
-      backdrop-filter: blur(12px);
-    }
-
-    .stage-time {
-      display: inline-block;
-      font-size: 0.8rem;
-      color: var(--accent);
-      background: rgba(223, 178, 81, 0.12);
-      padding: 3px 10px;
-      border-radius: 6px;
-      font-weight: bold;
-      align-self: flex-start;
-      margin-bottom: 10px;
-    }
-
-    .stage-title {
-      font-size: 1.25rem;
-      margin-bottom: 12px;
-      color: #ffffff;
-      line-height: 1.3;
-    }
-
-    .content-block {
-      font-size: 0.92rem;
-      line-height: 1.5;
-      color: #d8d8e5;
-    }
-
-    .speech-box {
-      background: rgba(10, 11, 15, 0.85);
-      border-left: 3px solid var(--accent);
-      padding: 12px 14px;
-      margin: 12px 0;
-      border-radius: 0 8px 8px 0;
-      font-style: italic;
-      color: var(--accent-light);
-    }
-
-    .mechanics-box {
-      background: rgba(223, 178, 81, 0.08);
-      border: 1px solid rgba(223, 178, 81, 0.25);
-      padding: 12px;
-      border-radius: 10px;
-      margin: 10px 0;
-      font-size: 0.88rem;
-    }
-
-    .mechanics-box strong {
-      color: var(--accent);
-      display: block;
-      margin-bottom: 4px;
-    }
-
-    .task-item {
-      background: rgba(26, 29, 40, 0.7);
-      border: 1px solid var(--border);
-      padding: 12px;
-      border-radius: 10px;
-      margin-bottom: 10px;
-    }
-
-    .task-item .person {
-      color: var(--accent);
-      font-weight: bold;
-      display: block;
-      margin-bottom: 4px;
-    }
-
-    .q-card {
-      background: rgba(18, 21, 30, 0.88);
-      border-left: 3px solid #3b82f6;
-      padding: 11px 13px;
-      margin-bottom: 10px;
-      border-radius: 0 8px 8px 0;
-      font-size: 0.9rem;
-    }
-
-    .q-card .ans {
-      color: #10b981;
-      font-weight: bold;
-      margin-top: 6px;
-      display: block;
-    }
-
-    .controls {
-      display: flex;
-      gap: 10px;
-      margin-top: 16px;
-    }
-
-    .btn {
-      flex: 1;
-      padding: 14px;
-      border: none;
+    /* Feedback & Questions Box */
+    .feedback-section {
+      margin-top: 50px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px dashed var(--border-color);
       border-radius: 12px;
-      font-size: 0.95rem;
-      font-weight: 600;
-      cursor: pointer;
-      background: var(--btn-bg);
-      color: var(--text);
-      border: 1px solid var(--border);
-      transition: all 0.2s;
+      padding: 25px;
+    }
+    .feedback-section h4 {
+      color: var(--accent-gold-light);
+      margin-bottom: 12px;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.5rem;
+    }
+    .feedback-list {
+      list-style: none;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+    .feedback-list li {
+      margin-bottom: 8px;
+      padding-left: 20px;
+      position: relative;
+    }
+    .feedback-list li::before {
+      content: '?';
+      position: absolute;
+      left: 0;
+      color: var(--accent-gold);
+      font-weight: bold;
     }
 
-    .btn-next {
-      background: var(--accent);
-      color: #08090d;
-      border: none;
-    }
-
-    .btn:disabled {
-      opacity: 0.3;
-      cursor: not-allowed;
+    footer {
+      text-align: center;
+      margin-top: 40px;
+      color: var(--text-muted);
+      font-size: 0.8rem;
     }
   </style>
 </head>
 <body>
 
-  <canvas id="bg-canvas"></canvas>
+  <canvas id="canvas-particles"></canvas>
 
-  <header>
-    <h1>Наталья Николаевна • 60 лет</h1>
-  </header>
-
-  <div class="nav-bar">
-    <span class="step-indicator" id="step-indicator">Шаг 1 из 8</span>
-    <select class="step-select" id="step-select" onchange="jumpToStep(this.value)">
-      <option value="1">1. Старт и Приветствие</option>
-      <option value="2">2. Тост Мамы</option>
-      <option value="3">3. Блок Семьи</option>
-      <option value="4">4. Эксперты по Наталье</option>
-      <option value="5">5. Соратники и Друзья</option>
-      <option value="6">6. Коды Эпохи (Квиз)</option>
-      <option value="7">7. Музыкальная Пауза</option>
-      <option value="8">8. Кульминация и Торт</option>
-    </select>
+  <!-- Top Status Bar -->
+  <div class="top-demo-bar">
+    ⚡ ДЕМО-ВЕРСИЯ СЦЕНАРИЯ | На согласовании у Татьяны и Константина
   </div>
 
-  <div class="progress-bar">
-    <div class="progress-fill" id="progress-fill"></div>
+  <!-- Modal Overlay -->
+  <div class="demo-modal-overlay" id="demoModal">
+    <div class="demo-card">
+      <div class="demo-icon">💍</div>
+      <h2>Татьяна & Константин</h2>
+      <p>Проект сценария вечера (Фарфоровая свадьба — 20 лет)<br>Пошаговая демо-версия для согласования тайминга и программы.</p>
+      <button class="btn-enter" onclick="closeDemoModal()">Открыть сценарий</button>
+    </div>
   </div>
 
-  <div class="main-card" id="card-container">
-    <!-- Шаги подгружаются через JS -->
-  </div>
+  <div class="app-container">
+    <header>
+      <h1>Татьяна & Константин</h1>
+      <div class="subtitle">Сценарий праздничного вечера (20 лет вместе)</div>
+      <div class="meta-info">
+        <span>👥 45 гостей</span>
+        <span>⏱️ 3.5 – 4 часа</span>
+        <span>📍 Зал банкета</span>
+      </div>
+    </header>
 
-  <div class="controls">
-    <button class="btn" id="btn-prev" onclick="prevStep()">◀ Назад</button>
-    <button class="btn btn-next" id="btn-next" onclick="nextStep()">Дальше ▶</button>
+    <!-- Block 1 -->
+    <div class="block-card active">
+      <div class="block-header">
+        <div class="block-title-group">
+          <h3>Блок 1: Сбор гостей и Велком</h3>
+        </div>
+        <span class="time-badge">17:30 – 18:00 (30 мин)</span>
+      </div>
+      <span class="badge-tag tag-dj">Блок ДИДЖЕЯ</span>
+      <span class="badge-tag tag-food">Подача: Аперитив</span>
+
+      <div class="content-box">
+        <p><strong>Атмосфера:</strong> Гости собираются, знакомятся, делают фотографии в фотозоне. Ведущий уделяет особое внимание старшему поколению (70+), помогая комфортно расположиться.</p>
+      </div>
+      <div class="content-box">
+        <p><strong>Музыкальный сет диджея:</strong> Легкий Lounge, Smooth Jazz, стильные современные ремиксы на хиты 80-90-х годов.</p>
+      </div>
+      <div class="content-box">
+        <p><strong>Гастрономия:</strong> На столах накрыты холодные закуски, напитки и фруктовые сеты.</p>
+      </div>
+    </div>
+
+    <!-- Block 2 -->
+    <div class="block-card">
+      <div class="block-header">
+        <div class="block-title-group">
+          <h3>Блок 2: Открытие вечера и Тост Родителей</h3>
+        </div>
+        <span class="time-badge">18:00 – 18:50 (50 мин)</span>
+      </div>
+      <span class="badge-tag tag-speech">Блок ВЕДУЩЕГО & ПОЗДРАВЛЕНИЙ</span>
+      <span class="badge-tag tag-food">18:35 — Первое горячее блюдо</span>
+
+      <div class="content-box">
+        <p><strong>18:00 – 18:20 | Вступительный аккорд:</strong> Ведущий задает теплый, праздничный вайб. Первый объединяющий тост за 20-летний фарфоровый рубеж пары.</p>
+      </div>
+      <div class="content-box">
+        <p><strong>18:20 – 18:35 | Поздравление родителей:</strong></p>
+        <ul>
+          <li>Родители Татьяны: <strong>Людмила Владимировна и Виталий Николаевич</strong></li>
+          <li>Мама Константина: <strong>Раиса Константиновна</strong></li>
+        </ul>
+      </div>
+
+      <div class="vibe-box">
+        <h5>💡 Подводка ведущего (Рекомендация):</h5>
+        <p>Перед передачей микрофона ведущий создает душевно-юмористический настрой, задавая вопрос: <em>«Помните ли вы тот день 20 лет назад, когда Костя впервые переступил порог дома в качестве жениха?»</em></p>
+      </div>
+
+      <div class="content-box">
+        <p><strong>18:35 – 18:50 | Подача первого горячего:</strong> Гастрономическая пауза под легкий фоновый сет от диджея.</p>
+      </div>
+    </div>
+
+    <!-- Block 3 -->
+    <div class="block-card">
+      <div class="block-header">
+        <div class="block-title-group">
+          <h3>Блок 3: Ближайшие родные & Интерактив №1</h3>
+        </div>
+        <span class="time-badge">18:50 – 19:40 (50 мин)</span>
+      </div>
+      <span class="badge-tag tag-speech">Поздравления</span>
+      <span class="badge-tag tag-interactive">15-20 мин Интерактив</span>
+
+      <div class="content-box">
+        <p><strong>18:50 – 19:15 | Поздравление близких родственников:</strong></p>
+        <ul>
+          <li>Брат Татьяны: <strong>Сергей с супругой Натальей</strong></li>
+          <li>Тётя Константина: <strong>Ирина Николаевна</strong></li>
+          <li>Сестра Константина: <strong>Светлана</strong></li>
+        </ul>
+      </div>
+
+      <div class="content-box">
+        <p><strong>19:15 – 19:35 | Интерактивный блок №1 (15–20 минут):</strong> Первое общее развлечение для гостей за столом (мультимедийный или легкий текстовый интерактив, объединяющий возраст 40-60 и молодежь до 25).</p>
+      </div>
+
+      <div class="content-box">
+        <p><strong>19:35 – 19:40 | Музыкальная отбивка:</strong> Диджей плавно подводит гостей к танцевальному перерыву.</p>
+      </div>
+    </div>
+
+    <!-- Block 4 -->
+    <div class="block-card">
+      <div class="block-header">
+        <div class="block-title-group">
+          <h3>Блок 4: Второе горячее & Диджейский сет</h3>
+        </div>
+        <span class="time-badge">19:40 – 20:10 (30 мин)</span>
+      </div>
+      <span class="badge-tag tag-food">19:40 — Второе горячее блюдо</span>
+      <span class="badge-tag tag-dj">Танцевальный Сет №1</span>
+
+      <div class="content-box">
+        <p><strong>19:40 – 20:00 | Подача второго горячего блюда:</strong> Основная горячая подача. Гости наслаждаются кухней и общением.</p>
+      </div>
+      <div class="content-box">
+        <p><strong>20:00 – 20:10 | Танцевальная пауза:</strong> Первый динамичный танцевальный блок от диджея (хиты 80-90-х вперемешку с ритмичной современной музыкой).</p>
+      </div>
+    </div>
+
+    <!-- Block 5 -->
+    <div class="block-card">
+      <div class="block-header">
+        <div class="block-title-group">
+          <h3>Блок 5: Поздравления друзей & Интерактив №2</h3>
+        </div>
+        <span class="time-badge">20:10 – 21:00 (50 мин)</span>
+      </div>
+      <span class="badge-tag tag-speech">Блок Друзей</span>
+      <span class="badge-tag tag-interactive">15-20 мин Интерактив</span>
+      <span class="badge-tag tag-dj">Диджей Сет №2</span>
+
+      <div class="content-box">
+        <p><strong>20:10 – 20:30 | Блок близких друзей:</strong></p>
+        <ul>
+          <li><strong>Роман и Ольга</strong></li>
+          <li><strong>Жанна и Александр</strong></li>
+          <li><strong>Лидия и Юрий</strong></li>
+        </ul>
+      </div>
+
+      <div class="vibe-box">
+        <h5>💡 Подводка ведущего:</h5>
+        <p>Интересный вопрос друзьям: <em>«Какое самое запоминающееся совместное событие или путешествие с Константином и Татьяной вы помните за эти 20 лет?»</em></p>
+      </div>
+
+      <div class="content-box">
+        <p><strong>20:30 – 20:50 | Интерактивный блок №2 (15–20 минут):</strong> Второй активный/музыкальный интерактив от ведущего с участием гостей и виновников торжества.</p>
+      </div>
+
+      <div class="content-box">
+        <p><strong>20:50 – 21:00 | Диджейский сет:</strong> Яркий танцевальный блок перед кульминацией.</p>
+      </div>
+    </div>
+
+    <!-- Block 6 -->
+    <div class="block-card">
+      <div class="block-header">
+        <div class="block-title-group">
+          <h3>Блок 6: Торт, Ответное слово & Финал</h3>
+        </div>
+        <span class="time-badge">21:00 – 22:00 (60 мин)</span>
+      </div>
+      <span class="badge-tag tag-cake">21:00 — Подача Торта</span>
+      <span class="badge-tag tag-speech">Финал</span>
+
+      <div class="content-box">
+        <p><strong>21:00 – 21:20 | Торжественный вынос торта:</strong> Красивая музыкальная и световая подача праздничного торта. Чайная и кофейная пауза.</p>
+      </div>
+      <div class="content-box">
+        <p><strong>21:20 – 21:35 | Ответное слово юбиляров:</strong> Татьяна и Константин благодарят родителей, родных и друзей за этот вечер.</p>
+      </div>
+      <div class="content-box">
+        <p><strong>21:35 – 22:00 | Общее фото & Финальный диджейский сет:</strong> Памятное фото со всеми 45 гостями, завершающий танцевальный блок.</p>
+      </div>
+    </div>
+
+    <!-- Navigation Controls -->
+    <div class="controls-bar">
+      <button class="btn-nav" id="prevBtn" onclick="changeStep(-1)">← Предыдущий блок</button>
+      <span class="step-indicator" id="stepIndicator">Блок 1 из 6</span>
+      <button class="btn-nav" id="nextBtn" onclick="changeStep(1)">Следующий блок →</button>
+    </div>
+
+    <!-- Feedback Questions for Couple -->
+    <div class="feedback-section">
+      <h4> Вопросы на уточнение для Татьяны и Константина:</h4>
+      <ul class="feedback-list">
+        <li>Удобно ли предложенное время подачи горячих блюд (18:35 и 19:40)?</li>
+        <li>Подходит ли очередность поздравлений (Родители → Родственники → Друзья)?</li>
+        <li>Есть ли особые музыкальные пожелания для диджейских сетов?</li>
+      </ul>
+    </div>
+
+    <footer>
+      Family Standard Event OS | Демо-версия сценария вечера
+    </footer>
   </div>
 
   <script>
-    /* ================= СЦЕНАРИЙ МЕРОПРИЯТИЯ ================= */
-    const stepsData = [
-      {
-        time: "15:00 – 15:20",
-        title: "1. Вход и Задаем Понятийный Вектор",
-        content: `
-          <div class="content-block">
-            <p><strong>Замысел:</strong> Фиксация статуса события. Спокойная, уважительная подача без суеты.</p>
-            <div class="speech-box">
-              «Добрый день, дорогие и самые близкие люди! Сегодня замечательный обеденный час, когда мы собрались по очень личному и сильному поводу — 60-летний юбилей нашей потрясающей Натальи Николаевны! Сегодня мы не будем никуда спешить. Наша задача — вкусно пообедать, насладиться общением и прожить этот день в максимальном уюте. С праздником, Наталья Николаевна!»
-            </div>
-            <p><strong>Действие:</strong> Первый общий тост. Фиксируем паузу 10-15 минут на трапезу.</p>
-          </div>
-        `
-      },
-      {
-        time: "15:20 – 15:30",
-        title: "2. Главное Слово — Мама",
-        content: `
-          <div class="content-block">
-            <div class="mechanics-box">
-              <strong>Объектное правило:</strong> Полное отсутствие любых модерационных барьеров или вопросов. Только прямой доступ к слову.
-            </div>
-            <div class="task-item">
-              <span class="person">Мама: Татьяна Федоровна</span>
-              <p><em>Подводка:</em> «Есть в жизни источник, из которого берет начало всё самое светлое. Человек, чья любовь и забота создали ту Наталью Николаевну, которую мы сегодня знаем и любим. Татьяна Федоровна, вам самое главное и первое слово!»</p>
-            </div>
-          </div>
-        `
-      },
-      {
-        time: "15:30 – 16:00",
-        title: "3. Блок Семьи (Муж и Дети)",
-        content: `
-          <div class="content-block">
-            <div class="mechanics-box">
-              <strong>Задача модерации:</strong> Ввести тостующих через конкретную смысловую зацепку (не избитый стих, а личностный факт).
-            </div>
-
-            <div class="task-item">
-              <span class="person">1. Муж — Григорий Анатольевич</span>
-              <p><strong>Вводный вектор:</strong> «Григорий Анатольевич, охарактеризуйте Наталью Николаевну ровно тремя словами, с которыми вы засыпаете и просыпаетесь последние годы?»</p>
-            </div>
-
-            <div class="task-item">
-              <span class="person">2. Сын Александр и Дочь Маргарита</span>
-              <p><strong>Вводный вектор:</strong> «Ребята, вспомните одну главную мамину фразу или воспитательное правило из детства, которое вы забрали в свою взрослую жизнь?»</p>
-            </div>
-          </div>
-        `
-      },
-      {
-        time: "16:00 – 16:20",
-        title: "4. Интерактив «Эксперты по Наталье»",
-        content: `
-          <div class="content-block">
-            <div class="mechanics-box">
-              <strong>ПОЛНЫЙ АЛГОРИТМ ПРОВЕДЕНИЯ:</strong><br>
-              1. Наталья Николаевна держит 2-й микрофон и выступает верховным арбитром.<br>
-              2. Ведущий задает вопрос в зал.<br>
-              3. Зал дает 2-3 версии с мест.<br>
-              4. Наталья указывает на автора самой точной версии, после чего сама кратко раскрывает реальную историю.
-            </div>
-
-            <div class="q-card"><strong>Вопрос 1:</strong> Какая фирменная привычка или коронное выражение Натальи мгновенно выдает её настроение?</div>
-            <div class="q-card"><strong>Вопрос 2:</strong> Какой самый неожиданный или авантюрный поступок совершила Наталья в своей жизни?</div>
-            <div class="q-card"><strong>Вопрос 3:</strong> Назовите поступок или решение Натальи, после которого вы подумали: «Вот это характер! Вот это сила!»?</div>
-            <div class="q-card"><strong>Вопрос 4:</strong> Если бы голливудский режиссер снимал байопик про жизнь Натальи, какая известная актриса сыграла бы её в главной роли, и как назывался бы этот фильм?</div>
-            <div class="q-card"><strong>Вопрос 5:</strong> Какое фирменное блюдо в исполнении Натальи Николаевны является её абсолютной визитной карточкой?</div>
-            <div class="q-card"><strong>Вопрос 6:</strong> Какая суперспособность есть у Натальи, о которой знают только самые близкие?</div>
-            <div class="q-card"><strong>Вопрос 7:</strong> Что гарантированно поднимает настроение Наталье, даже если день выдался непростым?</div>
-          </div>
-        `
-      },
-      {
-        time: "16:20 – 17:00",
-        title: "5. Блок Соратников, Подруг и Одноклассницы",
-        content: `
-          <div class="content-block">
-            <div class="mechanics-box">
-              <strong>Фокус внимания:</strong> Связь между объектом праздника (Натальей) и людьми, с которыми пройдены годы.
-            </div>
-
-            <div class="task-item">
-              <span class="person">1. Собит Тулянович и Ольга Алексеевна (Соратники)</span>
-              <p><strong>Подводка:</strong> «Собит Тулянович, Ольга Алексеевна, вы знаете Наталью Николаевну сквозь годы. Какое её главное человеческое качество делает её партнером и другом, на которого всегда можно положиться?»</p>
-            </div>
-
-            <div class="task-item">
-              <span class="person">2. Ирина и Елена (Подруги)</span>
-              <p><strong>Подводка:</strong> «Ирина, Елена, вспомните самый теплый или душевный момент вашей женской дружбы с Натальей, который лучше всего характеризует её отношение к людям?»</p>
-            </div>
-
-            <div class="task-item">
-              <span class="person">3. Татьяна (Одноклассница)</span>
-              <p><strong>Подводка:</strong> «Татьяна, какой Наталья была за школьной партой — тихой наблюдательницей или человеком, вокруг которого кипела вся жизнь класса?»</p>
-            </div>
-          </div>
-        `
-      },
-      {
-        time: "17:00 – 17:25",
-        title: "6. Концептуальный Блок «Коды Эпохи»",
-        content: `
-          <div class="content-block">
-            <div class="mechanics-box">
-              <strong>ПОНЯТИЙНАЯ МЕХАНИКА:</strong><br>
-              Мы исследуем не банальные ценники, а <strong>культурные коды, социальные явления и ритуалы</strong> эпохи юности Натальи Николаевны. Столы наперегонки разгадывают объёмный образ.
-            </div>
-
-            <div class="q-card">
-              <strong>Раунд 1 (Объект статуса и уюта):</strong> Предмет советского быта, который висел на стене, являлся главным звукопоглотителем, фоном для всех семейных снимков и индикатором достатка?<br>
-              <span class="ans">Ответ: Настенный ковер.</span>
-            </div>
-
-            <div class="q-card">
-              <strong>Раунд 2 (Социальный хаб):</strong> Место встречи и главный информационный центр двора эпохи 70-80-х, где без интернета и мобильных принимались важнейшие решения и обсуждались все новости?<br>
-              <span class="ans">Ответ: Скамейка у подъезда / Кухня 6 кв.м.</span>
-            </div>
-
-            <div class="q-card">
-              <strong>Раунд 3 (Ритуал добычи контента):</strong> Что нужно было сделать человеку в 80-е, чтобы записать любимую песню с радио, и о чем суеверно молились в этот момент?<br>
-              <span class="ans">Ответ: Успеть нажать RECORD на кассетнике и молиться, чтобы ведущий радио не заговорил поверх музыки.</span>
-            </div>
-
-            <div class="q-card">
-              <strong>Раунд 4 (Формула массового единения):</strong> Главная телепрограмма воскресного утра, которая объединяла всю страну у экранов и задавала музыкальный ритм на всю неделю?<br>
-              <span class="ans">Ответ: «Утренняя почта».</span>
-            </div>
-
-            <div class="q-card">
-              <strong>Раунд 5 (Праздничный ритуал):</strong> Кулинарный процесс, который за сутки до праздника превращался в семейный «субботник» с использованием самых больших эмалированных тазиков в доме?<br>
-              <span class="ans">Ответ: Заготовка салатов (Оливье / Селедка под шубой) на всю компанию.</span>
-            </div>
-          </div>
-        `
-      },
-      {
-        time: "17:25 – 18:00",
-        title: "7. Музыкально-Лаунжевая Пауза",
-        content: `
-          <div class="content-block">
-            <div class="mechanics-box">
-              <strong>Стратегия ведущего:</strong> Никаких насильственных призывов к танцам. Даем фоновую качественную ретро-эстраду, легкий диско-ритм и пространство для свободного общения.
-            </div>
-            <p>• Гости общаются, пьют кофе, фотографируются.<br>
-               • Модерация в мягком режиме — работа у столиков без микрофонного давления.</p>
-          </div>
-        `
-      },
-      {
-        time: "18:00 – 18:30",
-        title: "8. Финальный Торт и Торжественное Резюме",
-        content: `
-          <div class="content-block">
-            <p><strong>Кульминация:</strong> Вынос юбилейного торта, зажжение свечей, финальные аплодисменты.</p>
-            <div class="speech-box">
-              «Дорогие друзья! Сегодняшний день доказал главное: 60 лет — это не просто возраст, это статус богатой, любимой и гармоничной жизни. Давайте еще раз громко поаплодируем нашей замечательной Наталье Николаевне! Здоровья, тепла и пусть вокруг всегда будут самые близкие люди!»
-            </div>
-          </div>
-        `
-      }
-    ];
-
-    let currentStep = 0;
-
-    function renderStep() {
-      const step = stepsData[currentStep];
-      const container = document.getElementById('card-container');
-      
-      container.innerHTML = `
-        <span class="stage-time">${step.time}</span>
-        <h2 class="stage-title">${step.title}</h2>
-        ${step.content}
-      `;
-
-      document.getElementById('step-indicator').textContent = `Шаг ${currentStep + 1} из ${stepsData.length}`;
-      document.getElementById('step-select').value = currentStep + 1;
-      
-      const fillPercentage = ((currentStep + 1) / stepsData.length) * 100;
-      document.getElementById('progress-fill').style.width = `${fillPercentage}%`;
-
-      document.getElementById('btn-prev').disabled = currentStep === 0;
-      document.getElementById('btn-next').disabled = currentStep === stepsData.length - 1;
-    }
-
-    function nextStep() {
-      if (currentStep < stepsData.length - 1) {
-        currentStep++;
-        renderStep();
-      }
-    }
-
-    function prevStep() {
-      if (currentStep > 0) {
-        currentStep--;
-        renderStep();
-      }
-    }
-
-    function jumpToStep(stepNum) {
-      currentStep = parseInt(stepNum) - 1;
-      renderStep();
-    }
-
-    /* ================= АНИМАЦИЯ ФОНА (ЧАСТИЦЫ + СВЕЧЕНИЕ) ================= */
-    const canvas = document.getElementById('bg-canvas');
+    // Particle Animation
+    const canvas = document.getElementById('canvas-particles');
     const ctx = canvas.getContext('2d');
+    let particles = [];
 
-    let width, height;
-    function resize() {
-      width = canvas.width = window.innerWidth;
-      height = canvas.height = window.innerHeight;
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
     }
-    window.addEventListener('resize', resize);
-    resize();
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
 
-    // Частицы
-    const particleCount = 40;
-    const particles = [];
-
-    for (let i = 0; i < particleCount; i++) {
-      particles.push({
-        x: Math.random() * width,
-        y: Math.random() * height,
-        radius: Math.random() * 2 + 1,
-        vx: (Math.random() - 0.5) * 0.35,
-        vy: (Math.random() - 0.5) * 0.35,
-        alpha: Math.random() * 0.6 + 0.2
-      });
-    }
-
-    let pulseAngle = 0;
-
-    function animate() {
-      ctx.clearRect(0, 0, width, height);
-
-      // 1. Пульсирующее мерцающее свечение из центра
-      pulseAngle += 0.02;
-      const pulseOpacity = 0.20 + Math.sin(pulseAngle) * 0.07;
-      const centerX = width / 2 + Math.cos(pulseAngle * 0.4) * 15;
-      const centerY = height / 2 + Math.sin(pulseAngle * 0.3) * 15;
-
-      const gradient = ctx.createRadialGradient(
-        centerX, centerY, 10,
-        centerX, centerY, Math.max(width, height) * 0.55
-      );
-      gradient.addColorStop(0, `rgba(223, 178, 81, ${pulseOpacity})`);
-      gradient.addColorStop(0.5, `rgba(160, 110, 35, ${pulseOpacity * 0.35})`);
-      gradient.addColorStop(1, 'rgba(8, 9, 13, 0)');
-
-      ctx.fillStyle = gradient;
-      ctx.fillRect(0, 0, width, height);
-
-      // 2. Движение золотистых частиц
-      ctx.fillStyle = 'rgba(251, 236, 193, 0.85)';
-      for (let p of particles) {
-        p.x += p.vx;
-        p.y += p.vy;
-
-        if (p.x < 0) p.x = width;
-        if (p.x > width) p.x = 0;
-        if (p.y < 0) p.y = height;
-        if (p.y > height) p.y = 0;
-
+    class Particle {
+      constructor() { this.reset(); }
+      reset() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.size = Math.random() * 2 + 0.5;
+        this.speedX = (Math.random() - 0.5) * 0.3;
+        this.speedY = -Math.random() * 0.4 - 0.1;
+        this.alpha = Math.random() * 0.5 + 0.1;
+      }
+      update() {
+        this.x += this.speedX;
+        this.y += this.speedY;
+        if (this.y < 0) { this.reset(); this.y = canvas.height; }
+      }
+      draw() {
+        ctx.fillStyle = `rgba(226, 192, 85, ${this.alpha})`;
         ctx.beginPath();
-        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-        ctx.globalAlpha = p.alpha;
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
         ctx.fill();
       }
-      ctx.globalAlpha = 1.0;
-
-      requestAnimationFrame(animate);
     }
 
-    // Запуск
-    renderStep();
+    for (let i = 0; i < 50; i++) particles.push(new Particle());
+
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach(p => { p.update(); p.draw(); });
+      requestAnimationFrame(animate);
+    }
     animate();
+
+    // Modal Control
+    function closeDemoModal() {
+      document.getElementById('demoModal').classList.add('hidden');
+    }
+
+    // Step Pagination Logic
+    let currentStep = 0;
+    const cards = document.querySelectorAll('.block-card');
+    const totalSteps = cards.length;
+
+    function updateStepView() {
+      cards.forEach((card, index) => {
+        card.classList.toggle('active', index === currentStep);
+      });
+      document.getElementById('stepIndicator').innerText = `Блок ${currentStep + 1} из ${totalSteps}`;
+      document.getElementById('prevBtn').disabled = currentStep === 0;
+      document.getElementById('nextBtn').disabled = currentStep === totalSteps - 1;
+    }
+
+    function changeStep(direction) {
+      currentStep += direction;
+      if (currentStep < 0) currentStep = 0;
+      if (currentStep >= totalSteps) currentStep = totalSteps - 1;
+      updateStepView();
+    }
+
+    updateStepView();
   </script>
 </body>
 </html>
