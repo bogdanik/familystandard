@@ -185,14 +185,11 @@
   <div id="hintLabel" class="hint-label">Нажмите СТАРТ или ПРОБЕЛ на клавиатуре</div>
 
   <script>
-    // ==========================================
-    // ВСТАВЬТЕ СЮДА ССЫЛКУ НА ВАШ СЕРВЕР НА RENDER
-    // ==========================================
-    const RENDER_SERVER_URL = "https://your-app-name.onrender.com"; 
+    // Активный процесс на Render
+    const RENDER_SERVER_URL = "https://number-ssfj.onrender.com"; 
 
-    // Выбор хоста в зависимости от локального/продакшен запуска
     const serverUrl = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
-      ? 'http://127.0.0.1:5000'
+      ? 'http://127.0.0.1:10000'
       : RENDER_SERVER_URL;
 
     const socket = io(serverUrl, { transports: ['websocket', 'polling'] });
@@ -212,12 +209,12 @@
     const canvas = document.getElementById('particleCanvas');
     const ctx = canvas.getContext('2d');
 
-    let state = 'idle'; // 'idle', 'spinning', 'stopped'
+    let state = 'idle';
     let spinInterval = null;
     let spinTimeout = null;
     let audioCtx = null;
 
-    // --- СТАТУС ПОДКЛЮЧЕНИЯ ---
+    // СТАТУС ПОДКЛЮЧЕНИЯ
     socket.on('connect', () => {
       statusDot.classList.add('connected');
       statusText.textContent = 'ONLINE';
@@ -228,7 +225,7 @@
       statusText.textContent = 'OFFLINE';
     });
 
-    // --- CANVAS & ЧАСТИЦЫ ---
+    // CANVAS & ЧАСТИЦЫ
     let width, height, centerX, centerY;
     const MAX_PARTICLES = 50;
     const particles = [];
@@ -329,7 +326,7 @@
     }
     animateParticles();
 
-    // --- ЗВУК ---
+    // ЗВУК СЕКУНДОМЕРА
     function playStopwatchTickSound() {
       try {
         if (!audioCtx) {
@@ -388,7 +385,7 @@
       setTimeout(playStopwatchTickSound, 50);
     }
 
-    // --- СИНХРОНИЗИРОВАННАЯ ЛОГИКА ---
+    // СИНХРОНИЗИРОВАННАЯ ЛОГИКА
     function startLocalSpin(finalChar) {
       if (state === 'spinning') return;
 
@@ -439,19 +436,15 @@
       hintLabel.classList.remove('hidden');
     }
 
-    // --- ИВЕНТЫ СОКЕТОВ С СЕРВЕРА ---
-
-    // 1. Старт прокрутки для ВСЕХ
+    // СОБЫТИЯ ОТ СЕРВЕРА
     socket.on('spin_started', (data) => {
       startLocalSpin(data.finalChar);
     });
 
-    // 2. Сброс состояния для ВСЕХ
     socket.on('state_reset', () => {
       resetLocalState();
     });
 
-    // 3. Первичная синхронизация при открытии вкладки
     socket.on('sync_state', (serverState) => {
       if (serverState.status === 'stopped' && serverState.current_char) {
         state = 'stopped';
@@ -464,7 +457,7 @@
       }
     });
 
-    // --- ИНИЦИАЦИЯ СОБЫТИЙ КЛИЕНТОМ ---
+    // ИНИЦИАЦИЯ
     function emitSpinRequest() {
       if (state === 'idle' || state === 'stopped') {
         socket.emit('request_spin');
