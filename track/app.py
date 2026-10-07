@@ -3,7 +3,7 @@ import time
 from flask import Flask, render_template, send_from_directory
 from flask_socketio import SocketIO, emit
 
-app = Flask(__name__, template_folder='.')
+app = Flask(__name__, template_folder='.', static_folder='.')
 app.config['SECRET_KEY'] = 'karaoke_sync_secret'
 socketio = SocketIO(app, cors_allowed_origins="*")
 
@@ -15,7 +15,7 @@ audio_state = {
 }
 
 def get_synced_time():
-    """Вычисляет точное время трека с учетом задержки подключения"""
+    """Вычисляет реальное время трека для вновь зашедших пользователей"""
     if audio_state['is_playing']:
         elapsed = time.time() - audio_state['last_update']
         return audio_state['current_time'] + elapsed
@@ -31,6 +31,7 @@ def get_lyrics():
 
 @socketio.on('connect')
 def handle_connect():
+    """Передаёт синхронизированное состояние новому подключившемуся клиенту"""
     emit('sync_state', {
         'is_playing': audio_state['is_playing'],
         'current_time': get_synced_time()
@@ -70,6 +71,7 @@ def handle_reset():
     }, broadcast=True)
 
 if __name__ == '__main__':
-    # Render передает PORT через окружение; по умолчанию используем 10000
+    # Render автоматически передаёт переменную PORT (по умолчанию 10000)
     port = int(os.environ.get('PORT', 10000))
-    socketio.run(app, host='0.0.0.0', port=port)
+    # allow_unsafe_werkzeug=True отключает RuntimeError при запуске через python app.py
+    socketio.run(app, host='0.0.0.0', port=port, allow_unsafe_werkzeug=True)
