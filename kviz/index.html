@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Семейный ГОСТ: 20 лет выдержки</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,700;0,800;0,900;1,900&display=swap" rel="stylesheet">
+  
+  <!-- Socket.IO клиентская библиотека -->
+  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
+
+    body, html {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: 'Montserrat', sans-serif;
+      background-color: #020204;
+      color: #ffffff;
+    }
+
+    canvas#bgCanvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    /* Верхняя мини-панель */
+    .top-bar {
+      position: fixed;
+      top: 25px;
+      left: 30px;
+      right: 30px;
+      z-index: 30;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      pointer-events: auto;
+    }
+
+    .mini-btn {
+      background: rgba(15, 15, 25, 0.75);
+      border: 1px solid rgba(255, 215, 0, 0.5);
+      border-radius: 20px;
+      padding: 12px 26px;
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: #ffe082;
+      cursor: pointer;
+      backdrop-filter: blur(10px);
+      transition: all 0.25s ease;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .mini-btn:hover {
+      background: rgba(255, 215, 0, 0.25);
+      border-color: #ffd700;
+      color: #ffffff;
+      box-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+      transform: translateY(-2px);
+    }
+
+    .mini-btn.active-rules {
+      background: #ffd700;
+      color: #000000;
+      box-shadow: 0 0 25px rgba(255, 215, 0, 0.9);
+      border-color: #ffffff;
+    }
+
+    .mini-btn.reset-btn {
+      border-color: rgba(255, 85, 85, 0.5);
+      color: #ff8585;
+    }
+
+    .mini-btn.reset-btn:hover {
+      background: rgba(255, 85, 85, 0.25);
+      border-color: #ff4d4d;
+      color: #ffffff;
+      box-shadow: 0 0 20px rgba(255, 77, 77, 0.6);
+    }
+
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #ff4d4d;
+      display: inline-block;
+      margin-right: 8px;
+      box-shadow: 0 0 10px #ff4d4d;
+      transition: all 0.3s ease;
+    }
+
+    .status-dot.connected {
+      background: #00e676;
+      box-shadow: 0 0 10px #00e676;
+    }
+
+    .container {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 40px;
+    }
+
+    .screen {
+      position: absolute;
+      width: 100%;
+      max-width: 1300px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1), transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+      transform: scale(0.95);
+      pointer-events: none;
+    }
+
+    .screen.active {
+      opacity: 1;
+      visibility: visible;
+      transform: scale(1);
+      pointer-events: auto;
+    }
+
+    .rules-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 20;
+      background: rgba(3, 3, 8, 0.88);
+      backdrop-filter: blur(20px);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 40px;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.4s ease, visibility 0.4s ease;
+      pointer-events: none;
+    }
+
+    .rules-overlay.active {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+    }
+
+    h1.main-title {
+      font-size: 5.5rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      line-height: 1.05;
+      margin-bottom: 30px;
+      background: linear-gradient(135deg, #ffffff 0%, #fff176 40%, #ffb300 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 0 25px rgba(255, 179, 0, 0.8)) drop-shadow(0 10px 20px rgba(0,0,0,0.9));
+    }
+
+    .subtitle {
+      font-size: 2.2rem;
+      font-weight: 800;
+      line-height: 1.5;
+      max-width: 1050px;
+      margin-bottom: 50px;
+      color: #ffffff;
+      text-shadow: 0 4px 10px #000000, 0 0 30px rgba(0, 0, 0, 0.9), 0 0 20px rgba(255, 215, 0, 0.5);
+    }
+
+    .round-badge {
+      font-size: 6.5rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 5px;
+      background: linear-gradient(135deg, #ffffff, #ffd700, #ff8f00);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 0 35px rgba(255, 143, 0, 0.9)) drop-shadow(0 10px 25px rgba(0,0,0,0.9));
+      margin-bottom: 20px;
+    }
+
+    .round-title {
+      font-size: 3.8rem;
+      font-weight: 900;
+      color: #ffffff;
+      text-shadow: 0 5px 15px #000000, 0 0 40px rgba(255, 255, 255, 0.8), 0 0 20px rgba(255, 215, 0, 0.6);
+    }
+
+    .question-text {
+      font-size: 3rem;
+      font-weight: 900;
+      line-height: 1.4;
+      max-width: 1150px;
+      margin-bottom: 50px;
+      color: #ffffff;
+      text-shadow: 0 4px 12px #000000, 0 0 35px rgba(255, 255, 255, 0.8), 0 0 25px rgba(255, 179, 0, 0.5);
+    }
+
+    .options-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+      width: 100%;
+      max-width: 1250px;
+      margin-bottom: 45px;
+    }
+
+    .option-card {
+      background: rgba(10, 10, 18, 0.75);
+      border: 2px solid rgba(255, 215, 0, 0.45);
+      border-radius: 22px;
+      padding: 28px 32px;
+      font-size: 1.7rem;
+      font-weight: 800;
+      line-height: 1.4;
+      color: #ffffff;
+      text-align: left;
+      backdrop-filter: blur(16px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.9), inset 0 0 20px rgba(255, 215, 0, 0.15);
+      display: flex;
+      align-items: flex-start;
+      text-shadow: 0 2px 8px #000000, 0 0 15px rgba(255, 255, 255, 0.5);
+    }
+
+    .option-num {
+      font-weight: 900;
+      font-size: 2.4rem;
+      color: #ffd700;
+      margin-right: 22px;
+      text-shadow: 0 3px 10px #000000, 0 0 20px rgba(255, 215, 0, 0.9);
+      flex-shrink: 0;
+      line-height: 1;
+    }
+
+    .rules-list {
+      text-align: left;
+      max-width: 1000px;
+      margin-bottom: 40px;
+    }
+
+    .rule-item {
+      font-size: 2rem;
+      font-weight: 800;
+      margin-bottom: 25px;
+      line-height: 1.4;
+      color: #ffffff;
+      text-shadow: 0 3px 10px #000000, 0 0 20px rgba(255, 255, 255, 0.6);
+      display: flex;
+      align-items: center;
+    }
+
+    .rule-num {
+      font-weight: 900;
+      color: #ffd700;
+      font-size: 2.6rem;
+      margin-right: 25px;
+      text-shadow: 0 3px 10px #000000, 0 0 25px rgba(255, 215, 0, 0.9);
+    }
+
+    .nav-bar {
+      display: flex;
+      gap: 25px;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .glow-btn {
+      position: relative;
+      background: linear-gradient(135deg, #ffb300 0%, #ff6f00 50%, #e65100 100%);
+      border: 2px solid #ffe082;
+      border-radius: 60px;
+      padding: 22px 55px;
+      font-size: 1.65rem;
+      font-weight: 900;
+      font-family: inherit;
+      color: #ffffff;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      cursor: pointer;
+      box-shadow: 0 0 30px rgba(255, 143, 0, 0.8), 0 10px 25px rgba(0, 0, 0, 0.8), inset 0 2px 4px rgba(255, 255, 255, 0.6);
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      text-shadow: 0 2px 6px rgba(0,0,0,0.6);
+      overflow: hidden;
+    }
+
+    .glow-btn:hover {
+      background: linear-gradient(135deg, #ffc107 0%, #ff8f00 50%, #ff3d00 100%);
+      border-color: #ffffff;
+      box-shadow: 0 0 50px rgba(255, 179, 0, 1), 0 15px 35px rgba(0, 0, 0, 0.9), inset 0 2px 6px rgba(255, 255, 255, 0.9);
+      transform: scale(1.06) translateY(-3px);
+    }
+
+    .glow-btn:active {
+      transform: scale(0.98) translateY(1px);
+    }
+
+    .glow-btn.secondary {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.05) 100%);
+      border: 2px solid rgba(255, 255, 255, 0.5);
+      color: #ffffff;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.7), inset 0 1px 2px rgba(255, 255, 255, 0.3);
+      text-shadow: 0 2px 8px #000000;
+    }
+
+    .glow-btn.secondary:hover {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.1) 100%);
+      border-color: #ffffff;
+      box-shadow: 0 0 35px rgba(255, 255, 255, 0.6), 0 12px 30px rgba(0, 0, 0, 0.9);
+    }
+
+    .final-text {
+      font-size: 2.3rem;
+      font-weight: 800;
+      line-height: 1.6;
+      max-width: 1050px;
+      color: #ffffff;
+      text-shadow: 0 4px 12px #000000, 0 0 25px rgba(255, 255, 255, 0.6);
+      margin-bottom: 30px;
+    }
+
+    .highlight {
+      color: #ffd700;
+      font-weight: 900;
+      text-shadow: 0 3px 10px #000000, 0 0 25px rgba(255, 215, 0, 0.9);
+    }
+  </style>
+</head>
+<body>
+
+  <canvas id="bgCanvas"></canvas>
+
+  <div class="top-bar">
+    <button id="rules-btn" class="mini-btn" onclick="sendAction('toggle_rules')">
+      <span id="conn-dot" class="status-dot"></span>Правила
+    </button>
+    <button class="mini-btn reset-btn" onclick="sendAction('reset')">✕ Сброс</button>
+  </div>
+
+  <div id="rules-overlay" class="rules-overlay">
+    <h1 class="main-title" style="font-size: 3.8rem; margin-bottom: 35px;">Правила игры</h1>
+    <div class="rules-list">
+      <div class="rule-item"><span class="rule-num">1</span> На экране появляется бытовая ситуация из жизни нашей пары.</div>
+      <div class="rule-item"><span class="rule-num">2</span> Гости за столами выбирают один из 4 вариантов ответа.</div>
+      <div class="rule-item"><span class="rule-num">3</span> Голосуем всем залом и выкрикиваем самую правдоподобную версию!</div>
+      <div class="rule-item"><span class="rule-num">4</span> Константин и Татьяна выносят вердикт — как всё происходит НА САМОМ ДЕЛЕ.</div>
+    </div>
+  </div>
+
+  <div class="container">
+
+    <div id="screen-intro" class="screen active">
+      <h1 class="main-title">Семейный ГОСТ<br>20 лет выдержки</h1>
+      <p class="subtitle">
+        Друзья, 20 лет брака — это стадия высочайшего мастерства! Когда фраза «я тебя люблю» идеально звучит как «я оставил тебе последний кусок пиццы». Добро пожаловать на шоу Константина и Татьяны!
+      </p>
+      <button class="glow-btn" onclick="sendAction('go_to_screen', {screen: 'screen-rules'})">Узнать правила игры</button>
+    </div>
+
+    <div id="screen-rules" class="screen">
+      <h1 class="main-title" style="font-size: 3.8rem; margin-bottom: 35px;">Правила игры</h1>
+      <div class="rules-list">
+        <div class="rule-item"><span class="rule-num">1</span> На экране появляется бытовая ситуация из жизни нашей пары.</div>
+        <div class="rule-item"><span class="rule-num">2</span> Гости за столами выбирают один из 4 вариантов ответа.</div>
+        <div class="rule-item"><span class="rule-num">3</span> Голосуем всем залом и выкрикиваем самую правдоподобную версию!</div>
+        <div class="rule-item"><span class="rule-num">4</span> Константин и Татьяна выносят вердикт — как всё происходит НА САМОМ ДЕЛЕ.</div>
+      </div>
+      <div class="nav-bar">
+        <button class="glow-btn" onclick="sendAction('start_quiz')">Начать интерактив →</button>
+      </div>
+    </div>
+
+    <div id="screen-round-title" class="screen">
+      <div id="round-badge" class="round-badge">Раунд 1</div>
+      <div id="round-name" class="round-title">Синдром пустой полки</div>
+    </div>
+
+    <div id="screen-question" class="screen">
+      <div id="question-text" class="question-text"></div>
+      <div class="nav-bar">
+        <button class="glow-btn secondary" onclick="sendAction('prev_step')">← Предыдущий</button>
+        <button class="glow-btn" onclick="sendAction('show_options')">Узнать варианты →</button>
+      </div>
+    </div>
+
+    <div id="screen-options" class="screen">
+      <div class="options-grid">
+        <div class="option-card"><span class="option-num">1</span><span id="opt-1-text"></span></div>
+        <div class="option-card"><span class="option-num">2</span><span id="opt-2-text"></span></div>
+        <div class="option-card"><span class="option-num">3</span><span id="opt-3-text"></span></div>
+        <div class="option-card"><span class="option-num">4</span><span id="opt-4-text"></span></div>
+      </div>
+      <div class="nav-bar">
+        <button class="glow-btn secondary" onclick="sendAction('peek_question')">Показать вопрос</button>
+        <button class="glow-btn" onclick="sendAction('next_round')">Следующий раунд →</button>
+      </div>
+    </div>
+
+    <div id="screen-final" class="screen">
+      <h1 class="main-title" style="font-size: 4.5rem;">20 лет в одной лодке</h1>
+      <p class="final-text">
+        В этом квизе <span class="highlight">нет победителей и нет проигравших</span>. За эти 20 лет Константин и Татьяна научились понимать друг друга без слов и прощать любые мелкие заскоки!
+      </p>
+      <p class="final-text" style="font-size: 2rem; color: #ffe082;">
+        Идеальная семья — это умение вместе смеяться над любыми жизненными ситуациями. Поднимем бокалы за эту легендарную пару!
+      </p>
+      <div class="nav-bar" style="margin-top: 20px;">
+        <button class="glow-btn secondary" onclick="sendAction('reset')">В начало</button>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const quizData = [
+      {
+        roundNum: "Раунд 1",
+        title: "Синдром пустой полки",
+        question: "Константин открывает холодильник, смотрит ровно в центр и говорит: «А где майонез?». Реакция Татьяны?",
+        options: [
+          "Молча подходит, достает банку с первой полки и так же молча смотрит мужу в душу.",
+          "Звучит коронное из другой комнаты: «Посмотри глазами, а не руками!».",
+          "Константин закрывает и открывает дверцу еще три раза, надеясь, что майонез заспавнится.",
+          "Говорит: «Если я сейчас приду и найду его, я надену его тебе на голову!»."
+        ]
+      },
+      {
+        roundNum: "Раунд 2",
+        title: "Игры со временем",
+        question: "Татьяна произносит сакральное: «Я буду готова через 5 минут». Что в этот момент делает Константин?",
+        options: [
+          "Успевает посмотреть полсезона сериала, постареть и вырастить дерево.",
+          "Садится в коридоре на пуфик в куртке и ботинках, и начинает драматично потеть.",
+          "Идет заводить машину и сжигает полбака бензина в ожидании.",
+          "Он сам еще даже не нашел свои носки, так что эти «5 минут» его реально спасают!"
+        ]
+      },
+      {
+        roundNum: "Раунд 3",
+        title: "Навигационный коллапс",
+        question: "Совместная поездка в машине по незнакомому маршруту. Как работает семейный навигатор?",
+        options: [
+          "Татьяна уверенно говорит «поверни ТУДА», показывая рукой в абсолютно противоположную сторону.",
+          "Едут по Яндекс.Навигатору, но Константин знает, «где лучше срезать», и они встают в глухую пробку.",
+          "При скорости 40 км/ч Татьяна напряженно держится за ручку над дверью и жмет невидимую педаль тормоза.",
+          "Константин делает музыку в салоне тише, потому что так «лучше видно, куда парковаться»."
+        ]
+      },
+      {
+        roundNum: "Раунд 4",
+        title: "Великое перемирие",
+        question: "Случилась мелкая ссора из-за полнейшей ерунды. Как происходит примирение?",
+        options: [
+          "Кто-то из них просто молча скидывает другому смешной рилс в инсту.",
+          "Звучит универсальная лечебная фраза: «Будешь чай?» или «Иди есть!».",
+          "Ждут, пока дети или домашний питомец не сделают какую-то дичь, чтобы вместе над этим поржать.",
+          "Никто не извиняется. Утром оба делают вид, что у них коллективная амнезия."
+        ]
+      },
+      {
+        roundNum: "Раунд 5",
+        title: "Кулинарный пинг-понг",
+        question: "Ежедневный квест: «Что будем есть на ужин?». Как Константин и Татьяна решают этот вопрос?",
+        options: [
+          "«Не знаю, а ты что хочешь?» — игра, которая длится, пока не закроются все доставки в городе.",
+          "Едят то, что уже третий день смотрит на них из холодильника с немым укором.",
+          "Пока Татьяна выбирает между суши и пиццей, Константин уже сдался и пошел варить пельмени.",
+          "Константин ест то, что приготовил... в своих мечтах, пока ждал курьера."
+        ]
+      },
+      {
+        roundNum: "Раунд 6",
+        title: "Ремонтный апокалипсис",
+        question: "Совместный выбор обоев в строительном магазине. Чем заканчивается квест?",
+        options: [
+          "Татьяна выбирает цвет «пыльная роза», Константин видит просто «серый» и кивает, лишь бы быстрее уйти.",
+          "Чуть не развелись еще на парковке из-за того, кто как криво встал.",
+          "Купили шуруповерт, аромасвечи, коврик для ванны, а за чем приехали — забыли.",
+          "Константин включает режим «душного прораба» и начинает читать состав клея вслух."
+        ]
+      },
+      {
+        roundNum: "Раунд 7",
+        title: "Чемоданное настроение",
+        question: "Завтра вылет в отпуск. Как собираются чемоданы?",
+        options: [
+          "Татьяна собирается за неделю, Константин закидывает трусы и паспорт в рюкзак за час до такси.",
+          "Татьяна берет три вечерних платья на случай приема у английской королевы, а Константин — одни шорты на все случаи жизни.",
+          "Константин пытается закрыть чемодан своим весом, пока Татьяна докладывает туда «жизненно необходимый» фен.",
+          "Константин ходит по дому с багажными весами, чтобы не дай бог не переплатить за перевес в 200 грамм."
+        ]
+      }
+    ];
+
+    // Прямое подключение к бэкенду на Render
+    const RENDER_SERVER_URL = "https://kviz-gf12.onrender.com";
+    const socket = io(RENDER_SERVER_URL, {
+      transports: ['websocket', 'polling'],
+      reconnection: true
+    });
+
+    // Индикация успешного коннекта к серверу
+    const connDot = document.getElementById('conn-dot');
+    socket.on('connect', () => {
+      connDot.classList.add('connected');
+    });
+    socket.on('disconnect', () => {
+      connDot.classList.remove('connected');
+    });
+
+    function sendAction(type, extraData = {}) {
+      socket.emit('action', { type: type, ...extraData });
+    }
+
+    // Рендер состояния страницы
+    socket.on('state_update', function(state) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      const targetScreen = document.getElementById(state.screen);
+      if (targetScreen) targetScreen.classList.add('active');
+
+      const roundIdx = state.round;
+      if (quizData[roundIdx]) {
+        const data = quizData[roundIdx];
+        document.getElementById('round-badge').textContent = data.roundNum;
+        document.getElementById('round-name').textContent = data.title;
+        document.getElementById('question-text').textContent = data.question;
+
+        document.getElementById('opt-1-text').textContent = data.options[0];
+        document.getElementById('opt-2-text').textContent = data.options[1];
+        document.getElementById('opt-3-text').textContent = data.options[2];
+        document.getElementById('opt-4-text').textContent = data.options[3];
+      }
+
+      const overlay = document.getElementById('rules-overlay');
+      const rulesBtn = document.getElementById('rules-btn');
+      if (state.rules_overlay) {
+        overlay.classList.add('active');
+        rulesBtn.classList.add('active-rules');
+      } else {
+        overlay.classList.remove('active');
+        rulesBtn.classList.remove('active-rules');
+      }
+    });
+
+    /* Canvas: Космический туннель */
+    const canvas = document.getElementById('bgCanvas');
+    const ctx = canvas.getContext('2d');
+
+    let width, height;
+    function resizeCanvas() {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    const starCount = 350;
+    const stars = [];
+
+    for (let i = 0; i < starCount; i++) {
+      stars.push({
+        x: (Math.random() - 0.5) * 2000,
+        y: (Math.random() - 0.5) * 2000,
+        z: Math.random() * 1000 + 1,
+        size: Math.random() * 2 + 1,
+        color: Math.random() > 0.35 ? '#ffd700' : (Math.random() > 0.5 ? '#ff9100' : '#ffffff')
+      });
+    }
+
+    function animateTunnel() {
+      ctx.clearRect(0, 0, width, height);
+
+      const cx = width / 2;
+      const cy = height / 2;
+
+      const glowGrad = ctx.createRadialGradient(cx, cy, 10, cx, cy, Math.max(width, height) * 0.6);
+      glowGrad.addColorStop(0, 'rgba(255, 179, 0, 0.25)');
+      glowGrad.addColorStop(0.4, 'rgba(255, 111, 0, 0.08)');
+      glowGrad.addColorStop(1, 'rgba(2, 2, 4, 0)');
+      ctx.fillStyle = glowGrad;
+      ctx.fillRect(0, 0, width, height);
+
+      for (let star of stars) {
+        star.z -= 4.5;
+        if (star.z <= 1) {
+          star.z = 1000;
+          star.x = (Math.random() - 0.5) * 2000;
+          star.y = (Math.random() - 0.5) * 2000;
+        }
+
+        const k = 550 / star.z;
+        const px = star.x * k + cx;
+        const py = star.y * k + cy;
+
+        if (px >= -50 && px <= width + 50 && py >= -50 && py <= height + 50) {
+          const alpha = Math.min(1, (1000 - star.z) / 800);
+          const size = Math.max(0.8, star.size * k * 0.6);
+
+          ctx.save();
+          ctx.globalAlpha = alpha;
+          ctx.beginPath();
+          ctx.arc(px, py, size, 0, Math.PI * 2);
+          ctx.fillStyle = star.color;
+          ctx.shadowColor = star.color;
+          ctx.shadowBlur = Math.min(20, 8 * k);
+          ctx.fill();
+          ctx.restore();
+        }
+      }
+
+      requestAnimationFrame(animateTunnel);
+    }
+
+    animateTunnel();
+  </script>
+</body>
+</html>
