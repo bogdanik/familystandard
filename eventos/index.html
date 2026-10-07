@@ -209,7 +209,7 @@
     <!-- НИЖНЯЯ ПАНЕЛЬ (ТОЛЬКО ДЛЯ ВЕДУЩЕГО / HOST) -->
     <div id="host-bottom-bar">
         <div class="control-row">
-            <button class="btn-action gold" onclick="openModal('launcher-modal')">ИНТЕРАКТИВ</button>
+            <button class="btn-action gold" onclick="openLauncherModal()">ИНТЕРАКТИВ</button>
             <button class="btn-action red" onclick="handleCloseClick()">ЗАКРЫТЬ</button>
             <button class="btn-action gold" onclick="toggleScenario()" id="btn-scenario" style="flex: 0.8;">📜 СЦЕНАРИЙ</button>
             <button class="btn-action gold" onclick="socket.emit('add_timer_15s')" style="flex: 0.6;">+15 СЕК</button>
@@ -227,7 +227,7 @@
         <div class="modal-card">
             <h3 style="color: var(--gold-light);">Интерактивы</h3>
             <div id="modules-list-box"></div>
-            <button class="mod-btn" style="border-color: var(--gold-main); background: rgba(245,158,11,0.15); margin-top: 12px;" onclick="openEditEventModal()">✏️️ Настройки праздника</button>
+            <button class="mod-btn" style="border-color: var(--gold-main); background: rgba(245,158,11,0.15); margin-top: 12px;" onclick="openEditEventModal()">✏ Настройки праздника</button>
             <button onclick="closeModal('launcher-modal')" style="background: transparent; color: #94a3b8; border: none; margin-top: 15px; font-weight: bold; cursor: pointer;">Отмена</button>
         </div>
     </div>
@@ -370,8 +370,6 @@
             for (let k = 0; k < halfBars; k++) {
                 let val = 0;
                 if (analyser && dataArray && isAudioActive) {
-                    // k = 0 — Басовые частоты (рисуются на самых крайних боках)
-                    // k = halfBars - 1 — Высокие частоты (сходятся в центре)
                     let sampleIndex = Math.floor(k * (dataArray.length * 0.65) / halfBars);
                     val = dataArray[sampleIndex] || 0;
                 }
@@ -389,11 +387,9 @@
 
                 eqCtx.fillStyle = gradient;
 
-                // Левая сторона: от левого края (x = 0) к центру
                 let xLeft = k * barWidth;
                 eqCtx.fillRect(xLeft + 1, eqCanvas.height - h, barWidth - 2, h);
 
-                // Правая сторона: от правого края (x = width) к центру
                 let xRight = eqCanvas.width - (k + 1) * barWidth;
                 eqCtx.fillRect(xRight + 1, eqCanvas.height - h, barWidth - 2, h);
             }
@@ -771,6 +767,12 @@
                 socket.emit('update_event_info', { event_title: title, event_subtitle: subtitle, scenario_url: scenario });
             }
             closeModal('edit-event-modal');
+        }
+
+        // Запрос свежего списка интерактивов строго в момент клика по кнопке
+        function openLauncherModal() {
+            socket.emit('get_modules');
+            openModal('launcher-modal');
         }
 
         function openModal(id) { document.getElementById(id).style.display = 'flex'; }
