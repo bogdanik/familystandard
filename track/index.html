@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>20 лет вместе — Синхронное Караоке</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      background-color: #030307;
+      color: #ffffff;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: center;
+    }
+
+    /* Холст графики */
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    /* Еле заметная кнопка сброса сессии справа вверху */
+    .reset-btn {
+      position: fixed;
+      top: 18px;
+      right: 20px;
+      z-index: 100;
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: rgba(255, 255, 255, 0.25);
+      font-size: 1.2rem;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.25s ease;
+    }
+    .reset-btn:hover {
+      background: rgba(236, 72, 153, 0.2);
+      color: #ffffff;
+      border-color: rgba(236, 72, 153, 0.6);
+      box-shadow: 0 0 12px rgba(236, 72, 153, 0.5);
+    }
+
+    /* Текст караоке по центру снизу */
+    .lyrics-container {
+      position: relative;
+      z-index: 10;
+      width: 88%;
+      margin-bottom: 110px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      pointer-events: none;
+    }
+
+    .active-lyric {
+      font-size: 4.2rem;
+      font-weight: 900;
+      line-height: 1.25;
+      letter-spacing: -1px;
+      color: #ffffff;
+      text-shadow: 0 0 35px rgba(139, 92, 246, 0.95),
+                   0 0 70px rgba(6, 182, 212, 0.6);
+      opacity: 0;
+      transform: scale(0.92) translateY(15px);
+      transition: opacity 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+                  transform 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+                  filter 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+      filter: blur(10px);
+      max-width: 1150px;
+    }
+
+    .active-lyric.show {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+      filter: blur(0px);
+    }
+
+    /* Панель управления */
+    .controls {
+      position: fixed;
+      z-index: 20;
+      bottom: 25px;
+      background: rgba(10, 10, 18, 0.65);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      padding: 10px 24px;
+      border-radius: 30px;
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.7);
+    }
+
+    button.play-btn {
+      background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
+      border: none;
+      color: #ffffff;
+      padding: 10px 24px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      border-radius: 20px;
+      cursor: pointer;
+      box-shadow: 0 4px 20px rgba(139, 92, 246, 0.4);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    button.play-btn:hover {
+      transform: scale(1.04);
+      box-shadow: 0 6px 25px rgba(236, 72, 153, 0.6);
+    }
+
+    .time-display {
+      font-family: 'SF Mono', Monaco, Consolas, monospace;
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #06b6d4;
+      min-width: 125px;
+      text-align: center;
+      letter-spacing: 0.5px;
+    }
+  </style>
+  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+</head>
+<body>
+
+  <!-- Кнопка сброса активности -->
+  <button class="reset-btn" id="resetBtn" title="Сбросить сессию">&#10005;</button>
+
+  <canvas id="visualizer"></canvas>
+
+  <div class="lyrics-container">
+    <div id="activeLyric" class="active-lyric"></div>
+  </div>
+
+  <div class="controls">
+    <button class="play-btn" id="playBtn">Play / Pause</button>
+    <div class="time-display" id="timeDisplay">0,00 с</div>
+  </div>
+
+  <audio id="audioTrack" src="https://pub-372ba5f717cf4a8694558f47682d65d9.r2.dev/track.mp3" crossorigin="anonymous"></audio>
+
+  <script>
+    const socket = io();
+    let lyricsData = [];
+
+    // Загрузка словаря таймингов из внешнего JSON
+    fetch('/lyrics.json')
+      .then(res => res.json())
+      .then(data => { lyricsData = data; });
+
+    const audio = document.getElementById('audioTrack');
+    const playBtn = document.getElementById('playBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const timeDisplay = document.getElementById('timeDisplay');
+    const activeLyricEl = document.getElementById('activeLyric');
+    const canvas = document.getElementById('visualizer');
+    const ctx = canvas.getContext('2d');
+
+    let audioCtx, analyser, source, dataArray;
+    let isAudioSetup = false;
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    function setupAudio() {
+      if (isAudioSetup) return;
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      analyser = audioCtx.createAnalyser();
+      source = audioCtx.createMediaElementSource(audio);
+      source.connect(analyser);
+      analyser.connect(audioCtx.destination);
+      analyser.fftSize = 128;
+      dataArray = new Uint8Array(analyser.frequencyBinCount);
+      isAudioSetup = true;
+    }
+
+    // Обработка синка от сервера (для всех пользователей)
+    socket.on('sync_state', (state) => {
+      setupAudio();
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+
+      const timeDiff = Math.abs(audio.currentTime - state.current_time);
+      if (timeDiff > 0.25) {
+        audio.currentTime = state.current_time;
+      }
+
+      if (state.is_playing) {
+        audio.play().catch(() => {});
+      } else {
+        audio.pause();
+      }
+    });
+
+    // Нажатие на кнопки управления
+    playBtn.addEventListener('click', () => {
+      setupAudio();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+
+      if (audio.paused) {
+        socket.emit('play_audio', { current_time: audio.currentTime });
+      } else {
+        socket.emit('pause_audio', { current_time: audio.currentTime });
+      }
+    });
+
+    resetBtn.addEventListener('click', () => {
+      socket.emit('reset_audio');
+    });
+
+    // Синхронизация отображения текста
+    let currentActiveIndex = -1;
+    audio.addEventListener('timeupdate', () => {
+      const curTime = audio.currentTime;
+
+      let activeIndex = -1;
+      for (let i = 0; i < lyricsData.length; i++) {
+        if (curTime >= lyricsData[i].time) {
+          activeIndex = i;
+        } else {
+          break;
+        }
+      }
+
+      if (activeIndex !== currentActiveIndex) {
+        if (activeIndex !== -1) {
+          activeLyricEl.classList.remove('show');
+          setTimeout(() => {
+            activeLyricEl.innerText = lyricsData[activeIndex].text;
+            activeLyricEl.classList.add('show');
+          }, 100);
+        } else {
+          activeLyricEl.classList.remove('show');
+        }
+        currentActiveIndex = activeIndex;
+      }
+    });
+
+    // Отрисовка 3D сцена + Эквалайзер
+    const t = (1.0 + Math.sqrt(5.0)) / 2.0;
+    const baseVertices = [
+      [-1, t, 0], [1, t, 0], [-1, -t, 0], [1, -t, 0],
+      [0, -1, t], [0, 1, t], [0, -1, -t], [0, 1, -t],
+      [t, 0, -1], [t, 0, 1], [-t, 0, -1], [-t, 0, 1]
+    ].map(v => {
+      const len = Math.hypot(...v);
+      return [v[0]/len, v[1]/len, v[2]/len];
+    });
+
+    const edges = [
+      [0,11],[0,5],[0,1],[0,7],[0,10],
+      [1,5],[1,9],[1,8],[1,7],
+      [2,10],[2,11],[2,4],[2,6],
+      [3,9],[3,4],[3,6],[3,8],
+      [4,5],[4,9],[5,11],[6,7],[6,10],[7,8],[8,9],[10,11]
+    ];
+
+    let rotX = 0, rotY = 0, rotZ = 0, time = 0;
+
+    function render() {
+      requestAnimationFrame(render);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      time += 0.015;
+
+      const secondsFormatted = audio.currentTime.toFixed(2).replace('.', ',');
+      timeDisplay.innerText = `${secondsFormatted} с`;
+
+      let bassEnergy = 0, midEnergy = 0, highEnergy = 0;
+
+      if (isAudioSetup) {
+        analyser.getByteFrequencyData(dataArray);
+        let bassSum = 0, midSum = 0, highSum = 0;
+        for (let i = 0; i < 8; i++) bassSum += dataArray[i];
+        for (let i = 8; i < 24; i++) midSum += dataArray[i];
+        for (let i = 24; i < 48; i++) highSum += dataArray[i];
+
+        bassEnergy = (bassSum / 8) / 255;
+        midEnergy = (midSum / 16) / 255;
+        highEnergy = (highSum / 24) / 255;
+      }
+
+      const centerX = canvas.width / 2;
+      const centerY = canvas.height * 0.40;
+
+      // 1. Анимированная 3D-дорожка
+      ctx.save();
+      const horizonY = centerY + 110;
+      const roadSpeed = (time * (0.8 + bassEnergy * 0.6)) % 1;
+
+      const gridLines = 24;
+      for (let i = -gridLines; i <= gridLines; i++) {
+        const x1 = centerX + i * 14;
+        const x2 = centerX + i * 125;
+        const rayAlpha = Math.max(0.04, bassEnergy * 0.35);
+
+        ctx.strokeStyle = `rgba(139, 92, 246, ${rayAlpha})`;
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(x1, horizonY);
+        ctx.lineTo(x2, canvas.height);
+        ctx.stroke();
+      }
+
+      const numHorizLines = 16;
+      for (let j = 0; j < numHorizLines; j++) {
+        const progress = (j + roadSpeed) / numHorizLines;
+        const y = horizonY + Math.pow(progress, 2.4) * (canvas.height - horizonY);
+        const wave = Math.sin(time * 5 + j * 0.6) * (bassEnergy * 18);
+        const lineAlpha = progress * Math.max(0.12, bassEnergy * 0.6);
+
+        ctx.strokeStyle = `rgba(6, 182, 212, ${lineAlpha})`;
+        ctx.lineWidth = 1 + progress * 1.5;
+        ctx.beginPath();
+        ctx.moveTo(0, y + wave);
+        ctx.lineTo(canvas.width, y + wave);
+        ctx.stroke();
+      }
+      ctx.restore();
+
+      // 2. Вращение 3D-фигуры
+      rotX += 0.004 + bassEnergy * 0.02;
+      rotY += 0.007 + midEnergy * 0.02;
+      rotZ += 0.002;
+
+      const baseRadius = Math.min(canvas.width, canvas.height) * 0.22;
+      const dynamicRadius = baseRadius * (1 + bassEnergy * 0.3);
+
+      const overallAudioPower = (bassEnergy * 0.6 + midEnergy * 0.3 + highEnergy * 0.1);
+      const figureBrightness = Math.max(0.05, Math.pow(overallAudioPower, 1.3));
+
+      const projectedVertices = baseVertices.map(([vx, vy, vz], idx) => {
+        const deform = 1 + Math.sin(time * 6 + idx) * (highEnergy * 0.25);
+        let x = vx * dynamicRadius * deform;
+        let y = vy * dynamicRadius * deform;
+        let z = vz * dynamicRadius * deform;
+
+        let x1 = x * Math.cos(rotY) + z * Math.sin(rotY);
+        let z1 = -x * Math.sin(rotY) + z * Math.cos(rotY);
+        let y2 = y * Math.cos(rotX) - z1 * Math.sin(rotX);
+        let z2 = y * Math.sin(rotX) + z1 * Math.cos(rotX);
+        let x3 = x1 * Math.cos(rotZ) - y2 * Math.sin(rotZ);
+        let y3 = x1 * Math.sin(rotZ) + y2 * Math.cos(rotZ);
+
+        const fov = 600;
+        const scale = fov / (fov + z2);
+        return {
+          x: centerX + x3 * scale,
+          y: centerY + y3 * scale,
+          z: z2,
+          scale: scale
+        };
+      });
+
+      edges.forEach(([i, j]) => {
+        const p1 = projectedVertices[i];
+        const p2 = projectedVertices[j];
+        const lineAlpha = Math.min(1.0, figureBrightness * 1.8);
+
+        ctx.save();
+        ctx.beginPath();
+        ctx.moveTo(p1.x, p1.y);
+        ctx.lineTo(p2.x, p2.y);
+
+        const strokeGlow = ctx.createLinearGradient(p1.x, p1.y, p2.x, p2.y);
+        strokeGlow.addColorStop(0, `rgba(139, 92, 246, ${lineAlpha})`);
+        strokeGlow.addColorStop(0.5, `rgba(6, 182, 212, ${lineAlpha})`);
+        strokeGlow.addColorStop(1, `rgba(236, 72, 153, ${lineAlpha})`);
+
+        ctx.strokeStyle = strokeGlow;
+        ctx.lineWidth = 1.2 + figureBrightness * 3.5;
+        ctx.shadowBlur = figureBrightness * 25;
+        ctx.shadowColor = 'rgba(139, 92, 246, 0.9)';
+        ctx.stroke();
+        ctx.restore();
+      });
+
+      projectedVertices.forEach(p => {
+        const nodeAlpha = Math.min(1.0, figureBrightness * 2.0);
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, (2 + highEnergy * 3.5) * p.scale, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255, 255, 255, ${nodeAlpha})`;
+        ctx.shadowBlur = figureBrightness * 20;
+        ctx.shadowColor = '#06b6d4';
+        ctx.fill();
+        ctx.restore();
+      });
+
+      // 3. Эквалайзер по бокам
+      if (isAudioSetup) {
+        const barCount = 28;
+        const barHeight = canvas.height / barCount;
+        const maxBarWidth = canvas.width * 0.105;
+
+        for (let i = 0; i < barCount; i++) {
+          const rawVal = dataArray[i] / 255;
+          const scaleGain = 0.65 + (i / barCount) * 0.35;
+          const val = Math.min(0.82, rawVal * scaleGain);
+
+          const width = val * maxBarWidth;
+          const y = canvas.height - (i + 0.5) * barHeight;
+
+          ctx.save();
+          ctx.fillStyle = `hsla(${260 + i * 3.5}, 90%, 65%, ${0.2 + val * 0.65})`;
+          ctx.shadowBlur = val * 8;
+          ctx.shadowColor = `hsl(${260 + i * 3.5}, 90%, 60%)`;
+
+          ctx.beginPath();
+          ctx.roundRect(10, y - barHeight * 0.3, Math.max(4, width), barHeight * 0.6, 4);
+          ctx.fill();
+
+          ctx.beginPath();
+          ctx.roundRect(canvas.width - 10 - Math.max(4, width), y - barHeight * 0.3, Math.max(4, width), barHeight * 0.6, 4);
+          ctx.fill();
+          ctx.restore();
+        }
+      }
+    }
+
+    render();
+  </script>
+</body>
+</html>
