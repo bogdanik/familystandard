@@ -21,16 +21,18 @@ config = load_config()
 
 def save_config():
     try:
+        # Защита: перед сохранением читаем актуальный файл с диска, чтобы сохранить список modules нетронутым
+        current_disk_config = load_config()
         config_to_save = {
-            "_description": config.get("_description", ""),
+            "_description": current_disk_config.get("_description", config.get("_description", "")),
             "event_title": system_state.get("event_title", ""),
             "event_subtitle": system_state.get("event_subtitle", ""),
             "host_name": system_state.get("host_name", ""),
-            "host_pin": config.get("host_pin", ""),
-            "screen_pin": config.get("screen_pin", ""),
+            "host_pin": current_disk_config.get("host_pin", config.get("host_pin", "")),
+            "screen_pin": current_disk_config.get("screen_pin", config.get("screen_pin", "")),
             "cdn_base_url": system_state.get("cdn_base_url", ""),
             "scenario_url": system_state.get("scenario_url", ""),
-            "modules": config.get("modules", [])
+            "modules": current_disk_config.get("modules", config.get("modules", []))
         }
         with open('event_data.json', 'w', encoding='utf-8') as f:
             json.dump(config_to_save, f, ensure_ascii=False, indent=2)
@@ -84,7 +86,14 @@ def serve_file(filename):
 def handle_connect():
     clean_timer_state()
     emit('state_update', system_state)
-    emit('modules_config_update', config.get('modules', []))
+    fresh_config = load_config()
+    emit('modules_config_update', fresh_config.get('modules', []))
+
+# Новый точечный обработчик: запрашивает свежие интерактивы из event_data.json строго при клике
+@socketio.on('get_modules')
+def handle_get_modules():
+    fresh_config = load_config()
+    emit('modules_config_update', fresh_config.get('modules', []))
 
 @socketio.on('login')
 def handle_login(data):
