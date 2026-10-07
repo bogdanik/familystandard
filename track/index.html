@@ -33,6 +33,33 @@
       pointer-events: none;
     }
 
+    /* Кнопка выключения звука слева вверху */
+    .mute-btn {
+      position: fixed;
+      top: 18px;
+      left: 20px;
+      z-index: 100;
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: rgba(255, 255, 255, 0.35);
+      font-size: 1.1rem;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.25s ease;
+      user-select: none;
+    }
+    .mute-btn:hover, .mute-btn.is-muted {
+      background: rgba(6, 182, 212, 0.2);
+      color: #ffffff;
+      border-color: rgba(6, 182, 212, 0.6);
+      box-shadow: 0 0 12px rgba(6, 182, 212, 0.5);
+    }
+
     /* Еле заметная кнопка сброса сессии справа вверху */
     .reset-btn {
       position: fixed;
@@ -43,14 +70,15 @@
       border: 1px solid rgba(255, 255, 255, 0.1);
       color: rgba(255, 255, 255, 0.25);
       font-size: 1.2rem;
-      width: 32px;
-      height: 32px;
+      width: 34px;
+      height: 34px;
       border-radius: 50%;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
       transition: all 0.25s ease;
+      user-select: none;
     }
     .reset-btn:hover {
       background: rgba(236, 72, 153, 0.2);
@@ -123,6 +151,7 @@
       cursor: pointer;
       box-shadow: 0 4px 20px rgba(139, 92, 246, 0.4);
       transition: transform 0.2s, box-shadow 0.2s;
+      user-select: none;
     }
 
     button.play-btn:hover {
@@ -144,8 +173,11 @@
 </head>
 <body>
 
-  <!-- Кнопка сброса активности -->
-  <button class="reset-btn" id="resetBtn" title="Сбросить сессию">&#10005;</button>
+  <!-- Кнопка выключения звука (слева) -->
+  <button class="mute-btn" id="muteBtn" title="Включить / Выключить звук">🔊</button>
+
+  <!-- Кнопка сброса активности (3 клика) -->
+  <button class="reset-btn" id="resetBtn" title="Сбросить сессию (3 клика)">&#10005;</button>
 
   <canvas id="visualizer"></canvas>
 
@@ -154,22 +186,21 @@
   </div>
 
   <div class="controls">
-    <button class="play-btn" id="playBtn">Play / Pause</button>
+    <button class="play-btn" id="playBtn">Play / Pause (x3)</button>
     <div class="time-display" id="timeDisplay">0,00 с</div>
   </div>
 
   <audio id="audioTrack" src="https://pub-372ba5f717cf4a8694558f47682d65d9.r2.dev/track.mp3" crossorigin="anonymous"></audio>
 
   <script>
-    // Прямой URL бэкенда на Render
     const RENDER_SERVER = 'https://track-1lh5.onrender.com';
 
-    // Подключение Socket.IO строго к сервису на Render
+    // Подключение Socket.IO
     const socket = io(RENDER_SERVER, {
       transports: ['websocket', 'polling']
     });
 
-    // Резервный встроенный массив с вашими таймингами
+    // Массив с таймингами
     let lyricsData = [
       { time: 3, text: "Я долго думал, с чего начать" },
       { time: 9.8, text: "долго думал о чем написать." },
@@ -217,7 +248,7 @@
       { time: 173.8, text: "веру зажгли !" }
     ];
 
-    // Попытка асинхронно обновить тайминги с Render
+    // Тихо пробуем обновить тайминги
     fetch(`${RENDER_SERVER}/lyrics.json`)
       .then(res => res.ok ? res.json() : null)
       .then(data => { if (data) lyricsData = data; })
@@ -226,6 +257,7 @@
     const audio = document.getElementById('audioTrack');
     const playBtn = document.getElementById('playBtn');
     const resetBtn = document.getElementById('resetBtn');
+    const muteBtn = document.getElementById('muteBtn');
     const timeDisplay = document.getElementById('timeDisplay');
     const activeLyricEl = document.getElementById('activeLyric');
     const canvas = document.getElementById('visualizer');
@@ -233,6 +265,7 @@
 
     let audioCtx, analyser, source, dataArray;
     let isAudioSetup = false;
+    let iInitiatedPlay = false; // Флаг: нажали ли мы сами Play
 
     function resizeCanvas() {
       canvas.width = window.innerWidth;
@@ -243,21 +276,59 @@
 
     function setupAudio() {
       if (isAudioSetup) return;
-      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      analyser = audioCtx.createAnalyser();
-      source = audioCtx.createMediaElementSource(audio);
-      source.connect(analyser);
-      analyser.connect(audioCtx.destination);
-      analyser.fftSize = 128;
-      dataArray = new Uint8Array(analyser.frequencyBinCount);
-      isAudioSetup = true;
+      try {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        analyser = audioCtx.createAnalyser();
+        source = audioCtx.createMediaElementSource(audio);
+        source.connect(analyser);
+        analyser.connect(audioCtx.destination);
+        analyser.fftSize = 128;
+        dataArray = new Uint8Array(analyser.frequencyBinCount);
+        isAudioSetup = true;
+      } catch (e) {}
     }
 
-    // Обработка синка от сервера Render для всех открытых вкладок
+    function updateMuteUI() {
+      if (audio.muted) {
+        muteBtn.innerText = '🔇';
+        muteBtn.classList.add('is-muted');
+      } else {
+        muteBtn.innerText = '🔊';
+        muteBtn.classList.remove('is-muted');
+      }
+    }
+
+    // Ручное переключение Mute
+    muteBtn.addEventListener('click', () => {
+      setupAudio();
+      audio.muted = !audio.muted;
+      updateMuteUI();
+    });
+
+    // Функция обработки тройного клика
+    function addTripleClickListener(element, callback) {
+      let clickCount = 0;
+      let clickTimer = null;
+      element.addEventListener('click', () => {
+        clickCount++;
+        if (clickCount === 3) {
+          clearTimeout(clickTimer);
+          clickCount = 0;
+          callback();
+        } else {
+          clearTimeout(clickTimer);
+          clickTimer = setTimeout(() => {
+            clickCount = 0;
+          }, 800); // Окно 800 мс для 3 кликов
+        }
+      });
+    }
+
+    // Синхронизация по WebSocket от сервера
     socket.on('sync_state', (state) => {
       setupAudio();
       if (audioCtx && audioCtx.state === 'suspended') {
-        audioCtx.resume();
+        audioCtx.resume().catch(() => {});
       }
 
       const timeDiff = Math.abs(audio.currentTime - state.current_time);
@@ -266,29 +337,45 @@
       }
 
       if (state.is_playing) {
+        // Если трек запустили НЕ мы, включаем звук у себя
+        if (!iInitiatedPlay) {
+          audio.muted = false;
+          updateMuteUI();
+        }
+        iInitiatedPlay = false;
+
         audio.play().catch(() => {});
       } else {
         audio.pause();
+        iInitiatedPlay = false;
       }
     });
 
-    // Нажатие на Play / Pause транслирует сигнал на Render
-    playBtn.addEventListener('click', () => {
+    // Тройной клик на Play / Pause
+    addTripleClickListener(playBtn, () => {
       setupAudio();
-      if (audioCtx.state === 'suspended') audioCtx.resume();
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume().catch(() => {});
+      }
 
       if (audio.paused) {
+        // Автоматически глушим звук на устройстве того, кто нажал Play
+        iInitiatedPlay = true;
+        audio.muted = true;
+        updateMuteUI();
+
         socket.emit('play_audio', { current_time: audio.currentTime });
       } else {
         socket.emit('pause_audio', { current_time: audio.currentTime });
       }
     });
 
-    resetBtn.addEventListener('click', () => {
+    // Тройной клик на Сброс
+    addTripleClickListener(resetBtn, () => {
       socket.emit('reset_audio');
     });
 
-    // Синхронизация отображения текста
+    // Отображение караоке текста
     let currentActiveIndex = -1;
     audio.addEventListener('timeupdate', () => {
       const curTime = audio.currentTime;
@@ -347,7 +434,7 @@
 
       let bassEnergy = 0, midEnergy = 0, highEnergy = 0;
 
-      if (isAudioSetup) {
+      if (isAudioSetup && dataArray) {
         analyser.getByteFrequencyData(dataArray);
         let bassSum = 0, midSum = 0, highSum = 0;
         for (let i = 0; i < 8; i++) bassSum += dataArray[i];
@@ -467,7 +554,7 @@
       });
 
       // 3. Эквалайзер по бокам
-      if (isAudioSetup) {
+      if (isAudioSetup && dataArray) {
         const barCount = 28;
         const barHeight = canvas.height / barCount;
         const maxBarWidth = canvas.width * 0.105;
