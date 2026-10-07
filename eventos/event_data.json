@@ -1,5 +1,5 @@
 {
-  "_description": "ЦЕНТРАЛЬНЫЙ КОНФИГУРАТОР МЕРОПРИЯТИЯ (EVENT OS HOST DATA). Используется для хранения названия и типа праздника, имени ведущего (host_name), паролей доступа пульта (host_pin) и главного экрана (screen_pin), динамической ссылки на облачный CDN ресурсов, ссылки на сценарий (scenario_url) и списка подключаемых интерактивов.",
+  "_description": "ЦЕНТРАЛЬНЫЙ КОНФИГУРАТОР МЕРОПРИЯТИЯ...",
   "event_title": "ЧТО ПРАЗДНУЕМ СЕГОДНЯ ?",
   "event_subtitle": "ЖЕЛАЕМ СЧАСТЬЯ УСПЕХОВ И ЛЮБВИ!",
   "host_name": "Богдан",
@@ -9,14 +9,24 @@
   "scenario_url": "https://familystandard.uz/scenario/",
   "modules": [
     {
-      "id": "quiz",
-      "name": "ai-m",
+      "id": "aim",
+      "name": "AIM",
       "path": "https://familystandard.uz/aim/"
     },
     {
-      "id": "bunker",
+      "id": "photo",
       "name": "фото",
       "path": "https://familystandard.uz/pic/"
+    },
+    {
+      "id": "quiz_game",
+      "name": "Викторина",
+      "path": "https://familystandard.uz/quiz/"
+    },
+    {
+      "id": "custom_site",
+      "name": "Внешний сайт",
+      "path": "https://example.com/"
     }
   ]
 }
