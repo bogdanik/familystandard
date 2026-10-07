@@ -2,33 +2,38 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DEMO: Сценарий Фарфоровой Свадьбы — Татьяна и Константин</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Сценарий: Татьяна и Константин — 20 лет вместе</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-dark: #0a0d12;
-      --card-bg: rgba(18, 24, 36, 0.9);
-      --accent-gold: #e2c055;
-      --accent-gold-light: #f7e7a9;
-      --text-main: #f1f5f9;
-      --text-muted: #94a3b8;
-      --border-color: rgba(226, 192, 85, 0.3);
-      --shadow-gold: rgba(226, 192, 85, 0.15);
+      --bg-main: #0a0d14;
+      --card-bg: #131924;
+      --card-inner: #1a2232;
+      --gold-primary: #f59e0b;
+      --gold-bright: #fbbf24;
+      --gold-light: #fef08a;
+      --text-main: #ffffff;
+      --text-sub: #cbd5e1;
+      --border-accent: #3b82f6;
+      --border-gold: #d97706;
+      --border-card: rgba(245, 158, 11, 0.35);
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
+    
     body {
-      background-color: var(--bg-dark);
+      background-color: var(--bg-main);
       color: var(--text-main);
-      font-family: 'Montserrat', sans-serif;
-      line-height: 1.6;
-      position: relative;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      line-height: 1.5;
       min-height: 100vh;
       overflow-x: hidden;
+      padding-bottom: 50px;
+      -webkit-font-smoothing: antialiased;
     }
 
-    /* Particles Canvas */
+    /* Particle Canvas Background */
     #canvas-particles {
       position: fixed;
       top: 0; left: 0;
@@ -37,263 +42,232 @@
       pointer-events: none;
     }
 
-    /* Modal Overlay */
-    .demo-modal-overlay {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(5, 7, 10, 0.95);
-      backdrop-filter: blur(12px);
-      z-index: 1000;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      transition: opacity 0.5s ease, visibility 0.5s ease;
-    }
-    .demo-modal-overlay.hidden {
-      opacity: 0;
-      visibility: hidden;
-    }
-    .demo-card {
-      background: linear-gradient(145deg, #161c27, #0d1118);
-      border: 1px solid var(--accent-gold);
-      box-shadow: 0 0 50px rgba(226, 192, 85, 0.25);
-      border-radius: 20px;
-      padding: 40px;
-      max-width: 520px;
-      width: 90%;
-      text-align: center;
-    }
-    .demo-icon {
-      font-size: 3.5rem;
-      color: var(--accent-gold);
-      margin-bottom: 15px;
-    }
-    .demo-card h2 {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 2.2rem;
-      color: var(--accent-gold-light);
-      margin-bottom: 10px;
-    }
-    .demo-card p {
-      color: var(--text-muted);
-      font-size: 0.95rem;
-      margin-bottom: 25px;
-    }
-    .btn-enter {
-      background: linear-gradient(135deg, #e2c055, #b89327);
-      color: #000;
-      font-weight: 600;
-      font-size: 1rem;
-      padding: 14px 32px;
-      border: none;
-      border-radius: 30px;
-      cursor: pointer;
-      box-shadow: 0 5px 20px rgba(226, 192, 85, 0.4);
-      transition: all 0.3s ease;
-    }
-    .btn-enter:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 25px rgba(226, 192, 85, 0.6);
-    }
-
-    /* Top Sticky Status Bar */
-    .top-demo-bar {
-      background: linear-gradient(90deg, rgba(226, 192, 85, 0.15), rgba(226, 192, 85, 0.05));
-      border-bottom: 1px solid var(--border-color);
-      color: var(--accent-gold-light);
-      text-align: center;
-      padding: 8px;
-      font-size: 0.85rem;
-      letter-spacing: 1px;
-      position: relative;
-      z-index: 10;
-      text-transform: uppercase;
-    }
-
-    /* Main Container */
     .app-container {
       position: relative;
       z-index: 1;
-      max-width: 900px;
+      max-width: 820px;
       margin: 0 auto;
-      padding: 30px 20px 60px;
+      padding: 16px;
     }
 
-    header {
+    /* Top Navigation Header */
+    .sticky-controls {
+      position: sticky;
+      top: 10px;
+      z-index: 100;
+      background: rgba(19, 25, 36, 0.98);
+      border: 2px solid var(--gold-primary);
+      border-radius: 16px;
+      padding: 12px 16px;
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.8), 0 0 15px rgba(245, 158, 11, 0.2);
+    }
+
+    .btn-step {
+      background: linear-gradient(135deg, var(--gold-primary), #b45309);
+      border: none;
+      color: #000000;
+      padding: 12px 18px;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      flex: 1;
+      max-width: 190px;
       text-align: center;
-      padding-bottom: 30px;
-      border-bottom: 1px solid var(--border-color);
-      margin-bottom: 35px;
+      box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+    }
+    .btn-step:hover:not(:disabled) {
+      transform: translateY(-1px);
+      background: linear-gradient(135deg, var(--gold-bright), var(--gold-primary));
+      box-shadow: 0 6px 16px rgba(245, 158, 11, 0.5);
+    }
+    .btn-step:disabled {
+      opacity: 0.25;
+      cursor: not-allowed;
+      box-shadow: none;
+      background: #334155;
+      color: #94a3b8;
+    }
+
+    .step-counter {
+      font-size: 1rem;
+      font-weight: 900;
+      color: var(--gold-bright);
+      text-align: center;
+      white-space: nowrap;
+      letter-spacing: 0.5px;
+    }
+
+    /* Header Section */
+    header {
+      background: linear-gradient(180deg, #1e293b, #0f172a);
+      border: 2px solid rgba(245, 158, 11, 0.4);
+      border-radius: 20px;
+      padding: 24px 20px;
+      text-align: center;
+      margin-bottom: 24px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
     }
     header h1 {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 3rem;
-      color: var(--accent-gold);
-      letter-spacing: 1px;
+      font-size: 2.2rem;
+      font-weight: 900;
+      color: var(--gold-bright);
+      letter-spacing: -0.5px;
+      line-height: 1.2;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.5);
     }
     header .subtitle {
-      color: var(--text-muted);
-      font-size: 1.05rem;
+      color: var(--text-main);
+      font-size: 1.1rem;
+      font-weight: 700;
       margin-top: 8px;
     }
-    header .meta-info {
-      display: inline-flex;
-      gap: 15px;
-      margin-top: 15px;
-      background: rgba(255, 255, 255, 0.03);
-      padding: 6px 18px;
+    header .info-pills {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 16px;
+    }
+    .pill {
+      background: #0f172a;
+      border: 1.5px solid var(--gold-primary);
+      padding: 6px 14px;
       border-radius: 20px;
-      border: 1px solid rgba(255, 255, 255, 0.08);
       font-size: 0.85rem;
-      color: var(--accent-gold-light);
+      font-weight: 800;
+      color: var(--gold-light);
     }
 
-    /* Cards & Single Block View */
-    .block-card {
+    /* Cards */
+    .step-card {
       background: var(--card-bg);
-      border: 1px solid var(--border-color);
-      border-radius: 16px;
-      padding: 30px;
-      margin-bottom: 25px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-      display: none; /* Controlled by JS step pagination */
-      animation: fadeIn 0.4s ease-in-out;
+      border: 2px solid var(--border-card);
+      border-radius: 20px;
+      padding: 24px;
+      margin-bottom: 24px;
+      display: none;
+      box-shadow: 0 12px 32px rgba(0,0,0,0.6);
+      animation: fadeIn 0.25s ease-out;
     }
-    .block-card.active {
+    .step-card.active {
       display: block;
     }
 
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
+      from { opacity: 0; transform: translateY(6px); }
       to { opacity: 1; transform: translateY(0); }
     }
 
-    .block-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+    .card-header {
+      border-bottom: 2px solid rgba(245, 158, 11, 0.25);
+      padding-bottom: 14px;
       margin-bottom: 20px;
-      border-bottom: 1px solid rgba(226, 192, 85, 0.15);
-      padding-bottom: 12px;
     }
-    .block-title-group h3 {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1.8rem;
-      color: var(--accent-gold-light);
+    .card-title {
+      font-size: 1.7rem;
+      font-weight: 900;
+      color: var(--gold-bright);
+      line-height: 1.2;
     }
-    .time-badge {
-      background: var(--accent-gold);
-      color: #000;
-      font-weight: 700;
-      padding: 6px 14px;
-      border-radius: 20px;
-      font-size: 0.85rem;
+    .card-time {
+      font-size: 1.05rem;
+      color: #60a5fa;
+      font-weight: 800;
+      margin-top: 6px;
     }
 
-    .badge-tag {
-      display: inline-block;
-      font-size: 0.75rem;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      padding: 4px 10px;
-      border-radius: 6px;
-      margin-bottom: 15px;
-      font-weight: 600;
-    }
-    .tag-food { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
-    .tag-interactive { background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); }
-    .tag-dj { background: rgba(234, 179, 8, 0.15); color: #facc15; border: 1px solid rgba(234, 179, 8, 0.3); }
-    .tag-speech { background: rgba(168, 85, 247, 0.15); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.3); }
-    .tag-cake { background: rgba(236, 72, 153, 0.15); color: #f472b6; border: 1px solid rgba(236, 72, 153, 0.3); }
-
-    .content-box {
-      margin-bottom: 15px;
-      font-size: 0.95rem;
-      color: var(--text-main);
-    }
-    .content-box strong { color: var(--accent-gold-light); }
-
-    .vibe-box {
-      background: rgba(226, 192, 85, 0.06);
-      border-left: 3px solid var(--accent-gold);
-      padding: 12px 16px;
-      border-radius: 0 8px 8px 0;
-      margin: 15px 0;
-      font-size: 0.9rem;
-    }
-    .vibe-box h5 { color: var(--accent-gold); margin-bottom: 4px; }
-
-    /* Navigation Controls */
-    .controls-bar {
+    .tag-row {
       display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 30px;
-      padding-top: 20px;
-      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 20px;
     }
-    .btn-nav {
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid var(--border-color);
-      color: var(--text-main);
-      padding: 10px 20px;
+    .tag {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 6px 12px;
       border-radius: 8px;
-      cursor: pointer;
-      font-size: 0.9rem;
-      transition: all 0.2s ease;
+      font-weight: 900;
     }
-    .btn-nav:hover:not(:disabled) {
-      background: var(--accent-gold);
-      color: #000;
+    .tag-speech { background: #581c87; color: #f0abfc; border: 1.5px solid #c084fc; }
+    .tag-interactive { background: #1e3a8a; color: #93c5fd; border: 1.5px solid #60a5fa; }
+    .tag-dj { background: #713f12; color: #fde047; border: 1.5px solid #facc15; }
+    .tag-food { background: #14532d; color: #86efac; border: 1.5px solid #4ade80; }
+
+    .content-block {
+      margin-bottom: 20px;
+      font-size: 1rem;
+    }
+    .content-block h4 {
+      color: var(--gold-light);
+      font-size: 1.15rem;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+    .content-block p {
+      color: var(--text-sub);
       font-weight: 600;
-    }
-    .btn-nav:disabled {
-      opacity: 0.3;
-      cursor: not-allowed;
-    }
-    .step-indicator {
-      font-size: 0.85rem;
-      color: var(--text-muted);
+      margin-bottom: 10px;
     }
 
-    /* Feedback & Questions Box */
-    .feedback-section {
-      margin-top: 50px;
-      background: rgba(255, 255, 255, 0.02);
-      border: 1px dashed var(--border-color);
+    .speech-script {
+      background: var(--card-inner);
+      border-left: 5px solid var(--gold-primary);
+      border-radius: 0 12px 12px 0;
+      padding: 16px 18px;
+      margin: 14px 0;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #f8fafc;
+      line-height: 1.6;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .guest-question-box {
+      background: var(--card-inner);
+      border: 1.5px solid rgba(245, 158, 11, 0.4);
       border-radius: 12px;
-      padding: 25px;
+      padding: 16px;
+      margin-top: 12px;
     }
-    .feedback-section h4 {
-      color: var(--accent-gold-light);
-      margin-bottom: 12px;
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1.5rem;
+    .guest-name {
+      color: var(--gold-bright);
+      font-size: 1.1rem;
+      font-weight: 800;
+      display: block;
+      margin-bottom: 6px;
     }
-    .feedback-list {
-      list-style: none;
-      font-size: 0.9rem;
-      color: var(--text-muted);
-    }
-    .feedback-list li {
-      margin-bottom: 8px;
-      padding-left: 20px;
-      position: relative;
-    }
-    .feedback-list li::before {
-      content: '?';
-      position: absolute;
-      left: 0;
-      color: var(--accent-gold);
-      font-weight: bold;
+    .guest-question {
+      color: #f1f5f9;
+      font-size: 0.98rem;
+      font-weight: 700;
+      line-height: 1.5;
     }
 
     footer {
       text-align: center;
-      margin-top: 40px;
-      color: var(--text-muted);
-      font-size: 0.8rem;
+      padding: 24px 0 10px;
+      color: var(--text-sub);
+      font-size: 0.85rem;
+      font-weight: 700;
+      border-top: 1px solid rgba(245, 158, 11, 0.2);
+      margin-top: 32px;
+    }
+
+    @media (max-width: 600px) {
+      header h1 { font-size: 1.7rem; }
+      .card-title { font-size: 1.4rem; }
+      .btn-step { padding: 10px 12px; font-size: 0.85rem; }
+      .step-card { padding: 16px; }
+      .guest-question-box { padding: 12px; }
     }
   </style>
 </head>
@@ -301,215 +275,203 @@
 
   <canvas id="canvas-particles"></canvas>
 
-  <!-- Top Status Bar -->
-  <div class="top-demo-bar">
-    ⚡ ДЕМО-ВЕРСИЯ СЦЕНАРИЯ | На согласовании у Татьяны и Константина
-  </div>
-
-  <!-- Modal Overlay -->
-  <div class="demo-modal-overlay" id="demoModal">
-    <div class="demo-card">
-      <div class="demo-icon">💍</div>
-      <h2>Татьяна & Константин</h2>
-      <p>Проект сценария вечера (Фарфоровая свадьба — 20 лет)<br>Пошаговая демо-версия для согласования тайминга и программы.</p>
-      <button class="btn-enter" onclick="closeDemoModal()">Открыть сценарий</button>
-    </div>
-  </div>
-
   <div class="app-container">
+
+    <!-- Top Sticky Controls -->
+    <div class="sticky-controls">
+      <button class="btn-step" id="prevBtn" onclick="changeStep(-1)">Предыдущий этап</button>
+      <span class="step-counter" id="stepCounter">Этап 1 из 6</span>
+      <button class="btn-step" id="nextBtn" onclick="changeStep(1)">Следующий этап</button>
+    </div>
+
     <header>
-      <h1>Татьяна & Константин</h1>
-      <div class="subtitle">Сценарий праздничного вечера (20 лет вместе)</div>
-      <div class="meta-info">
-        <span>👥 45 гостей</span>
-        <span>⏱️ 3.5 – 4 часа</span>
-        <span>📍 Зал банкета</span>
+      <h1>Татьяна и Константин</h1>
+      <div class="subtitle">Фарфоровая свадьба — 20 лет вместе</div>
+      <div class="info-pills">
+        <span class="pill">45 гостей</span>
+        <span class="pill">Сбор: 17:30 – 18:00</span>
+        <span class="pill">Формат: Свободный вечер</span>
       </div>
     </header>
 
-    <!-- Block 1 -->
-    <div class="block-card active">
-      <div class="block-header">
-        <div class="block-title-group">
-          <h3>Блок 1: Сбор гостей и Велком</h3>
+    <!-- STEP 1 -->
+    <div class="step-card active">
+      <div class="card-header">
+        <div class="card-title">Этап 1: Сбор гостей и Велком</div>
+        <div class="card-time">Тайминг: 17:30 – 18:00</div>
+      </div>
+      <div class="tag-row">
+        <span class="tag tag-dj">Сет Диджея</span>
+        <span class="tag tag-food">Свободная подача</span>
+      </div>
+
+      <div class="content-block">
+        <h4>Атмосфера и работа ведущего</h4>
+        <p>Сбор гостей, свободное общение, фотосессия. Ведущий встречает приходящих, помогает комфортно расположиться старшему поколению. На столах накрыты холодные закуски и напитки. Подача горячих блюд происходит в свободном графике по готовности и запросам гостей.</p>
+      </div>
+
+      <div class="content-block">
+        <h4>Музыкальное сопровождение</h4>
+        <p>Фоновый сет диджея: Mellow Lounge, Smooth Jazz, стильные обработанные версии популярной музыки.</p>
+      </div>
+    </div>
+
+    <!-- STEP 2 -->
+    <div class="step-card">
+      <div class="card-header">
+        <div class="card-title">Этап 2: Торжественное открытие и Слова Родителям</div>
+        <div class="card-time">Тайминг: 18:00 – 18:50</div>
+      </div>
+      <div class="tag-row">
+        <span class="tag tag-speech">Приветственная речь</span>
+        <span class="tag tag-speech">Поздравления</span>
+      </div>
+
+      <div class="content-block">
+        <h4>Приветственное слово ведущего</h4>
+        <div class="speech-script">
+          «Добрый вечер, дорогие гости! Двадцать лет. Фарфоровая свадьба. Что такое двадцать лет совместной жизни? Это не просто цифра в календаре. Это тысячи прожитых вместе дней, сотни семейных традиций, общий юмор, пройденные испытания и, самое главное, умение беречь друг друга с той же нежностью, с какой хранят ценнейший фарфор. Сегодня у нас нет строгих регламентов. Это свободный праздник близких людей. Сегодня работает формат свободного микрофона: каждый, кто захочет поделиться теплом, сможет это сделать без какого-либо принуждения. Поздравляем Татьяну и Константина!»
         </div>
-        <span class="time-badge">17:30 – 18:00 (30 мин)</span>
       </div>
-      <span class="badge-tag tag-dj">Блок ДИДЖЕЯ</span>
-      <span class="badge-tag tag-food">Подача: Аперитив</span>
 
-      <div class="content-box">
-        <p><strong>Атмосфера:</strong> Гости собираются, знакомятся, делают фотографии в фотозоне. Ведущий уделяет особое внимание старшему поколению (70+), помогая комфортно расположиться.</p>
-      </div>
-      <div class="content-box">
-        <p><strong>Музыкальный сет диджея:</strong> Легкий Lounge, Smooth Jazz, стильные современные ремиксы на хиты 80-90-х годов.</p>
-      </div>
-      <div class="content-box">
-        <p><strong>Гастрономия:</strong> На столах накрыты холодные закуски, напитки и фруктовые сеты.</p>
-      </div>
-    </div>
+      <div class="content-block">
+        <h4>Блок поздравлений родителей</h4>
+        <p>Ведущий аккуратно приглашает к микрофону старшее поколение, задавая легкий вводный вопрос перед речью.</p>
 
-    <!-- Block 2 -->
-    <div class="block-card">
-      <div class="block-header">
-        <div class="block-title-group">
-          <h3>Блок 2: Открытие вечера и Тост Родителей</h3>
+        <div class="guest-question-box">
+          <span class="guest-name">Людмила Владимировна и Виталий Николаевич (Родители Татьяны)</span>
+          <p class="guest-question">Вопрос от ведущего: «Расскажите, каким вы помните тот день 20 лет назад, когда Татьяна впервые представила вам Константина? Было ли сразу понятно, что это союз на десятилетия?»</p>
         </div>
-        <span class="time-badge">18:00 – 18:50 (50 мин)</span>
-      </div>
-      <span class="badge-tag tag-speech">Блок ВЕДУЩЕГО & ПОЗДРАВЛЕНИЙ</span>
-      <span class="badge-tag tag-food">18:35 — Первое горячее блюдо</span>
 
-      <div class="content-box">
-        <p><strong>18:00 – 18:20 | Вступительный аккорд:</strong> Ведущий задает теплый, праздничный вайб. Первый объединяющий тост за 20-летний фарфоровый рубеж пары.</p>
-      </div>
-      <div class="content-box">
-        <p><strong>18:20 – 18:35 | Поздравление родителей:</strong></p>
-        <ul>
-          <li>Родители Татьяны: <strong>Людмила Владимировна и Виталий Николаевич</strong></li>
-          <li>Мама Константина: <strong>Раиса Константиновна</strong></li>
-        </ul>
-      </div>
-
-      <div class="vibe-box">
-        <h5>💡 Подводка ведущего (Рекомендация):</h5>
-        <p>Перед передачей микрофона ведущий создает душевно-юмористический настрой, задавая вопрос: <em>«Помните ли вы тот день 20 лет назад, когда Костя впервые переступил порог дома в качестве жениха?»</em></p>
-      </div>
-
-      <div class="content-box">
-        <p><strong>18:35 – 18:50 | Подача первого горячего:</strong> Гастрономическая пауза под легкий фоновый сет от диджея.</p>
-      </div>
-    </div>
-
-    <!-- Block 3 -->
-    <div class="block-card">
-      <div class="block-header">
-        <div class="block-title-group">
-          <h3>Блок 3: Ближайшие родные & Интерактив №1</h3>
+        <div class="guest-question-box">
+          <span class="guest-name">Раиса Константиновна (Мама Константина)</span>
+          <p class="guest-question">Вопрос от ведущего: «Какая черта характера вашего сына, по вашему мнению, стала главным залогом того, что их семья с Татьяной такая крепкая?»</p>
         </div>
-        <span class="time-badge">18:50 – 19:40 (50 мин)</span>
-      </div>
-      <span class="badge-tag tag-speech">Поздравления</span>
-      <span class="badge-tag tag-interactive">15-20 мин Интерактив</span>
-
-      <div class="content-box">
-        <p><strong>18:50 – 19:15 | Поздравление близких родственников:</strong></p>
-        <ul>
-          <li>Брат Татьяны: <strong>Сергей с супругой Натальей</strong></li>
-          <li>Тётя Константина: <strong>Ирина Николаевна</strong></li>
-          <li>Сестра Константина: <strong>Светлана</strong></li>
-        </ul>
-      </div>
-
-      <div class="content-box">
-        <p><strong>19:15 – 19:35 | Интерактивный блок №1 (15–20 минут):</strong> Первое общее развлечение для гостей за столом (мультимедийный или легкий текстовый интерактив, объединяющий возраст 40-60 и молодежь до 25).</p>
-      </div>
-
-      <div class="content-box">
-        <p><strong>19:35 – 19:40 | Музыкальная отбивка:</strong> Диджей плавно подводит гостей к танцевальному перерыву.</p>
       </div>
     </div>
 
-    <!-- Block 4 -->
-    <div class="block-card">
-      <div class="block-header">
-        <div class="block-title-group">
-          <h3>Блок 4: Второе горячее & Диджейский сет</h3>
+    <!-- STEP 3 -->
+    <div class="step-card">
+      <div class="card-header">
+        <div class="card-title">Этап 3: Родственники и Интерактив «Нейромузыка»</div>
+        <div class="card-time">Тайминг: 18:50 – 19:40</div>
+      </div>
+      <div class="tag-row">
+        <span class="tag tag-speech">Семья</span>
+        <span class="tag tag-interactive">Интерактив 1: Нейромузыка</span>
+      </div>
+
+      <div class="content-block">
+        <h4>Поздравления близких родственников</h4>
+
+        <div class="guest-question-box">
+          <span class="guest-name">Сергей и Наталья (Брат Татьяны с супругой)</span>
+          <p class="guest-question">Вопрос от ведущего: «Сергей, как брат, вспомните забавный или самый яркий момент из жизни Татьяны и Кости, когда они только начинали строить совместный быт?»</p>
         </div>
-        <span class="time-badge">19:40 – 20:10 (30 мин)</span>
-      </div>
-      <span class="badge-tag tag-food">19:40 — Второе горячее блюдо</span>
-      <span class="badge-tag tag-dj">Танцевальный Сет №1</span>
 
-      <div class="content-box">
-        <p><strong>19:40 – 20:00 | Подача второго горячего блюда:</strong> Основная горячая подача. Гости наслаждаются кухней и общением.</p>
-      </div>
-      <div class="content-box">
-        <p><strong>20:00 – 20:10 | Танцевальная пауза:</strong> Первый динамичный танцевальный блок от диджея (хиты 80-90-х вперемешку с ритмичной современной музыкой).</p>
-      </div>
-    </div>
-
-    <!-- Block 5 -->
-    <div class="block-card">
-      <div class="block-header">
-        <div class="block-title-group">
-          <h3>Блок 5: Поздравления друзей & Интерактив №2</h3>
+        <div class="guest-question-box">
+          <span class="guest-name">Ирина Николаевна (Тётя Константина) и Светлана (Сестра Константина)</span>
+          <p class="guest-question">Вопрос от ведущего: «Что для вашей большой семьи всегда означал дом Татьяны и Константина?»</p>
         </div>
-        <span class="time-badge">20:10 – 21:00 (50 мин)</span>
-      </div>
-      <span class="badge-tag tag-speech">Блок Друзей</span>
-      <span class="badge-tag tag-interactive">15-20 мин Интерактив</span>
-      <span class="badge-tag tag-dj">Диджей Сет №2</span>
-
-      <div class="content-box">
-        <p><strong>20:10 – 20:30 | Блок близких друзей:</strong></p>
-        <ul>
-          <li><strong>Роман и Ольга</strong></li>
-          <li><strong>Жанна и Александр</strong></li>
-          <li><strong>Лидия и Юрий</strong></li>
-        </ul>
       </div>
 
-      <div class="vibe-box">
-        <h5>💡 Подводка ведущего:</h5>
-        <p>Интересный вопрос друзьям: <em>«Какое самое запоминающееся совместное событие или путешествие с Константином и Татьяной вы помните за эти 20 лет?»</em></p>
-      </div>
-
-      <div class="content-box">
-        <p><strong>20:30 – 20:50 | Интерактивный блок №2 (15–20 минут):</strong> Второй активный/музыкальный интерактив от ведущего с участием гостей и виновников торжества.</p>
-      </div>
-
-      <div class="content-box">
-        <p><strong>20:50 – 21:00 | Диджейский сет:</strong> Яркий танцевальный блок перед кульминацией.</p>
+      <div class="content-block">
+        <h4>Интерактивный блок №1: «Нейромузыка» (15–20 минут)</h4>
+        <p>Музыкально-технологичный интерактив, построенный на прослушивании и угадывании уникальных персонализированных аудио-треков о паре, сгенерированных нейросетью. Подходит для аудитории всех возрастов.</p>
       </div>
     </div>
 
-    <!-- Block 6 -->
-    <div class="block-card">
-      <div class="block-header">
-        <div class="block-title-group">
-          <h3>Блок 6: Торт, Ответное слово & Финал</h3>
+    <!-- STEP 4 -->
+    <div class="step-card">
+      <div class="card-header">
+        <div class="card-title">Этап 4: Танцевальная пауза & Диджейский сет №1</div>
+        <div class="card-time">Тайминг: 19:40 – 20:10</div>
+      </div>
+      <div class="tag-row">
+        <span class="tag tag-dj">Диджей Сет</span>
+        <span class="tag tag-food">Свободная подача блюд</span>
+      </div>
+
+      <div class="content-block">
+        <h4>Первый танцевальный блок</h4>
+        <p>Время активного отдыха гостей, свободного общения и заказа горячих блюд. Диджей строит сет на стыке эпох: золотые хиты для гостей 40-60 лет с плавной интеграцией современных ритмов для молодежной группы до 25 лет.</p>
+      </div>
+    </div>
+
+    <!-- STEP 5 -->
+    <div class="step-card">
+      <div class="card-header">
+        <div class="card-title">Этап 5: Блок Друзей & Интерактив «Фарфоровый Квиз»</div>
+        <div class="card-time">Тайминг: 20:10 – 21:00</div>
+      </div>
+      <div class="tag-row">
+        <span class="tag tag-speech">Друзья</span>
+        <span class="tag tag-interactive">Интерактив 2: Квиз</span>
+      </div>
+
+      <div class="content-block">
+        <h4>Блок поздравлений друзей (Свободный микрофон)</h4>
+
+        <div class="guest-question-box">
+          <span class="guest-name">Роман и Ольга</span>
+          <p class="guest-question">Вопрос от ведущего: «Вы знаете эту пару много лет. Поделитесь, в чем секрет их гостеприимства и как они изменились за эти 20 лет?»</p>
         </div>
-        <span class="time-badge">21:00 – 22:00 (60 мин)</span>
-      </div>
-      <span class="badge-tag tag-cake">21:00 — Подача Торта</span>
-      <span class="badge-tag tag-speech">Финал</span>
 
-      <div class="content-box">
-        <p><strong>21:00 – 21:20 | Торжественный вынос торта:</strong> Красивая музыкальная и световая подача праздничного торта. Чайная и кофейная пауза.</p>
+        <div class="guest-question-box">
+          <span class="guest-name">Жанна и Александр</span>
+          <p class="guest-question">Вопрос от ведущего: «Какая совместная поездка или вечер с Таней и Костей запомнились вам больше всего?»</p>
+        </div>
+
+        <div class="guest-question-box">
+          <span class="guest-name">Лидия и Юрий</span>
+          <p class="guest-question">Вопрос от ведущего: «Каким одним словом вы бы охарактеризовали союз Татьяны и Константина?»</p>
+        </div>
+
+        <div class="guest-question-box">
+          <span class="guest-name">Друг Константин</span>
+          <p class="guest-question">Вопрос от ведущего: «Константин, как тёзка главного виновника торжества и его близкий друг, расскажи, каково это — иметь в друзьях человека с таким же именем и в чем вы с ним наиболее похожи?»</p>
+        </div>
       </div>
-      <div class="content-box">
-        <p><strong>21:20 – 21:35 | Ответное слово юбиляров:</strong> Татьяна и Константин благодарят родителей, родных и друзей за этот вечер.</p>
-      </div>
-      <div class="content-box">
-        <p><strong>21:35 – 22:00 | Общее фото & Финальный диджейский сет:</strong> Памятное фото со всеми 45 гостями, завершающий танцевальный блок.</p>
+
+      <div class="content-block">
+        <h4>Интерактивный блок №2: «Фарфоровый Квиз» (15–20 минут)</h4>
+        <p>Юмористическая викторина с вопросами о 20-летней истории союза Татьяны и Константина, курьезных моментах и забавных фактах из их жизни. Гости отвечают по командам или индивидуально.</p>
       </div>
     </div>
 
-    <!-- Navigation Controls -->
-    <div class="controls-bar">
-      <button class="btn-nav" id="prevBtn" onclick="changeStep(-1)">← Предыдущий блок</button>
-      <span class="step-indicator" id="stepIndicator">Блок 1 из 6</span>
-      <button class="btn-nav" id="nextBtn" onclick="changeStep(1)">Следующий блок →</button>
-    </div>
+    <!-- STEP 6 -->
+    <div class="step-card">
+      <div class="card-header">
+        <div class="card-title">Этап 6: Интерактив «Символы» & Финальный танцевальный сет</div>
+        <div class="card-time">Тайминг: 21:00 – 22:00</div>
+      </div>
+      <div class="tag-row">
+        <span class="tag tag-interactive">Интерактив 3: Символы</span>
+        <span class="tag tag-dj">Финал и Фото</span>
+      </div>
 
-    <!-- Feedback Questions for Couple -->
-    <div class="feedback-section">
-      <h4> Вопросы на уточнение для Татьяны и Константина:</h4>
-      <ul class="feedback-list">
-        <li>Удобно ли предложенное время подачи горячих блюд (18:35 и 19:40)?</li>
-        <li>Подходит ли очередность поздравлений (Родители → Родственники → Друзья)?</li>
-        <li>Есть ли особые музыкальные пожелания для диджейских сетов?</li>
-      </ul>
+      <div class="content-block">
+        <h4>Интерактивный блок №3: Танцевальный интерактив «Символы» (15–20 минут)</h4>
+        <p>Динамичный танцевальный интерактив, объединяющий всех гостей на площадке через жесты, ритмические движения и музыкальные символы разных десятилетий.</p>
+      </div>
+
+      <div class="content-block">
+        <h4>Ответное слово пары и Общее фото</h4>
+        <p>Татьяна и Константин берут микрофон для финального благодарственного слова всем пришедшим близким. Завершающая совместная фотография со всеми 45 гостями.</p>
+      </div>
+
+      <div class="content-block">
+        <h4>Финальный танцевальный блок</h4>
+        <p>Завершающий музыкальный сет от диджея, свободные танцы и завершение вечера.</p>
+      </div>
     </div>
 
     <footer>
-      Family Standard Event OS | Демо-версия сценария вечера
+      Family Standard Event OS | Сценарий праздничного вечера
     </footer>
   </div>
 
   <script>
-    // Particle Animation
     const canvas = document.getElementById('canvas-particles');
     const ctx = canvas.getContext('2d');
     let particles = [];
@@ -526,10 +488,10 @@
       reset() {
         this.x = Math.random() * canvas.width;
         this.y = Math.random() * canvas.height;
-        this.size = Math.random() * 2 + 0.5;
-        this.speedX = (Math.random() - 0.5) * 0.3;
-        this.speedY = -Math.random() * 0.4 - 0.1;
-        this.alpha = Math.random() * 0.5 + 0.1;
+        this.size = Math.random() * 2.5 + 0.8;
+        this.speedX = (Math.random() - 0.5) * 0.2;
+        this.speedY = -Math.random() * 0.3 - 0.1;
+        this.alpha = Math.random() * 0.5 + 0.15;
       }
       update() {
         this.x += this.speedX;
@@ -537,14 +499,14 @@
         if (this.y < 0) { this.reset(); this.y = canvas.height; }
       }
       draw() {
-        ctx.fillStyle = `rgba(226, 192, 85, ${this.alpha})`;
+        ctx.fillStyle = `rgba(245, 158, 11, ${this.alpha})`;
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
         ctx.fill();
       }
     }
 
-    for (let i = 0; i < 50; i++) particles.push(new Particle());
+    for (let i = 0; i < 45; i++) particles.push(new Particle());
 
     function animate() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -553,33 +515,28 @@
     }
     animate();
 
-    // Modal Control
-    function closeDemoModal() {
-      document.getElementById('demoModal').classList.add('hidden');
-    }
-
-    // Step Pagination Logic
     let currentStep = 0;
-    const cards = document.querySelectorAll('.block-card');
+    const cards = document.querySelectorAll('.step-card');
     const totalSteps = cards.length;
 
-    function updateStepView() {
+    function updateView() {
       cards.forEach((card, index) => {
         card.classList.toggle('active', index === currentStep);
       });
-      document.getElementById('stepIndicator').innerText = `Блок ${currentStep + 1} из ${totalSteps}`;
+      document.getElementById('stepCounter').innerText = `Этап ${currentStep + 1} из ${totalSteps}`;
       document.getElementById('prevBtn').disabled = currentStep === 0;
       document.getElementById('nextBtn').disabled = currentStep === totalSteps - 1;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    function changeStep(direction) {
-      currentStep += direction;
+    function changeStep(dir) {
+      currentStep += dir;
       if (currentStep < 0) currentStep = 0;
       if (currentStep >= totalSteps) currentStep = totalSteps - 1;
-      updateStepView();
+      updateView();
     }
 
-    updateStepView();
+    updateView();
   </script>
 </body>
 </html>
