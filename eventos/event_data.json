@@ -19,6 +19,11 @@
       "path": "https://familystandard.uz/pic/"
     },
     {
+      "id": "kviz_game",
+      "name": "Квиз",
+      "path": "https://familystandard.uz/kviz/"
+    },
+    {
       "id": "quiz_game",
       "name": "Песня",
       "path": "https://familystandard.uz/track/"
