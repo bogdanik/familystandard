@@ -15,7 +15,7 @@ audio_state = {
 }
 
 def get_synced_time():
-    """Вычисляет текущее реальное время звучания трека для вновь зашедших"""
+    """Вычисляет точное время трека с учетом задержки подключения"""
     if audio_state['is_playing']:
         elapsed = time.time() - audio_state['last_update']
         return audio_state['current_time'] + elapsed
@@ -31,7 +31,6 @@ def get_lyrics():
 
 @socketio.on('connect')
 def handle_connect():
-    """Когда любой клиент заходит на сайт, передаем ему активный момент сессии"""
     emit('sync_state', {
         'is_playing': audio_state['is_playing'],
         'current_time': get_synced_time()
@@ -71,5 +70,6 @@ def handle_reset():
     }, broadcast=True)
 
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))
+    # Render передает PORT через окружение; по умолчанию используем 10000
+    port = int(os.environ.get('PORT', 10000))
     socketio.run(app, host='0.0.0.0', port=port)
