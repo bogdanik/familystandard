@@ -94,6 +94,5 @@ def handle_action(data):
         socketio.emit('state_update', game_state)
 
 if __name__ == '__main__':
-    # Render автоматически передает порт через системную переменную PORT (по умолчанию 10000)
     port = int(os.environ.get('PORT', 10000))
-    socketio.run(app, host='0.0.0.0', port=port)
+    socketio.run(app, host='0.0.0.0', port=port, allow_unsafe_werkzeug=True)
