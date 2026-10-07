@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Синхронный Генератор Букв</title>
+  <!-- Socket.IO Client -->
+  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
+
+    body {
+      background-color: #0a0d14;
+      color: #ffffff;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      height: 100vh;
+      width: 100vw;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+    }
+
+    canvas#particleCanvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .reset-btn {
+      position: absolute;
+      top: 25px;
+      right: 25px;
+      z-index: 10;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #ffffff;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      font-size: 24px;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: all 0.2s ease;
+      backdrop-filter: blur(5px);
+    }
+
+    .reset-btn:hover {
+      background: rgba(255, 0, 85, 0.4);
+      border-color: #ff0055;
+      transform: scale(1.1) rotate(90deg);
+      box-shadow: 0 0 20px rgba(255, 0, 85, 0.6);
+    }
+
+    .stage {
+      position: relative;
+      z-index: 5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      height: 100%;
+    }
+
+    .start-btn {
+      background: linear-gradient(135deg, #00f0ff, #7000ff);
+      color: #ffffff;
+      border: none;
+      padding: 24px 64px;
+      font-size: 2.2rem;
+      font-weight: 900;
+      letter-spacing: 4px;
+      border-radius: 60px;
+      cursor: pointer;
+      box-shadow: 0 0 35px rgba(0, 240, 255, 0.4);
+      transition: all 0.25s ease;
+      outline: none;
+    }
+
+    .start-btn:hover {
+      transform: scale(1.08);
+      box-shadow: 0 0 50px rgba(0, 240, 255, 0.7);
+    }
+
+    .start-btn:active {
+      transform: scale(0.95);
+    }
+
+    .start-btn.hidden {
+      display: none;
+    }
+
+    .char-display {
+      font-size: min(55vh, 52vw);
+      font-weight: 900;
+      line-height: 1;
+      text-transform: uppercase;
+      text-align: center;
+      color: #00f0ff;
+      text-shadow: 0 0 35px rgba(0, 240, 255, 0.5), 0 0 70px rgba(0, 240, 255, 0.2);
+      cursor: pointer;
+      transition: transform 0.15s ease, filter 0.2s ease;
+    }
+
+    .char-display:hover {
+      transform: scale(1.03);
+      filter: drop-shadow(0 0 25px rgba(0, 240, 255, 0.8));
+    }
+
+    .char-display.hidden {
+      display: none;
+    }
+
+    .hint-label {
+      position: absolute;
+      bottom: 25px;
+      z-index: 5;
+      color: rgba(255, 255, 255, 0.35);
+      font-size: 0.85rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .hint-label.hidden {
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    .status-online {
+      position: absolute;
+      top: 25px;
+      left: 25px;
+      z-index: 10;
+      font-size: 0.75rem;
+      letter-spacing: 1px;
+      color: rgba(255, 255, 255, 0.4);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #ff4444;
+    }
+
+    .dot.connected {
+      background: #00ff88;
+      box-shadow: 0 0 8px #00ff88;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="status-online">
+    <div id="statusDot" class="dot"></div>
+    <span id="statusText">Подключение...</span>
+  </div>
+
+  <canvas id="particleCanvas"></canvas>
+
+  <button id="resetBtn" class="reset-btn" title="Сбросить">✕</button>
+
+  <div class="stage">
+    <button id="startBtn" class="start-btn">СТАРТ</button>
+    <div id="charDisplay" class="char-display hidden"></div>
+  </div>
+
+  <div id="hintLabel" class="hint-label">Нажмите СТАРТ или ПРОБЕЛ на клавиатуре</div>
+
+  <script>
+    // ==========================================
+    // ВСТАВЬТЕ СЮДА ССЫЛКУ НА ВАШ СЕРВЕР НА RENDER
+    // ==========================================
+    const RENDER_SERVER_URL = "https://your-app-name.onrender.com"; 
+
+    // Выбор хоста в зависимости от локального/продакшен запуска
+    const serverUrl = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+      ? 'http://127.0.0.1:5000'
+      : RENDER_SERVER_URL;
+
+    const socket = io(serverUrl, { transports: ['websocket', 'polling'] });
+
+    const characters = [
+      'А','Б','В','Г','Д','Е','Ё','Ж','З','И','Й','К','Л','М','Н','О','П','Р','С','Т','У','Ф','Х','Ц','Ч','Ш','Щ','Ъ','Ы','Ь','Э','Ю','Я',
+      'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z',
+      '0','1','2','3','4','5','6','7','8','9'
+    ];
+
+    const startBtn = document.getElementById('startBtn');
+    const charDisplay = document.getElementById('charDisplay');
+    const resetBtn = document.getElementById('resetBtn');
+    const hintLabel = document.getElementById('hintLabel');
+    const statusDot = document.getElementById('statusDot');
+    const statusText = document.getElementById('statusText');
+    const canvas = document.getElementById('particleCanvas');
+    const ctx = canvas.getContext('2d');
+
+    let state = 'idle'; // 'idle', 'spinning', 'stopped'
+    let spinInterval = null;
+    let spinTimeout = null;
+    let audioCtx = null;
+
+    // --- СТАТУС ПОДКЛЮЧЕНИЯ ---
+    socket.on('connect', () => {
+      statusDot.classList.add('connected');
+      statusText.textContent = 'ONLINE';
+    });
+
+    socket.on('disconnect', () => {
+      statusDot.classList.remove('connected');
+      statusText.textContent = 'OFFLINE';
+    });
+
+    // --- CANVAS & ЧАСТИЦЫ ---
+    let width, height, centerX, centerY;
+    const MAX_PARTICLES = 50;
+    const particles = [];
+
+    function resizeCanvas() {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+      centerX = width / 2;
+      centerY = height / 2;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    class Particle {
+      constructor() {
+        this.resetInCenter();
+      }
+
+      resetInCenter() {
+        this.x = centerX;
+        this.y = centerY;
+        this.prevX = centerX;
+        this.prevY = centerY;
+
+        const angle = Math.random() * Math.PI * 2;
+        const speed = 9 + Math.random() * 11;
+        this.vx = Math.cos(angle) * speed;
+        this.vy = Math.sin(angle) * speed;
+        this.radius = 2 + Math.random() * 3.5;
+        this.alpha = 0.7 + Math.random() * 0.3;
+        
+        this.angle = angle;
+        this.orbitRadius = 130 + Math.random() * 180;
+        this.orbitSpeed = (0.012 + Math.random() * 0.02) * (Math.random() < 0.5 ? 1 : -1);
+      }
+
+      update() {
+        this.prevX = this.x;
+        this.prevY = this.y;
+
+        if (state === 'spinning') {
+          this.x += this.vx;
+          this.y += this.vy;
+
+          if (this.x < 0 || this.x > width || this.y < 0 || this.y > height) {
+            this.resetInCenter();
+          }
+        } else if (state === 'stopped') {
+          this.angle += this.orbitSpeed;
+          const dx = this.x - centerX;
+          const dy = this.y - centerY;
+          const currentDist = Math.sqrt(dx * dx + dy * dy);
+          const targetDist = this.orbitRadius;
+          const newDist = currentDist + (targetDist - currentDist) * 0.05;
+          
+          this.x = centerX + Math.cos(this.angle) * newDist;
+          this.y = centerY + Math.sin(this.angle) * newDist;
+        }
+      }
+
+      draw() {
+        if (state === 'idle') return;
+
+        ctx.save();
+        ctx.beginPath();
+        ctx.moveTo(this.prevX, this.prevY);
+        ctx.lineTo(this.x, this.y);
+        ctx.strokeStyle = state === 'spinning' ? 'rgba(0, 240, 255, ' + (this.alpha * 0.6) + ')' : 'rgba(255, 0, 127, ' + (this.alpha * 0.6) + ')';
+        ctx.lineWidth = this.radius * 1.5;
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fillStyle = state === 'spinning' ? 'rgba(0, 240, 255, ' + this.alpha + ')' : 'rgba(255, 0, 127, ' + this.alpha + ')';
+        ctx.shadowBlur = 10;
+        ctx.shadowColor = state === 'spinning' ? '#00f0ff' : '#ff007f';
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    for (let i = 0; i < MAX_PARTICLES; i++) {
+      particles.push(new Particle());
+    }
+
+    function animateParticles() {
+      if (state === 'idle') {
+        ctx.clearRect(0, 0, width, height);
+      } else {
+        ctx.fillStyle = 'rgba(10, 13, 20, 0.22)';
+        ctx.fillRect(0, 0, width, height);
+        particles.forEach(p => {
+          p.update();
+          p.draw();
+        });
+      }
+      requestAnimationFrame(animateParticles);
+    }
+    animateParticles();
+
+    // --- ЗВУК ---
+    function playStopwatchTickSound() {
+      try {
+        if (!audioCtx) {
+          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioCtx.state === 'suspended') {
+          audioCtx.resume();
+        }
+
+        const t = audioCtx.currentTime;
+
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(3400 + Math.random() * 400, t);
+        osc.frequency.exponentialRampToValueAtTime(1100, t + 0.007);
+
+        gain.gain.setValueAtTime(0.22, t);
+        gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.008);
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        osc.start(t);
+        osc.stop(t + 0.008);
+
+        const bufferSize = audioCtx.sampleRate * 0.005;
+        const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+          data[i] = Math.random() * 2 - 1;
+        }
+
+        const noise = audioCtx.createBufferSource();
+        noise.buffer = buffer;
+
+        const filter = audioCtx.createBiquadFilter();
+        filter.type = 'highpass';
+        filter.frequency.setValueAtTime(4500, t);
+
+        const noiseGain = audioCtx.createGain();
+        noiseGain.gain.setValueAtTime(0.18, t);
+        noiseGain.gain.exponentialRampToValueAtTime(0.001, t + 0.005);
+
+        noise.connect(filter);
+        filter.connect(noiseGain);
+        noiseGain.connect(audioCtx.destination);
+
+        noise.start(t);
+      } catch (e) {}
+    }
+
+    function playStopSound() {
+      playStopwatchTickSound();
+      setTimeout(playStopwatchTickSound, 50);
+    }
+
+    // --- СИНХРОНИЗИРОВАННАЯ ЛОГИКА ---
+    function startLocalSpin(finalChar) {
+      if (state === 'spinning') return;
+
+      state = 'spinning';
+
+      startBtn.classList.add('hidden');
+      hintLabel.classList.add('hidden');
+      charDisplay.classList.remove('hidden');
+
+      particles.forEach(p => p.resetInCenter());
+
+      spinInterval = setInterval(() => {
+        const randChar = characters[Math.floor(Math.random() * characters.length)];
+        charDisplay.textContent = randChar;
+        playStopwatchTickSound();
+      }, 35);
+
+      spinTimeout = setTimeout(() => {
+        stopLocalSpin(finalChar);
+      }, 1600);
+    }
+
+    function stopLocalSpin(finalChar) {
+      clearInterval(spinInterval);
+      clearTimeout(spinTimeout);
+
+      charDisplay.textContent = finalChar;
+      state = 'stopped';
+
+      particles.forEach(p => {
+        const dx = p.x - centerX;
+        const dy = p.y - centerY;
+        p.angle = Math.atan2(dy, dx);
+      });
+
+      playStopSound();
+      socket.emit('spin_completed');
+    }
+
+    function resetLocalState() {
+      clearInterval(spinInterval);
+      clearTimeout(spinTimeout);
+
+      state = 'idle';
+
+      charDisplay.classList.add('hidden');
+      startBtn.classList.remove('hidden');
+      hintLabel.classList.remove('hidden');
+    }
+
+    // --- ИВЕНТЫ СОКЕТОВ С СЕРВЕРА ---
+
+    // 1. Старт прокрутки для ВСЕХ
+    socket.on('spin_started', (data) => {
+      startLocalSpin(data.finalChar);
+    });
+
+    // 2. Сброс состояния для ВСЕХ
+    socket.on('state_reset', () => {
+      resetLocalState();
+    });
+
+    // 3. Первичная синхронизация при открытии вкладки
+    socket.on('sync_state', (serverState) => {
+      if (serverState.status === 'stopped' && serverState.current_char) {
+        state = 'stopped';
+        startBtn.classList.add('hidden');
+        hintLabel.classList.add('hidden');
+        charDisplay.classList.remove('hidden');
+        charDisplay.textContent = serverState.current_char;
+      } else if (serverState.status === 'idle') {
+        resetLocalState();
+      }
+    });
+
+    // --- ИНИЦИАЦИЯ СОБЫТИЙ КЛИЕНТОМ ---
+    function emitSpinRequest() {
+      if (state === 'idle' || state === 'stopped') {
+        socket.emit('request_spin');
+      }
+    }
+
+    function emitResetRequest() {
+      socket.emit('request_reset');
+    }
+
+    startBtn.addEventListener('click', emitSpinRequest);
+    charDisplay.addEventListener('click', emitSpinRequest);
+    resetBtn.addEventListener('click', emitResetRequest);
+
+    window.addEventListener('keydown', (e) => {
+      if (e.code === 'Space') {
+        e.preventDefault();
+        emitSpinRequest();
+      }
+    });
+  </script>
+</body>
+</html>
