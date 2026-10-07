@@ -161,13 +161,67 @@
   <audio id="audioTrack" src="https://pub-372ba5f717cf4a8694558f47682d65d9.r2.dev/track.mp3" crossorigin="anonymous"></audio>
 
   <script>
-    const socket = io();
-    let lyricsData = [];
+    // Прямой URL бэкенда на Render
+    const RENDER_SERVER = 'https://track-1lh5.onrender.com';
 
-    // Загрузка словаря таймингов из внешнего JSON
-    fetch('/lyrics.json')
-      .then(res => res.json())
-      .then(data => { lyricsData = data; });
+    // Подключение Socket.IO строго к сервису на Render
+    const socket = io(RENDER_SERVER, {
+      transports: ['websocket', 'polling']
+    });
+
+    // Резервный встроенный массив с вашими таймингами
+    let lyricsData = [
+      { time: 3, text: "Я долго думал, с чего начать" },
+      { time: 9.8, text: "долго думал о чем написать." },
+      { time: 14.2, text: "Двадцать лет вместе это срок!" },
+      { time: 21.5, text: "все в восторге от вас. дайте урок." },
+
+      { time: 40.2, text: "Вокруг эпоха мгновенных иллюзий," },
+      { time: 43.8, text: "Где ценность тонет в потоке диффузий." },
+      { time: 47.0, text: "Все ищут лёгкость, меняя причалы," },
+      { time: 51.2, text: "Забыв, где искренность жизни звучала." },
+      { time: 55, text: "А вы создали монолитный союз," },
+      { time: 58, text: "Прочность священных, невидимых уз." },
+      { time: 61.2, text: "И пусть я с вами ещё незнаком," },
+      { time: 65.2, text: "я ваш пример заберу к себе в home." },
+
+      { time: 68.8, text: "Двадцать лет вместе хранили свет!" },
+      { time: 78.2, text: "Двадцать лет вместе — раскройте секрет!" },
+      { time: 81.8, text: "как вы смогли?" },
+      { time: 83.0, text: "веру зажгли!" },
+      { time: 85.2, text: "Двадцать лет вместе — вот это да!" },
+      { time: 89.8, text: "живите счастливо вместе всегда" },
+
+      { time: 95.2, text: "Сквозь трудности лет" },
+      { time: 98.2, text: "Вы пронесли этот искренний свет." },
+      { time: 101.5, text: "В мире, где всё рассыпается пылью," },
+      { time: 103.8, text: "Вы сделали сказку осознанной былью." },
+      { time: 109.0, text: "Стоя со сцены, скажу вам открыто:" },
+      { time: 112.2, text: "Ваша любовь никогда не будет забыта." },
+      { time: 116.8, text: "О таком моменте каждый мечтает" },
+      { time: 120.0, text: "Зал аплодирует вам замирает!" },
+
+      { time: 123.8, text: "Сквозь время и вечность, сквозь тысячи снов…" },
+      { time: 131.0, text: "Вы доказали, что значит любовь!" },
+      { time: 135.2, text: "Слышите?" },
+
+      { time: 136.2, text: "Двадцать лет вместе хранили свет!" },
+      { time: 143.8, text: "Двадцать лет вместе — раскройте секрет!" },
+      { time: 148.2, text: "как вы смогли?" },
+      { time: 150.5, text: "веру зажгли!" },
+      { time: 152.8, text: "Двадцать лет вместе — вот это да!" },
+      { time: 157.0, text: "живите счастливо вместе всегда" },
+
+      { time: 164.8, text: "мало кто может… а вы смогли." },
+      { time: 170.2, text: "Двадцать лет вместе." },
+      { time: 173.8, text: "веру зажгли !" }
+    ];
+
+    // Попытка асинхронно обновить тайминги с Render
+    fetch(`${RENDER_SERVER}/lyrics.json`)
+      .then(res => res.ok ? res.json() : null)
+      .then(data => { if (data) lyricsData = data; })
+      .catch(() => {});
 
     const audio = document.getElementById('audioTrack');
     const playBtn = document.getElementById('playBtn');
@@ -199,7 +253,7 @@
       isAudioSetup = true;
     }
 
-    // Обработка синка от сервера (для всех пользователей)
+    // Обработка синка от сервера Render для всех открытых вкладок
     socket.on('sync_state', (state) => {
       setupAudio();
       if (audioCtx && audioCtx.state === 'suspended') {
@@ -218,7 +272,7 @@
       }
     });
 
-    // Нажатие на кнопки управления
+    // Нажатие на Play / Pause транслирует сигнал на Render
     playBtn.addEventListener('click', () => {
       setupAudio();
       if (audioCtx.state === 'suspended') audioCtx.resume();
@@ -262,7 +316,7 @@
       }
     });
 
-    // Отрисовка 3D сцена + Эквалайзер
+    // 3D-сцена и эквалайзер
     const t = (1.0 + Math.sqrt(5.0)) / 2.0;
     const baseVertices = [
       [-1, t, 0], [1, t, 0], [-1, -t, 0], [1, -t, 0],
