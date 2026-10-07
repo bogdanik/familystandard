@@ -33,7 +33,7 @@
       pointer-events: none;
     }
 
-    /* Кнопка выключения звука слева вверху */
+    /* Кнопка выключения звука (слева) */
     .mute-btn {
       position: fixed;
       top: 18px;
@@ -60,7 +60,7 @@
       box-shadow: 0 0 12px rgba(6, 182, 212, 0.5);
     }
 
-    /* Еле заметная кнопка сброса сессии справа вверху */
+    /* Кнопка сброса сессии (справа) */
     .reset-btn {
       position: fixed;
       top: 18px;
@@ -140,22 +140,38 @@
       box-shadow: 0 15px 35px rgba(0, 0, 0, 0.7);
     }
 
+    /* Кнопка Play со стрелочкой и плавной прозрачностью */
     button.play-btn {
       background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
       border: none;
       color: #ffffff;
-      padding: 10px 24px;
-      font-size: 0.95rem;
-      font-weight: 700;
-      border-radius: 20px;
+      width: 44px;
+      height: 44px;
+      font-size: 1.1rem;
+      border-radius: 50%;
       cursor: pointer;
       box-shadow: 0 4px 20px rgba(139, 92, 246, 0.4);
-      transition: transform 0.2s, box-shadow 0.2s;
+      transition: transform 0.2s, box-shadow 0.2s, opacity 0.5s ease;
       user-select: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding-left: 3px; /* Центрирование знака ▶ */
+      opacity: 1;
+    }
+
+    /* Когда трек играет — кнопка имеет 90% прозрачность (opacity 0.1) */
+    button.play-btn.is-playing {
+      opacity: 0.1;
+    }
+
+    /* При наведении во время проигрывания — слегка подсвечивается */
+    button.play-btn.is-playing:hover {
+      opacity: 0.7;
     }
 
     button.play-btn:hover {
-      transform: scale(1.04);
+      transform: scale(1.08);
       box-shadow: 0 6px 25px rgba(236, 72, 153, 0.6);
     }
 
@@ -173,7 +189,7 @@
 </head>
 <body>
 
-  <!-- Кнопка выключения звука (слева) -->
+  <!-- Кнопка выключения звука -->
   <button class="mute-btn" id="muteBtn" title="Включить / Выключить звук">🔊</button>
 
   <!-- Кнопка сброса активности (3 клика) -->
@@ -186,7 +202,7 @@
   </div>
 
   <div class="controls">
-    <button class="play-btn" id="playBtn">Play / Pause (x3)</button>
+    <button class="play-btn" id="playBtn" title="Play / Pause (3 клика)">▶</button>
     <div class="time-display" id="timeDisplay">0,00 с</div>
   </div>
 
@@ -248,7 +264,6 @@
       { time: 173.8, text: "веру зажгли !" }
     ];
 
-    // Тихо пробуем обновить тайминги
     fetch(`${RENDER_SERVER}/lyrics.json`)
       .then(res => res.ok ? res.json() : null)
       .then(data => { if (data) lyricsData = data; })
@@ -265,7 +280,7 @@
 
     let audioCtx, analyser, source, dataArray;
     let isAudioSetup = false;
-    let iInitiatedPlay = false; // Флаг: нажали ли мы сами Play
+    let iInitiatedPlay = false;
 
     function resizeCanvas() {
       canvas.width = window.innerWidth;
@@ -298,14 +313,12 @@
       }
     }
 
-    // Ручное переключение Mute
     muteBtn.addEventListener('click', () => {
       setupAudio();
       audio.muted = !audio.muted;
       updateMuteUI();
     });
 
-    // Функция обработки тройного клика
     function addTripleClickListener(element, callback) {
       let clickCount = 0;
       let clickTimer = null;
@@ -319,10 +332,24 @@
           clearTimeout(clickTimer);
           clickTimer = setTimeout(() => {
             clickCount = 0;
-          }, 800); // Окно 800 мс для 3 кликов
+          }, 800);
         }
       });
     }
+
+    // Управление видимостью кнопки Play в зависимости от воспроизведения
+    function setPlayStateUI(isPlaying) {
+      if (isPlaying) {
+        playBtn.classList.add('is-playing');
+      } else {
+        playBtn.classList.remove('is-playing');
+      }
+    }
+
+    // Возврат кнопки при завершении трека
+    audio.addEventListener('ended', () => {
+      setPlayStateUI(false);
+    });
 
     // Синхронизация по WebSocket от сервера
     socket.on('sync_state', (state) => {
@@ -337,7 +364,6 @@
       }
 
       if (state.is_playing) {
-        // Если трек запустили НЕ мы, включаем звук у себя
         if (!iInitiatedPlay) {
           audio.muted = false;
           updateMuteUI();
@@ -345,9 +371,11 @@
         iInitiatedPlay = false;
 
         audio.play().catch(() => {});
+        setPlayStateUI(true);
       } else {
         audio.pause();
         iInitiatedPlay = false;
+        setPlayStateUI(false);
       }
     });
 
@@ -359,7 +387,6 @@
       }
 
       if (audio.paused) {
-        // Автоматически глушим звук на устройстве того, кто нажал Play
         iInitiatedPlay = true;
         audio.muted = true;
         updateMuteUI();
