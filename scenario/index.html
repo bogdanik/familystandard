@@ -5,18 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Свадебный Сценарий — Юра & Маргарита</title>
     <style>
-        /* iOS Core Styles & Dark Glassmorphism Aesthetic */
+        /* iOS Core Styles & Dark Romantic Glassmorphism Aesthetic */
         :root {
-            --ios-bg: #000000;
+            --ios-bg-start: #1a0624;
+            --ios-bg-end: #07010b;
             --ios-card-bg: rgba(255, 255, 255, 0.09);
-            --ios-card-border: rgba(255, 255, 255, 0.18);
-            --ios-accent: #0A84FF;
+            --ios-card-border: rgba(255, 255, 255, 0.22);
+            --ios-accent: #FF2D55; /* Romantic Pink/Rose Accent */
             --ios-gold: #FFD60A;
             --ios-green: #30D158;
             --ios-red: #FF453A;
             --ios-text: #FFFFFF;
-            --ios-text-secondary: rgba(255, 255, 255, 0.65);
-            --ios-blur: blur(30px) saturate(190%);
+            --ios-text-secondary: rgba(255, 255, 255, 0.75);
+            --ios-blur: blur(35px) saturate(200%);
         }
 
         * {
@@ -25,19 +26,21 @@
             padding: 0;
             -webkit-tap-highlight-color: transparent;
             user-select: none;
+            /* ВСЁ ЖИРНОЕ ПО УМОЛЧАНИЮ */
+            font-weight: 700 !important;
         }
 
         body, html {
             width: 100%;
             height: 100%;
             overflow: hidden;
-            background-color: var(--ios-bg);
+            background: radial-gradient(circle at center, var(--ios-bg-start) 0%, var(--ios-bg-end) 100%);
             font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
             color: var(--ios-text);
         }
 
-        /* Hyperspace Canvas Background */
-        #canvas-hyperspace {
+        /* Romantic Heart & Canvas Background */
+        #canvas-romantic {
             position: fixed;
             top: 0;
             left: 0;
@@ -56,97 +59,107 @@
             height: 100vh;
             max-width: 680px;
             margin: 0 auto;
-            padding: 12px 14px 16px 14px;
-            gap: 12px;
+            padding: 10px 12px 12px 12px;
+            gap: 10px;
         }
 
-        /* Header Bar */
-        .ios-header {
-            background: var(--ios-card-bg);
-            backdrop-filter: var(--ios-blur);
-            -webkit-backdrop-filter: var(--ios-blur);
-            border: 1px solid var(--ios-card-border);
-            border-radius: 20px;
-            padding: 12px 16px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+        /* INTRO ANIMATION STATES */
+        .top-nav-panel,
+        .main-content {
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(18px);
+            transition: opacity 0.7s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
         }
 
-        .couple-names {
-            font-size: 20px;
-            font-weight: 700;
+        /* Active App State After Intro */
+        .app-container.intro-active .top-nav-panel,
+        .app-container.intro-active .main-content {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0);
+        }
+
+        /* INTRO OVERLAY TITLE (STARTS CENTERED) */
+        .intro-title-overlay {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.7);
+            z-index: 30;
+            text-align: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: transform 0.9s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease;
+            width: 90%;
+            max-width: 500px;
+        }
+
+        .intro-title-overlay.visible {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1.1);
+        }
+
+        /* Title when shifted to footer after intro */
+        .intro-title-overlay.settled-footer {
+            top: calc(100vh - 48px);
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.9);
+            opacity: 1;
+        }
+
+        .couple-title-text {
+            font-size: 26px;
             letter-spacing: -0.5px;
-            background: linear-gradient(135deg, #FFFFFF 0%, #FFD60A 100%);
+            background: linear-gradient(135deg, #FFFFFF 0%, #FF2D55 50%, #FFD60A 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px rgba(255, 45, 85, 0.6);
         }
 
-        .event-subtitle {
+        .couple-subtitle-text {
             font-size: 11px;
             color: var(--ios-text-secondary);
-            font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 1.2px;
+            margin-top: 3px;
         }
 
-        .btn-pin-toggle {
-            background: rgba(255, 255, 255, 0.12);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: #fff;
-            padding: 6px 12px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .btn-pin-toggle.unlocked {
-            border-color: rgba(48, 209, 88, 0.5);
-            color: var(--ios-green);
-            background: rgba(48, 209, 88, 0.15);
-        }
-
-        /* TOP NAVIGATION CONTROLS */
+        /* TOP NAVIGATION CONTROLS (ВЕРХНЯЯ ШАПКА) */
         .top-nav-panel {
             background: var(--ios-card-bg);
             backdrop-filter: var(--ios-blur);
             -webkit-backdrop-filter: var(--ios-blur);
             border: 1px solid var(--ios-card-border);
-            border-radius: 22px;
-            padding: 10px 14px;
+            border-radius: 20px;
+            padding: 8px 12px;
             display: flex;
             flex-direction: column;
-            gap: 10px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            gap: 8px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
         }
 
         .nav-buttons-top {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 10px;
+            gap: 8px;
         }
 
         .btn-ios {
             flex: 1;
-            height: 44px;
-            border-radius: 16px;
+            height: 38px;
+            border-radius: 14px;
             border: none;
             background: var(--ios-accent);
             color: #FFFFFF;
-            font-size: 14px;
-            font-weight: 600;
+            font-size: 13px;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 4px;
             cursor: pointer;
+            box-shadow: 0 4px 12px rgba(255, 45, 85, 0.35);
             transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
         }
 
@@ -156,9 +169,10 @@
         }
 
         .btn-ios-secondary {
-            background: rgba(255, 255, 255, 0.12);
-            border: 1px solid rgba(255, 255, 255, 0.18);
+            background: rgba(255, 255, 255, 0.14);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             color: #FFFFFF;
+            box-shadow: none;
         }
 
         .btn-ios:disabled {
@@ -167,10 +181,9 @@
         }
 
         .step-counter-top {
-            font-size: 12px;
-            font-weight: 700;
+            font-size: 11px;
             color: var(--ios-text-secondary);
-            min-width: 75px;
+            min-width: 65px;
             text-align: center;
             letter-spacing: 0.3px;
         }
@@ -178,7 +191,7 @@
         /* Hourly Jump Bar */
         .hour-tabs-scroll {
             display: flex;
-            gap: 6px;
+            gap: 5px;
             overflow-x: auto;
             scrollbar-width: none;
             padding-bottom: 2px;
@@ -190,12 +203,11 @@
 
         .hour-tab-pill {
             background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            color: rgba(255, 255, 255, 0.8);
-            padding: 5px 11px;
-            border-radius: 10px;
-            font-size: 12px;
-            font-weight: 600;
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            color: rgba(255, 255, 255, 0.85);
+            padding: 4px 10px;
+            border-radius: 9px;
+            font-size: 11px;
             white-space: nowrap;
             cursor: pointer;
             transition: all 0.2s ease;
@@ -205,13 +217,13 @@
             background: var(--ios-accent);
             border-color: var(--ios-accent);
             color: #FFFFFF;
-            box-shadow: 0 4px 12px rgba(10, 132, 255, 0.35);
+            box-shadow: 0 4px 12px rgba(255, 45, 85, 0.4);
         }
 
         .progress-bar-wrap {
             width: 100%;
-            height: 4px;
-            background: rgba(255, 255, 255, 0.12);
+            height: 3px;
+            background: rgba(255, 255, 255, 0.15);
             border-radius: 2px;
             overflow: hidden;
         }
@@ -229,7 +241,8 @@
             overflow-y: auto;
             position: relative;
             scrollbar-width: none;
-            border-radius: 24px;
+            border-radius: 22px;
+            margin-bottom: 50px; /* Space for settled bottom title */
         }
 
         .main-content::-webkit-scrollbar {
@@ -242,12 +255,12 @@
             backdrop-filter: var(--ios-blur);
             -webkit-backdrop-filter: var(--ios-blur);
             border: 1px solid var(--ios-card-border);
-            border-radius: 24px;
-            padding: 20px;
+            border-radius: 22px;
+            padding: 18px;
             box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6);
             display: flex;
             flex-direction: column;
-            gap: 14px;
+            gap: 12px;
             animation: cardFadeIn 0.25s ease-out;
         }
 
@@ -256,42 +269,56 @@
             to { opacity: 1; transform: translateY(0) scale(1); }
         }
 
-        .time-badge-row {
+        /* CARD HEADER ROW WITH TIMER BADGE & PIN BUTTON */
+        .timer-pin-row {
             display: flex;
             align-items: center;
             justify-content: space-between;
+            gap: 8px;
+            flex-wrap: wrap;
         }
 
         .time-badge {
-            background: rgba(10, 132, 255, 0.2);
-            border: 1px solid rgba(10, 132, 255, 0.4);
-            color: #64D2FF;
+            background: rgba(255, 45, 85, 0.25);
+            border: 1px solid rgba(255, 45, 85, 0.5);
+            color: #FFB3C1;
             font-size: 13px;
-            font-weight: 700;
             padding: 5px 12px;
             border-radius: 10px;
             letter-spacing: 0.5px;
         }
 
-        .hour-badge {
+        .btn-pin-toggle {
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            color: #fff;
+            padding: 5px 12px;
+            border-radius: 10px;
             font-size: 11px;
-            color: var(--ios-text-secondary);
-            font-weight: 600;
-            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn-pin-toggle.unlocked {
+            border-color: rgba(48, 209, 88, 0.6);
+            color: var(--ios-green);
+            background: rgba(48, 209, 88, 0.18);
         }
 
         .block-title {
-            font-size: 19px;
-            font-weight: 700;
+            font-size: 18px;
             line-height: 1.35;
             color: #FFFFFF;
         }
 
         .section-box {
-            background: rgba(255, 255, 255, 0.04);
+            background: rgba(255, 255, 255, 0.05);
             border-left: 3px solid var(--ios-accent);
-            padding: 10px 14px;
-            border-radius: 0 14px 14px 0;
+            padding: 10px 12px;
+            border-radius: 0 12px 12px 0;
         }
 
         .section-label {
@@ -299,22 +326,21 @@
             text-transform: uppercase;
             letter-spacing: 0.8px;
             color: var(--ios-text-secondary);
-            font-weight: 700;
-            margin-bottom: 4px;
+            margin-bottom: 3px;
         }
 
         .section-text {
             font-size: 14px;
             line-height: 1.48;
-            color: rgba(255, 255, 255, 0.92);
+            color: rgba(255, 255, 255, 0.95);
         }
 
         /* Speech Box */
         .speech-box {
-            background: rgba(255, 214, 10, 0.12);
-            border: 1px solid rgba(255, 214, 10, 0.45);
-            border-radius: 16px;
-            padding: 14px;
+            background: rgba(255, 214, 10, 0.14);
+            border: 1px solid rgba(255, 214, 10, 0.5);
+            border-radius: 14px;
+            padding: 12px;
             animation: fadeInSpeech 0.3s ease;
         }
 
@@ -325,11 +351,10 @@
 
         .speech-header {
             font-size: 11px;
-            font-weight: 700;
             color: var(--ios-gold);
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            margin-bottom: 6px;
+            margin-bottom: 5px;
         }
 
         .speech-content {
@@ -341,20 +366,19 @@
 
         /* Question Box */
         .question-box {
-            background: rgba(48, 209, 88, 0.12);
-            border: 1px solid rgba(48, 209, 88, 0.45);
-            border-radius: 16px;
-            padding: 14px;
+            background: rgba(48, 209, 88, 0.14);
+            border: 1px solid rgba(48, 209, 88, 0.5);
+            border-radius: 14px;
+            padding: 12px;
             animation: fadeInSpeech 0.3s ease;
         }
 
         .question-header {
             font-size: 11px;
-            font-weight: 700;
             color: var(--ios-green);
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            margin-bottom: 6px;
+            margin-bottom: 5px;
         }
 
         /* PIN Modal */
@@ -364,7 +388,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.75);
+            background: rgba(0, 0, 0, 0.78);
             backdrop-filter: blur(16px);
             z-index: 100;
             display: flex;
@@ -382,13 +406,13 @@
         }
 
         .pin-modal {
-            background: rgba(28, 28, 30, 0.9);
+            background: rgba(28, 14, 35, 0.92);
             backdrop-filter: blur(40px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 26px;
-            padding: 24px;
+            border: 1px solid rgba(255, 45, 85, 0.3);
+            border-radius: 24px;
+            padding: 22px;
             width: 100%;
-            max-width: 310px;
+            max-width: 300px;
             text-align: center;
             box-shadow: 0 25px 50px rgba(0,0,0,0.8);
             transform: scale(0.92);
@@ -400,29 +424,28 @@
         }
 
         .pin-modal h3 {
-            font-size: 18px;
-            font-weight: 700;
-            margin-bottom: 6px;
+            font-size: 17px;
+            margin-bottom: 5px;
         }
 
         .pin-modal p {
-            font-size: 13px;
+            font-size: 12px;
             color: var(--ios-text-secondary);
-            margin-bottom: 16px;
+            margin-bottom: 14px;
         }
 
         .pin-input-field {
             width: 100%;
-            height: 46px;
+            height: 44px;
             background: rgba(0, 0, 0, 0.5);
-            border: 1px solid rgba(255, 255, 255, 0.25);
-            border-radius: 14px;
+            border: 1px solid rgba(255, 45, 85, 0.4);
+            border-radius: 12px;
             color: #FFF;
             font-size: 20px;
             letter-spacing: 10px;
             text-align: center;
             outline: none;
-            margin-bottom: 16px;
+            margin-bottom: 14px;
         }
 
         .pin-input-field:focus {
@@ -431,30 +454,24 @@
 
         .modal-actions {
             display: flex;
-            gap: 10px;
+            gap: 8px;
         }
     </style>
 </head>
 <body>
 
-    <!-- Mathematical Hyperspace Canvas -->
-    <canvas id="canvas-hyperspace"></canvas>
+    <!-- Romantic Heart & Floating Sparks Canvas -->
+    <canvas id="canvas-romantic"></canvas>
 
-    <div class="app-container">
+    <!-- CENTER INTRO OVERLAY TITLE (ANIMATES TO FOOTER) -->
+    <div class="intro-title-overlay" id="intro-title-overlay">
+        <div class="couple-title-text">Юра & Маргарита</div>
+        <div class="couple-subtitle-text">Свадебный Сценарий</div>
+    </div>
+
+    <div class="app-container" id="app-container">
         
-        <!-- Header -->
-        <header class="ios-header">
-            <div>
-                <div class="couple-names">Юра & Маргарита</div>
-                <div class="event-subtitle">Свадебный сценарий</div>
-            </div>
-            <button class="btn-pin-toggle" id="btn-open-pin">
-                <span id="pin-icon">🔒</span>
-                <span id="pin-status-text">ПИН</span>
-            </button>
-        </header>
-
-        <!-- TOP NAVIGATION CONTROLS -->
+        <!-- TOP NAVIGATION CONTROLS (ШАПКА ВВЕРХУ) -->
         <div class="top-nav-panel">
             <div class="nav-buttons-top">
                 <button class="btn-ios btn-ios-secondary" id="btn-prev">
@@ -498,15 +515,20 @@
 
     <script>
         /* ===================================================
-           1. MATHEMATICAL HYPERSPACE CANVAS ANIMATION
+           1. INTRO ENGINE & ROMANTIC HEART PULSE ANIMATION
            =================================================== */
-        const canvas = document.getElementById('canvas-hyperspace');
+        const canvas = document.getElementById('canvas-romantic');
         const ctx = canvas.getContext('2d');
+        const introOverlay = document.getElementById('intro-title-overlay');
+        const appContainer = document.getElementById('app-container');
 
         let width, height, centerX, centerY;
-        const numParticles = 240;
-        const particles = [];
-        const speed = 14;
+        let animationStartTime = null;
+        let pulsePhase = 0; // 0..3 pulse cycles
+        let isIntroFinished = false;
+
+        const sparks = [];
+        const numSparks = 160;
 
         function resizeCanvas() {
             width = canvas.width = window.innerWidth;
@@ -518,72 +540,165 @@
         window.addEventListener('resize', resizeCanvas);
         resizeCanvas();
 
-        class Particle {
+        class Spark {
             constructor() {
-                this.reset(true);
+                this.reset();
             }
 
-            reset(initial = false) {
-                this.x = (Math.random() - 0.5) * width * 2;
-                this.y = (Math.random() - 0.5) * height * 2;
-                this.z = initial ? Math.random() * width : width;
-                this.px = 0;
-                this.py = 0;
-                this.color = `hsl(${195 + Math.random() * 45}, 100%, ${70 + Math.random() * 25}%)`;
+            reset() {
+                const t = Math.random() * Math.PI * 2;
+                const scale = (Math.min(width, height) * 0.015) * (0.8 + Math.random() * 0.4);
+                
+                // Parametric Heart Formula
+                const hx = 16 * Math.pow(Math.sin(t), 3);
+                const hy = -(13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t));
+
+                this.x = centerX + hx * scale;
+                this.y = centerY + hy * scale;
+
+                const angle = Math.atan2(this.y - centerY, this.x - centerX) + (Math.random() - 0.5) * 0.6;
+                const speed = 0.3 + Math.random() * 1.2; // Slow romantic floating
+                
+                this.vx = Math.cos(angle) * speed;
+                this.vy = Math.sin(angle) * speed;
+                
+                this.size = 1 + Math.random() * 2.8;
+                this.alpha = 0.2 + Math.random() * 0.8;
+                this.decay = 0.003 + Math.random() * 0.006;
+                this.color = Math.random() > 0.35 ? '#FF2D55' : '#FFD60A';
             }
 
             update() {
-                this.z -= speed;
-                if (this.z <= 0) {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.alpha -= this.decay;
+
+                if (this.alpha <= 0 || this.x < 0 || this.x > width || this.y < 0 || this.y > height) {
                     this.reset();
                 }
             }
 
             draw() {
-                const k = 260 / this.z;
-                const sx = this.x * k + centerX;
-                const sy = this.y * k + centerY;
-
-                if (sx < 0 || sx >= width || sy < 0 || sy >= height) {
-                    this.reset();
-                    return;
-                }
-
-                const size = Math.max(0.5, (1 - this.z / width) * 2.8);
-                
-                if (this.px !== 0 && this.py !== 0) {
-                    ctx.beginPath();
-                    ctx.moveTo(this.px, this.py);
-                    ctx.lineTo(sx, sy);
-                    ctx.strokeStyle = this.color;
-                    ctx.lineWidth = size;
-                    ctx.globalAlpha = Math.min(1, (1 - this.z / width) * 1.6);
-                    ctx.stroke();
-                }
-
-                this.px = sx;
-                this.py = sy;
-                ctx.globalAlpha = 1;
+                ctx.save();
+                ctx.globalAlpha = Math.max(0, this.alpha);
+                ctx.fillStyle = this.color;
+                ctx.shadowColor = this.color;
+                ctx.shadowBlur = 8;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
             }
         }
 
-        for (let i = 0; i < numParticles; i++) {
-            particles.push(new Particle());
+        for (let i = 0; i < numSparks; i++) {
+            sparks.push(new Spark());
         }
 
-        function animateHyperspace() {
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.24)';
-            ctx.fillRect(0, 0, width, height);
+        function drawHeart(scaleFactor, glowIntensity, flashAlpha = 0) {
+            const baseScale = Math.min(width, height) * 0.016 * scaleFactor;
 
-            for (let i = 0; i < particles.length; i++) {
-                particles[i].update();
-                particles[i].draw();
+            ctx.save();
+            ctx.translate(centerX, centerY);
+
+            // Optional Flash Burst Overlay
+            if (flashAlpha > 0) {
+                const radGlow = ctx.createRadialGradient(0, 0, 10, 0, 0, baseScale * 25);
+                radGlow.addColorStop(0, `rgba(255, 45, 85, ${flashAlpha * 0.5})`);
+                radGlow.addColorStop(0.5, `rgba(255, 214, 10, ${flashAlpha * 0.2})`);
+                radGlow.addColorStop(1, 'rgba(0, 0, 0, 0)');
+                ctx.fillStyle = radGlow;
+                ctx.beginPath();
+                ctx.arc(0, 0, baseScale * 25, 0, Math.PI * 2);
+                ctx.fill();
             }
 
-            requestAnimationFrame(animateHyperspace);
+            ctx.beginPath();
+            for (let t = 0; t <= Math.PI * 2; t += 0.02) {
+                const hx = 16 * Math.pow(Math.sin(t), 3);
+                const hy = -(13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t));
+                if (t === 0) ctx.moveTo(hx * baseScale, hy * baseScale);
+                else ctx.lineTo(hx * baseScale, hy * baseScale);
+            }
+            ctx.closePath();
+
+            ctx.strokeStyle = `rgba(255, 45, 85, ${0.7 + glowIntensity * 0.3})`;
+            ctx.lineWidth = 3.5;
+            ctx.shadowColor = '#FF2D55';
+            ctx.shadowBlur = 15 + glowIntensity * 30;
+            ctx.stroke();
+
+            ctx.fillStyle = `rgba(255, 45, 85, ${0.05 + glowIntensity * 0.12})`;
+            ctx.fill();
+
+            ctx.restore();
         }
 
-        animateHyperspace();
+        function animate(timestamp) {
+            if (!animationStartTime) animationStartTime = timestamp;
+            const elapsed = timestamp - animationStartTime;
+
+            ctx.clearRect(0, 0, width, height);
+
+            let scaleFactor = 1;
+            let glowIntensity = 0.5;
+            let flashAlpha = 0;
+
+            if (!isIntroFinished) {
+                // Exactly 3 Pulses over ~2.8 seconds
+                const pulseDuration = 900; // ms per pulse
+                const currentPulseIndex = Math.floor(elapsed / pulseDuration);
+
+                if (currentPulseIndex < 3) {
+                    const progressInPulse = (elapsed % pulseDuration) / pulseDuration;
+                    const sinVal = Math.sin(progressInPulse * Math.PI);
+                    
+                    scaleFactor = 1 + sinVal * 0.28; // Heart expands and contracts
+                    glowIntensity = sinVal;
+                    flashAlpha = Math.pow(sinVal, 3) * 0.6; // High intensity bursts at peak
+                } else if (currentPulseIndex === 3) {
+                    // Phase 2: Title Appears in Center
+                    introOverlay.classList.add('visible');
+                    scaleFactor = 1.05 + Math.sin((elapsed / 300)) * 0.03;
+                }
+
+                // Transition to Footer & Show Script UI at ~3.2 seconds
+                if (elapsed >= 3200 && !introOverlay.classList.contains('settled-footer')) {
+                    introOverlay.classList.remove('visible');
+                    introOverlay.classList.add('settled-footer');
+                    appContainer.classList.add('intro-active');
+                    isIntroFinished = true;
+                }
+            } else {
+                // Gentle continuous background breathing after intro
+                const breathe = Math.sin(timestamp * 0.002);
+                scaleFactor = 1 + breathe * 0.04;
+                glowIntensity = 0.5 + breathe * 0.2;
+            }
+
+            // Draw Heart
+            drawHeart(scaleFactor, glowIntensity, flashAlpha);
+
+            // Draw Sparks
+            for (let i = 0; i < sparks.length; i++) {
+                sparks[i].update();
+                sparks[i].draw();
+            }
+
+            requestAnimationFrame(animate);
+        }
+
+        requestAnimationFrame(animate);
+
+        // Allow instant tap to skip intro if host is in a rush
+        document.body.addEventListener('click', () => {
+            if (!isIntroFinished) {
+                introOverlay.classList.remove('visible');
+                introOverlay.classList.add('settled-footer');
+                appContainer.classList.add('intro-active');
+                isIntroFinished = true;
+            }
+        }, { once: true });
 
         /* ===================================================
            2. SCENARIO DATA & HOURLY TIMINGS
@@ -591,21 +706,20 @@
         const SECRET_PIN = "111";
         const STORAGE_KEY = "wedding_script_pin_unlocked_v1";
         
-        // Persistent PIN state from LocalStorage
         let isUnlocked = localStorage.getItem(STORAGE_KEY) === "true";
         let currentStepIndex = 0;
 
         const hourlyBlocks = [
             { id: "17:00", label: "17:00 – 18:00", startIndex: 0 },
             { id: "18:00", label: "18:00 – 19:00", startIndex: 6 },
-            { id: "19:00", label: "19:00 – 20:00", startIndex: 11 },
-            { id: "20:00", label: "20:00 – 21:00", startIndex: 13 },
+            { id: "19:00", label: "19:00 – 20:00", startIndex: 12 },
+            { id: "20:00", label: "20:00 – 21:00", startIndex: 14 },
             { id: "21:00", label: "21:00 – 23:00", startIndex: 16 },
             { id: "23:00", label: "23:00 – 00:00", startIndex: 22 }
         ];
 
         const scenarioData = [
-            // 17:00 Block
+            // 17:00 Block (Indices 0..5)
             {
                 hourGroup: "17:00",
                 time: "17:00 – 17:30",
@@ -654,13 +768,21 @@
                 speech: "«Друзья, это была абсолютно великолепная регистрация! Теперь у нас есть официальный документ их совместной любви, теперь Юра и Рита — официальная семья! Но это — только самое начало нашего большого вечера. Сегодня мы будем праздновать, гулять и радоваться от всей души! Дорогие гости, проходите и присаживайтесь за столы!»"
             },
 
-            // 18:00 Block
+            // 18:00 Block (Indices 6..11)
             {
                 hourGroup: "18:00",
                 time: "18:00",
                 title: "18:00 — Старт вечера",
                 type: "Блок 1: Старт вечера & Главные тосты",
                 details: "Приветствие ведущего / авторский стих / импровизация — БЕЗ ЧЁТКОГО ТЕКСТА, без тоста."
+            },
+            {
+                hourGroup: "18:00",
+                time: "18:05",
+                title: "18:05 — ПЕРВЫЙ ТАНЕЦ МОЛОДОЖЕНОВ",
+                type: "Главный романтический момент старта",
+                details: "Первый танец Юры и Маргариты в статусе официальной семьи. Трек: Свят — «Не отпускай».",
+                speech: "«Друзья, они только что зафиксировали свой главный союз и официально стали семьей! И прямо сейчас, открывая наш большой праздничный вечер, время для их первого танца в новом статусе мужа и жены. На танцпол приглашаются наши молодожены — Юра и Рита!»"
             },
             {
                 hourGroup: "18:00",
@@ -697,7 +819,7 @@
                 details: "Подача 1-го Основного Горячего блюда."
             },
 
-            // 19:00 Block
+            // 19:00 Block (Indices 12..13)
             {
                 hourGroup: "19:00",
                 time: "19:00 – 19:40",
@@ -739,7 +861,7 @@
                 details: "Запуск первого интерактива «Нейромузыка»."
             },
 
-            // 20:00 Block
+            // 20:00 Block (Indices 14..15)
             {
                 hourGroup: "20:00",
                 time: "20:00 – 20:30",
@@ -766,21 +888,13 @@
             {
                 hourGroup: "20:00",
                 time: "20:30",
-                title: "20:30 — ПЕРВЫЙ ТАНЕЦ МОЛОДОЖЕНОВ",
-                type: "Кульминационный момент",
-                details: "Танцевальный номер пары. Трек: Свят — «Не отпускай».",
-                speech: "«Друзья, затаите дыхание. Время для самого романтичного момента этого вечера. На танцпол приглашаются наши молодожены — Юра и Рита!»"
-            },
-            {
-                hourGroup: "20:00",
-                time: "20:35",
-                title: "20:35 — ВЗРЫВ ТАНЦПОЛА",
-                type: "Интерактив «Танцевальный алфавит»",
-                details: "Массовый зажигательный танцевальный интерактив.",
-                speech: "«Не размыкаем круг! Все подхватываем ребят, выходим в центр — прямо сейчас мы разрываем этот танцпол! Поехали!»"
+                title: "20:30 — ОТКРЫТЫЙ ТАНЦПОЛ: Интерактив «Танцевальный алфавит»",
+                type: "Взрыв танцпола & Танцевальный блок",
+                details: "Переход к активной танцевальной паузе с интерактивом «Танцевальный алфавит».",
+                speech: "«Друзья! Сегодня наша семейная пара уже открыла этот танцпол своим прекрасным танцем, а теперь я предлагаю всем нам немного зарядить его бешеным танцевальным ритмом! Выходим все в центр, не стесняемся — прямо сейчас мы разрываем этот танцпол! Поехали!»"
             },
 
-            // 21:00 Block
+            // 21:00 Block (Indices 16..21)
             {
                 hourGroup: "21:00",
                 time: "21:00",
@@ -830,7 +944,7 @@
                 speech: "«Друзья! Сегодня звучало очень много правильных, душевных и важных слов от родителей, братьев, свидетелей и друзей. И наблюдая за Юрой и Ритой на протяжении всего этого вечера, я хочу сказать кое-что от себя.\n\nСмотреть на вас — это настоящее удовольствие. В вас нет ни капли наигранности. Только искренность, драйв и глубокое, настоящее уважение друг к другу. Вы — потрясающая команда.\n\nДавайте поднимем бокалы за то, чтобы эта легкость, этот огонь в глазах и это чувство юмора сопровождали вашу семью всю жизнь! За Юру и Риту! Горько!»"
             },
 
-            // 23:00 Block
+            // 23:00 Block (Index 22)
             {
                 hourGroup: "23:00",
                 time: "23:00 – 00:00",
@@ -841,7 +955,7 @@
         ];
 
         /* ===================================================
-           3. UI RENDER ENGINE
+           3. UI RENDER ENGINE & EVENT LISTENERS
            =================================================== */
         const mainContent = document.getElementById('main-content');
         const btnPrev = document.getElementById('btn-prev');
@@ -850,25 +964,10 @@
         const progressFill = document.getElementById('progress-fill');
         const hourTabsContainer = document.getElementById('hour-tabs-container');
 
-        const btnOpenPin = document.getElementById('btn-open-pin');
         const pinModalOverlay = document.getElementById('pin-modal-overlay');
         const btnCloseModal = document.getElementById('btn-close-modal');
         const btnSubmitPin = document.getElementById('btn-submit-pin');
         const pinInput = document.getElementById('pin-input');
-        const pinIcon = document.getElementById('pin-icon');
-        const pinStatusText = document.getElementById('pin-status-text');
-
-        function updatePinUI() {
-            if (isUnlocked) {
-                btnOpenPin.classList.add('unlocked');
-                pinIcon.textContent = "🔓";
-                pinStatusText.textContent = "Открыто";
-            } else {
-                btnOpenPin.classList.remove('unlocked');
-                pinIcon.textContent = "🔒";
-                pinStatusText.textContent = "ПИН";
-            }
-        }
 
         function renderHourTabs() {
             let tabsHTML = '';
@@ -890,11 +989,9 @@
             renderStep(currentStepIndex);
         }
 
-        // Returns speech HTML ONLY if unlocked, otherwise empty string (no DOM markup)
+        // Returns speech HTML ONLY if unlocked, otherwise empty string (Omit from DOM)
         function formatSpeechHTML(text) {
-            if (!isUnlocked || !text) {
-                return '';
-            }
+            if (!isUnlocked || !text) return '';
             return `
                 <div class="speech-box">
                     <div class="speech-header">🎙️ Речь Богдана</div>
@@ -903,27 +1000,32 @@
             `;
         }
 
-        // Returns question HTML ONLY if unlocked, otherwise empty string (no DOM markup)
+        // Returns question HTML ONLY if unlocked, otherwise empty string (Omit from DOM)
         function formatQuestionHTML(text) {
-            if (!isUnlocked || !text) {
-                return '';
-            }
+            if (!isUnlocked || !text) return '';
             return `
                 <div class="question-box">
                     <div class="question-header">❓ Вопрос гостю</div>
-                    <div class="section-text" style="font-weight: 600; color: #E8FFEA;">${text}</div>
+                    <div class="section-text" style="font-weight: 700; color: #E8FFEA;">${text}</div>
                 </div>
             `;
         }
 
         function renderStep(index) {
             const item = scenarioData[index];
+            const pinBtnLabel = isUnlocked ? "🔓 Открыто" : "🔒 ПИН";
+            const pinBtnClass = isUnlocked ? "btn-pin-toggle unlocked" : "btn-pin-toggle";
+
             let html = `
                 <div class="scenario-card">
-                    <div class="time-badge-row">
+                    <!-- TIMER BADGE & PIN BUTTON IN ONE ROW -->
+                    <div class="timer-pin-row">
                         <div class="time-badge">⏰ ${item.time}</div>
-                        <div class="hour-badge">Блок ${item.hourGroup}</div>
+                        <button class="${pinBtnClass}" onclick="handlePinButtonClick()">
+                            ${pinBtnLabel}
+                        </button>
                     </div>
+
                     <div class="block-title">${item.title}</div>
             `;
 
@@ -978,8 +1080,8 @@
                     const questionPart = formatQuestionHTML(f.question);
 
                     html += `
-                        <div style="border-top: 1px solid rgba(255,255,255,0.12); padding-top: 12px; margin-top: 6px; display: flex; flex-direction: column; gap: 8px;">
-                            <div style="font-size: 15px; font-weight: 700; color: var(--ios-accent);">👥 ${f.names}</div>
+                        <div style="border-top: 1px solid rgba(255,255,255,0.15); padding-top: 10px; margin-top: 4px; display: flex; flex-direction: column; gap: 8px;">
+                            <div style="font-size: 15px; font-weight: 800; color: #FF2D55;">👥 ${f.names}</div>
                             ${speechPart}
                             ${questionPart}
                         </div>
@@ -994,8 +1096,8 @@
                     const questionPart = formatQuestionHTML(e.question);
 
                     html += `
-                        <div style="border-top: 1px solid rgba(255,255,255,0.12); padding-top: 12px; margin-top: 6px; display: flex; flex-direction: column; gap: 8px;">
-                            <div style="font-size: 15px; font-weight: 700; color: var(--ios-gold);">✨ ${e.names}</div>
+                        <div style="border-top: 1px solid rgba(255,255,255,0.15); padding-top: 10px; margin-top: 4px; display: flex; flex-direction: column; gap: 8px;">
+                            <div style="font-size: 15px; font-weight: 800; color: var(--ios-gold);">✨ ${e.names}</div>
                             ${speechPart}
                             ${questionPart}
                         </div>
@@ -1032,37 +1134,35 @@
             pinInput.blur();
         }
 
+        function handlePinButtonClick() {
+            if (isUnlocked) {
+                if (confirm("Заблокировать речи ведущего и вопросы?")) {
+                    isUnlocked = false;
+                    try {
+                        localStorage.removeItem(STORAGE_KEY);
+                    } catch(e) {}
+                    renderStep(currentStepIndex);
+                }
+            } else {
+                openPinModal();
+            }
+        }
+
         function checkPin() {
             if (pinInput.value === SECRET_PIN) {
                 isUnlocked = true;
                 try {
                     localStorage.setItem(STORAGE_KEY, "true");
                 } catch(e) {}
-                updatePinUI();
                 closePinModal();
                 renderStep(currentStepIndex);
             } else {
                 pinInput.style.borderColor = "var(--ios-red)";
                 setTimeout(() => {
-                    pinInput.style.borderColor = "rgba(255, 255, 255, 0.25)";
+                    pinInput.style.borderColor = "rgba(255, 45, 85, 0.4)";
                 }, 800);
             }
         }
-
-        btnOpenPin.addEventListener('click', () => {
-            if (isUnlocked) {
-                if (confirm("Снова заблокировать речи ведущего и вопросы?")) {
-                    isUnlocked = false;
-                    try {
-                        localStorage.removeItem(STORAGE_KEY);
-                    } catch(e) {}
-                    updatePinUI();
-                    renderStep(currentStepIndex);
-                }
-            } else {
-                openPinModal();
-            }
-        });
 
         btnCloseModal.addEventListener('click', closePinModal);
         btnSubmitPin.addEventListener('click', checkPin);
@@ -1091,7 +1191,6 @@
         });
 
         // Initialize App
-        updatePinUI();
         renderStep(0);
     </script>
 </body>
