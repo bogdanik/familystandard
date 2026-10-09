@@ -7,11 +7,11 @@ socketio = SocketIO(app, cors_allowed_origins="*")
 # Исходное состояние интерактива
 def get_initial_state():
     return {
-        "round": 0,              # 0 = режим ожидания
-        "track": None,          # 'aim' или 'm'
+        "round": 0,              # 0 = режим ожидания, 1-12 = обычные раунды, 13 = бонус
+        "track": None,          # 'aim', 'm' или 'bonus'
         "playing": False,        # Воспроизводится ли трек
         "trigger_animation": False,
-        "admin_sid": None        # Socket ID первого нажавшего
+        "admin_sid": None        # Socket ID ведущего
     }
 
 game_state = get_initial_state()
@@ -57,7 +57,7 @@ def handle_admin_command(data):
     action = data.get('action')
 
     if action == 'next_round':
-        if game_state['round'] < 12:
+        if game_state['round'] <= 12:
             game_state['round'] += 1
             game_state['playing'] = False
             game_state['track'] = None
