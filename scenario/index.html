@@ -1,542 +1,1098 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Сценарий: Татьяна и Константин — 20 лет вместе</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --bg-main: #0a0d14;
-      --card-bg: #131924;
-      --card-inner: #1a2232;
-      --gold-primary: #f59e0b;
-      --gold-bright: #fbbf24;
-      --gold-light: #fef08a;
-      --text-main: #ffffff;
-      --text-sub: #cbd5e1;
-      --border-accent: #3b82f6;
-      --border-gold: #d97706;
-      --border-card: rgba(245, 158, 11, 0.35);
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Свадебный Сценарий — Юра & Маргарита</title>
+    <style>
+        /* iOS Core Styles & Dark Glassmorphism Aesthetic */
+        :root {
+            --ios-bg: #000000;
+            --ios-card-bg: rgba(255, 255, 255, 0.09);
+            --ios-card-border: rgba(255, 255, 255, 0.18);
+            --ios-accent: #0A84FF;
+            --ios-gold: #FFD60A;
+            --ios-green: #30D158;
+            --ios-red: #FF453A;
+            --ios-text: #FFFFFF;
+            --ios-text-secondary: rgba(255, 255, 255, 0.65);
+            --ios-blur: blur(30px) saturate(190%);
+        }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    
-    body {
-      background-color: var(--bg-main);
-      color: var(--text-main);
-      font-family: 'Inter', system-ui, -apple-system, sans-serif;
-      line-height: 1.5;
-      min-height: 100vh;
-      overflow-x: hidden;
-      padding-bottom: 50px;
-      -webkit-font-smoothing: antialiased;
-    }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
 
-    /* Particle Canvas Background */
-    #canvas-particles {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100vw; height: 100vh;
-      z-index: 0;
-      pointer-events: none;
-    }
+        body, html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: var(--ios-bg);
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+            color: var(--ios-text);
+        }
 
-    .app-container {
-      position: relative;
-      z-index: 1;
-      max-width: 820px;
-      margin: 0 auto;
-      padding: 16px;
-    }
+        /* Hyperspace Canvas Background */
+        #canvas-hyperspace {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
 
-    /* Top Navigation Header */
-    .sticky-controls {
-      position: sticky;
-      top: 10px;
-      z-index: 100;
-      background: rgba(19, 25, 36, 0.98);
-      border: 2px solid var(--gold-primary);
-      border-radius: 16px;
-      padding: 12px 16px;
-      margin-bottom: 24px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.8), 0 0 15px rgba(245, 158, 11, 0.2);
-    }
+        /* Main Container */
+        .app-container {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            max-width: 680px;
+            margin: 0 auto;
+            padding: 12px 14px 16px 14px;
+            gap: 12px;
+        }
 
-    .btn-step {
-      background: linear-gradient(135deg, var(--gold-primary), #b45309);
-      border: none;
-      color: #000000;
-      padding: 12px 18px;
-      border-radius: 10px;
-      font-size: 0.95rem;
-      font-weight: 800;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      flex: 1;
-      max-width: 190px;
-      text-align: center;
-      box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
-    }
-    .btn-step:hover:not(:disabled) {
-      transform: translateY(-1px);
-      background: linear-gradient(135deg, var(--gold-bright), var(--gold-primary));
-      box-shadow: 0 6px 16px rgba(245, 158, 11, 0.5);
-    }
-    .btn-step:disabled {
-      opacity: 0.25;
-      cursor: not-allowed;
-      box-shadow: none;
-      background: #334155;
-      color: #94a3b8;
-    }
+        /* Header Bar */
+        .ios-header {
+            background: var(--ios-card-bg);
+            backdrop-filter: var(--ios-blur);
+            -webkit-backdrop-filter: var(--ios-blur);
+            border: 1px solid var(--ios-card-border);
+            border-radius: 20px;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+        }
 
-    .step-counter {
-      font-size: 1rem;
-      font-weight: 900;
-      color: var(--gold-bright);
-      text-align: center;
-      white-space: nowrap;
-      letter-spacing: 0.5px;
-    }
+        .couple-names {
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #FFFFFF 0%, #FFD60A 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
 
-    /* Header Section */
-    header {
-      background: linear-gradient(180deg, #1e293b, #0f172a);
-      border: 2px solid rgba(245, 158, 11, 0.4);
-      border-radius: 20px;
-      padding: 24px 20px;
-      text-align: center;
-      margin-bottom: 24px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
-    }
-    header h1 {
-      font-size: 2.2rem;
-      font-weight: 900;
-      color: var(--gold-bright);
-      letter-spacing: -0.5px;
-      line-height: 1.2;
-      text-shadow: 0 2px 10px rgba(0,0,0,0.5);
-    }
-    header .subtitle {
-      color: var(--text-main);
-      font-size: 1.1rem;
-      font-weight: 700;
-      margin-top: 8px;
-    }
-    header .info-pills {
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 16px;
-    }
-    .pill {
-      background: #0f172a;
-      border: 1.5px solid var(--gold-primary);
-      padding: 6px 14px;
-      border-radius: 20px;
-      font-size: 0.85rem;
-      font-weight: 800;
-      color: var(--gold-light);
-    }
+        .event-subtitle {
+            font-size: 11px;
+            color: var(--ios-text-secondary);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
 
-    /* Cards */
-    .step-card {
-      background: var(--card-bg);
-      border: 2px solid var(--border-card);
-      border-radius: 20px;
-      padding: 24px;
-      margin-bottom: 24px;
-      display: none;
-      box-shadow: 0 12px 32px rgba(0,0,0,0.6);
-      animation: fadeIn 0.25s ease-out;
-    }
-    .step-card.active {
-      display: block;
-    }
+        .btn-pin-toggle {
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            padding: 6px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(6px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+        .btn-pin-toggle.unlocked {
+            border-color: rgba(48, 209, 88, 0.5);
+            color: var(--ios-green);
+            background: rgba(48, 209, 88, 0.15);
+        }
 
-    .card-header {
-      border-bottom: 2px solid rgba(245, 158, 11, 0.25);
-      padding-bottom: 14px;
-      margin-bottom: 20px;
-    }
-    .card-title {
-      font-size: 1.7rem;
-      font-weight: 900;
-      color: var(--gold-bright);
-      line-height: 1.2;
-    }
-    .card-time {
-      font-size: 1.05rem;
-      color: #60a5fa;
-      font-weight: 800;
-      margin-top: 6px;
-    }
+        /* TOP NAVIGATION CONTROLS */
+        .top-nav-panel {
+            background: var(--ios-card-bg);
+            backdrop-filter: var(--ios-blur);
+            -webkit-backdrop-filter: var(--ios-blur);
+            border: 1px solid var(--ios-card-border);
+            border-radius: 22px;
+            padding: 10px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        }
 
-    .tag-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-bottom: 20px;
-    }
-    .tag {
-      font-size: 0.8rem;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      padding: 6px 12px;
-      border-radius: 8px;
-      font-weight: 900;
-    }
-    .tag-speech { background: #581c87; color: #f0abfc; border: 1.5px solid #c084fc; }
-    .tag-interactive { background: #1e3a8a; color: #93c5fd; border: 1.5px solid #60a5fa; }
-    .tag-dj { background: #713f12; color: #fde047; border: 1.5px solid #facc15; }
-    .tag-food { background: #14532d; color: #86efac; border: 1.5px solid #4ade80; }
+        .nav-buttons-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
 
-    .content-block {
-      margin-bottom: 20px;
-      font-size: 1rem;
-    }
-    .content-block h4 {
-      color: var(--gold-light);
-      font-size: 1.15rem;
-      font-weight: 800;
-      margin-bottom: 8px;
-    }
-    .content-block p {
-      color: var(--text-sub);
-      font-weight: 600;
-      margin-bottom: 10px;
-    }
+        .btn-ios {
+            flex: 1;
+            height: 44px;
+            border-radius: 16px;
+            border: none;
+            background: var(--ios-accent);
+            color: #FFFFFF;
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
 
-    .speech-script {
-      background: var(--card-inner);
-      border-left: 5px solid var(--gold-primary);
-      border-radius: 0 12px 12px 0;
-      padding: 16px 18px;
-      margin: 14px 0;
-      font-size: 1rem;
-      font-weight: 600;
-      color: #f8fafc;
-      line-height: 1.6;
-      box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
-    }
+        .btn-ios:active {
+            transform: scale(0.96);
+            opacity: 0.85;
+        }
 
-    .guest-question-box {
-      background: var(--card-inner);
-      border: 1.5px solid rgba(245, 158, 11, 0.4);
-      border-radius: 12px;
-      padding: 16px;
-      margin-top: 12px;
-    }
-    .guest-name {
-      color: var(--gold-bright);
-      font-size: 1.1rem;
-      font-weight: 800;
-      display: block;
-      margin-bottom: 6px;
-    }
-    .guest-question {
-      color: #f1f5f9;
-      font-size: 0.98rem;
-      font-weight: 700;
-      line-height: 1.5;
-    }
+        .btn-ios-secondary {
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            color: #FFFFFF;
+        }
 
-    footer {
-      text-align: center;
-      padding: 24px 0 10px;
-      color: var(--text-sub);
-      font-size: 0.85rem;
-      font-weight: 700;
-      border-top: 1px solid rgba(245, 158, 11, 0.2);
-      margin-top: 32px;
-    }
+        .btn-ios:disabled {
+            opacity: 0.3;
+            pointer-events: none;
+        }
 
-    @media (max-width: 600px) {
-      header h1 { font-size: 1.7rem; }
-      .card-title { font-size: 1.4rem; }
-      .btn-step { padding: 10px 12px; font-size: 0.85rem; }
-      .step-card { padding: 16px; }
-      .guest-question-box { padding: 12px; }
-    }
-  </style>
+        .step-counter-top {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--ios-text-secondary);
+            min-width: 75px;
+            text-align: center;
+            letter-spacing: 0.3px;
+        }
+
+        /* Hourly Jump Bar */
+        .hour-tabs-scroll {
+            display: flex;
+            gap: 6px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            padding-bottom: 2px;
+        }
+
+        .hour-tabs-scroll::-webkit-scrollbar {
+            display: none;
+        }
+
+        .hour-tab-pill {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: rgba(255, 255, 255, 0.8);
+            padding: 5px 11px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .hour-tab-pill.active {
+            background: var(--ios-accent);
+            border-color: var(--ios-accent);
+            color: #FFFFFF;
+            box-shadow: 0 4px 12px rgba(10, 132, 255, 0.35);
+        }
+
+        .progress-bar-wrap {
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.12);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: var(--ios-accent);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        /* Main Scroll Content */
+        .main-content {
+            flex: 1;
+            overflow-y: auto;
+            position: relative;
+            scrollbar-width: none;
+            border-radius: 24px;
+        }
+
+        .main-content::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Scenario Card */
+        .scenario-card {
+            background: var(--ios-card-bg);
+            backdrop-filter: var(--ios-blur);
+            -webkit-backdrop-filter: var(--ios-blur);
+            border: 1px solid var(--ios-card-border);
+            border-radius: 24px;
+            padding: 20px;
+            box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6);
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            animation: cardFadeIn 0.25s ease-out;
+        }
+
+        @keyframes cardFadeIn {
+            from { opacity: 0; transform: translateY(8px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .time-badge-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .time-badge {
+            background: rgba(10, 132, 255, 0.2);
+            border: 1px solid rgba(10, 132, 255, 0.4);
+            color: #64D2FF;
+            font-size: 13px;
+            font-weight: 700;
+            padding: 5px 12px;
+            border-radius: 10px;
+            letter-spacing: 0.5px;
+        }
+
+        .hour-badge {
+            font-size: 11px;
+            color: var(--ios-text-secondary);
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .block-title {
+            font-size: 19px;
+            font-weight: 700;
+            line-height: 1.35;
+            color: #FFFFFF;
+        }
+
+        .section-box {
+            background: rgba(255, 255, 255, 0.04);
+            border-left: 3px solid var(--ios-accent);
+            padding: 10px 14px;
+            border-radius: 0 14px 14px 0;
+        }
+
+        .section-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: var(--ios-text-secondary);
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .section-text {
+            font-size: 14px;
+            line-height: 1.48;
+            color: rgba(255, 255, 255, 0.92);
+        }
+
+        /* Speech Box */
+        .speech-box {
+            background: rgba(255, 214, 10, 0.12);
+            border: 1px solid rgba(255, 214, 10, 0.45);
+            border-radius: 16px;
+            padding: 14px;
+            animation: fadeInSpeech 0.3s ease;
+        }
+
+        @keyframes fadeInSpeech {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .speech-header {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--ios-gold);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+
+        .speech-content {
+            font-size: 14px;
+            line-height: 1.5;
+            color: #FFF8E7;
+            font-style: italic;
+        }
+
+        /* Question Box */
+        .question-box {
+            background: rgba(48, 209, 88, 0.12);
+            border: 1px solid rgba(48, 209, 88, 0.45);
+            border-radius: 16px;
+            padding: 14px;
+            animation: fadeInSpeech 0.3s ease;
+        }
+
+        .question-header {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--ios-green);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+
+        /* PIN Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(16px);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .pin-modal {
+            background: rgba(28, 28, 30, 0.9);
+            backdrop-filter: blur(40px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 26px;
+            padding: 24px;
+            width: 100%;
+            max-width: 310px;
+            text-align: center;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.8);
+            transform: scale(0.92);
+            transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .modal-overlay.active .pin-modal {
+            transform: scale(1);
+        }
+
+        .pin-modal h3 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .pin-modal p {
+            font-size: 13px;
+            color: var(--ios-text-secondary);
+            margin-bottom: 16px;
+        }
+
+        .pin-input-field {
+            width: 100%;
+            height: 46px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 14px;
+            color: #FFF;
+            font-size: 20px;
+            letter-spacing: 10px;
+            text-align: center;
+            outline: none;
+            margin-bottom: 16px;
+        }
+
+        .pin-input-field:focus {
+            border-color: var(--ios-accent);
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+        }
+    </style>
 </head>
 <body>
 
-  <canvas id="canvas-particles"></canvas>
+    <!-- Mathematical Hyperspace Canvas -->
+    <canvas id="canvas-hyperspace"></canvas>
 
-  <div class="app-container">
+    <div class="app-container">
+        
+        <!-- Header -->
+        <header class="ios-header">
+            <div>
+                <div class="couple-names">Юра & Маргарита</div>
+                <div class="event-subtitle">Свадебный сценарий</div>
+            </div>
+            <button class="btn-pin-toggle" id="btn-open-pin">
+                <span id="pin-icon">🔒</span>
+                <span id="pin-status-text">ПИН</span>
+            </button>
+        </header>
 
-    <!-- Top Sticky Controls -->
-    <div class="sticky-controls">
-      <button class="btn-step" id="prevBtn" onclick="changeStep(-1)">Предыдущий этап</button>
-      <span class="step-counter" id="stepCounter">Этап 1 из 6</span>
-      <button class="btn-step" id="nextBtn" onclick="changeStep(1)">Следующий этап</button>
+        <!-- TOP NAVIGATION CONTROLS -->
+        <div class="top-nav-panel">
+            <div class="nav-buttons-top">
+                <button class="btn-ios btn-ios-secondary" id="btn-prev">
+                    ‹ Назад
+                </button>
+                <div class="step-counter-top" id="step-counter">1 из 23</div>
+                <button class="btn-ios" id="btn-next">
+                    Следующий этап ›
+                </button>
+            </div>
+
+            <!-- Hour-by-Hour Fast Jump Tabs -->
+            <div class="hour-tabs-scroll" id="hour-tabs-container">
+                <!-- Dynamically injected hour pills -->
+            </div>
+
+            <div class="progress-bar-wrap">
+                <div class="progress-bar-fill" id="progress-fill"></div>
+            </div>
+        </div>
+
+        <!-- Main Scenario Card Area -->
+        <main class="main-content" id="main-content">
+            <!-- Active step rendered dynamically via JS -->
+        </main>
+
     </div>
 
-    <header>
-      <h1>Татьяна и Константин</h1>
-      <div class="subtitle">Фарфоровая свадьба — 20 лет вместе</div>
-      <div class="info-pills">
-        <span class="pill">45 гостей</span>
-        <span class="pill">Сбор: 17:30 – 18:00</span>
-        <span class="pill">Формат: Свободный вечер</span>
-      </div>
-    </header>
-
-    <!-- STEP 1 -->
-    <div class="step-card active">
-      <div class="card-header">
-        <div class="card-title">Этап 1: Сбор гостей и Велком</div>
-        <div class="card-time">Тайминг: 17:30 – 18:00</div>
-      </div>
-      <div class="tag-row">
-        <span class="tag tag-dj">Сет Диджея</span>
-        <span class="tag tag-food">Свободная подача</span>
-      </div>
-
-      <div class="content-block">
-        <h4>Атмосфера и работа ведущего</h4>
-        <p>Сбор гостей, свободное общение, фотосессия. Ведущий встречает приходящих, помогает комфортно расположиться старшему поколению. На столах накрыты холодные закуски и напитки. Подача горячих блюд происходит в свободном графике по готовности и запросам гостей.</p>
-      </div>
-
-      <div class="content-block">
-        <h4>Музыкальное сопровождение</h4>
-        <p>Фоновый сет диджея: Mellow Lounge, Smooth Jazz, стильные обработанные версии популярной музыки.</p>
-      </div>
+    <!-- PIN Modal -->
+    <div class="modal-overlay" id="pin-modal-overlay">
+        <div class="pin-modal">
+            <h3>Доступ ведущего</h3>
+            <p>Введите ПИН-код для отображения речей и вопросов гостям</p>
+            <input type="password" id="pin-input" class="pin-input-field" maxlength="4" placeholder="••••" autocomplete="off" inputmode="numeric">
+            <div class="modal-actions">
+                <button class="btn-ios btn-ios-secondary" id="btn-close-modal">Отмена</button>
+                <button class="btn-ios" id="btn-submit-pin">Войти</button>
+            </div>
+        </div>
     </div>
 
-    <!-- STEP 2 -->
-    <div class="step-card">
-      <div class="card-header">
-        <div class="card-title">Этап 2: Торжественное открытие и Слова Родителям</div>
-        <div class="card-time">Тайминг: 18:00 – 18:50</div>
-      </div>
-      <div class="tag-row">
-        <span class="tag tag-speech">Приветственная речь</span>
-        <span class="tag tag-speech">Поздравления</span>
-      </div>
+    <script>
+        /* ===================================================
+           1. MATHEMATICAL HYPERSPACE CANVAS ANIMATION
+           =================================================== */
+        const canvas = document.getElementById('canvas-hyperspace');
+        const ctx = canvas.getContext('2d');
 
-      <div class="content-block">
-        <h4>Приветственное слово ведущего</h4>
-        <div class="speech-script">
-          «Добрый вечер, дорогие гости! Двадцать лет. Фарфоровая свадьба. Что такое двадцать лет совместной жизни? Это не просто цифра в календаре. Это тысячи прожитых вместе дней, сотни семейных традиций, общий юмор, пройденные испытания и, самое главное, умение беречь друг друга с той же нежностью, с какой хранят ценнейший фарфор. Сегодня у нас нет строгих регламентов. Это свободный праздник близких людей. Сегодня работает формат свободного микрофона: каждый, кто захочет поделиться теплом, сможет это сделать без какого-либо принуждения. Поздравляем Татьяну и Константина!»
-        </div>
-      </div>
+        let width, height, centerX, centerY;
+        const numParticles = 240;
+        const particles = [];
+        const speed = 14;
 
-      <div class="content-block">
-        <h4>Блок поздравлений родителей</h4>
-        <p>Ведущий аккуратно приглашает к микрофону старшее поколение, задавая легкий вводный вопрос перед речью.</p>
+        function resizeCanvas() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+            centerX = width / 2;
+            centerY = height / 2;
+        }
 
-        <div class="guest-question-box">
-          <span class="guest-name">Людмила Владимировна и Виталий Николаевич (Родители Татьяны)</span>
-          <p class="guest-question">Вопрос от ведущего: «Расскажите, каким вы помните тот день 20 лет назад, когда Татьяна впервые представила вам Константина? Было ли сразу понятно, что это союз на десятилетия?»</p>
-        </div>
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
 
-        <div class="guest-question-box">
-          <span class="guest-name">Раиса Константиновна (Мама Константина)</span>
-          <p class="guest-question">Вопрос от ведущего: «Какая черта характера вашего сына, по вашему мнению, стала главным залогом того, что их семья с Татьяной такая крепкая?»</p>
-        </div>
-      </div>
-    </div>
+        class Particle {
+            constructor() {
+                this.reset(true);
+            }
 
-    <!-- STEP 3 -->
-    <div class="step-card">
-      <div class="card-header">
-        <div class="card-title">Этап 3: Родственники и Интерактив «Нейромузыка»</div>
-        <div class="card-time">Тайминг: 18:50 – 19:40</div>
-      </div>
-      <div class="tag-row">
-        <span class="tag tag-speech">Семья</span>
-        <span class="tag tag-interactive">Интерактив 1: Нейромузыка</span>
-      </div>
+            reset(initial = false) {
+                this.x = (Math.random() - 0.5) * width * 2;
+                this.y = (Math.random() - 0.5) * height * 2;
+                this.z = initial ? Math.random() * width : width;
+                this.px = 0;
+                this.py = 0;
+                this.color = `hsl(${195 + Math.random() * 45}, 100%, ${70 + Math.random() * 25}%)`;
+            }
 
-      <div class="content-block">
-        <h4>Поздравления близких родственников</h4>
+            update() {
+                this.z -= speed;
+                if (this.z <= 0) {
+                    this.reset();
+                }
+            }
 
-        <div class="guest-question-box">
-          <span class="guest-name">Сергей и Наталья (Брат Татьяны с супругой)</span>
-          <p class="guest-question">Вопрос от ведущего: «Сергей, как брат, вспомните забавный или самый яркий момент из жизни Татьяны и Кости, когда они только начинали строить совместный быт?»</p>
-        </div>
+            draw() {
+                const k = 260 / this.z;
+                const sx = this.x * k + centerX;
+                const sy = this.y * k + centerY;
 
-        <div class="guest-question-box">
-          <span class="guest-name">Ирина Николаевна (Тётя Константина) и Светлана (Сестра Константина)</span>
-          <p class="guest-question">Вопрос от ведущего: «Что для вашей большой семьи всегда означал дом Татьяны и Константина?»</p>
-        </div>
-      </div>
+                if (sx < 0 || sx >= width || sy < 0 || sy >= height) {
+                    this.reset();
+                    return;
+                }
 
-      <div class="content-block">
-        <h4>Интерактивный блок №1: «Нейромузыка» (15–20 минут)</h4>
-        <p>Музыкально-технологичный интерактив, построенный на прослушивании и угадывании уникальных персонализированных аудио-треков о паре, сгенерированных нейросетью. Подходит для аудитории всех возрастов.</p>
-      </div>
-    </div>
+                const size = Math.max(0.5, (1 - this.z / width) * 2.8);
+                
+                if (this.px !== 0 && this.py !== 0) {
+                    ctx.beginPath();
+                    ctx.moveTo(this.px, this.py);
+                    ctx.lineTo(sx, sy);
+                    ctx.strokeStyle = this.color;
+                    ctx.lineWidth = size;
+                    ctx.globalAlpha = Math.min(1, (1 - this.z / width) * 1.6);
+                    ctx.stroke();
+                }
 
-    <!-- STEP 4 -->
-    <div class="step-card">
-      <div class="card-header">
-        <div class="card-title">Этап 4: Танцевальная пауза & Диджейский сет №1</div>
-        <div class="card-time">Тайминг: 19:40 – 20:10</div>
-      </div>
-      <div class="tag-row">
-        <span class="tag tag-dj">Диджей Сет</span>
-        <span class="tag tag-food">Свободная подача блюд</span>
-      </div>
+                this.px = sx;
+                this.py = sy;
+                ctx.globalAlpha = 1;
+            }
+        }
 
-      <div class="content-block">
-        <h4>Первый танцевальный блок</h4>
-        <p>Время активного отдыха гостей, свободного общения и заказа горячих блюд. Диджей строит сет на стыке эпох: золотые хиты для гостей 40-60 лет с плавной интеграцией современных ритмов для молодежной группы до 25 лет.</p>
-      </div>
-    </div>
+        for (let i = 0; i < numParticles; i++) {
+            particles.push(new Particle());
+        }
 
-    <!-- STEP 5 -->
-    <div class="step-card">
-      <div class="card-header">
-        <div class="card-title">Этап 5: Блок Друзей & Интерактив «Фарфоровый Квиз»</div>
-        <div class="card-time">Тайминг: 20:10 – 21:00</div>
-      </div>
-      <div class="tag-row">
-        <span class="tag tag-speech">Друзья</span>
-        <span class="tag tag-interactive">Интерактив 2: Квиз</span>
-      </div>
+        function animateHyperspace() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.24)';
+            ctx.fillRect(0, 0, width, height);
 
-      <div class="content-block">
-        <h4>Блок поздравлений друзей (Свободный микрофон)</h4>
+            for (let i = 0; i < particles.length; i++) {
+                particles[i].update();
+                particles[i].draw();
+            }
 
-        <div class="guest-question-box">
-          <span class="guest-name">Роман и Ольга</span>
-          <p class="guest-question">Вопрос от ведущего: «Вы знаете эту пару много лет. Поделитесь, в чем секрет их гостеприимства и как они изменились за эти 20 лет?»</p>
-        </div>
+            requestAnimationFrame(animateHyperspace);
+        }
 
-        <div class="guest-question-box">
-          <span class="guest-name">Жанна и Александр</span>
-          <p class="guest-question">Вопрос от ведущего: «Какая совместная поездка или вечер с Таней и Костей запомнились вам больше всего?»</p>
-        </div>
+        animateHyperspace();
 
-        <div class="guest-question-box">
-          <span class="guest-name">Лидия и Юрий</span>
-          <p class="guest-question">Вопрос от ведущего: «Каким одним словом вы бы охарактеризовали союз Татьяны и Константина?»</p>
-        </div>
+        /* ===================================================
+           2. SCENARIO DATA & HOURLY TIMINGS
+           =================================================== */
+        const SECRET_PIN = "111";
+        const STORAGE_KEY = "wedding_script_pin_unlocked_v1";
+        
+        // Persistent PIN state from LocalStorage
+        let isUnlocked = localStorage.getItem(STORAGE_KEY) === "true";
+        let currentStepIndex = 0;
 
-        <div class="guest-question-box">
-          <span class="guest-name">Друг Константин</span>
-          <p class="guest-question">Вопрос от ведущего: «Константин, как тёзка главного виновника торжества и его близкий друг, расскажи, каково это — иметь в друзьях человека с таким же именем и в чем вы с ним наиболее похожи?»</p>
-        </div>
-      </div>
+        const hourlyBlocks = [
+            { id: "17:00", label: "17:00 – 18:00", startIndex: 0 },
+            { id: "18:00", label: "18:00 – 19:00", startIndex: 6 },
+            { id: "19:00", label: "19:00 – 20:00", startIndex: 11 },
+            { id: "20:00", label: "20:00 – 21:00", startIndex: 13 },
+            { id: "21:00", label: "21:00 – 23:00", startIndex: 16 },
+            { id: "23:00", label: "23:00 – 00:00", startIndex: 22 }
+        ];
 
-      <div class="content-block">
-        <h4>Интерактивный блок №2: «Фарфоровый Квиз» (15–20 минут)</h4>
-        <p>Юмористическая викторина с вопросами о 20-летней истории союза Татьяны и Константина, курьезных моментах и забавных фактах из их жизни. Гости отвечают по командам или индивидуально.</p>
-      </div>
-    </div>
+        const scenarioData = [
+            // 17:00 Block
+            {
+                hourGroup: "17:00",
+                time: "17:00 – 17:30",
+                title: "17:00 — Сбор гостей & Велком",
+                type: "Велком & Брифинг (Одно помещение)",
+                details: "Сбор гостей, легкая музыка, пирамида шампанского.",
+                purpose: "Погружение гостей в праздничную атмосферу, знакомство, легкие напитки."
+            },
+            {
+                hourGroup: "17:00",
+                time: "17:20",
+                title: "17:20 — Разогревающий брифинг Богдана",
+                type: "Брифинг перед выездной регистрацией",
+                details: "Инструктаж гостей перед выходом пары.",
+                speech: "«Дорогие друзья, рад всех видеть! Буквально через 10 минут мы начинаем выездную регистрацию Юры и Риты. Просьба от меня лично: не стесняйтесь громких аплодисментов и искренних эмоций! Пусть ребят на выходе накроет настоящей волной нашей поддержки. Переводим телефоны в режим съемки и готовимся встречать нашу пару!»"
+            },
+            {
+                hourGroup: "17:00",
+                time: "17:30",
+                title: "17:30 — Выход Юры и Маргариты",
+                type: "Церемония Выездной Регистрации",
+                details: "Выход пары под Марш Мендельсона.",
+                speech: "«Дамы и господа, затаите дыхание! Под звуки главного марша любви и ваши оглушительные аплодисменты — встречаем главных героев этого дня, нашу потрясающую пару — Юру и Маргариту!»"
+            },
+            {
+                hourGroup: "17:00",
+                time: "17:35",
+                title: "17:35 — Подводка к церемонии",
+                type: "Церемония Выездной Регистрации",
+                details: "Передача слова регистратору.",
+                speech: "«Сегодня здесь, на наших глазах, происходит самое главное чудо — рождается новая семья. Два человека, два мира, объединяются в один союз искренней любви. И прямо сейчас я передаю слово не просто регистратору, а главному свидетелю этого исторического момента — человеку, который зафиксирует это прекрасное создание новой семьи и подпишет их самый первый официальный документ совместной любви!»"
+            },
+            {
+                hourGroup: "17:00",
+                time: "17:37 – 17:50",
+                title: "17:37 – 17:50 — Роспись & Поздравления",
+                type: "Церемония Выездной Регистрации",
+                details: "Роспись, обряд, поздравления с цветами."
+            },
+            {
+                hourGroup: "17:00",
+                time: "17:50",
+                title: "17:50 — Переход за столы",
+                type: "Завершение церемонии",
+                details: "Приглашение гостей в основной зал за столы.",
+                speech: "«Друзья, это была абсолютно великолепная регистрация! Теперь у нас есть официальный документ их совместной любви, теперь Юра и Рита — официальная семья! Но это — только самое начало нашего большого вечера. Сегодня мы будем праздновать, гулять и радоваться от всей души! Дорогие гости, проходите и присаживайтесь за столы!»"
+            },
 
-    <!-- STEP 6 -->
-    <div class="step-card">
-      <div class="card-header">
-        <div class="card-title">Этап 6: Интерактив «Символы» & Финальный танцевальный сет</div>
-        <div class="card-time">Тайминг: 21:00 – 22:00</div>
-      </div>
-      <div class="tag-row">
-        <span class="tag tag-interactive">Интерактив 3: Символы</span>
-        <span class="tag tag-dj">Финал и Фото</span>
-      </div>
+            // 18:00 Block
+            {
+                hourGroup: "18:00",
+                time: "18:00",
+                title: "18:00 — Старт вечера",
+                type: "Блок 1: Старт вечера & Главные тосты",
+                details: "Приветствие ведущего / авторский стих / импровизация — БЕЗ ЧЁТКОГО ТЕКСТА, без тоста."
+            },
+            {
+                hourGroup: "18:00",
+                time: "18:10",
+                title: "18:10 — ПЕРВЫЙ ТОСТ (Отец Жениха)",
+                type: "Блок 1: Главные тосты",
+                details: "Объяснение формата тостов & Выход Владимира Борисовича.",
+                speech: "«Друзья, мы с вами переходим к блоку поздравлений! И прежде чем прозвучит первый тост, я хочу сказать, как мы сегодня будем знакомиться. Чтобы мы лучше прочувствовали нашу теперь уже общую большую семью, перед каждым тостом я буду задавать нашим гостям небольшие вопросы. Так как Юра и Рита из разных стран и у каждого свой уникальный жизненный путь, эти вопросы помогут нам всем еще глубже узнать их как личностей, понять их характер, душевные качества и ту глубину, за которую мы их так любим.\n\nИ открывать нашу эстафету поздравлений должен человек, чья мудрость, мужской пример и сила сформировали Юру как человека. Первое слово и самый первый тост вечера — отец жениха, Владимир Борисович! Встречаем!»",
+                question: "«Владимир Борисович, если посмотреть на Юру не просто как на сына, а как на мужчину — какое его главное человеческое качество вы цените больше всего?»"
+            },
+            {
+                hourGroup: "18:00",
+                time: "18:25",
+                title: "18:25 — Боря и Аня (Брат жениха с женой)",
+                type: "Блок 1: Главные тосты",
+                details: "Поздравление от брата жениха Бори и его супруги Ани.",
+                speech: "«Семья — это надежный тыл и люди, с которыми радость умножается вдвое. На сцену приглашаются брат жениха Боря со своей супругой Аней!»",
+                question: "«Боря, Аня, какой главный масштаб личности или редкую черту характера вы открыли в Юре за годы общения?»"
+            },
+            {
+                hourGroup: "18:00",
+                time: "18:40",
+                title: "18:40 — Свидетели: Андрей, Галина (+ Таня)",
+                type: "Блок 1: Главные тосты",
+                details: "Выход свидетелей. Вручение «Чек-листа Свидетеля».",
+                speech: "«Люди, которые прошли с парой огонь, воду и организацию этой свадьбы! Встречаем — наши свидетели Андрей, Галина и Таня!»",
+                question: "«Ребята, расскажите, почему именно вы сегодня стали свидетелями этой пары и что для вас лично значит этот статус?»"
+            },
+            {
+                hourGroup: "18:00",
+                time: "18:55",
+                title: "18:55 — Подача 1-го Основного Горячего",
+                type: "Гастрономия",
+                details: "Подача 1-го Основного Горячего блюда."
+            },
 
-      <div class="content-block">
-        <h4>Интерактивный блок №3: Танцевальный интерактив «Символы» (15–20 минут)</h4>
-        <p>Динамичный танцевальный интерактив, объединяющий всех гостей на площадке через жесты, ритмические движения и музыкальные символы разных десятилетий.</p>
-      </div>
+            // 19:00 Block
+            {
+                hourGroup: "19:00",
+                time: "19:00 – 19:40",
+                title: "19:00 – 19:40 — Блок тостов друзей",
+                type: "Блок 2: Поздравления друзей & Нейромузыка",
+                friendsList: [
+                    {
+                        names: "Арсен с супругой",
+                        speech: "«Встречаем аплодисментами — Арсен и его супруга!»",
+                        question: "«Арсен, какое главное качество Юры как друга делает его человеком, на которого всегда можно положиться?»"
+                    },
+                    {
+                        names: "Альфия с мужем",
+                        speech: "«Ваши тёплые слова — Альфия с мужем!»",
+                        question: "«Альфия, какая черта характера Риты восхищает тебя больше всего?»"
+                    },
+                    {
+                        names: "Катерина с мужем",
+                        speech: "«На сцену приглашаются Катерина и её супруг!»",
+                        question: "«Катерина, в чем, по-твоему, заключается внутренняя сила и обаяние нашей пары?»"
+                    },
+                    {
+                        names: "Олеся и Светлана",
+                        speech: "«Олеся и Светлана — встречаем девушек!»",
+                        question: "«Девушки, какими глубокими человеческими качествами Рита покоряет людей с первых минут общения?»"
+                    },
+                    {
+                        names: "Сарвар, Денис, Хушнуд",
+                        speech: "«Мужской десант поздравлений — Сарвар, Денис, Хушнуд!»",
+                        question: "«Парни, три главных принципа Юры, за которые его по-настоящему уважают мужчины?»"
+                    }
+                ]
+            },
+            {
+                hourGroup: "19:00",
+                time: "19:40",
+                title: "19:40 — Интерактив №1: Нейромузыка",
+                type: "Блок 2: Интерактив",
+                details: "Запуск первого интерактива «Нейромузыка»."
+            },
 
-      <div class="content-block">
-        <h4>Ответное слово пары и Общее фото</h4>
-        <p>Татьяна и Константин берут микрофон для финального благодарственного слова всем пришедшим близким. Завершающая совместная фотография со всеми 45 гостями.</p>
-      </div>
+            // 20:00 Block
+            {
+                hourGroup: "20:00",
+                time: "20:00 – 20:30",
+                title: "20:00 – 20:30 — Поздравления от близких людей",
+                type: "Блок 3: Атмосферные тосты от дорогих гостей",
+                experiencedList: [
+                    {
+                        names: "Виктория и Елена",
+                        speech: "«Наш вечер продолжается, и на сцену приглашаются невероятно душевные и дорогие нашей паре гости! Встречаем — Виктория и Елена!»",
+                        question: "«Виктория, Елена, в чём, на ваш взгляд, главный секрет сохранения искреннего тепла, уюта и гармонии в доме на долгие годы?»"
+                    },
+                    {
+                        names: "Альбина, Кристина, Руслан",
+                        speech: "«Люди, которые умеют дарить потрясающее настроение и всегда рядом! Под ваши громкие аплодисменты на сцене — Альбина, Кристина и Руслан!»",
+                        question: "«Ребята, какой главный житейский совет вы дадите Юре и Рите, чтобы абсолютно любые мелочи в жизни они встречали с лёгкой улыбкой?»"
+                    },
+                    {
+                        names: "Василий и Лена",
+                        speech: "«Встречаем ещё одних невероятно близких людей нашей пары, готовых подарить свои самые тёплые слова! Василий и Лена, прошу на сцену!»",
+                        question: "«Василий, Лена, смотря на Юру и Риту сегодня — какое главное правило счастливой совместной жизни вы бы пожелали им взять с собой?»"
+                    }
+                ]
+            },
+            {
+                hourGroup: "20:00",
+                time: "20:30",
+                title: "20:30 — ПЕРВЫЙ ТАНЕЦ МОЛОДОЖЕНОВ",
+                type: "Кульминационный момент",
+                details: "Танцевальный номер пары. Трек: Свят — «Не отпускай».",
+                speech: "«Друзья, затаите дыхание. Время для самого романтичного момента этого вечера. На танцпол приглашаются наши молодожены — Юра и Рита!»"
+            },
+            {
+                hourGroup: "20:00",
+                time: "20:35",
+                title: "20:35 — ВЗРЫВ ТАНЦПОЛА",
+                type: "Интерактив «Танцевальный алфавит»",
+                details: "Массовый зажигательный танцевальный интерактив.",
+                speech: "«Не размыкаем круг! Все подхватываем ребят, выходим в центр — прямо сейчас мы разрываем этот танцпол! Поехали!»"
+            },
 
-      <div class="content-block">
-        <h4>Финальный танцевальный блок</h4>
-        <p>Завершающий музыкальный сет от диджея, свободные танцы и завершение вечера.</p>
-      </div>
-    </div>
+            // 21:00 Block
+            {
+                hourGroup: "21:00",
+                time: "21:00",
+                title: "21:00 — Подача 2-го Горячего блюда",
+                type: "Гастрономия",
+                details: "Сервировка 2-го горячего блюда."
+            },
+            {
+                hourGroup: "21:00",
+                time: "21:05",
+                title: "21:05 — Видеопоздравления",
+                type: "Блок 4: Медиа",
+                details: "Объединенный блок видеопоздравлений на экранах.",
+                speech: "«Друзья, внимание на экраны! Сейчас прозвучат самые тёплые видеопоздравления от тех, кто сегодня всей душой с нашей парой!»"
+            },
+            {
+                hourGroup: "21:00",
+                time: "21:15",
+                title: "21:15 — Интерактив №2: Свадебный Квиз",
+                type: "Блок 4: Развлечения",
+                details: "Забавные и неожиданные вопросы про историю любви Юры и Риты на экранах с вариантами ответов.",
+                purpose: "Дать гостям перевести дух за столом во время подачи 2-го горячего и мягко вовлечь весь зал.",
+                emotion: "Лёгкий азарт, гордость за знание фактов о паре, добрый смех и объединение всех поколений."
+            },
+            {
+                hourGroup: "21:00",
+                time: "21:35",
+                title: "21:35 — Традиции: Цветы Невесты",
+                type: "Блок 4: Традиции",
+                details: "Рита передает эстафету фаты незамужним девушкам.",
+                speech: "«Девушки, время узнать, кто следующий примеряет свадебную фату! Рита передает эстафету!»"
+            },
+            {
+                hourGroup: "21:00",
+                time: "21:45",
+                title: "21:45 — Свадебный ТОРТ & Ответное слово",
+                type: "Блок 4: Торт & Ответная речь",
+                details: "Вынос торта и ответная речь Юры и Риты.",
+                speech: "«Кульминация вечера — праздничный свадебный торт и самые важные слова от нашей пары!»"
+            },
+            {
+                hourGroup: "21:00",
+                time: "22:00",
+                title: "22:00 — ЛИЧНАЯ РЕЧЬ И ТОСТ ВЕДУЩЕГО",
+                type: "Финальный тост Богдана",
+                details: "Итоговый авторский тост ведущего.",
+                speech: "«Друзья! Сегодня звучало очень много правильных, душевных и важных слов от родителей, братьев, свидетелей и друзей. И наблюдая за Юрой и Ритой на протяжении всего этого вечера, я хочу сказать кое-что от себя.\n\nСмотреть на вас — это настоящее удовольствие. В вас нет ни капли наигранности. Только искренность, драйв и глубокое, настоящее уважение друг к другу. Вы — потрясающая команда.\n\nДавайте поднимем бокалы за то, чтобы эта легкость, этот огонь в глазах и это чувство юмора сопровождали вашу семью всю жизнь! За Юру и Риту! Горько!»"
+            },
 
-    <footer>
-      Family Standard Event OS | Сценарий праздничного вечера
-    </footer>
-  </div>
+            // 23:00 Block
+            {
+                hourGroup: "23:00",
+                time: "23:00 – 00:00",
+                title: "23:00 – 00:00 — Диджей-сет & Free Dance",
+                type: "Финал программы",
+                details: "Диджей-сет, свободная танцевальная программа."
+            }
+        ];
 
-  <script>
-    const canvas = document.getElementById('canvas-particles');
-    const ctx = canvas.getContext('2d');
-    let particles = [];
+        /* ===================================================
+           3. UI RENDER ENGINE
+           =================================================== */
+        const mainContent = document.getElementById('main-content');
+        const btnPrev = document.getElementById('btn-prev');
+        const btnNext = document.getElementById('btn-next');
+        const stepCounter = document.getElementById('step-counter');
+        const progressFill = document.getElementById('progress-fill');
+        const hourTabsContainer = document.getElementById('hour-tabs-container');
 
-    function resizeCanvas() {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    }
-    window.addEventListener('resize', resizeCanvas);
-    resizeCanvas();
+        const btnOpenPin = document.getElementById('btn-open-pin');
+        const pinModalOverlay = document.getElementById('pin-modal-overlay');
+        const btnCloseModal = document.getElementById('btn-close-modal');
+        const btnSubmitPin = document.getElementById('btn-submit-pin');
+        const pinInput = document.getElementById('pin-input');
+        const pinIcon = document.getElementById('pin-icon');
+        const pinStatusText = document.getElementById('pin-status-text');
 
-    class Particle {
-      constructor() { this.reset(); }
-      reset() {
-        this.x = Math.random() * canvas.width;
-        this.y = Math.random() * canvas.height;
-        this.size = Math.random() * 2.5 + 0.8;
-        this.speedX = (Math.random() - 0.5) * 0.2;
-        this.speedY = -Math.random() * 0.3 - 0.1;
-        this.alpha = Math.random() * 0.5 + 0.15;
-      }
-      update() {
-        this.x += this.speedX;
-        this.y += this.speedY;
-        if (this.y < 0) { this.reset(); this.y = canvas.height; }
-      }
-      draw() {
-        ctx.fillStyle = `rgba(245, 158, 11, ${this.alpha})`;
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        ctx.fill();
-      }
-    }
+        function updatePinUI() {
+            if (isUnlocked) {
+                btnOpenPin.classList.add('unlocked');
+                pinIcon.textContent = "🔓";
+                pinStatusText.textContent = "Открыто";
+            } else {
+                btnOpenPin.classList.remove('unlocked');
+                pinIcon.textContent = "🔒";
+                pinStatusText.textContent = "ПИН";
+            }
+        }
 
-    for (let i = 0; i < 45; i++) particles.push(new Particle());
+        function renderHourTabs() {
+            let tabsHTML = '';
+            const currentGroup = scenarioData[currentStepIndex].hourGroup;
 
-    function animate() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      particles.forEach(p => { p.update(); p.draw(); });
-      requestAnimationFrame(animate);
-    }
-    animate();
+            hourlyBlocks.forEach(hb => {
+                const isActive = hb.id === currentGroup ? 'active' : '';
+                tabsHTML += `
+                    <button class="hour-tab-pill ${isActive}" onclick="jumpToHour(${hb.startIndex})">
+                        ${hb.label}
+                    </button>
+                `;
+            });
+            hourTabsContainer.innerHTML = tabsHTML;
+        }
 
-    let currentStep = 0;
-    const cards = document.querySelectorAll('.step-card');
-    const totalSteps = cards.length;
+        function jumpToHour(index) {
+            currentStepIndex = index;
+            renderStep(currentStepIndex);
+        }
 
-    function updateView() {
-      cards.forEach((card, index) => {
-        card.classList.toggle('active', index === currentStep);
-      });
-      document.getElementById('stepCounter').innerText = `Этап ${currentStep + 1} из ${totalSteps}`;
-      document.getElementById('prevBtn').disabled = currentStep === 0;
-      document.getElementById('nextBtn').disabled = currentStep === totalSteps - 1;
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
+        // Returns speech HTML ONLY if unlocked, otherwise empty string (no DOM markup)
+        function formatSpeechHTML(text) {
+            if (!isUnlocked || !text) {
+                return '';
+            }
+            return `
+                <div class="speech-box">
+                    <div class="speech-header">🎙️ Речь Богдана</div>
+                    <div class="speech-content">${text.replace(/\n/g, '<br>')}</div>
+                </div>
+            `;
+        }
 
-    function changeStep(dir) {
-      currentStep += dir;
-      if (currentStep < 0) currentStep = 0;
-      if (currentStep >= totalSteps) currentStep = totalSteps - 1;
-      updateView();
-    }
+        // Returns question HTML ONLY if unlocked, otherwise empty string (no DOM markup)
+        function formatQuestionHTML(text) {
+            if (!isUnlocked || !text) {
+                return '';
+            }
+            return `
+                <div class="question-box">
+                    <div class="question-header">❓ Вопрос гостю</div>
+                    <div class="section-text" style="font-weight: 600; color: #E8FFEA;">${text}</div>
+                </div>
+            `;
+        }
 
-    updateView();
-  </script>
+        function renderStep(index) {
+            const item = scenarioData[index];
+            let html = `
+                <div class="scenario-card">
+                    <div class="time-badge-row">
+                        <div class="time-badge">⏰ ${item.time}</div>
+                        <div class="hour-badge">Блок ${item.hourGroup}</div>
+                    </div>
+                    <div class="block-title">${item.title}</div>
+            `;
+
+            if (item.type) {
+                html += `
+                    <div class="section-box">
+                        <div class="section-label">Этап</div>
+                        <div class="section-text">${item.type}</div>
+                    </div>
+                `;
+            }
+
+            if (item.details) {
+                html += `
+                    <div class="section-box">
+                        <div class="section-label">Детали / Сценарий</div>
+                        <div class="section-text">${item.details}</div>
+                    </div>
+                `;
+            }
+
+            if (item.purpose) {
+                html += `
+                    <div class="section-box">
+                        <div class="section-label">Цель</div>
+                        <div class="section-text">${item.purpose}</div>
+                    </div>
+                `;
+            }
+
+            if (item.emotion) {
+                html += `
+                    <div class="section-box">
+                        <div class="section-label">Эмоция</div>
+                        <div class="section-text">${item.emotion}</div>
+                    </div>
+                `;
+            }
+
+            if (item.speech) {
+                html += formatSpeechHTML(item.speech);
+            }
+
+            if (item.question) {
+                html += formatQuestionHTML(item.question);
+            }
+
+            // Render Friends Toasts List
+            if (item.friendsList) {
+                item.friendsList.forEach(f => {
+                    const speechPart = formatSpeechHTML(f.speech);
+                    const questionPart = formatQuestionHTML(f.question);
+
+                    html += `
+                        <div style="border-top: 1px solid rgba(255,255,255,0.12); padding-top: 12px; margin-top: 6px; display: flex; flex-direction: column; gap: 8px;">
+                            <div style="font-size: 15px; font-weight: 700; color: var(--ios-accent);">👥 ${f.names}</div>
+                            ${speechPart}
+                            ${questionPart}
+                        </div>
+                    `;
+                });
+            }
+
+            // Render Close Guests Toasts List
+            if (item.experiencedList) {
+                item.experiencedList.forEach(e => {
+                    const speechPart = formatSpeechHTML(e.speech);
+                    const questionPart = formatQuestionHTML(e.question);
+
+                    html += `
+                        <div style="border-top: 1px solid rgba(255,255,255,0.12); padding-top: 12px; margin-top: 6px; display: flex; flex-direction: column; gap: 8px;">
+                            <div style="font-size: 15px; font-weight: 700; color: var(--ios-gold);">✨ ${e.names}</div>
+                            ${speechPart}
+                            ${questionPart}
+                        </div>
+                    `;
+                });
+            }
+
+            html += `</div>`;
+            mainContent.innerHTML = html;
+
+            // Update Header & Controls State
+            stepCounter.textContent = `${index + 1} из ${scenarioData.length}`;
+            btnPrev.disabled = index === 0;
+            btnNext.disabled = index === scenarioData.length - 1;
+            
+            const progressPercent = ((index + 1) / scenarioData.length) * 100;
+            progressFill.style.width = `${progressPercent}%`;
+
+            renderHourTabs();
+            mainContent.scrollTop = 0;
+        }
+
+        /* ===================================================
+           4. PIN LOGIC & PERSISTENCE
+           =================================================== */
+        function openPinModal() {
+            pinModalOverlay.classList.add('active');
+            pinInput.value = "";
+            setTimeout(() => pinInput.focus(), 100);
+        }
+
+        function closePinModal() {
+            pinModalOverlay.classList.remove('active');
+            pinInput.blur();
+        }
+
+        function checkPin() {
+            if (pinInput.value === SECRET_PIN) {
+                isUnlocked = true;
+                try {
+                    localStorage.setItem(STORAGE_KEY, "true");
+                } catch(e) {}
+                updatePinUI();
+                closePinModal();
+                renderStep(currentStepIndex);
+            } else {
+                pinInput.style.borderColor = "var(--ios-red)";
+                setTimeout(() => {
+                    pinInput.style.borderColor = "rgba(255, 255, 255, 0.25)";
+                }, 800);
+            }
+        }
+
+        btnOpenPin.addEventListener('click', () => {
+            if (isUnlocked) {
+                if (confirm("Снова заблокировать речи ведущего и вопросы?")) {
+                    isUnlocked = false;
+                    try {
+                        localStorage.removeItem(STORAGE_KEY);
+                    } catch(e) {}
+                    updatePinUI();
+                    renderStep(currentStepIndex);
+                }
+            } else {
+                openPinModal();
+            }
+        });
+
+        btnCloseModal.addEventListener('click', closePinModal);
+        btnSubmitPin.addEventListener('click', checkPin);
+
+        pinInput.addEventListener('keyup', (e) => {
+            if (e.key === 'Enter') {
+                checkPin();
+            }
+        });
+
+        /* ===================================================
+           5. EVENT LISTENERS
+           =================================================== */
+        btnPrev.addEventListener('click', () => {
+            if (currentStepIndex > 0) {
+                currentStepIndex--;
+                renderStep(currentStepIndex);
+            }
+        });
+
+        btnNext.addEventListener('click', () => {
+            if (currentStepIndex < scenarioData.length - 1) {
+                currentStepIndex++;
+                renderStep(currentStepIndex);
+            }
+        });
+
+        // Initialize App
+        updatePinUI();
+        renderStep(0);
+    </script>
 </body>
 </html>
