@@ -552,9 +552,10 @@
                 const video = document.createElement('video');
                 video.className = 'slide-video';
                 video.src = `${R2_BASE_URL}video${currentVideoId}.mp4`;
-                video.controls = false;
                 
-                // У ВЕДУЩЕГО ВИДЕО ОСТАЁТСЯ НА ПАУЗЕ И БЕЗ ЗВУКА, У ЗРИТЕЛЕЙ — АВТОМАТИЧЕСКИЙ ПЛЕЙ
+                // ВОЗВРАЩАЕМ СТАНДАРТНЫЙ ПЛЕЕР (CONTROLS)
+                video.controls = true;
+                
                 if (isAdmin) {
                     video.muted = true;
                 } else {
