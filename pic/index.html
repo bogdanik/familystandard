@@ -172,103 +172,88 @@
 
         .slide-img, .slide-video {
             display: block;
-            max-height: 72vh;
-            max-width: 32vw;
+            max-height: 75vh;
+            max-width: 44vw;
             width: auto;
             height: auto;
             object-fit: contain;
             border-radius: 16px;
             pointer-events: auto;
-            transition: opacity 0.8s ease-in-out;
         }
 
-        .slide-video.preloading {
-            opacity: 0;
+        /* АНИМАЦИЯ УВЕЛИЧЕНИЯ АКТИВНОГО ФОТО НА 30% ЗА 10 СЕКУНД */
+        @keyframes zoomCenter30 {
+            0% {
+                transform: translate3d(-50%, -50%, 0) scale3d(1, 1, 1);
+            }
+            100% {
+                transform: translate3d(-50%, -50%, 0) scale3d(1.3, 1.3, 1);
+            }
         }
 
-        .slide-video.ready {
-            opacity: 1;
-        }
-
-        /* АНИМИРОВАННЫЙ ЛОАДЕР ДЛЯ ВИДЕО (СИЯНИЕ И ЧАСТИЦЫ) */
-        .video-loader-glow {
-            position: absolute;
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(224, 169, 109, 0.9) 0%, rgba(140, 66, 39, 0.4) 50%, rgba(0, 0, 0, 0) 70%);
-            box-shadow: 0 0 50px rgba(224, 169, 109, 0.8);
-            animation: pulseGlow 1.5s infinite alternate ease-in-out;
-            pointer-events: none;
-            z-index: 35;
-            transition: opacity 0.8s ease-out;
-        }
-
-        @keyframes pulseGlow {
-            0% { transform: scale(0.8); opacity: 0.5; }
-            100% { transform: scale(1.3); opacity: 1; filter: drop-shadow(0 0 25px #e0a96d); }
-        }
-
-        /* POSITIONS */
+        /* ЦЕНТРАЛЬНЫЙ КАДР */
         .pos-center {
-            transform: translate3d(-50%, -50%, 0) scale3d(1.15, 1.15, 1);
             opacity: 1;
             z-index: 30;
             border-color: rgba(224, 169, 109, 0.95);
             box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 35px rgba(224, 169, 109, 0.5);
             filter: brightness(1);
+            animation: zoomCenter30 10s linear forwards;
         }
 
+        /* ЛЕВАЯ СТОРОНА (ПРОШЕДШИЕ) */
         .pos-left-1 {
-            transform: translate3d(calc(-50% - 28vw), -50%, -50px) scale3d(0.9, 0.9, 1);
-            opacity: 0.9;
+            transform: translate3d(calc(-50% - 32vw), -50%, -50px) scale3d(0.82, 0.82, 1);
+            opacity: 0.85;
             z-index: 25;
             filter: brightness(0.85);
         }
 
         .pos-left-2 {
-            transform: translate3d(calc(-50% - 50vw), -50%, -100px) scale3d(0.8, 0.8, 1);
-            opacity: 0.8;
+            transform: translate3d(calc(-50% - 56vw), -50%, -100px) scale3d(0.7, 0.7, 1);
+            opacity: 0.7;
             z-index: 20;
             filter: brightness(0.7);
         }
 
         .pos-left-3 {
-            transform: translate3d(calc(-50% - 70vw), -50%, -150px) scale3d(0.7, 0.7, 1);
-            opacity: 0.6;
+            transform: translate3d(calc(-50% - 78vw), -50%, -150px) scale3d(0.6, 0.6, 1);
+            opacity: 0.5;
             z-index: 15;
             filter: brightness(0.55);
         }
 
+        /* ПРАВАЯ СТОРОНА (ПРЕДСТОЯЩИЕ) */
         .pos-right-1 {
-            transform: translate3d(calc(-50% + 28vw), -50%, -50px) scale3d(0.9, 0.9, 1);
-            opacity: 0.9;
+            transform: translate3d(calc(-50% + 32vw), -50%, -50px) scale3d(0.82, 0.82, 1);
+            opacity: 0.85;
             z-index: 25;
             filter: brightness(0.85);
         }
 
         .pos-right-2 {
-            transform: translate3d(calc(-50% + 50vw), -50%, -100px) scale3d(0.8, 0.8, 1);
-            opacity: 0.8;
+            transform: translate3d(calc(-50% + 56vw), -50%, -100px) scale3d(0.7, 0.7, 1);
+            opacity: 0.7;
             z-index: 20;
             filter: brightness(0.7);
         }
 
         .pos-right-3 {
-            transform: translate3d(calc(-50% + 70vw), -50%, -150px) scale3d(0.7, 0.7, 1);
-            opacity: 0.6;
+            transform: translate3d(calc(-50% + 78vw), -50%, -150px) scale3d(0.6, 0.6, 1);
+            opacity: 0.5;
             z-index: 15;
             filter: brightness(0.55);
         }
 
+        /* СКРЫТЫЕ КРАЙНИЕ */
         .pos-far-left {
-            transform: translate3d(calc(-50% - 90vw), -50%, -200px) scale3d(0.5, 0.5, 1);
+            transform: translate3d(calc(-50% - 95vw), -50%, -200px) scale3d(0.5, 0.5, 1);
             opacity: 0;
             z-index: 1;
         }
 
         .pos-far-right {
-            transform: translate3d(calc(-50% + 90vw), -50%, -200px) scale3d(0.5, 0.5, 1);
+            transform: translate3d(calc(-50% + 95vw), -50%, -200px) scale3d(0.5, 0.5, 1);
             opacity: 0;
             z-index: 1;
         }
@@ -352,25 +337,6 @@
             border-color: transparent;
         }
 
-        .play-video-trigger {
-            background: linear-gradient(135deg, #28a745, #1e7e34);
-            border-color: #28a745;
-            color: #ffffff;
-            font-weight: 800;
-            letter-spacing: 1px;
-            display: none;
-        }
-
-        .play-video-trigger.visible {
-            display: inline-block;
-            animation: pulseGreen 1.2s infinite alternate;
-        }
-
-        @keyframes pulseGreen {
-            0% { box-shadow: 0 0 10px rgba(40, 167, 69, 0.4); }
-            100% { box-shadow: 0 0 25px rgba(40, 167, 69, 0.9); }
-        }
-
         .video-btn-group {
             display: flex;
             gap: 6px;
@@ -404,7 +370,6 @@
                 <button id="prevBtn" class="ctrl-btn">◄ Назад</button>
                 <button id="nextBtn" class="ctrl-btn">Вперед ►</button>
                 <button id="autoBtn" class="ctrl-btn">Автопоказ (10 сек)</button>
-                <button id="playVideoBtn" class="ctrl-btn play-video-trigger">▶ ЗАПУСТИТЬ ВИДЕО</button>
                 
                 <div class="video-btn-group">
                     <button class="ctrl-btn video-direct-btn" data-video="1">🎬 Видео 1</button>
@@ -516,7 +481,6 @@
         const prevBtn = document.getElementById('prevBtn');
         const nextBtn = document.getElementById('nextBtn');
         const autoBtn = document.getElementById('autoBtn');
-        const playVideoBtn = document.getElementById('playVideoBtn');
 
         function setupAutoPlayTimer() {
             if (autoPlayTimer) clearInterval(autoPlayTimer);
@@ -572,13 +536,6 @@
             setupAutoPlayTimer();
         });
 
-        socket.on('play_video_command', () => {
-            const video = document.querySelector('.slide-video');
-            if (video) {
-                video.play().catch(e => console.log('Autoplay blocked', e));
-            }
-        });
-
         function getWrappedIndex(idx) {
             let res = idx % totalSlidesCount;
             if (res <= 0) res += totalSlidesCount;
@@ -588,40 +545,26 @@
         function updateStackView() {
             if (currentMediaType === 'video') {
                 imageWrapper.innerHTML = '';
-                
                 const card = document.createElement('div');
                 card.className = 'slide-card pos-center';
                 card.dataset.type = 'video';
-
-                const loaderGlow = document.createElement('div');
-                loaderGlow.className = 'video-loader-glow';
-
+                
                 const video = document.createElement('video');
-                video.className = 'slide-video preloading';
+                video.className = 'slide-video';
                 video.src = `${R2_BASE_URL}video${currentVideoId}.mp4`;
                 video.controls = false;
                 
-                // ВЕДУЩИЙ ВСЕГДА БЕЗ ЗВУКА
-                video.muted = isAdmin;
-
-                video.addEventListener('canplaythrough', () => {
-                    loaderGlow.style.opacity = '0';
-                    setTimeout(() => loaderGlow.remove(), 800);
-
-                    video.classList.remove('preloading');
-                    video.classList.add('ready');
-
-                    if (isAdmin) {
-                        playVideoBtn.classList.add('visible');
-                    }
-                });
-
-                card.appendChild(loaderGlow);
+                // У ВЕДУЩЕГО ВИДЕО ОСТАЁТСЯ НА ПАУЗЕ И БЕЗ ЗВУКА, У ЗРИТЕЛЕЙ — АВТОМАТИЧЕСКИЙ ПЛЕЙ
+                if (isAdmin) {
+                    video.muted = true;
+                } else {
+                    video.autoplay = true;
+                    video.play().catch(e => console.log('Autoplay error:', e));
+                }
+                
                 card.appendChild(video);
                 imageWrapper.appendChild(card);
                 return;
-            } else {
-                playVideoBtn.classList.remove('visible');
             }
 
             if (currentSlideIndex < 1) {
@@ -731,12 +674,6 @@
             socket.emit('toggle_autoplay', { auto_play: isAutoPlay });
         });
 
-        playVideoBtn.addEventListener('click', () => {
-            if (!isAdmin) return;
-            socket.emit('trigger_play_video');
-            playVideoBtn.classList.remove('visible');
-        });
-
         document.querySelectorAll('.video-direct-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 if (!isAdmin) return;
@@ -756,7 +693,6 @@
             isAdmin = false;
             isAutoPlay = true;
             currentMediaType = 'photo';
-            playVideoBtn.classList.remove('visible');
             if (autoPlayTimer) clearInterval(autoPlayTimer);
             updateUI();
         });
