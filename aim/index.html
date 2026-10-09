@@ -59,8 +59,15 @@
             font-size: 32px; font-weight: 900;
             box-shadow: 0 0 50px #0055ff, inset 0 0 30px #0055ff;
             text-align: center; line-height: 1.2; text-transform: uppercase;
-            opacity: 1; transition: opacity 0.8s ease, transform 0.05s ease-out;
+            opacity: 1; transition: opacity 0.8s ease, transform 0.05s ease-out, border-color 0.5s ease, box-shadow 0.5s ease, background 0.5s ease;
             position: relative;
+        }
+
+        /* Стили круга для бонусного раунда */
+        #center-circle.bonus-mode {
+            background: radial-gradient(circle, #4d2600 0%, #1a0d00 100%);
+            border-color: #ffaa00;
+            box-shadow: 0 0 50px #ffaa00, inset 0 0 30px #ffaa00;
         }
 
         /* Экран со стартовой кнопкой */
@@ -86,9 +93,9 @@
 
         /* Текст номера раунда */
         #round-title {
-            position: absolute; font-size: 9vw; font-weight: 900;
+            position: absolute; font-size: 8vw; font-weight: 900;
             text-shadow: 0 0 40px rgba(0, 85, 255, 0.9); opacity: 0;
-            pointer-events: none; z-index: 4;
+            pointer-events: none; z-index: 4; text-align: center;
         }
         
         .animate-round { animation: roundAnim 3s cubic-bezier(0.25, 1, 0.5, 1) forwards; }
@@ -110,6 +117,12 @@
             border: 2px solid #0055ff; gap: 15px;
             box-shadow: 0 0 60px rgba(0, 85, 255, 0.7);
             backdrop-filter: blur(10px); min-width: 300px;
+            transition: border-color 0.5s ease, box-shadow 0.5s ease;
+        }
+
+        #admin-panel.bonus-mode {
+            border-color: #ffaa00;
+            box-shadow: 0 0 60px rgba(255, 170, 0, 0.7);
         }
 
         .admin-header {
@@ -145,6 +158,8 @@
         #btn-ai:hover { background: #3377ff; box-shadow: 0 0 15px #0055ff; }
         #btn-orig { background: #ffaa00; } 
         #btn-orig:hover { background: #ffcc33; box-shadow: 0 0 15px #ffaa00; }
+        #btn-bonus { background: #ffaa00; width: 100%; display: none; }
+        #btn-bonus:hover { background: #ffcc33; box-shadow: 0 0 15px #ffaa00; }
         #btn-next { background: #333; width: 100%; border: 1px solid #555; }
         #btn-next:hover { background: #555; }
         
@@ -178,10 +193,11 @@
                 <button id="btn-toggle-mute" class="icon-btn" title="Включить/выключить звук на этом устройстве">🔇</button>
             </div>
         </div>
-        <div class="admin-row">
+        <div class="admin-row" id="standard-controls">
             <button class="admin-btn" id="btn-ai">AI-музыка</button>
             <button class="admin-btn" id="btn-orig">Оригинал</button>
         </div>
+        <button class="admin-btn" id="btn-bonus">ЗАПУСТИТЬ</button>
         <button class="admin-btn" id="btn-next">СЛЕДУЮЩИЙ РАУНД</button>
     </div>
 
@@ -206,9 +222,11 @@
         const btnGlobalReset = document.getElementById('btn-global-reset');
         const btnToggleMute = document.getElementById('btn-toggle-mute');
         
+        const standardControls = document.getElementById('standard-controls');
         const btnStart = document.getElementById('btn-start');
         const btnAi = document.getElementById('btn-ai');
         const btnOrig = document.getElementById('btn-orig');
+        const btnBonus = document.getElementById('btn-bonus');
         const btnNext = document.getElementById('btn-next');
 
         let audioContext, analyser, dataArray;
@@ -216,13 +234,11 @@
         let fadeInterval = null;
         let isAdmin = false;
 
-        // Переключение звука на текущем устройстве
         btnToggleMute.onclick = () => {
             audio.muted = !audio.muted;
             btnToggleMute.innerText = audio.muted ? '🔇' : '🔊';
         };
 
-        // Тройной клик по крестику
         let closeClicks = 0;
         let closeClickTimer = null;
 
@@ -246,7 +262,6 @@
             }, 3000);
         };
 
-        // Инициализация аудиоконтекста (вызывается при любом касании экрана)
         function initAudio() {
             if(!audioContext) {
                 audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -272,7 +287,6 @@
             isAdmin = data.is_admin;
             if (isAdmin) {
                 adminPanel.style.display = 'flex';
-                // Отключаем звук у Ведущего по умолчанию
                 audio.muted = true;
                 btnToggleMute.innerText = '🔇';
             } else {
@@ -293,8 +307,14 @@
             socket.emit('admin_command', { action: action, track: 'm' });
         };
 
+        btnBonus.onclick = () => {
+            initAudio();
+            let action = (localState.playing && localState.track === 'bonus') ? 'pause' : 'play';
+            socket.emit('admin_command', { action: action, track: 'bonus' });
+        };
+
         btnNext.onclick = () => {
-            if (localState.round >= 12) {
+            if (localState.round >= 13) {
                 socket.emit('admin_command', { action: 'end_game' });
             } else {
                 socket.emit('admin_command', { action: 'next_round' });
@@ -342,7 +362,6 @@
         socket.on('state_update', (state) => {
             localState = state;
 
-            // Сброс в исходное состояние (Round 0)
             if (state.round === 0) {
                 isAdmin = false;
                 audio.pause();
@@ -351,29 +370,58 @@
                 adminPanel.style.display = 'none';
                 centerCircle.style.opacity = 1;
                 centerCircle.style.transform = 'scale(1)';
+                centerCircle.classList.remove('bonus-mode');
+                adminPanel.classList.remove('bonus-mode');
+                centerCircle.innerHTML = 'AI<br>МУЗЫКА';
                 return;
             }
 
             entryScreen.style.display = 'none';
-            adminRoundDisplay.innerText = `РАУНД ${state.round} / 12`;
 
-            if (state.round === 12) {
+            // Режим Бонусного трека (13 раунд)
+            if (state.round === 13) {
+                adminRoundDisplay.innerText = 'БОНУСНЫЙ ТРАК';
+                adminRoundDisplay.style.color = '#ffaa00';
+                adminRoundDisplay.style.textShadow = '0 0 10px #ffaa00';
                 btnNext.innerText = 'THE END (СБРОС)';
                 btnNext.style.background = '#880000';
+                
+                standardControls.style.display = 'none';
+                btnBonus.style.display = 'block';
+
+                centerCircle.classList.add('bonus-mode');
+                adminPanel.classList.add('bonus-mode');
+                centerCircle.innerHTML = 'БОНУСНЫЙ<br>ТРЕК';
             } else {
+                adminRoundDisplay.innerText = `РАУНД ${state.round} / 12`;
+                adminRoundDisplay.style.color = '#0088ff';
+                adminRoundDisplay.style.textShadow = '0 0 10px #0055ff';
                 btnNext.innerText = 'СЛЕДУЮЩИЙ РАУНД';
                 btnNext.style.background = '#333';
+
+                standardControls.style.display = 'flex';
+                btnBonus.style.display = 'none';
+
+                centerCircle.classList.remove('bonus-mode');
+                adminPanel.classList.remove('bonus-mode');
+                centerCircle.innerHTML = 'AI<br>МУЗЫКА';
             }
 
             btnAi.classList.remove('active-btn');
             btnOrig.classList.remove('active-btn');
+            btnBonus.classList.remove('active-btn');
 
             if (state.playing) {
-                if (state.track === 'aim') btnAi.classList.add('active-btn');
-                if (state.track === 'm') btnOrig.classList.add('active-btn');
-
-                let trackPrefix = state.track === 'aim' ? 'aim' : 'm';
-                let targetSrc = `${CLOUD_URL}${trackPrefix}${state.round}.mp3`;
+                let targetSrc = '';
+                if (state.track === 'bonus') {
+                    btnBonus.classList.add('active-btn');
+                    targetSrc = `${CLOUD_URL}track.mp3`;
+                } else {
+                    if (state.track === 'aim') btnAi.classList.add('active-btn');
+                    if (state.track === 'm') btnOrig.classList.add('active-btn');
+                    let trackPrefix = state.track === 'aim' ? 'aim' : 'm';
+                    targetSrc = `${CLOUD_URL}${trackPrefix}${state.round}.mp3`;
+                }
 
                 if (audio.src !== targetSrc) {
                     audio.src = targetSrc;
@@ -390,12 +438,15 @@
                 if (state.trigger_animation) centerCircle.style.opacity = 0;
             }
 
-            // Анимация номера раунда
+            // Анимация названия раунда
             if (state.trigger_animation) {
                 centerCircle.style.opacity = 0;
                 centerCircle.style.transform = 'scale(1)';
 
-                roundTitle.innerText = `РАУНД ${state.round}`;
+                roundTitle.innerText = state.round === 13 ? 'БОНУСНЫЙ ТРАК' : `РАУНД ${state.round}`;
+                roundTitle.style.color = state.round === 13 ? '#ffaa00' : 'white';
+                roundTitle.style.textShadow = state.round === 13 ? '0 0 40px rgba(255, 170, 0, 0.9)' : '0 0 40px rgba(0, 85, 255, 0.9)';
+
                 roundTitle.classList.remove('animate-round');
                 void roundTitle.offsetWidth; 
                 roundTitle.classList.add('animate-round');
@@ -437,7 +488,7 @@
                 ctxP.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
                 ctxP.fillStyle = 'rgba(255, 255, 255, 0.7)';
                 ctxP.shadowBlur = 10;
-                ctxP.shadowColor = '#0055ff';
+                ctxP.shadowColor = localState.round === 13 ? '#ffaa00' : '#0055ff';
                 ctxP.fill();
             }
         }
@@ -454,7 +505,7 @@
                     let dist = Math.sqrt(dx*dx + dy*dy);
                     if(dist < 130) {
                         ctxP.beginPath(); 
-                        ctxP.strokeStyle = `rgba(0, 85, 255, ${1 - dist/130})`;
+                        ctxP.strokeStyle = localState.round === 13 ? `rgba(255, 170, 0, ${1 - dist/130})` : `rgba(0, 85, 255, ${1 - dist/130})`;
                         ctxP.lineWidth = 1; 
                         ctxP.moveTo(particles[i].x, particles[i].y);
                         ctxP.lineTo(particles[j].x, particles[j].y); 
@@ -478,10 +529,9 @@
                 analyser.getByteFrequencyData(dataArray);
                 const cx = canvasEq.width / 2, cy = canvasEq.height / 2;
                 const radius = 142; 
-                const bars = 80; // 80 полосок всего
+                const bars = 80;
                 const step = (Math.PI * 2) / bars;
 
-                // Считаем басы для пульсации круга
                 let bassSum = 0;
                 for (let k = 0; k < 10; k++) bassSum += dataArray[k];
                 let avgBass = bassSum / 10;
@@ -490,13 +540,11 @@
                 centerCircle.style.transform = `scale(${pulseScale})`;
 
                 for(let i = 0; i < bars; i++) {
-                    let qPos = i % 20; // Индекс полоски внутри квадранта (0-19)
-                    let q = Math.floor(i / 20); // Номер квадранта (0, 1, 2, 3)
+                    let qPos = i % 20;
+                    let q = Math.floor(i / 20);
 
-                    // Зеркалим четные/нечетные квадранты для плавного соединения
                     let normPos = (q % 2 === 0) ? qPos : (19 - qPos);
                     
-                    // Мапим частоты
                     let dataIdx = Math.floor((normPos / 20) * (dataArray.length * 0.42));
                     let value = dataArray[dataIdx] * 0.75; 
                     let angle = i * step;
@@ -509,7 +557,9 @@
                     ctxEq.beginPath(); 
                     ctxEq.moveTo(x1, y1); 
                     ctxEq.lineTo(x2, y2);
-                    ctxEq.strokeStyle = `rgba(0, 85, 255, ${Math.min(1, value/70 + 0.35)})`;
+                    ctxEq.strokeStyle = localState.round === 13 
+                        ? `rgba(255, 170, 0, ${Math.min(1, value/70 + 0.35)})` 
+                        : `rgba(0, 85, 255, ${Math.min(1, value/70 + 0.35)})`;
                     ctxEq.lineWidth = 4; 
                     ctxEq.lineCap = 'round'; 
                     ctxEq.stroke();
