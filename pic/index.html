@@ -82,7 +82,7 @@
             box-shadow: 0 0 25px rgba(255, 59, 48, 0.6);
         }
 
-        /* МИНИМАЛИСТИЧНЫЙ СТАРТОВЫЙ ЭКРАН (ТОЛЬКО КНОПКА) */
+        /* МИНИМАЛИСТИЧНЫЙ СТАРТОВЫЙ ЭКРАН */
         .splash-screen {
             position: absolute;
             z-index: 30;
@@ -143,9 +143,10 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            perspective: 1400px;
+            perspective: 1200px;
         }
 
+        /* КАРТОЧКА В СТИЛЕ ЛЕНТЫ / ЗАБОРЧИКА */
         .slide-card {
             position: absolute;
             top: 50%;
@@ -155,94 +156,98 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            border-radius: 22px;
+            border-radius: 18px;
             overflow: hidden;
-            background: rgba(18, 9, 5, 0.7);
-            border: 3px solid rgba(224, 169, 109, 0.6);
+            background: rgba(18, 9, 5, 0.85);
+            border: 2px solid rgba(224, 169, 109, 0.4);
             will-change: transform, opacity, filter, box-shadow;
             backface-visibility: hidden;
-            transform-style: preserve-3d;
             
-            transition: transform 0.85s cubic-bezier(0.16, 1, 0.3, 1),
-                        opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1),
-                        filter 0.85s cubic-bezier(0.16, 1, 0.3, 1),
-                        box-shadow 0.85s cubic-bezier(0.16, 1, 0.3, 1),
-                        border-color 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: transform 0.75s cubic-bezier(0.16, 1, 0.3, 1),
+                        opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1),
+                        filter 0.75s cubic-bezier(0.16, 1, 0.3, 1),
+                        box-shadow 0.75s cubic-bezier(0.16, 1, 0.3, 1),
+                        border-color 0.75s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .slide-img, .slide-video {
             display: block;
-            max-height: 70vh;
-            max-width: 46vw;
+            max-height: 72vh;
+            max-width: 32vw;
             width: auto;
             height: auto;
             object-fit: contain;
-            border-radius: 19px;
+            border-radius: 16px;
             pointer-events: auto;
         }
 
-        /* ПОЗИЦИОНИРОВАНИЕ */
+        /* ================= ПОЗИЦИОНИРОВАНИЕ ЗАБОРЧИКОМ ================= */
+
+        /* ЦЕНТРАЛЬНЫЙ КАДР */
         .pos-center {
+            transform: translate3d(-50%, -50%, 0) scale3d(1.15, 1.15, 1);
             opacity: 1;
             z-index: 30;
             border-color: rgba(224, 169, 109, 0.95);
-            box-shadow: 0 25px 60px -10px rgba(0, 0, 0, 0.9), 0 0 45px 10px rgba(224, 169, 109, 0.55);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 35px rgba(224, 169, 109, 0.5);
             filter: brightness(1);
-            animation: frame130Zoom 10.5s linear forwards;
         }
 
-        @keyframes frame130Zoom {
-            0% { transform: translate3d(-50%, -50%, 0) scale3d(1, 1, 1) rotate(0deg); }
-            100% { transform: translate3d(-50%, -50%, 0) scale3d(1.3, 1.3, 1) rotate(0deg); }
+        /* ЛЕВАЯ СТОРОНА (ПРОШЕДШИЕ) */
+        .pos-left-1 {
+            transform: translate3d(calc(-50% - 28vw), -50%, -50px) scale3d(0.9, 0.9, 1);
+            opacity: 0.9;
+            z-index: 25;
+            filter: brightness(0.85);
         }
 
-        .pos-stack-1 {
-            transform: translate3d(calc(-50% - 25vw), calc(-50% + 10px), -40px) scale3d(0.8, 0.8, 1) rotate(calc(var(--card-angle) - 3deg));
-            opacity: 0.7;
+        .pos-left-2 {
+            transform: translate3d(calc(-50% - 50vw), -50%, -100px) scale3d(0.8, 0.8, 1);
+            opacity: 0.8;
             z-index: 20;
-            border-color: rgba(224, 169, 109, 0.4);
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.7);
-            filter: brightness(0.75);
+            filter: brightness(0.7);
         }
 
-        .pos-stack-2 {
-            transform: translate3d(calc(-50% - 32vw), calc(-50% + 22px), -80px) scale3d(0.72, 0.72, 1) rotate(calc(var(--card-angle) - 7deg));
-            opacity: 0.5;
+        .pos-left-3 {
+            transform: translate3d(calc(-50% - 70vw), -50%, -150px) scale3d(0.7, 0.7, 1);
+            opacity: 0.6;
             z-index: 15;
-            border-color: rgba(224, 169, 109, 0.25);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
             filter: brightness(0.55);
         }
 
-        .pos-far-left {
-            transform: translate3d(calc(-50% - 42vw), calc(-50% + 35px), -150px) scale3d(0.55, 0.55, 1) rotate(-12deg);
-            opacity: 0;
-            z-index: 1;
-            filter: brightness(0.1);
-        }
-
+        /* ПРАВАЯ СТОРОНА (ПРЕДСТОЯЩИЕ) */
         .pos-right-1 {
-            transform: translate3d(calc(-50% + 25vw), -50%, -40px) scale3d(0.8, 0.8, 1) rotate(calc(var(--card-angle) + 3deg));
-            opacity: 0.7;
-            z-index: 22;
-            border-color: rgba(224, 169, 109, 0.4);
-            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
-            filter: brightness(0.75);
+            transform: translate3d(calc(-50% + 28vw), -50%, -50px) scale3d(0.9, 0.9, 1);
+            opacity: 0.9;
+            z-index: 25;
+            filter: brightness(0.85);
         }
 
         .pos-right-2 {
-            transform: translate3d(calc(-50% + 32vw), -50%, -80px) scale3d(0.72, 0.72, 1) rotate(calc(var(--card-angle) + 7deg));
-            opacity: 0.5;
-            z-index: 18;
-            border-color: rgba(224, 169, 109, 0.25);
+            transform: translate3d(calc(-50% + 50vw), -50%, -100px) scale3d(0.8, 0.8, 1);
+            opacity: 0.8;
+            z-index: 20;
+            filter: brightness(0.7);
+        }
+
+        .pos-right-3 {
+            transform: translate3d(calc(-50% + 70vw), -50%, -150px) scale3d(0.7, 0.7, 1);
+            opacity: 0.6;
+            z-index: 15;
             filter: brightness(0.55);
         }
 
-        .pos-far-right {
-            transform: translate3d(calc(-50% + 42vw), -50%, -150px) scale3d(0.55, 0.55, 1) rotate(10deg);
+        /* СКРЫТЫЕ КРАЙНИЕ */
+        .pos-far-left {
+            transform: translate3d(calc(-50% - 90vw), -50%, -200px) scale3d(0.5, 0.5, 1);
             opacity: 0;
             z-index: 1;
-            filter: brightness(0.1);
+        }
+
+        .pos-far-right {
+            transform: translate3d(calc(-50% + 90vw), -50%, -200px) scale3d(0.5, 0.5, 1);
+            opacity: 0;
+            z-index: 1;
         }
 
         /* ПУЛЬТ ВЕДУЩЕГО */
@@ -341,7 +346,6 @@
 
     <div class="main-container">
 
-        <!-- ПРОСТАЯ КНОПКА СТАРТА ПОКАЗА -->
         <div id="splashScreen" class="splash-screen">
             <button id="startBtn" class="start-btn">▶ СТАРТ ПОКАЗА</button>
         </div>
@@ -350,7 +354,6 @@
             <div id="imageWrapper" class="image-wrapper"></div>
         </div>
 
-        <!-- ПУЛЬТ ВЕДУЩЕГО -->
         <div id="adminPanel" class="admin-panel">
             <div class="panel-header">
                 <span id="slideIndicator" class="slide-counter">ФОТО 1 / 20</span>
@@ -456,12 +459,10 @@
         let isAdmin = false;
         let currentSlideIndex = 0;
         let totalSlidesCount = 20;
-        let isAutoPlay = false;
+        let isAutoPlay = true; // Автопоказ включён по умолчанию
         let autoPlayTimer = null;
-        let currentMediaType = 'photo'; // 'photo' или 'video'
+        let currentMediaType = 'photo';
         let currentVideoId = 1;
-
-        let stackHistory = [];
 
         const splashScreen = document.getElementById('splashScreen');
         const startBtn = document.getElementById('startBtn');
@@ -472,6 +473,15 @@
         const prevBtn = document.getElementById('prevBtn');
         const nextBtn = document.getElementById('nextBtn');
         const autoBtn = document.getElementById('autoBtn');
+
+        function setupAutoPlayTimer() {
+            if (autoPlayTimer) clearInterval(autoPlayTimer);
+            if (isAutoPlay && isAdmin && currentMediaType === 'photo') {
+                autoPlayTimer = setInterval(() => {
+                    socket.emit('change_slide', { action: 'next' });
+                }, 10000);
+            }
+        }
 
         socket.on('init_state', (data) => {
             currentSlideIndex = data.current_slide;
@@ -485,6 +495,7 @@
             if (currentSlideIndex > 0 || currentMediaType === 'video') {
                 updateStackView();
             }
+            setupAutoPlayTimer();
         });
 
         startBtn.addEventListener('click', () => {
@@ -498,27 +509,31 @@
         socket.on('session_started', (data) => {
             currentSlideIndex = data.current_slide;
             currentMediaType = 'photo';
+            isAutoPlay = data.auto_play;
             if (socket.id === data.admin_sid) isAdmin = true;
 
-            stackHistory = [];
             updateUI();
             updateStackView();
+            setupAutoPlayTimer();
         });
 
         socket.on('slide_updated', (data) => {
-            const oldIdx = currentSlideIndex;
             currentSlideIndex = data.current_slide;
             currentMediaType = data.media_type || 'photo';
             currentVideoId = data.video_id || 1;
-
-            if (currentMediaType === 'photo' && oldIdx > 0 && oldIdx !== currentSlideIndex) {
-                stackHistory.push(oldIdx);
-                if (stackHistory.length > 4) stackHistory.shift();
-            }
+            isAutoPlay = data.auto_play;
 
             updateUI();
             updateStackView();
+            setupAutoPlayTimer();
         });
+
+        /* ОТОБРАЖЕНИЕ ЗАБОРЧИКОМ */
+        function getWrappedIndex(idx) {
+            let res = idx % totalSlidesCount;
+            if (res <= 0) res += totalSlidesCount;
+            return res;
+        }
 
         function updateStackView() {
             if (currentMediaType === 'video') {
@@ -543,21 +558,18 @@
                 return;
             }
 
-            const total = totalSlidesCount;
-            const centerIdx = currentSlideIndex;
-            const right1Idx = centerIdx < total ? centerIdx + 1 : 1;
-            const right2Idx = right1Idx < total ? right1Idx + 1 : 1;
+            const curr = currentSlideIndex;
 
-            const stack1 = stackHistory.length >= 1 ? stackHistory[stackHistory.length - 1] : null;
-            const stack2 = stackHistory.length >= 2 ? stackHistory[stackHistory.length - 2] : null;
-
+            // Распределяем позиции ленты/заборчика от центра
             const neededMap = {};
-            if (stack2) neededMap[stack2] = 'pos-stack-2';
-            if (stack1) neededMap[stack1] = 'pos-stack-1';
+            neededMap[curr] = 'pos-center';
+            neededMap[getWrappedIndex(curr + 1)] = 'pos-right-1';
+            neededMap[getWrappedIndex(curr + 2)] = 'pos-right-2';
+            neededMap[getWrappedIndex(curr + 3)] = 'pos-right-3';
 
-            neededMap[centerIdx] = 'pos-center';
-            neededMap[right1Idx] = 'pos-right-1';
-            neededMap[right2Idx] = 'pos-right-2';
+            neededMap[getWrappedIndex(curr - 1)] = 'pos-left-1';
+            neededMap[getWrappedIndex(curr - 2)] = 'pos-left-2';
+            neededMap[getWrappedIndex(curr - 3)] = 'pos-left-3';
 
             const existingCards = {};
             imageWrapper.querySelectorAll('.slide-card').forEach(card => {
@@ -569,21 +581,21 @@
                 existingCards[num] = card;
             });
 
+            // Убираем старые карточки за пределы экрана
             Object.keys(existingCards).forEach(numStr => {
                 const num = parseInt(numStr, 10);
                 if (!neededMap[num]) {
                     const card = existingCards[num];
-                    if (card.className.includes('stack') || card.className.includes('center')) {
-                        card.className = 'slide-card pos-far-left';
-                    } else {
-                        card.className = 'slide-card pos-far-right';
-                    }
+                    if (card.className.includes('left')) card.className = 'slide-card pos-far-left';
+                    else card.className = 'slide-card pos-far-right';
+
                     setTimeout(() => {
                         if (card && card.parentNode) card.remove();
-                    }, 850);
+                    }, 750);
                 }
             });
 
+            // Размещаем или обновляем видимые кадры
             Object.keys(neededMap).forEach(numStr => {
                 const num = parseInt(numStr, 10);
                 const targetClass = neededMap[num];
@@ -594,11 +606,9 @@
                 } else {
                     card = document.createElement('div');
                     card.dataset.slide = num;
-                    card.style.setProperty('--card-angle', `${(num * 3) % 7 - 3}deg`);
 
                     if (targetClass.includes('right')) card.className = 'slide-card pos-far-right';
-                    else if (targetClass.includes('stack')) card.className = 'slide-card pos-far-left';
-                    else card.className = 'slide-card pos-far-right';
+                    else card.className = 'slide-card pos-far-left';
 
                     const img = document.createElement('img');
                     img.className = 'slide-img';
@@ -635,7 +645,7 @@
                 imageWrapper.innerHTML = '';
             }
 
-            if (isAutoPlay) autoBtn.classList.add('active');
+            if (isAutoPlay && currentMediaType === 'photo') autoBtn.classList.add('active');
             else autoBtn.classList.remove('active');
         }
 
@@ -664,22 +674,14 @@
         socket.on('autoplay_updated', (data) => {
             isAutoPlay = data.auto_play;
             updateUI();
-
-            if (autoPlayTimer) clearInterval(autoPlayTimer);
-
-            if (isAutoPlay && isAdmin) {
-                autoPlayTimer = setInterval(() => {
-                    socket.emit('change_slide', { action: 'next' });
-                }, 10000);
-            }
+            setupAutoPlayTimer();
         });
 
         socket.on('session_reset', () => {
             currentSlideIndex = 0;
             isAdmin = false;
-            isAutoPlay = false;
+            isAutoPlay = true;
             currentMediaType = 'photo';
-            stackHistory = [];
             if (autoPlayTimer) clearInterval(autoPlayTimer);
             updateUI();
         });
