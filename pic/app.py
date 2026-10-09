@@ -10,7 +10,7 @@ state = {
     'admin_sid': None,
     'current_slide': 0,    # 0 = Заставка (СТАРТ), 1..20 = Слайд-шоу
     'total_slides': 20,
-    'auto_play': False,
+    'auto_play': True,     # По умолчанию включен автопоказ
     'media_type': 'photo', # 'photo' или 'video'
     'video_id': 1
 }
@@ -44,9 +44,11 @@ def handle_start():
         state['admin_sid'] = request.sid
         state['current_slide'] = 1
         state['media_type'] = 'photo'
+        state['auto_play'] = True # При старте показа всегда включаем автопоказ
         emit('session_started', {
             'current_slide': state['current_slide'],
-            'admin_sid': state['admin_sid']
+            'admin_sid': state['admin_sid'],
+            'auto_play': state['auto_play']
         }, broadcast=True)
 
 @socketio.on('change_slide')
@@ -59,7 +61,12 @@ def handle_change_slide(data):
     if media_type == 'video':
         state['media_type'] = 'video'
         state['video_id'] = data.get('video_id', 1)
+        state['auto_play'] = False # При запуске видео отключаем автопоказ
     else:
+        # Если переключаемся на фото вручную с видео, возобновляем автопоказ
+        if state['media_type'] == 'video':
+            state['auto_play'] = True
+
         state['media_type'] = 'photo'
         action = data.get('action')
         
@@ -79,21 +86,22 @@ def handle_change_slide(data):
     emit('slide_updated', {
         'current_slide': state['current_slide'],
         'media_type': state['media_type'],
-        'video_id': state['video_id']
+        'video_id': state['video_id'],
+        'auto_play': state['auto_play']
     }, broadcast=True)
 
 @socketio.on('toggle_autoplay')
 def handle_toggle_autoplay(data):
     if request.sid != state['admin_sid']:
         return
-    state['auto_play'] = data.get('auto_play', False)
+    state['auto_play'] = data.get('auto_play', True)
     emit('autoplay_updated', {'auto_play': state['auto_play']}, broadcast=True)
 
 @socketio.on('reset_session')
 def handle_reset():
     state['admin_sid'] = None
     state['current_slide'] = 0
-    state['auto_play'] = False
+    state['auto_play'] = True
     state['media_type'] = 'photo'
     emit('session_reset', {}, broadcast=True)
 
