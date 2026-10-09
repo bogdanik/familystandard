@@ -82,22 +82,13 @@
             box-shadow: 0 0 25px rgba(255, 59, 48, 0.6);
         }
 
-        /* СТАРТОВЫЙ ЭКРАН */
+        /* МИНИМАЛИСТИЧНЫЙ СТАРТОВЫЙ ЭКРАН (ТОЛЬКО КНОПКА) */
         .splash-screen {
             position: absolute;
             z-index: 30;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
-            text-align: center;
-            padding: 50px 70px;
-            background: rgba(28, 14, 8, 0.82);
-            border: 1px solid rgba(224, 169, 109, 0.3);
-            border-radius: 32px;
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
-            box-shadow: 0 30px 70px rgba(0, 0, 0, 0.7), 0 0 40px rgba(140, 66, 39, 0.3);
             transition: all 0.65s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
@@ -108,44 +99,25 @@
             visibility: hidden;
         }
 
-        .brand-title {
-            font-size: 2.7rem;
-            font-weight: 800;
-            letter-spacing: 5px;
-            text-transform: uppercase;
-            background: linear-gradient(135deg, #ffffff 30%, #e0a96d 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 30px rgba(224, 169, 109, 0.25);
-            margin-bottom: 6px;
-        }
-
-        .brand-subtitle {
-            font-size: 1.15rem;
-            font-weight: 600;
-            letter-spacing: 9px;
-            color: #d4a373;
-            text-transform: uppercase;
-            margin-bottom: 38px;
-        }
-
         .start-btn {
-            padding: 20px 64px;
-            font-size: 1.9rem;
+            padding: 22px 58px;
+            font-size: 1.8rem;
             font-weight: 700;
             color: #fff;
-            background: linear-gradient(135deg, #e0a96d, #8c4227);
-            border: none;
+            background: linear-gradient(135deg, rgba(224, 169, 109, 0.9), rgba(140, 66, 39, 0.9));
+            border: 1px solid rgba(255, 255, 255, 0.25);
             border-radius: 60px;
             cursor: pointer;
-            box-shadow: 0 10px 35px rgba(224, 169, 109, 0.45);
+            box-shadow: 0 15px 45px rgba(224, 169, 109, 0.35), 0 0 30px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-            letter-spacing: 3px;
+            letter-spacing: 2px;
         }
 
         .start-btn:hover {
             transform: scale3d(1.06, 1.06, 1);
-            box-shadow: 0 15px 45px rgba(224, 169, 109, 0.75);
+            box-shadow: 0 20px 55px rgba(224, 169, 109, 0.65);
             background: linear-gradient(135deg, #f4a261, #a04928);
         }
 
@@ -174,7 +146,6 @@
             perspective: 1400px;
         }
 
-        /* КАРТОЧКА: ПЛОТНО ОБЛЕГАЕТ ФОТОГРАФИЮ (fit-content) */
         .slide-card {
             position: absolute;
             top: 50%;
@@ -192,7 +163,6 @@
             backface-visibility: hidden;
             transform-style: preserve-3d;
             
-            /* Физика плавного движения от центра */
             transition: transform 0.85s cubic-bezier(0.16, 1, 0.3, 1),
                         opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1),
                         filter 0.85s cubic-bezier(0.16, 1, 0.3, 1),
@@ -200,7 +170,7 @@
                         border-color 0.85s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        .slide-img {
+        .slide-img, .slide-video {
             display: block;
             max-height: 70vh;
             max-width: 46vw;
@@ -208,54 +178,42 @@
             height: auto;
             object-fit: contain;
             border-radius: 19px;
+            pointer-events: auto;
         }
 
-        /* ================= ПОЗИЦИОНИРОВАНИЕ ОТ ЦЕНТРА ================= */
-
-        /* 1. ЦЕНТРАЛЬНАЯ КАРТОЧКА: 100% ПРОЗРАЧНОСТЬ И УВЕЛИЧЕНИЕ ВСЕЙ РАМКИ ДО 130% (1.3) */
+        /* ПОЗИЦИОНИРОВАНИЕ */
         .pos-center {
-            opacity: 1; /* 100% прозрачности */
+            opacity: 1;
             z-index: 30;
             border-color: rgba(224, 169, 109, 0.95);
-            box-shadow: 
-                0 25px 60px -10px rgba(0, 0, 0, 0.9),
-                0 0 45px 10px rgba(224, 169, 109, 0.55);
+            box-shadow: 0 25px 60px -10px rgba(0, 0, 0, 0.9), 0 0 45px 10px rgba(224, 169, 109, 0.55);
             filter: brightness(1);
             animation: frame130Zoom 10.5s linear forwards;
         }
 
         @keyframes frame130Zoom {
-            0% {
-                transform: translate3d(-50%, -50%, 0) scale3d(1, 1, 1) rotate(0deg);
-            }
-            100% {
-                transform: translate3d(-50%, -50%, 0) scale3d(1.3, 1.3, 1) rotate(0deg);
-            }
+            0% { transform: translate3d(-50%, -50%, 0) scale3d(1, 1, 1) rotate(0deg); }
+            100% { transform: translate3d(-50%, -50%, 0) scale3d(1.3, 1.3, 1) rotate(0deg); }
         }
 
-        /* 2. ЛЕВАЯ СТОПКА (СВАЙПНУТЫЕ ФОТО) — ПРИЖАТЫ К ЦЕНТРУ */
-
-        /* Верхняя свайпнутая карточка (прислонена к центру слева): 70% прозрачности */
         .pos-stack-1 {
             transform: translate3d(calc(-50% - 25vw), calc(-50% + 10px), -40px) scale3d(0.8, 0.8, 1) rotate(calc(var(--card-angle) - 3deg));
-            opacity: 0.7; /* 70% прозрачности */
+            opacity: 0.7;
             z-index: 20;
             border-color: rgba(224, 169, 109, 0.4);
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.7);
             filter: brightness(0.75);
         }
 
-        /* Нижняя карточка в стопке слева: 50% прозрачности */
         .pos-stack-2 {
             transform: translate3d(calc(-50% - 32vw), calc(-50% + 22px), -80px) scale3d(0.72, 0.72, 1) rotate(calc(var(--card-angle) - 7deg));
-            opacity: 0.5; /* 50% прозрачности */
+            opacity: 0.5;
             z-index: 15;
             border-color: rgba(224, 169, 109, 0.25);
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
             filter: brightness(0.55);
         }
 
-        /* Дальняя карточка стопки */
         .pos-far-left {
             transform: translate3d(calc(-50% - 42vw), calc(-50% + 35px), -150px) scale3d(0.55, 0.55, 1) rotate(-12deg);
             opacity: 0;
@@ -263,28 +221,23 @@
             filter: brightness(0.1);
         }
 
-        /* 3. ПРАВАЯ СТОРОНА (ПРЕДСТОЯЩИЕ ФОТО) — ИДУТ ОТ ЦЕНТРА */
-
-        /* Ближайшая карточка справа (прислонена к центру справа): 70% прозрачности */
         .pos-right-1 {
             transform: translate3d(calc(-50% + 25vw), -50%, -40px) scale3d(0.8, 0.8, 1) rotate(calc(var(--card-angle) + 3deg));
-            opacity: 0.7; /* 70% прозрачности */
+            opacity: 0.7;
             z-index: 22;
             border-color: rgba(224, 169, 109, 0.4);
             box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
             filter: brightness(0.75);
         }
 
-        /* Дальняя карточка справа: 50% прозрачности */
         .pos-right-2 {
             transform: translate3d(calc(-50% + 32vw), -50%, -80px) scale3d(0.72, 0.72, 1) rotate(calc(var(--card-angle) + 7deg));
-            opacity: 0.5; /* 50% прозрачности */
+            opacity: 0.5;
             z-index: 18;
             border-color: rgba(224, 169, 109, 0.25);
             filter: brightness(0.55);
         }
 
-        /* Зарождение новой фотографии чуть правее */
         .pos-far-right {
             transform: translate3d(calc(-50% + 42vw), -50%, -150px) scale3d(0.55, 0.55, 1) rotate(10deg);
             opacity: 0;
@@ -300,11 +253,11 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
             background: rgba(25, 13, 8, 0.88);
             border: 1px solid rgba(224, 169, 109, 0.35);
             border-radius: 24px;
-            padding: 14px 26px;
+            padding: 16px 28px;
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
@@ -340,13 +293,14 @@
         .controls-row {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
             justify-content: center;
+            flex-wrap: wrap;
         }
 
         .ctrl-btn {
-            padding: 10px 20px;
-            font-size: 0.95rem;
+            padding: 10px 18px;
+            font-size: 0.9rem;
             font-weight: 600;
             border: none;
             border-radius: 12px;
@@ -369,6 +323,14 @@
             box-shadow: 0 0 18px rgba(224, 169, 109, 0.55);
             border-color: transparent;
         }
+
+        .video-btn-group {
+            display: flex;
+            gap: 6px;
+            margin-left: 8px;
+            border-left: 1px solid rgba(224, 169, 109, 0.25);
+            padding-left: 12px;
+        }
     </style>
 </head>
 <body>
@@ -379,16 +341,16 @@
 
     <div class="main-container">
 
+        <!-- ПРОСТАЯ КНОПКА СТАРТА ПОКАЗА -->
         <div id="splashScreen" class="splash-screen">
-            <h1 class="brand-title">FAMILY STANDARD OS</h1>
-            <div class="brand-subtitle">ФОТО</div>
-            <button id="startBtn" class="start-btn">▶ СТАРТ</button>
+            <button id="startBtn" class="start-btn">▶ СТАРТ ПОКАЗА</button>
         </div>
 
         <div id="stageFrame" class="stage-frame">
             <div id="imageWrapper" class="image-wrapper"></div>
         </div>
 
+        <!-- ПУЛЬТ ВЕДУЩЕГО -->
         <div id="adminPanel" class="admin-panel">
             <div class="panel-header">
                 <span id="slideIndicator" class="slide-counter">ФОТО 1 / 20</span>
@@ -397,13 +359,19 @@
                 <button id="prevBtn" class="ctrl-btn">◄ Назад</button>
                 <button id="nextBtn" class="ctrl-btn">Вперед ►</button>
                 <button id="autoBtn" class="ctrl-btn">Автопоказ (10 сек)</button>
+                
+                <div class="video-btn-group">
+                    <button class="ctrl-btn video-direct-btn" data-video="1">🎬 Видео 1</button>
+                    <button class="ctrl-btn video-direct-btn" data-video="2">🎬 Видео 2</button>
+                    <button class="ctrl-btn video-direct-btn" data-video="3">🎬 Видео 3</button>
+                    <button class="ctrl-btn video-direct-btn" data-video="4">🎬 Видео 4</button>
+                </div>
             </div>
         </div>
 
     </div>
 
     <script>
-        // 120 FPS CANVAS С ДЕЛЬТА-ТАЙМОМ
         const canvas = document.getElementById('bgCanvas');
         const ctx = canvas.getContext('2d');
         let particles = [];
@@ -448,7 +416,6 @@
         for (let i = 0; i < particleCount; i++) particles.push(new Particle());
 
         let lastTime = performance.now();
-
         function animateCanvas(currentTime) {
             let dt = (currentTime - lastTime) / 1000;
             if (dt > 0.1) dt = 0.1;
@@ -479,7 +446,6 @@
         }
         requestAnimationFrame(animateCanvas);
 
-        // ПОДКЛЮЧЕНИЕ СЕРВЕРУ
         const socket = io("https://pic-jj29.onrender.com", {
             transports: ['polling', 'websocket'],
             upgrade: true
@@ -492,13 +458,14 @@
         let totalSlidesCount = 20;
         let isAutoPlay = false;
         let autoPlayTimer = null;
+        let currentMediaType = 'photo'; // 'photo' или 'video'
+        let currentVideoId = 1;
 
         let stackHistory = [];
 
         const splashScreen = document.getElementById('splashScreen');
         const startBtn = document.getElementById('startBtn');
         const topCloseBtn = document.getElementById('topCloseBtn');
-        const stageFrame = document.getElementById('stageFrame');
         const imageWrapper = document.getElementById('imageWrapper');
         const adminPanel = document.getElementById('adminPanel');
         const slideIndicator = document.getElementById('slideIndicator');
@@ -506,30 +473,17 @@
         const nextBtn = document.getElementById('nextBtn');
         const autoBtn = document.getElementById('autoBtn');
 
-        const persistentCache = {};
-        function preloadImages() {
-            for (let i = 1; i <= totalSlidesCount; i++) {
-                const img = new Image();
-                img.src = `${R2_BASE_URL}pic${i}.jpg`;
-                persistentCache[i] = img;
-            }
-        }
-        preloadImages();
-
-        function getDeterministicAngle(num) {
-            const angles = [-3, 2, -4, 3, -2, 4, -3, 2, -1, 3];
-            return angles[num % angles.length];
-        }
-
         socket.on('init_state', (data) => {
             currentSlideIndex = data.current_slide;
             totalSlidesCount = data.total_slides;
             isAdmin = data.is_admin;
             isAutoPlay = data.auto_play;
+            currentMediaType = data.media_type || 'photo';
+            currentVideoId = data.video_id || 1;
 
             updateUI();
-            if (currentSlideIndex > 0) {
-                updateStackView(currentSlideIndex);
+            if (currentSlideIndex > 0 || currentMediaType === 'video') {
+                updateStackView();
             }
         });
 
@@ -543,37 +497,54 @@
 
         socket.on('session_started', (data) => {
             currentSlideIndex = data.current_slide;
+            currentMediaType = 'photo';
             if (socket.id === data.admin_sid) isAdmin = true;
 
             stackHistory = [];
             updateUI();
-            updateStackView(currentSlideIndex);
+            updateStackView();
         });
 
         socket.on('slide_updated', (data) => {
             const oldIdx = currentSlideIndex;
             currentSlideIndex = data.current_slide;
+            currentMediaType = data.media_type || 'photo';
+            currentVideoId = data.video_id || 1;
 
-            if (oldIdx > 0 && oldIdx !== currentSlideIndex) {
+            if (currentMediaType === 'photo' && oldIdx > 0 && oldIdx !== currentSlideIndex) {
                 stackHistory.push(oldIdx);
-                if (stackHistory.length > 4) {
-                    stackHistory.shift();
-                }
+                if (stackHistory.length > 4) stackHistory.shift();
             }
 
             updateUI();
-            updateStackView(currentSlideIndex);
+            updateStackView();
         });
 
-        // 3D-ПОЗИЦИОНИРОВАНИЕ ОТ ЦЕНТРА
-        function updateStackView(centerNum) {
-            if (centerNum < 1) {
+        function updateStackView() {
+            if (currentMediaType === 'video') {
+                imageWrapper.innerHTML = '';
+                const card = document.createElement('div');
+                card.className = 'slide-card pos-center';
+                card.dataset.type = 'video';
+                
+                const video = document.createElement('video');
+                video.className = 'slide-video';
+                video.src = `${R2_BASE_URL}video${currentVideoId}.mp4`;
+                video.controls = true;
+                video.autoplay = true;
+                
+                card.appendChild(video);
+                imageWrapper.appendChild(card);
+                return;
+            }
+
+            if (currentSlideIndex < 1) {
                 imageWrapper.innerHTML = '';
                 return;
             }
 
             const total = totalSlidesCount;
-            const centerIdx = centerNum;
+            const centerIdx = currentSlideIndex;
             const right1Idx = centerIdx < total ? centerIdx + 1 : 1;
             const right2Idx = right1Idx < total ? right1Idx + 1 : 1;
 
@@ -590,11 +561,14 @@
 
             const existingCards = {};
             imageWrapper.querySelectorAll('.slide-card').forEach(card => {
+                if (card.dataset.type === 'video') {
+                    card.remove();
+                    return;
+                }
                 const num = parseInt(card.dataset.slide, 10);
                 existingCards[num] = card;
             });
 
-            // 1. Плавный уход лишних карточек
             Object.keys(existingCards).forEach(numStr => {
                 const num = parseInt(numStr, 10);
                 if (!neededMap[num]) {
@@ -610,7 +584,6 @@
                 }
             });
 
-            // 2. Построение позиций от центра
             Object.keys(neededMap).forEach(numStr => {
                 const num = parseInt(numStr, 10);
                 const targetClass = neededMap[num];
@@ -621,43 +594,37 @@
                 } else {
                     card = document.createElement('div');
                     card.dataset.slide = num;
-                    card.style.setProperty('--card-angle', `${getDeterministicAngle(num)}deg`);
+                    card.style.setProperty('--card-angle', `${(num * 3) % 7 - 3}deg`);
 
-                    if (targetClass.includes('right')) {
-                        card.className = 'slide-card pos-far-right';
-                    } else if (targetClass.includes('stack')) {
-                        card.className = 'slide-card pos-far-left';
-                    } else {
-                        card.className = 'slide-card pos-far-right';
-                    }
+                    if (targetClass.includes('right')) card.className = 'slide-card pos-far-right';
+                    else if (targetClass.includes('stack')) card.className = 'slide-card pos-far-left';
+                    else card.className = 'slide-card pos-far-right';
 
                     const img = document.createElement('img');
                     img.className = 'slide-img';
                     img.src = `${R2_BASE_URL}pic${num}.jpg`;
-                    img.onerror = function() {
-                        setTimeout(() => {
-                            this.src = `${R2_BASE_URL}pic${num}.jpg?retry=${Date.now()}`;
-                        }, 800);
-                    };
 
                     card.appendChild(img);
                     imageWrapper.appendChild(card);
 
                     void card.offsetWidth;
-
                     card.className = `slide-card ${targetClass}`;
                 }
             });
         }
 
         function updateUI() {
-            if (currentSlideIndex > 0) {
+            if (currentSlideIndex > 0 || currentMediaType === 'video') {
                 splashScreen.classList.add('hidden');
                 topCloseBtn.classList.add('visible');
 
                 if (isAdmin) {
                     adminPanel.classList.add('visible');
-                    slideIndicator.innerText = `ФОТО ${currentSlideIndex} / ${totalSlidesCount}`;
+                    if (currentMediaType === 'video') {
+                        slideIndicator.innerText = `ВИДЕО ${currentVideoId}`;
+                    } else {
+                        slideIndicator.innerText = `ФОТО ${currentSlideIndex} / ${totalSlidesCount}`;
+                    }
                 } else {
                     adminPanel.classList.remove('visible');
                 }
@@ -686,6 +653,14 @@
             socket.emit('toggle_autoplay', { auto_play: isAutoPlay });
         });
 
+        document.querySelectorAll('.video-direct-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                if (!isAdmin) return;
+                const vId = parseInt(e.target.dataset.video, 10);
+                socket.emit('change_slide', { media_type: 'video', video_id: vId });
+            });
+        });
+
         socket.on('autoplay_updated', (data) => {
             isAutoPlay = data.auto_play;
             updateUI();
@@ -703,6 +678,7 @@
             currentSlideIndex = 0;
             isAdmin = false;
             isAutoPlay = false;
+            currentMediaType = 'photo';
             stackHistory = [];
             if (autoPlayTimer) clearInterval(autoPlayTimer);
             updateUI();
