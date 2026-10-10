@@ -21,7 +21,6 @@ config = load_config()
 
 def save_config():
     try:
-        # Защита: перед сохранением читаем актуальный файл с диска, чтобы сохранить список modules нетронутым
         current_disk_config = load_config()
         config_to_save = {
             "_description": current_disk_config.get("_description", config.get("_description", "")),
@@ -58,6 +57,7 @@ system_state = {
     "seek_position": 0.0,
     "track_duration": 0.0,
     "jingle_playing": False,
+    "active_sfx": None,
     "timer": {"active": False, "end_time": 0}
 }
 
@@ -89,7 +89,6 @@ def handle_connect():
     fresh_config = load_config()
     emit('modules_config_update', fresh_config.get('modules', []))
 
-# Новый точечный обработчик: запрашивает свежие интерактивы из event_data.json строго при клике
 @socketio.on('get_modules')
 def handle_get_modules():
     fresh_config = load_config()
@@ -197,13 +196,24 @@ def host_toggle_jingle():
 @socketio.on('sfx_ended')
 def sfx_ended():
     system_state['jingle_playing'] = False
+    system_state['active_sfx'] = None
     socketio.emit('state_update', system_state)
 
 @socketio.on('host_trigger_sfx')
 def trigger_sfx(data):
     sfx = data.get('sfx')
-    sfx_counters[sfx] = (sfx_counters.get(sfx, 0) % sfx_max.get(sfx, 3)) + 1
-    socketio.emit('play_sfx_stream', {'file': f"{sfx}_{sfx_counters[sfx]}.mp3"})
+    
+    # Если нажат тот же эффект, который проигрывается в данный момент — плавно останавливаем
+    if system_state.get('active_sfx') == sfx:
+        system_state['active_sfx'] = None
+        socketio.emit('stop_sfx')
+    else:
+        # Запускаем эффект
+        system_state['active_sfx'] = sfx
+        sfx_counters[sfx] = (sfx_counters.get(sfx, 0) % sfx_max.get(sfx, 3)) + 1
+        socketio.emit('play_sfx_stream', {'file': f"{sfx}_{sfx_counters[sfx]}.mp3"})
+        
+    socketio.emit('state_update', system_state)
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 10000))
