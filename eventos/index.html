@@ -39,7 +39,7 @@
         }
         #particles-canvas { position: fixed; inset: 0; z-index: 3; pointer-events: none; }
 
-        /* БРЕНДИНГ (УВЕЛИЧЕННЫЙ ШРИФТ) */
+        /* БРЕНДИНГ */
         .footer-logo { 
             position: fixed; 
             bottom: 14px; 
@@ -216,9 +216,9 @@
         </div>
         <div class="control-row">
             <button class="seek-btn" id="btn-jingle" onclick="socket.emit('host_toggle_jingle')" style="font-size:1.2rem">🎁</button>
-            <button class="seek-btn" onclick="triggerSfx('applause')" style="font-size:1.2rem">👏</button>
-            <button class="seek-btn" onclick="triggerSfx('correct')" style="font-size:1.2rem">✅</button>
-            <button class="seek-btn" onclick="triggerSfx('wrong')" style="font-size:1.2rem">❌</button>
+            <button class="seek-btn" id="btn-sfx-applause" onclick="triggerSfx('applause')" style="font-size:1.2rem">👏</button>
+            <button class="seek-btn" id="btn-sfx-correct" onclick="triggerSfx('correct')" style="font-size:1.2rem">✅</button>
+            <button class="seek-btn" id="btn-sfx-wrong" onclick="triggerSfx('wrong')" style="font-size:1.2rem">❌</button>
         </div>
     </div>
 
@@ -311,7 +311,7 @@
         function animateParticles() { pCtx.clearRect(0, 0, pCanvas.width, pCanvas.height); particles.forEach(p => { p.update(); p.draw(); }); requestAnimationFrame(animateParticles); }
         requestAnimationFrame(animateParticles);
 
-        // --- НАСТОЯЩИЙ ЭКВАЛАЙЗЕР (ОТ КРАЁВ К ЦЕНТРУ: БАСЫ ПО КРАЯМ) ---
+        // --- ШЕЛКОВИСТЫЙ ЭКВАЛАЙЗЕР С ЯРКОЙ ВСПЫШКОЙ НАВЕРХУ ---
         const eqCanvas = document.getElementById('eq-canvas');
         const eqCtx = eqCanvas.getContext('2d');
         function resizeEqCanvas() { eqCanvas.width = window.innerWidth; eqCanvas.height = 200; }
@@ -322,8 +322,24 @@
         let analyser = null;
         let dataArray = null;
         
-        const halfBars = 32;
-        let eqBars = new Array(halfBars).fill(2);
+        const halfBars = 40;
+        let eqBars = new Array(halfBars).fill(4);
+        let idleTime = 0;
+
+        function drawRoundedBar(ctx, x, y, w, h, r) {
+            if (h < 1) return;
+            r = Math.min(r, w / 2, h / 2);
+            ctx.beginPath();
+            ctx.moveTo(x + r, y);
+            ctx.lineTo(x + w - r, y);
+            ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+            ctx.lineTo(x + w, y + h);
+            ctx.lineTo(x, y + h);
+            ctx.lineTo(x, y + r);
+            ctx.quadraticCurveTo(x, y, x + r, y);
+            ctx.closePath();
+            ctx.fill();
+        }
 
         function initWebAudio() {
             if (audioCtx) {
@@ -358,40 +374,71 @@
         function drawEq() {
             requestAnimationFrame(drawEq);
             eqCtx.clearRect(0, 0, eqCanvas.width, eqCanvas.height);
-            if (!eqCanvas.width) return;
+            if (!eqCanvas.width || !eqCanvas.height) return;
 
-            const barWidth = (eqCanvas.width / 2) / halfBars;
+            idleTime -= 0.03;
+            const width = eqCanvas.width;
+            const height = eqCanvas.height;
+            const halfWidth = width / 2;
+            const barSpacing = 3;
+            const barWidth = (halfWidth / halfBars);
+            const actualBarWidth = Math.max(1.5, barWidth - barSpacing);
+
             let isAudioActive = state_is_playing || isSfxActive || eqIsPlaying;
 
             if (analyser && dataArray && isAudioActive) {
                 analyser.getByteFrequencyData(dataArray);
             }
 
+            // 1. Считывание частот и мягкое дыхание в паузе
+            let rawValues = new Float32Array(halfBars);
             for (let k = 0; k < halfBars; k++) {
-                let val = 0;
                 if (analyser && dataArray && isAudioActive) {
-                    let sampleIndex = Math.floor(k * (dataArray.length * 0.65) / halfBars);
-                    val = dataArray[sampleIndex] || 0;
+                    let logIndex = Math.floor(Math.pow(k / halfBars, 1.3) * (dataArray.length * 0.65));
+                    rawValues[k] = dataArray[logIndex] || 0;
+                } else {
+                    rawValues[k] = Math.sin(idleTime * 1.8 + k * 0.25) * 10 + Math.cos(idleTime * 1.1 - k * 0.15) * 6 + 14;
+                }
+            }
+
+            // 5-точечное сглаживание Гаусса
+            let smoothedValues = new Float32Array(halfBars);
+            for (let k = 0; k < halfBars; k++) {
+                let p2 = rawValues[Math.max(0, k - 2)];
+                let p1 = rawValues[Math.max(0, k - 1)];
+                let curr = rawValues[k];
+                let n1 = rawValues[Math.min(halfBars - 1, k + 1)];
+                let n2 = rawValues[Math.min(halfBars - 1, k + 2)];
+                smoothedValues[k] = p2 * 0.08 + p1 * 0.24 + curr * 0.36 + n1 * 0.24 + n2 * 0.08;
+            }
+
+            // 2. Столбцы эквалайзера с ярким акцентом на самом верху
+            for (let k = 0; k < halfBars; k++) {
+                let targetH = (smoothedValues[k] / 255) * (height * 0.82);
+                if (targetH < 4) targetH = 4;
+
+                if (targetH > eqBars[k]) {
+                    eqBars[k] += (targetH - eqBars[k]) * 0.22;
+                } else {
+                    eqBars[k] += (targetH - eqBars[k]) * 0.08;
                 }
 
-                let targetH = (val / 255) * (eqCanvas.height * 0.85);
-                if (targetH < 2) targetH = 2;
-
-                eqBars[k] += (targetH - eqBars[k]) * 0.25;
                 let h = eqBars[k];
 
-                let gradient = eqCtx.createLinearGradient(0, eqCanvas.height, 0, eqCanvas.height - h);
-                gradient.addColorStop(0, 'rgba(245, 158, 11, 0.3)');
-                gradient.addColorStop(0.5, 'rgba(245, 158, 11, 0.7)');
-                gradient.addColorStop(1, 'rgba(255, 251, 235, 0.95)');
+                let xLeft = k * barWidth + barSpacing / 2;
+                let xRight = width - (k + 1) * barWidth + barSpacing / 2;
 
-                eqCtx.fillStyle = gradient;
+                // Градиент: на 50% высоты ровно 20% яркости, низ - еле заметный, а самый верх — яркая вспышка 100%
+                let barGradient = eqCtx.createLinearGradient(0, height, 0, height - h);
+                barGradient.addColorStop(0, 'rgba(3, 7, 18, 0.05)');       // Низ практически полностью тёмный
+                barGradient.addColorStop(0.5, 'rgba(245, 158, 11, 0.2)');   // 50% высоты: ровно 20% яркости
+                barGradient.addColorStop(0.82, 'rgba(245, 158, 11, 0.65)'); // Нарастание
+                barGradient.addColorStop(1, 'rgba(255, 255, 255, 1.0)');    // 100% яркая вспышка на вершине
 
-                let xLeft = k * barWidth;
-                eqCtx.fillRect(xLeft + 1, eqCanvas.height - h, barWidth - 2, h);
+                eqCtx.fillStyle = barGradient;
 
-                let xRight = eqCanvas.width - (k + 1) * barWidth;
-                eqCtx.fillRect(xRight + 1, eqCanvas.height - h, barWidth - 2, h);
+                drawRoundedBar(eqCtx, xLeft, height - h, actualBarWidth, h, 4);
+                drawRoundedBar(eqCtx, xRight, height - h, actualBarWidth, h, 4);
             }
         }
         drawEq();
@@ -523,7 +570,7 @@
                 sfxAudio.volume = 0; 
                 sfxAudio.play().catch(()=>{});
                 isSfxActive = true;
-                sfxTargetVol = 0.6; 
+                sfxTargetVol = 1.0; 
             }
         });
 
@@ -552,6 +599,17 @@
                 const jBtn = document.getElementById('btn-jingle');
                 if (state.jingle_playing) jBtn.classList.add('sfx-active');
                 else jBtn.classList.remove('sfx-active');
+
+                ['applause', 'correct', 'wrong'].forEach(type => {
+                    const btn = document.getElementById(`btn-sfx-${type}`);
+                    if (btn) {
+                        if (state.active_sfx === type) {
+                            btn.classList.add('sfx-active');
+                        } else {
+                            btn.classList.remove('sfx-active');
+                        }
+                    }
+                });
 
                 document.getElementById('play-icon').innerText = state.is_playing ? '⏸' : '⏯';
             }
@@ -769,7 +827,6 @@
             closeModal('edit-event-modal');
         }
 
-        // Запрос свежего списка интерактивов строго в момент клика по кнопке
         function openLauncherModal() {
             socket.emit('get_modules');
             openModal('launcher-modal');
