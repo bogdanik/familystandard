@@ -7,8 +7,6 @@ app.config['SECRET_KEY'] = 'event_secret_key'
 
 socketio = SocketIO(app, cors_allowed_origins="*")
 
-SECRET_PIN = "1"  # ПИН-код изменен на 1
-
 STATE = {
     'videoId': None,
     'action': 'pause',
@@ -24,14 +22,12 @@ def on_connect():
     if STATE['videoId']:
         emit('sync', STATE)
 
+# Авторизация в 1 клик (без ПИН-кода)
 @socketio.on('auth_pin')
 def on_auth(data):
-    if str(data.get('pin')).strip() == SECRET_PIN:
-        emit('auth_result', {'success': True})
-        if STATE['videoId']:
-            emit('sync', STATE)
-    else:
-        emit('auth_result', {'success': False})
+    emit('auth_result', {'success': True})
+    if STATE['videoId']:
+        emit('sync', STATE)
 
 @socketio.on('host_action')
 def on_host_action(data):
