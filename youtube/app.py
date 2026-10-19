@@ -24,7 +24,6 @@ STATE = {
 def index():
     return jsonify({"status": "Server running", "mode": STATE['mode']})
 
-# Имитируем браузерный запрос и вытаскиваем данные напрямую со страницы поиска
 @app.route('/api/search')
 def youtube_search():
     query = request.args.get('q', '').strip()
@@ -34,23 +33,21 @@ def youtube_search():
         return resp
 
     try:
-        # Формируем стандартную ссылку поиска
         url = "https://www.youtube.com/results?search_query=" + urllib.parse.quote(query)
         
-        # Притворяемся обычным браузером Google Chrome
+        # Подкидываем куки согласия, чтобы обойти заглушки 18+ и SafeSearch
         headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-            'Accept-Language': 'ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7'
+            'Accept-Language': 'ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7',
+            'Cookie': 'CONSENT=YES+cb.20230501-08-p0.ru+FX+343; PREF=hl=ru&gl=RU&f2=0'
         }
         req = urllib.request.Request(url, headers=headers)
         
         with urllib.request.urlopen(req, timeout=5) as response:
             html = response.read().decode('utf-8')
 
-        # Ищем переменную ytInitialData, в которой лежат все результаты поиска
         match = re.search(r'var ytInitialData = (.*?);</script>', html)
         if not match:
-            print("ytInitialData не найден на странице")
             resp = jsonify([])
             resp.headers.add('Access-Control-Allow-Origin', '*')
             return resp
@@ -58,7 +55,6 @@ def youtube_search():
         data = json.loads(match.group(1))
         results = []
         
-        # Безопасно пробираемся к массиву видеороликов
         contents = data.get('contents', {}).get('twoColumnSearchResultsRenderer', {}).get('primaryContents', {}).get('sectionListRenderer', {}).get('contents', [])
         
         for section in contents:
@@ -68,27 +64,22 @@ def youtube_search():
                 if not v_data: continue
 
                 video_id = v_data.get('videoId')
+                if not video_id: continue
                 
-                # Забираем название
                 title_runs = v_data.get('title', {}).get('runs', [])
                 title = title_runs[0].get('text') if title_runs else 'Без названия'
-                
-                # Забираем длительность
                 duration = v_data.get('lengthText', {}).get('simpleText', '')
                 
-                # Забираем лучшую обложку
-                thumbnails = v_data.get('thumbnail', {}).get('thumbnails', [])
-                thumb_url = thumbnails[-1].get('url') if thumbnails else f'https://i.ytimg.com/vi/{video_id}/hqdefault.jpg'
+                # ЖЕСТКИЙ ОБХОД ЗАБЛЮРЕННЫХ КАРТИНОК: берем raw-исходник напрямую по ID
+                thumb_url = f'https://i.ytimg.com/vi/{video_id}/hqdefault.jpg'
 
-                if video_id:
-                    results.append({
-                        'videoId': video_id, 
-                        'title': title, 
-                        'duration': duration, 
-                        'thumbnail': thumb_url
-                    })
+                results.append({
+                    'videoId': video_id, 
+                    'title': title, 
+                    'duration': duration, 
+                    'thumbnail': thumb_url
+                })
 
-        # Отдаем первые 30 результатов (этого хватит на 5 страниц пульта)
         resp = jsonify(results[:30])
         resp.headers.add('Access-Control-Allow-Origin', '*')
         return resp
