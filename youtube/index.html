@@ -3,44 +3,37 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Family Standard YouTube Event</title>
-  
-  <!-- Подключение Socket.IO и YouTube API -->
+  <title>Family Standard YouTube Control</title>
+
   <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
   <script src="https://www.youtube.com/iframe_api"></script>
 
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body, html { width: 100%; height: 100%; overflow: hidden; background: #080808; font-family: -apple-system, sans-serif; color: #fff; }
-    
-    /* Анимированный Canvas фон */
+
     #bg-canvas { position: absolute; top:0; left:0; width: 100%; height: 100%; z-index: 1; }
-    
-    /* Форма ввода ПИН */
+
+    /* Окно авторизации */
     #pin-modal { position: absolute; z-index: 100; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(18, 18, 18, 0.95); padding: 25px; border-radius: 16px; text-align: center; width: 85%; max-width: 320px; border: 1px solid #2a2a2a; backdrop-filter: blur(12px); }
     #pin-modal input { width: 100%; padding: 12px; font-size: 24px; text-align: center; border-radius: 10px; border: 1px solid #333; background: #111; color: #fff; margin: 15px 0; letter-spacing: 6px; }
     #pin-modal button { width: 100%; padding: 12px; font-size: 16px; font-weight: bold; background: #ff0000; color: white; border: none; border-radius: 10px; cursor: pointer; }
 
-    /* Экран Зрителя (полноэкранный плеер) */
+    /* Полноэкранный показ для Зрителей */
     #viewer-screen { display: none; position: absolute; top:0; left:0; width: 100%; height: 100%; z-index: 10; }
     #viewer-screen iframe { width: 100%; height: 100%; border: none; }
 
-    /* Пульт Ведущего (телефон) */
-    #host-controller { display: none; position: absolute; top:0; left:0; width: 100%; height: 100%; z-index: 50; background: #0f0f0f; padding: 15px; overflow-y: auto; }
-    .search-box { display: flex; gap: 8px; margin-bottom: 15px; }
-    .search-box input { flex: 1; padding: 12px; font-size: 15px; border-radius: 8px; border: 1px solid #333; background: #1f1f1f; color: #fff; }
-    .search-box button { padding: 12px 18px; background: #ff0000; color: #fff; border: none; border-radius: 8px; font-weight: bold; }
-    
-    #host-player-container { width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 12px; overflow: hidden; border: 1px solid #2a2a2a; }
+    /* Полноценный YouTube-интерфейс для Ведущего */
+    #host-screen { display: none; position: absolute; top:0; left:0; width: 100%; height: 100%; z-index: 50; background: #0f0f0f; flex-direction: column; }
+    #host-yt-iframe { width: 100%; height: 100%; border: none; }
   </style>
 </head>
 <body>
 
   <canvas id="bg-canvas"></canvas>
 
-  <!-- Вход для ведущего -->
   <div id="pin-modal">
-    <h3>Управление экраном</h3>
+    <h3>Управление Экраном</h3>
     <input type="password" id="pin-input" placeholder="ПИН" maxlength="4" pattern="\d*">
     <button onclick="submitPin()">Войти как Ведущий</button>
   </div>
@@ -50,38 +43,29 @@
     <div id="viewer-player"></div>
   </div>
 
-  <!-- Пульт Ведущего -->
-  <div id="host-controller">
-    <div class="search-box">
-      <input type="text" id="yt-url" placeholder="Ссылка или ID видео YouTube...">
-      <button onclick="loadHostVideo()">Запустить</button>
-    </div>
-
-    <div id="host-player-container">
-      <div id="host-player"></div>
-    </div>
+  <!-- Полноценный YouTube для Ведущего -->
+  <div id="host-screen">
+    <iframe id="host-yt-iframe" src="about:blank"></iframe>
   </div>
 
   <script>
-    // Ссылка на процесс Render
     const RENDER_SERVER_URL = "https://familystandard.onrender.com";
 
-    // Подключение к сокет-серверу на Render
     const socket = io(RENDER_SERVER_URL, {
       transports: ['websocket', 'polling']
     });
 
     let isHost = false;
-    let hostPlayer, viewerPlayer;
+    let viewerPlayer;
 
-    // --- 1. Canvas фоновые эффекты ---
+    // --- 1. Анимация Canvas ---
     const canvas = document.getElementById('bg-canvas');
     const ctx = canvas.getContext('2d');
     function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
 
-    let particles = Array.from({length: 35}, () => ({
+    let particles = Array.from({length: 30}, () => ({
       x: Math.random() * canvas.width,
       y: Math.random() * canvas.height,
       r: Math.random() * 3 + 1,
@@ -104,7 +88,7 @@
     }
     animateParticles();
 
-    // --- 2. Авторизация Ведущего ---
+    // --- 2. Вход Ведущего ---
     function submitPin() {
       const pin = document.getElementById('pin-input').value;
       socket.emit('auth_pin', { pin });
@@ -114,14 +98,34 @@
       if (data.success) {
         isHost = true;
         document.getElementById('pin-modal').style.display = 'none';
-        document.getElementById('host-controller').style.display = 'block';
-        initHostPlayer();
+        document.getElementById('host-screen').style.display = 'flex';
+        
+        // Открываем полноценный открытый интерфейс YouTube
+        const iframe = document.getElementById('host-yt-iframe');
+        iframe.src = "https://piped.video";
+
+        // Отслеживаем изменения ссылки внутри интерфейса
+        setInterval(() => {
+          try {
+            const currentUrl = iframe.contentWindow.location.href;
+            if (currentUrl.includes('/watch?v=')) {
+              const urlParams = new URLSearchParams(currentUrl.split('?')[1]);
+              const videoId = urlParams.get('v');
+              const time = parseFloat(urlParams.get('t') || 0);
+
+              socket.emit('host_control', { videoId: videoId, action: 'play', time: time });
+            }
+          } catch(e) {
+            // Игнорируем cross-origin ошибки при навигации
+          }
+        }, 1000);
+
       } else {
         alert(data.message);
       }
     });
 
-    // --- 3. YouTube API инициализация ---
+    // --- 3. Плеер Зрителя ---
     function onYouTubeIframeAPIReady() {
       viewerPlayer = new YT.Player('viewer-player', {
         height: '100%',
@@ -130,45 +134,7 @@
       });
     }
 
-    function initHostPlayer() {
-      hostPlayer = new YT.Player('host-player', {
-        height: '100%',
-        width: '100%',
-        playerVars: { 'autoplay': 0, 'controls': 1 },
-        events: {
-          'onReady': (e) => e.target.mute(),
-          'onStateChange': onHostPlayerStateChange
-        }
-      });
-    }
-
-    // --- 4. Управление Ведущего ---
-    function loadHostVideo() {
-      const input = document.getElementById('yt-url').value;
-      const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-      const match = input.match(regExp);
-      const videoId = (match && match[2].length === 11) ? match[2] : input;
-
-      if(videoId && hostPlayer) {
-        hostPlayer.loadVideoById(videoId);
-      }
-    }
-
-    function onHostPlayerStateChange(event) {
-      if (!isHost) return;
-
-      const videoData = hostPlayer.getVideoData();
-      const videoId = videoData.video_id;
-      const currentTime = hostPlayer.getCurrentTime();
-
-      if (event.data === YT.PlayerState.PLAYING) {
-        socket.emit('host_control', { videoId: videoId, action: 'play', time: currentTime });
-      } else if (event.data === YT.PlayerState.PAUSED) {
-        socket.emit('host_control', { videoId: videoId, action: 'pause', time: currentTime });
-      }
-    }
-
-    // --- 5. Прием команд Зрителями ---
+    // --- 4. Прием синхронизации у Зрителей ---
     socket.on('sync_to_viewers', (data) => {
       if (isHost) return;
 
@@ -180,6 +146,7 @@
         if (!currentUrl || !currentUrl.includes(data.videoId)) {
           viewerPlayer.loadVideoById(data.videoId, data.time);
         } else {
+          // Перемотка на нужное время
           viewerPlayer.seekTo(data.time, true);
           viewerPlayer.playVideo();
         }
