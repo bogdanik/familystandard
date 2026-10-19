@@ -7,6 +7,7 @@ app.config['SECRET_KEY'] = 'event_secret_key'
 
 socketio = SocketIO(app, cors_allowed_origins="*")
 
+# Абсолютно чистое начальное состояние
 STATE = {
     'videoId': None,
     'action': 'pause',
@@ -19,15 +20,13 @@ def index():
 
 @socketio.on('connect')
 def on_connect():
-    if STATE['videoId']:
-        emit('sync', STATE)
+    # Отдаем только текущее состояние (если None — зритель увидит заставку)
+    emit('sync', STATE)
 
 @socketio.on('auth_pin')
 def on_auth(data):
-    # Теперь пускаем сразу без проверок ПИН-кода
     emit('auth_result', {'success': True})
-    if STATE['videoId']:
-        emit('sync', STATE)
+    emit('sync', STATE)
 
 @socketio.on('host_action')
 def on_host_action(data):
@@ -37,20 +36,14 @@ def on_host_action(data):
     STATE['time'] = data.get('time', 0)
     emit('sync', STATE, broadcast=True, include_self=False)
 
-# Сброс экрана (красный квадрат на пульте)
+# Сброс в абсолютный ноль
 @socketio.on('clear_screen')
-def on_clear():
-    global STATE
-    STATE = {'videoId': None, 'action': 'pause', 'time': 0}
-    emit('sync', STATE, broadcast=True)
-
-# АБСОЛЮТНЫЙ СБРОС (Левая верхняя кнопка)
 @socketio.on('full_reset')
 def on_full_reset():
     global STATE
+    # Полностью вычищаем память на сервере
     STATE = {'videoId': None, 'action': 'pause', 'time': 0}
-    # Рассылаем всем приказ полностью перезагрузить вкладку браузера
-    emit('force_reload', broadcast=True)
+    emit('sync', STATE, broadcast=True)
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 10000))
