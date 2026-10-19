@@ -12,22 +12,21 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body, html { width: 100%; height: 100%; overflow: hidden; background: #0f0f0f; font-family: 'Roboto', 'Arial', sans-serif; color: #fff; }
 
-    /* ГЛОБАЛЬНЫЕ КНОПКИ */
     #reset-btn { position: absolute; top: 12px; left: 12px; z-index: 9999; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.4); padding: 6px 10px; border-radius: 6px; font-size: 11px; cursor: pointer; }
     #reset-btn:active { background: rgba(255,0,0,0.3); color: #fff; }
     #login-btn { position: absolute; top: 12px; right: 12px; z-index: 9999; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #888; padding: 6px 10px; border-radius: 6px; font-size: 11px; cursor: pointer; }
 
-    /* --- ЭКРАН 1: ЗАСТАВКА --- */
+    /* ЗАСТАВКА */
     #idle-screen { position: absolute; top:0; left:0; width: 100%; height: 100%; z-index: 10; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #0f0f0f; }
     .fs-text { font-size: 5vw; font-weight: 300; color: #aaa; letter-spacing: 3px; margin-bottom: 10px; text-transform: uppercase; text-align: center; }
     .yt-logo-container { font-size: 8vw; font-weight: 700; color: #fff; letter-spacing: -2px; display: flex; align-items: center; }
     .yt-logo-red { background-color: #FF0000; color: #fff; padding: 0.5vw 2vw; border-radius: 1.5vw; margin-left: 5px; line-height: 1.1; }
 
-    /* --- ЭКРАН 2: ПЛЕЕР ЗРИТЕЛЯ --- */
+    /* ПЛЕЕР ЗРИТЕЛЯ */
     #viewer-screen { opacity: 0; visibility: hidden; position: absolute; top:0; left:0; width: 100%; height: 100%; z-index: 20; background: #000; transition: opacity 0.2s ease; }
     #viewer-player { width: 100%; height: 100%; border: none; pointer-events: none; }
 
-    /* --- ЭКРАН 3: МЕНЮ ПОИСКА НА БОЛЬШОМ ЭКРАНЕ --- */
+    /* МЕНЮ ПОИСКА НА БОЛЬШОМ ЭКРАНЕ */
     #search-viewer-screen { display: none; position: absolute; top:0; left:0; width: 100%; height: 100%; z-index: 15; background: #080808; flex-direction: column; padding: 4vw; }
     .sv-title { font-size: 3vw; color: #fff; margin-bottom: 3vw; font-weight: 300; text-align: center; letter-spacing: 2px; }
     .sv-title span { font-weight: bold; color: #FF0000; }
@@ -36,10 +35,9 @@
     .sv-card img { width: 100%; aspect-ratio: 16/9; object-fit: cover; }
     .sv-card .sv-info { padding: 1.5vw; }
     .sv-card .sv-video-title { font-size: 1.6vw; color: #fff; font-weight: bold; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.3; }
-    /* Гигантская цифра в углу */
     .sv-badge { position: absolute; top: 0; left: 0; background: #FF0000; color: #fff; font-size: 3.5vw; font-weight: bold; padding: 0.5vw 2vw; border-bottom-right-radius: 1vw; z-index: 2; box-shadow: 2px 2px 15px rgba(0,0,0,0.5); }
 
-    /* --- ПУЛЬТ ВЕДУЩЕГО --- */
+    /* ПУЛЬТ ВЕДУЩЕГО */
     #host-screen { display: none; position: absolute; top:0; left:0; width: 100%; height: 100%; z-index: 50; background: #0f0f0f; overflow-y: auto; }
     .host-container { width: 100%; max-width: 500px; margin: 0 auto; padding: 15px; display: flex; flex-direction: column; min-height: 100%; }
     
@@ -50,7 +48,6 @@
     #host-monitor { width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 8px; overflow: hidden; border: 1px solid #282828; pointer-events: none; margin-bottom: 8px; }
     #host-player { width: 100%; height: 100%; border: none; }
 
-    /* Панель 1 Строка */
     .control-row { display: flex; justify-content: space-between; gap: 8px; width: 100%; margin-bottom: 15px; margin-top: 10px; }
     .control-row button { flex: 1; padding: 16px 0; background: #1a1a1a; color: #fff; border: 1px solid #333; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; transition: 0.1s; }
     .control-row button:active { background: #333; transform: scale(0.95); }
@@ -58,20 +55,17 @@
     .control-row .btn-play.is-playing { background: #333; border-color: #555; }
     .control-row .btn-stop { background: #1a1a1a; font-size: 16px; color: #FF0000; border-color: #333; }
 
-    /* Громкость */
     .vol-label { font-size: 11px; color: #888; text-align: center; text-transform: uppercase; margin-bottom: 6px; }
     .vol-row { display: flex; justify-content: space-between; gap: 5px; margin-bottom: 20px; }
     .vol-row button { flex: 1; padding: 10px 0; background: #1a1a1a; border: 1px solid #333; border-radius: 6px; color: #fff; font-weight: bold; cursor: pointer; font-size: 12px; }
     .vol-row button.active { background: #fff; color: #000; border-color: #fff; }
 
-    /* --- БЛОК ПОИСКА (НОВЫЙ) --- */
     .dashed-line { border-top: 2px dashed #333; margin-bottom: 15px; }
     .search-pagination { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
     .search-pagination button { padding: 10px 15px; background: #222; color: #fff; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
     .search-pagination button:disabled { opacity: 0.3; cursor: not-allowed; }
     .search-pagination span { font-size: 13px; color: #aaa; font-weight: bold; }
     
-    /* Сетка на пульте ведущего (по 2 в ряд) */
     .search-grid-host { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
     .search-card-host { background: #1a1a1a; border: 1px solid #333; border-radius: 8px; overflow: hidden; cursor: pointer; display: flex; flex-direction: column; }
     .search-card-host:active { border-color: #ff0000; }
@@ -88,30 +82,23 @@
 </head>
 <body>
 
-  <!-- Глобальные кнопки -->
   <button id="reset-btn" onclick="globalHardReset()">Сброс</button>
   <button id="login-btn" onclick="auth()">Host</button>
 
-  <!-- ЭКРАН 1: Заставка -->
   <div id="idle-screen">
     <div class="fs-text">Family Standard</div>
     <div class="yt-logo-container">You<span class="yt-logo-red">Tube</span></div>
   </div>
 
-  <!-- ЭКРАН 2: Плеер -->
   <div id="viewer-screen">
     <div id="viewer-player"></div>
   </div>
 
-  <!-- ЭКРАН 3: Меню Поиска (Для проектора) -->
   <div id="search-viewer-screen">
     <div class="sv-title" id="sv-title">Запрос: <span>...</span></div>
-    <div class="sv-grid" id="sv-grid">
-      <!-- Сюда вставятся 6 огромных карточек -->
-    </div>
+    <div class="sv-grid" id="sv-grid"></div>
   </div>
 
-  <!-- Пульт Ведущего -->
   <div id="host-screen">
     <div class="host-container">
       
@@ -140,7 +127,6 @@
         <button id="vol-100" class="active" onclick="hostSetVolume(100)">100</button>
       </div>
 
-      <!-- НОВЫЙ БЛОК: ИНТЕРАКТИВНЫЙ ПОИСК -->
       <div class="dashed-line"></div>
       <div class="input-row">
         <input type="text" id="search-query" placeholder="Поиск (например: Градусы Голая)..." onkeydown="if(event.key==='Enter') performSearch()">
@@ -177,7 +163,6 @@
     let currentVol = 100;
     let smoothVolInterval;
 
-    // Переменные для поиска
     let allSearchResults = [];
     let currentSearchPage = 0;
     let currentQuery = "";
@@ -188,20 +173,28 @@
       return match ? match[1] : (url.trim().length === 11 ? url.trim() : null);
     }
 
-    // --- 1. АВТОРИЗАЦИЯ И СБРОС ---
     function auth() { socket.emit('auth_pin', {}); }
     
     socket.on('auth_result', (data) => {
       if (data.success) {
         isHost = true;
+        // Очищаем экраны зрителей, чтобы пульт ведущего не перекрывался
+        document.getElementById('idle-screen').style.display = 'none';
+        document.getElementById('viewer-screen').style.opacity = '0';
+        document.getElementById('viewer-screen').style.visibility = 'hidden';
+        document.getElementById('search-viewer-screen').style.display = 'none';
+        
         document.getElementById('login-btn').style.display = 'none';
         document.getElementById('host-screen').style.display = 'block';
+        
+        initPlayersIfReady();
+      } else {
+        alert("ОШИБКА: Сервер отклонил запрос! Убедись, что новый app.py загружен на Render и запущен.");
       }
     });
 
     function globalHardReset() { socket.emit('full_reset'); }
 
-    // --- 2. ИНИЦИАЛИЗАЦИЯ ПЛЕЕРОВ ---
     function initPlayersIfReady() {
       if (window.YT && window.YT.Player) {
         if (!vPlayer) {
@@ -222,9 +215,8 @@
       }
     }
     function onYouTubeIframeAPIReady() { initPlayersIfReady(); }
-    setInterval(initPlayersIfReady, 500); // Защита от зависаний API
+    setInterval(initPlayersIfReady, 500); 
 
-    // --- 3. БАЗОВЫЙ ПУЛЬТ (PLAY / ССЫЛКИ) ---
     function handleManualLink() {
       const vid = extractId(document.getElementById('manual-link').value);
       if (vid && hPlayerReady) {
@@ -239,7 +231,6 @@
     function togglePlayPause() {
       if (!hPlayerReady || !preparedId) return;
       const state = hPlayer.getPlayerState();
-      
       if (state === YT.PlayerState.PLAYING) {
         hPlayer.pauseVideo();
       } else {
@@ -293,10 +284,9 @@
       if (!hPlayerReady || !currentHostId) return;
       const state = hPlayer.getPlayerState() === YT.PlayerState.PLAYING ? 'play' : 'pause';
       const time = hPlayer.getCurrentTime();
-      socket.emit('host_action', { videoId: currentHostId, action: `${state}\vert{}${currentVol}`, time: time });
+      socket.emit('host_action', { videoId: currentHostId, action: `${state}|${currentVol}`, time: time });
     }
 
-    // --- 4. ИНТЕРАКТИВНЫЙ ПОИСК (НОВОЕ) ---
     async function performSearch() {
       const q = document.getElementById('search-query').value.trim();
       if (!q) return;
@@ -324,8 +314,6 @@
     function renderSearchPage() {
       const grid = document.getElementById('search-results-host');
       const pag = document.getElementById('search-pagination');
-      const prevBtn = document.getElementById('page-prev');
-      const nextBtn = document.getElementById('page-next');
       
       grid.innerHTML = '';
       if (allSearchResults.length === 0) {
@@ -335,14 +323,13 @@
       }
 
       pag.style.display = 'flex';
-      prevBtn.disabled = currentSearchPage === 0;
-      nextBtn.disabled = (currentSearchPage * 6 + 6) >= allSearchResults.length;
+      document.getElementById('page-prev').disabled = currentSearchPage === 0;
+      document.getElementById('page-next').disabled = (currentSearchPage * 6 + 6) >= allSearchResults.length;
       document.getElementById('page-info').innerText = `Стр. ${currentSearchPage + 1}`;
 
       const start = currentSearchPage * 6;
       const slice = allSearchResults.slice(start, start + 6);
 
-      // Рисуем на пульте ведущего
       slice.forEach((item, idx) => {
         const num = idx + 1;
         const card = document.createElement('div');
@@ -361,18 +348,15 @@
         grid.appendChild(card);
       });
 
-      // Отправляем приказ вывести этот кусок сетки на экраны зрителей!
       socket.emit('host_search', { query: currentQuery, results: slice });
     }
 
     function hostPlaySearchResult(vid) {
-      // 1 клик по карточке — мгновенно вырубает меню и запускает видео у всех
       preparedId = vid;
       currentHostId = vid;
       if (hPlayerReady) hPlayer.loadVideoById(vid);
     }
 
-    // --- 5. ПРИЕМ СОКЕТОВ (ЛОГИКА ЗРИТЕЛЯ) ---
     function smoothVolumeTransition(targetVol) {
       if (!vPlayerReady || !vPlayer.getVolume) return;
       let current = vPlayer.getVolume();
@@ -392,27 +376,86 @@
     socket.on('force_reload', () => { window.location.reload(true); });
 
     socket.on('sync', (data) => {
-      // Хост игнорирует входящие сокеты, если это не восстановление
-      if (isHost) return;
+      if (isHost) {
+        if (data.mode === 'idle') {
+           document.getElementById('manual-link').value = '';
+           document.getElementById('search-query').value = '';
+           currentHostId = null;
+           preparedId = null;
+           if (hPlayerReady && hPlayer.stopVideo) hPlayer.stopVideo();
+           updatePlayButtonUI(YT.PlayerState.PAUSED);
+        } else if (data.mode === 'video' && data.videoId) {
+           if (data.videoId !== currentHostId) {
+             currentHostId = data.videoId;
+             preparedId = data.videoId;
+             if (hPlayerReady) hPlayer.loadVideoById(data.videoId, data.time);
+           }
+        }
+        return; 
+      }
 
       const idleScreen = document.getElementById('idle-screen');
       const vScreen = document.getElementById('viewer-screen');
       const sScreen = document.getElementById('search-viewer-screen');
 
-      // 1. ЗАСТАВКА (idle)
       if (data.mode === 'idle') {
         vScreen.style.opacity = '0'; vScreen.style.visibility = 'hidden';
         sScreen.style.display = 'none';
         idleScreen.style.display = 'flex';
         document.getElementById('login-btn').style.display = 'block';
         if (vPlayerReady && vPlayer.stopVideo) vPlayer.stopVideo();
-        return;
-      }
-
-      // 2. МЕНЮ ПОИСКА НА БОЛЬШОМ ЭКРАНЕ (search)
-      if (data.mode === 'search') {
+      } else if (data.mode === 'search') {
         vScreen.style.opacity = '0'; vScreen.style.visibility = 'hidden';
         idleScreen.style.display = 'none';
         document.getElementById('login-btn').style.display = 'none';
         
-        document.getElementById('sv-title').innerHTML = `Запрос:
+        document.getElementById('sv-title').innerHTML = `Запрос: <span>${data.searchQuery}</span>`;
+        const grid = document.getElementById('sv-grid');
+        grid.innerHTML = '';
+        
+        data.searchResults.forEach((item, idx) => {
+          const num = idx + 1;
+          const card = document.createElement('div');
+          card.className = 'sv-card';
+          card.innerHTML = `
+            <div class="sv-badge">${num}</div>
+            <img src="${item.thumbnail}">
+            <div class="sv-info">
+              <div class="sv-video-title">${item.title}</div>
+            </div>
+          `;
+          grid.appendChild(card);
+        });
+
+        sScreen.style.display = 'flex';
+        if (vPlayerReady && vPlayer.pauseVideo) vPlayer.pauseVideo();
+      } else if (data.mode === 'video') {
+        idleScreen.style.display = 'none';
+        sScreen.style.display = 'none';
+        document.getElementById('login-btn').style.display = 'none';
+        vScreen.style.opacity = '1'; vScreen.style.visibility = 'visible';
+
+        if (!vPlayerReady) return; 
+
+        const parts = data.action.split('|');
+        const actionStr = parts[0];
+        const volTarget = parts.length > 1 ? parseInt(parts[1]) : null;
+
+        if (volTarget !== null) smoothVolumeTransition(volTarget);
+
+        if (actionStr === 'play') {
+          const url = vPlayer.getVideoUrl && vPlayer.getVideoUrl();
+          if (!url || !url.includes(data.videoId)) {
+            vPlayer.loadVideoById(data.videoId, data.time);
+          } else {
+            vPlayer.seekTo(data.time, true);
+            vPlayer.playVideo();
+          }
+        } else if (actionStr === 'pause') {
+          vPlayer.pauseVideo();
+        }
+      }
+    });
+  </script>
+</body>
+</html>
