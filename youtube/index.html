@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Family Standard Event</title>
+  <title>Family Standard Event Hub</title>
 
   <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
   <script src="https://www.youtube.com/iframe_api"></script>
@@ -12,52 +12,56 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body, html { width: 100%; height: 100%; overflow: hidden; background: #080808; font-family: -apple-system, sans-serif; color: #fff; }
 
+    /* Canvas эффекты по умолчанию для зрителей */
     #bg-canvas { position: absolute; top:0; left:0; width: 100%; height: 100%; z-index: 1; }
 
-    /* Незаметная кнопка входа для Ведущего в углу */
-    #host-login-btn { position: absolute; top: 15px; right: 15px; z-index: 20; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #888; padding: 8px 14px; border-radius: 20px; font-size: 12px; cursor: pointer; backdrop-filter: blur(5px); }
+    /* Кнопка входа ведущего */
+    #host-login-btn { position: absolute; top: 15px; right: 15px; z-index: 20; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: #aaa; padding: 8px 16px; border-radius: 20px; font-size: 12px; cursor: pointer; backdrop-filter: blur(8px); }
 
-    /* Окно авторизации */
-    #pin-modal { display: none; position: absolute; z-index: 100; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(18, 18, 18, 0.95); padding: 25px; border-radius: 16px; text-align: center; width: 85%; max-width: 320px; border: 1px solid #2a2a2a; backdrop-filter: blur(12px); }
+    /* Окно ПИН */
+    #pin-modal { display: none; position: absolute; z-index: 100; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(20, 20, 20, 0.95); padding: 25px; border-radius: 16px; text-align: center; width: 85%; max-width: 320px; border: 1px solid #2a2a2a; backdrop-filter: blur(12px); }
     #pin-modal input { width: 100%; padding: 12px; font-size: 24px; text-align: center; border-radius: 10px; border: 1px solid #333; background: #111; color: #fff; margin: 15px 0; letter-spacing: 6px; }
     #pin-modal button { width: 100%; padding: 12px; font-size: 16px; font-weight: bold; background: #ff0000; color: white; border: none; border-radius: 10px; cursor: pointer; }
 
-    /* Экран Зрителей (Главный проектор/ТВ) */
+    /* Главный экран Зрителя */
     #viewer-screen { display: none; position: absolute; top:0; left:0; width: 100%; height: 100%; z-index: 30; background: #000; }
     #viewer-screen iframe { width: 100%; height: 100%; border: none; }
 
-    /* Мобильный Пульт Ведущего */
-    #host-screen { display: none; position: absolute; top:0; left:0; width: 100%; height: 100%; z-index: 50; background: #0f0f0f; padding: 12px; overflow-y: auto; flex-direction: column; }
-    .search-box { display: flex; gap: 8px; margin-bottom: 12px; }
-    .search-box input { flex: 1; padding: 12px; font-size: 15px; border-radius: 8px; border: 1px solid #333; background: #1a1a1a; color: #fff; }
-    .search-box button { padding: 12px 18px; background: #ff0000; color: #fff; border: none; border-radius: 8px; font-weight: bold; }
+    /* Пульт управления для Ведущего */
+    #host-screen { display: none; position: absolute; top:0; left:0; width: 100%; height: 100%; z-index: 50; background: #0f0f0f; padding: 12px; flex-direction: column; gap: 12px; overflow-y: auto; }
+    
+    .search-box { display: flex; gap: 8px; }
+    .search-box input { flex: 1; padding: 12px; font-size: 15px; border-radius: 8px; border: 1px solid #333; background: #181818; color: #fff; }
+    .search-box button { padding: 12px 18px; background: #ff0000; color: #fff; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
 
-    /* Превью-плеер ведущего */
-    #host-player-container { width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 10px; overflow: hidden; margin-bottom: 12px; border: 1px solid #282828; }
+    #host-player-container { width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 10px; overflow: hidden; border: 1px solid #282828; }
+    .clear-btn { width: 100%; padding: 12px; background: #222; color: #ff4444; border: 1px solid #333; border-radius: 8px; font-weight: bold; cursor: pointer; }
 
-    /* Выдача карточек YouTube */
+    /* Выдача результатов поиска */
     .results-list { display: flex; flex-direction: column; gap: 10px; }
-    .video-card { display: flex; gap: 10px; background: #181818; padding: 8px; border-radius: 8px; cursor: pointer; border: 1px solid #262626; }
-    .video-card img { width: 120px; height: 68px; object-fit: cover; border-radius: 6px; }
-    .video-info { display: flex; flex-direction: column; justify-content: center; }
-    .video-info h4 { font-size: 13px; color: #fff; margin-bottom: 4px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .video-card { display: flex; gap: 12px; background: #181818; padding: 10px; border-radius: 10px; cursor: pointer; border: 1px solid #262626; transition: background 0.2s; }
+    .video-card:active { background: #282828; }
+    .video-card img { width: 120px; height: 68px; object-fit: cover; border-radius: 6px; background: #222; }
+    .video-info { display: flex; flex-direction: column; justify-content: center; flex: 1; }
+    .video-info h4 { font-size: 13px; color: #fff; margin-bottom: 4px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.3; }
     .video-info p { font-size: 11px; color: #888; }
   </style>
 </head>
 <body>
 
-  <!-- Фон для всех зрителей по умолчанию -->
+  <!-- Заставка Canvas -->
   <canvas id="bg-canvas"></canvas>
 
   <button id="host-login-btn" onclick="openPinModal()">Вход ведущего</button>
 
   <div id="pin-modal">
     <h3>Family Standard</h3>
+    <p><small style="color:#888;">Введите ПИН ведущего</small></p>
     <input type="password" id="pin-input" placeholder="ПИН" maxlength="4" pattern="\d*">
     <button onclick="submitPin()">Войти</button>
   </div>
 
-  <!-- Экран Зрителей -->
+  <!-- Полноэкранный плеер для Зрителей -->
   <div id="viewer-screen">
     <div id="viewer-player"></div>
   </div>
@@ -65,13 +69,16 @@
   <!-- Пульт Ведущего -->
   <div id="host-screen">
     <div class="search-box">
-      <input type="text" id="yt-query" placeholder="Поиск YouTube или ссылка...">
-      <button onclick="searchVideos()">Найти</button>
+      <input type="text" id="yt-query" placeholder="Поиск в YouTube или ссылка..." onkeydown="if(event.key==='Enter') searchYouTube()">
+      <button onclick="searchYouTube()">Найти</button>
     </div>
 
+    <!-- Мониторный плеер без звука на телефоне -->
     <div id="host-player-container">
       <div id="host-player"></div>
     </div>
+
+    <button class="clear-btn" onclick="clearSpectatorScreens()">Очистить экран (Вернуть заставку)</button>
 
     <div class="results-list" id="results-container"></div>
   </div>
@@ -86,7 +93,7 @@
     let isHost = false;
     let hostPlayer, viewerPlayer;
 
-    // --- 1. Canvas эффекты ---
+    // --- 1. Анимация фона Canvas ---
     const canvas = document.getElementById('bg-canvas');
     const ctx = canvas.getContext('2d');
     function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
@@ -116,7 +123,7 @@
     }
     animateParticles();
 
-    // --- 2. Авторизация Ведущего ---
+    // --- 2. Авторизация ---
     function openPinModal() {
       document.getElementById('pin-modal').style.display = 'block';
     }
@@ -143,7 +150,13 @@
       viewerPlayer = new YT.Player('viewer-player', {
         height: '100%',
         width: '100%',
-        playerVars: { 'autoplay': 1, 'controls': 0, 'rel': 0 }
+        playerVars: {
+          'autoplay': 1,
+          'controls': 0,
+          'rel': 0,
+          'enablejsapi': 1,
+          'origin': window.location.origin
+        }
       });
     }
 
@@ -151,7 +164,12 @@
       hostPlayer = new YT.Player('host-player', {
         height: '100%',
         width: '100%',
-        playerVars: { 'autoplay': 0, 'controls': 1 },
+        playerVars: {
+          'autoplay': 0,
+          'controls': 1,
+          'enablejsapi': 1,
+          'origin': window.location.origin
+        },
         events: {
           'onReady': (e) => e.target.mute(),
           'onStateChange': onHostPlayerStateChange
@@ -159,12 +177,12 @@
       });
     }
 
-    // --- 4. Поиск YouTube без лагов ---
-    async function searchVideos() {
+    // --- 4. Прямой поиск через сервер Python ---
+    async function searchYouTube() {
       const query = document.getElementById('yt-query').value.trim();
       if (!query) return;
 
-      // Извлечение ID если вставлена ссылка
+      // Если вставлена прямая ссылка
       const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
       const match = query.match(regExp);
       if (match && match[2].length === 11) {
@@ -172,27 +190,32 @@
         return;
       }
 
-      // Нативный быстрой поиск карточек YouTube
-      try {
-        const res = await fetch(`https://invidious.nerdvpn.de/api/v1/search?q=${encodeURIComponent(query)}&type=video`);
-        const data = await res.json();
-        
-        const container = document.getElementById('results-container');
-        container.innerHTML = '';
+      const container = document.getElementById('results-container');
+      container.innerHTML = '<div style="text-align:center; padding:15px; color:#666;">Поиск в база данных YouTube...</div>';
 
-        data.slice(0, 10).forEach(item => {
-          const card = document.createElement('div');
-          card.className = 'video-card';
-          card.onclick = () => playOnHost(item.videoId);
-          card.innerHTML = `
-            <img src="${item.videoThumbnails ? item.videoThumbnails[0].url : ''}" alt="thumb">
-            <div class="video-info">
-              <h4>${item.title}</h4>
-              <p>${item.author}</p>
-            </div>
-          `;
-          container.appendChild(card);
-        });
+      try {
+        const res = await fetch(`${RENDER_SERVER_URL}/api/search?q=${encodeURIComponent(query)}`);
+        const data = await res.json();
+
+        if (Array.isArray(data) && data.length > 0) {
+          container.innerHTML = '';
+          data.forEach(item => {
+            const card = document.createElement('div');
+            card.className = 'video-card';
+            card.onclick = () => playOnHost(item.videoId);
+
+            card.innerHTML = `
+              <img src="${item.thumbnail}" alt="thumb" onerror="this.src='https://i.ytimg.com/vi/${item.videoId}/hqdefault.jpg'">
+              <div class="video-info">
+                <h4>${item.title}</h4>
+                <p>${item.channel} ${item.duration ? '• ' + item.duration : ''}</p>
+              </div>
+            `;
+            container.appendChild(card);
+          });
+        } else {
+          container.innerHTML = '<div style="text-align:center; padding:15px; color:#888;">Ничего не найдено</div>';
+        }
       } catch (e) {
         playOnHost(query);
       }
@@ -202,6 +225,10 @@
       if (hostPlayer && videoId) {
         hostPlayer.loadVideoById(videoId);
       }
+    }
+
+    function clearSpectatorScreens() {
+      socket.emit('clear_screen');
     }
 
     function onHostPlayerStateChange(event) {
@@ -218,21 +245,28 @@
       }
     }
 
-    // --- 5. Синхронизация для Зрителей ---
+    // --- 5. Синхронизация Зрителей ---
     socket.on('sync_to_viewers', (data) => {
-      if (isHost || !data.videoId) return;
+      if (isHost) return;
 
-      // Автоматически скрываем ПИН и заставку, показываем видео
+      const viewerScreen = document.getElementById('viewer-screen');
+
+      if (!data || !data.videoId) {
+        viewerScreen.style.display = 'none';
+        if (viewerPlayer && viewerPlayer.stopVideo) viewerPlayer.stopVideo();
+        return;
+      }
+
       document.getElementById('pin-modal').style.display = 'none';
       document.getElementById('host-login-btn').style.display = 'none';
-      document.getElementById('viewer-screen').style.display = 'block';
+      viewerScreen.style.display = 'block';
 
       if (data.action === 'play') {
         const currentUrl = viewerPlayer.getVideoUrl();
         if (!currentUrl || !currentUrl.includes(data.videoId)) {
-          viewerPlayer.loadVideoById(data.videoId, data.time);
+          viewerPlayer.loadVideoById(data.videoId, data.time || 0);
         } else {
-          viewerPlayer.seekTo(data.time, true);
+          viewerPlayer.seekTo(data.time || 0, true);
           viewerPlayer.playVideo();
         }
       } else if (data.action === 'pause') {
