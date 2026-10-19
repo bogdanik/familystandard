@@ -4,34 +4,46 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Family Standard Event</title>
+
   <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
   <script src="https://www.youtube.com/iframe_api"></script>
+
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body, html { width: 100%; height: 100%; overflow: hidden; background: #080808; font-family: 'Roboto', 'Arial', sans-serif; color: #fff; }
 
+    /* ГЛОБАЛЬНЫЕ КНОПКИ */
     #reset-btn { position: absolute; top: 12px; left: 12px; z-index: 9999; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.4); padding: 6px 10px; border-radius: 6px; font-size: 11px; cursor: pointer; transition: 0.2s; }
-    #reset-btn:active { background: rgba(255,0,0,0.3); color: #fff; }
+    #reset-btn:active { background: rgba(255,0,0,0.3); color: #fff; border-color: #ff0000; }
     #login-btn { position: absolute; top: 12px; right: 12px; z-index: 9999; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #888; padding: 6px 10px; border-radius: 6px; font-size: 11px; cursor: pointer; }
 
+    /* ЗАСТАВКА */
     #idle-screen { position: absolute; top:0; left:0; width: 100%; height: 100%; z-index: 10; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #080808; }
     .fs-text { font-size: 5vw; font-weight: 300; color: #aaa; letter-spacing: 3px; margin-bottom: 10px; text-transform: uppercase; text-align: center; }
     .yt-logo-container { font-size: 8vw; font-weight: 700; color: #fff; letter-spacing: -2px; display: flex; align-items: center; }
     .yt-logo-red { background-color: #FF0000; color: #fff; padding: 0.5vw 2vw; border-radius: 1.5vw; margin-left: 5px; line-height: 1.1; }
 
+    /* ПЛЕЕР ЗРИТЕЛЯ */
     #viewer-screen { opacity: 0; visibility: hidden; position: absolute; top:0; left:0; width: 100%; height: 100%; z-index: 20; background: #000; transition: opacity 0.3s ease; }
     #viewer-player { width: 100%; height: 100%; border: none; pointer-events: none; }
 
-    #search-viewer-screen { display: none; position: absolute; top:0; left:0; width: 100%; height: 100%; z-index: 15; background: radial-gradient(circle at center, #1a1a1a 0%, #050505 100%); flex-direction: column; justify-content: center; align-items: center; padding: 3vw; gap: 3vw; }
-    .sv-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2.5vw; width: 100%; max-width: 90vw; }
-    .sv-card { background: #000; border-radius: 1.5vw; overflow: hidden; position: relative; border: 2px solid #333; display: flex; flex-direction: column; box-shadow: 0 15px 35px rgba(0,0,0,0.6); }
-    .sv-card img { width: 100%; aspect-ratio: 16/9; object-fit: cover; border-bottom: 2px solid #222; }
-    .sv-card .sv-info { padding: 1.5vw; background: linear-gradient(180deg, #181818 0%, #0a0a0a 100%); flex: 1; }
-    .sv-card .sv-video-title { font-size: 1.7vw; color: #fff; font-weight: bold; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.3; }
-    .sv-badge { position: absolute; top: 0; left: 0; background: #FF0000; color: #fff; font-size: 3.5vw; font-weight: bold; padding: 0.5vw 2.5vw; border-bottom-right-radius: 1.5vw; z-index: 2; box-shadow: 3px 3px 15px rgba(255,0,0,0.3); }
-    .sv-title { font-size: 2vw; color: #888; text-transform: uppercase; letter-spacing: 3px; }
-    .sv-title span { font-weight: bold; color: #fff; font-size: 2.5vw; margin-left: 10px; }
+    /* --- НОВЫЙ ДИЗАЙН МЕНЮ ПОИСКА НА ЭКРАНАХ --- */
+    #search-viewer-screen { display: none; position: absolute; top:0; left:0; width: 100%; height: 100%; z-index: 15; background: radial-gradient(circle at center, #1a1a1a 0%, #050505 100%); flex-direction: column; justify-content: center; align-items: center; padding: 4vh 4vw; }
+    
+    .sv-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2vw; width: 100%; max-width: 85vw; max-height: 75vh; }
+    
+    .sv-card { background: #000; border-radius: 1vw; overflow: hidden; position: relative; border: 0.2vw solid #333; box-shadow: 0 1vw 3vw rgba(0,0,0,0.6); aspect-ratio: 16/9; }
+    .sv-card img { width: 100%; height: 100%; object-fit: cover; display: block; position: absolute; top: 0; left: 0; z-index: 1; }
+    
+    /* Градиент и инфо внутри карточки */
+    .sv-overlay { position: absolute; bottom: 0; left: 0; width: 100%; background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.6) 50%, rgba(0,0,0,0) 100%); padding: 4vw 1.5vw 1vw 1.5vw; display: flex; justify-content: space-between; align-items: flex-end; gap: 1vw; z-index: 2; }
+    .sv-video-title { font-size: 1.6vw; color: #fff; font-weight: bold; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.3; text-shadow: 1px 1px 4px #000; flex: 1; }
+    .sv-badge { font-size: 2.5vw; font-weight: bold; color: rgba(255, 255, 255, 0.4); line-height: 1; text-shadow: 1px 1px 3px rgba(0,0,0,0.8); }
+    
+    .sv-title { font-size: 3vh; color: #888; text-transform: uppercase; letter-spacing: 3px; margin-top: 4vh; }
+    .sv-title span { font-weight: bold; color: #fff; font-size: 3.5vh; margin-left: 10px; }
 
+    /* ПУЛЬТ ВЕДУЩЕГО */
     #host-screen { display: none; position: absolute; top:0; left:0; width: 100%; height: 100%; z-index: 50; background: #0a0a0a; overflow-y: auto; }
     .host-container { width: 100%; max-width: 500px; margin: 0 auto; padding: 15px; display: flex; flex-direction: column; min-height: 100%; }
     
@@ -58,6 +70,7 @@
     .vol-row button { flex: 1; padding: 12px 0; background: #111; border: 1px solid #333; border-radius: 6px; color: #888; font-weight: bold; cursor: pointer; font-size: 13px; }
     .vol-row button.active { background: #fff; color: #000; border-color: #fff; }
 
+    /* НОВЫЙ ДИЗАЙН КАРТОЧЕК НА ПУЛЬТЕ (По аналогии со зрителями) */
     .dashed-line { border-top: 2px dashed #222; margin-bottom: 20px; }
     .search-pagination { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
     .search-pagination button { padding: 12px 18px; background: #1a1a1a; color: #fff; border: 1px solid #333; border-radius: 6px; font-weight: bold; cursor: pointer; }
@@ -65,12 +78,13 @@
     .search-pagination span { font-size: 14px; color: #aaa; font-weight: bold; }
     
     .search-grid-host { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
-    .search-card-host { background: #111; border: 1px solid #222; border-radius: 8px; overflow: hidden; cursor: pointer; display: flex; flex-direction: column; transition: 0.1s; }
+    .search-card-host { background: #111; border: 1px solid #333; border-radius: 8px; overflow: hidden; cursor: pointer; display: flex; flex-direction: column; position: relative; aspect-ratio: 16/9; transition: 0.1s; }
     .search-card-host:active { border-color: #ff0000; transform: scale(0.98); }
-    .search-card-host img { width: 100%; aspect-ratio: 16/9; object-fit: cover; border-bottom: 1px solid #222; }
-    .search-card-host .info { padding: 10px; font-size: 12px; }
-    .search-card-host .title { font-weight: bold; margin-bottom: 4px; color: #ddd; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-    .search-card-host .badge { position: absolute; background: #ff0000; color: #fff; font-size: 13px; font-weight: bold; padding: 3px 10px; border-bottom-right-radius: 8px; z-index: 2; }
+    .search-card-host img { width: 100%; height: 100%; object-fit: cover; display: block; position: absolute; top: 0; left: 0; z-index: 1; }
+    
+    .search-card-host .overlay { position: absolute; bottom: 0; left: 0; width: 100%; background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.5) 60%, rgba(0,0,0,0) 100%); padding: 25px 8px 8px 8px; display: flex; justify-content: space-between; align-items: flex-end; gap: 5px; z-index: 2; }
+    .search-card-host .title { font-weight: bold; color: #fff; font-size: 11px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; flex: 1; text-shadow: 1px 1px 3px #000; }
+    .search-card-host .badge { color: rgba(255,255,255,0.4); font-size: 14px; font-weight: bold; line-height: 1; }
 
     .host-footer { margin-top: auto; padding-top: 30px; padding-bottom: 15px; display: flex; flex-direction: column; align-items: center; opacity: 0.3; }
     .host-footer .fs-text { font-size: 14px; margin-bottom: 4px; letter-spacing: 2px; }
@@ -99,16 +113,22 @@
 
   <div id="host-screen">
     <div class="host-container">
+      
       <div class="input-row">
         <input type="text" id="manual-link" placeholder="Прямая ссылка...">
         <button onclick="handleManualLink()">Подготовить</button>
       </div>
 
-      <div id="host-monitor"><div id="host-player"></div></div>
+      <div id="host-monitor">
+        <div id="host-player"></div>
+      </div>
 
       <div class="timeline-box">
         <input type="range" id="seek-bar" min="0" max="100" value="0" step="0.1" oninput="onSeekBarScrub(this.value)">
-        <div class="time-display"><span id="time-curr">0:00</span><span id="time-dur">0:00</span></div>
+        <div class="time-display">
+          <span id="time-curr">0:00</span>
+          <span id="time-dur">0:00</span>
+        </div>
       </div>
 
       <div class="control-row">
@@ -134,9 +154,9 @@
       </div>
       
       <div class="search-pagination" id="search-pagination" style="display:none;">
-        <button id="page-prev" onclick="changeSearchPage(-1)">◀</button>
+        <button id="page-prev" onclick="changeSearchPage(-1)">◀ Назад</button>
         <span id="page-info">Стр. 1</span>
-        <button id="page-next" onclick="changeSearchPage(1)">▶</button>
+        <button id="page-next" onclick="changeSearchPage(1)">Вперед ▶</button>
       </div>
       
       <div class="search-grid-host" id="search-results-host"></div>
@@ -145,6 +165,7 @@
         <div class="fs-text">Family Standard</div>
         <div class="yt-logo-container">You<span class="yt-logo-red">Tube</span></div>
       </div>
+      
     </div>
   </div>
 
@@ -186,7 +207,7 @@
 
     function globalHardReset() { socket.emit('full_reset'); }
 
-    // ЖЕСТКАЯ НАСТРОЙКА YOUTUBE IFRAME (Отключение субтитров и аннотаций)
+    // ЖЕСТКАЯ НАСТРОЙКА YOUTUBE IFRAME (Отключение субтитров)
     const PLAYER_VARS = { 'autoplay': 1, 'controls': 0, 'disablekb': 1, 'rel': 0, 'modestbranding': 1, 'cc_load_policy': 0, 'iv_load_policy': 3, 'origin': window.location.origin };
 
     function initPlayersIfReady() {
@@ -312,8 +333,12 @@
         const card = document.createElement('div');
         card.className = 'search-card-host';
         card.onclick = () => { preparedId = item.videoId; currentHostId = item.videoId; if (hPlayerReady) hPlayer.loadVideoById(item.videoId); };
-        card.innerHTML = `<div style="position:relative;"><div class="badge">${idx + 1}</div><img src="${item.thumbnail}"></div>
-          <div class="info"><div class="title">${item.title}</div><div style="color:#888; margin-top:2px;">${item.duration}</div></div>`;
+        card.innerHTML = `
+          <img src="${item.thumbnail}">
+          <div class="overlay">
+            <div class="title">${item.title}</div>
+            <div class="badge">${idx + 1}</div>
+          </div>`;
         grid.appendChild(card);
       });
       socket.emit('host_search', { query: currentQuery, results: slice });
@@ -360,7 +385,12 @@
         const grid = document.getElementById('sv-grid'); grid.innerHTML = '';
         data.searchResults.forEach((item, idx) => {
           const card = document.createElement('div'); card.className = 'sv-card';
-          card.innerHTML = `<div class="sv-badge">${idx + 1}</div><img src="${item.thumbnail}"><div class="sv-info"><div class="sv-video-title">${item.title}</div></div>`;
+          card.innerHTML = `
+            <img src="${item.thumbnail}">
+            <div class="sv-overlay">
+              <div class="sv-video-title">${item.title}</div>
+              <div class="sv-badge">${idx + 1}</div>
+            </div>`;
           grid.appendChild(card);
         });
         sSc.style.display = 'flex';
