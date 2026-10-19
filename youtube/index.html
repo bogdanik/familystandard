@@ -27,7 +27,8 @@
     .yt-logo-red { background-color: #FF0000; color: #fff; padding: 0.5vw 2vw; border-radius: 1.5vw; margin-left: 5px; line-height: 1.1; }
 
     /* --- ПЛЕЕР ЗРИТЕЛЯ --- */
-    #viewer-screen { display: none; position: absolute; top:0; left:0; width: 100%; height: 100%; z-index: 20; background: #000; }
+    /* ИСПОЛЬЗУЕМ OPACITY, А НЕ DISPLAY: NONE, ЧТОБЫ БРАУЗЕР ПК НЕ УБИВАЛ ПРОЦЕСС IFRAME */
+    #viewer-screen { opacity: 0; visibility: hidden; position: absolute; top:0; left:0; width: 100%; height: 100%; z-index: 20; background: #000; transition: opacity 0.3s ease; }
     #viewer-player { width: 100%; height: 100%; border: none; pointer-events: none; }
 
     /* --- ПУЛЬТ ВЕДУЩЕГО --- */
@@ -41,20 +42,18 @@
     .input-row input { flex: 1; min-width: 0; padding: 14px 10px; font-size: 15px; background: #000; border: 1px solid #333; color: #fff; border-radius: 8px; }
     .input-row button { padding: 0 15px; background: #222; color: #fff; border: 1px solid #333; font-weight: bold; border-radius: 8px; cursor: pointer; white-space: nowrap; }
     
-    /* Монитор */
+    /* Монитор (Кастомный) */
     #host-monitor { width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 8px; overflow: hidden; border: 1px solid #282828; pointer-events: none; margin-bottom: 15px; }
     #host-player { width: 100%; height: 100%; border: none; }
 
-    /* --- ПАНЕЛЬ УПРАВЛЕНИЯ В ОДНУ СТРОКУ --- */
+    /* --- ПАНЕЛЬ УПРАВЛЕНИЯ --- */
     .control-row { display: flex; justify-content: space-between; gap: 8px; width: 100%; margin-bottom: 20px; }
     .control-row button { flex: 1; padding: 18px 0; background: #1a1a1a; color: #fff; border: 1px solid #333; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.1s; }
     .control-row button:active { background: #333; transform: scale(0.95); }
     
-    /* Play/Pause */
     .control-row .btn-play { background: #FF0000; border-color: #FF0000; font-size: 18px; }
     .control-row .btn-play.is-playing { background: #333; border-color: #555; }
     
-    /* Красный квадрат (Сброс экрана) */
     .control-row .btn-stop { background: #1a1a1a; font-size: 16px; color: #FF0000; border-color: #333; }
 
     /* --- ГРОМКОСТЬ --- */
@@ -63,7 +62,7 @@
     .vol-row button { flex: 1; padding: 12px 0; background: #1a1a1a; border: 1px solid #333; border-radius: 6px; color: #fff; font-weight: bold; cursor: pointer; }
     .vol-row button.active { background: #fff; color: #000; border-color: #fff; }
 
-    /* --- ЛОГОТИП ВНИЗУ ПУЛЬТА --- */
+    /* --- ЛОГОТИП ФУТЕР --- */
     .host-footer { margin-top: auto; padding-top: 30px; padding-bottom: 10px; display: flex; flex-direction: column; align-items: center; opacity: 0.5; }
     .host-footer .fs-text { font-size: 4vw; margin-bottom: 5px; letter-spacing: 2px; }
     .host-footer .yt-logo-container { font-size: 6vw; }
@@ -97,17 +96,14 @@
       <div class="status-text" id="status">Вставьте ссылку на видео</div>
       
       <div class="input-row">
-        <!-- Ссылка остается в инпуте -->
         <input type="text" id="manual-link" placeholder="Вставьте ссылку...">
         <button onclick="handleManualLink()">Подготовить</button>
       </div>
 
-      <!-- Монитор (Кастомный) -->
       <div id="host-monitor">
         <div id="host-player"></div>
       </div>
 
-      <!-- ПАНЕЛЬ 1 СТРОКА -->
       <div class="control-row">
         <button onclick="hostSeek(-10)">-10с</button>
         <button id="btn-play-pause" class="btn-play" onclick="togglePlayPause()">▶</button>
@@ -115,7 +111,6 @@
         <button onclick="hostSeek(10)">+10с</button>
       </div>
 
-      <!-- ГРОМКОСТЬ -->
       <div class="vol-label">Уровень громкости на экранах</div>
       <div class="vol-row">
         <button id="vol-3" onclick="hostSetVolume(3)">3</button>
@@ -125,7 +120,6 @@
         <button id="vol-100" class="active" onclick="hostSetVolume(100)">100</button>
       </div>
 
-      <!-- ЛОГОТИП ФУТЕР -->
       <div class="host-footer">
         <div class="fs-text">Family Standard</div>
         <div class="yt-logo-container">You<span class="yt-logo-red">Tube</span></div>
@@ -142,7 +136,7 @@
     let vPlayer, hPlayer;
     let vPlayerReady = false; 
     let hPlayerReady = false;
-    let pendingSyncData = null; // Очередь команд для защиты от зависаний
+    let pendingSyncData = null;
 
     let preparedId = null;  
     let currentHostId = null; 
@@ -169,14 +163,32 @@
       }
     });
 
-    // Абсолютный сброс в 0 (Левая кнопка)
+    // Левая кнопка сброса: отправляем сигнал на сервер
     function globalHardReset() {
       socket.emit('full_reset');
     }
 
-    // Приказ перезагрузить страницу от сервера
+    // ПРОГРАММНЫЙ АБСОЛЮТНЫЙ СБРОС (без перезагрузки страницы!)
     socket.on('force_reload', () => {
-      window.location.reload(true);
+      isHost = false;
+      currentHostId = null;
+      preparedId = null;
+      pendingSyncData = null;
+
+      if (vPlayer && vPlayer.stopVideo) vPlayer.stopVideo();
+      if (hPlayer && hPlayer.stopVideo) hPlayer.stopVideo();
+
+      document.getElementById('host-screen').style.display = 'none';
+      document.getElementById('viewer-screen').style.opacity = '0';
+      document.getElementById('viewer-screen').style.visibility = 'hidden';
+      
+      document.getElementById('idle-screen').style.display = 'flex';
+      document.getElementById('login-btn').style.display = 'block';
+
+      const statusEl = document.getElementById('status');
+      if (statusEl) statusEl.innerText = "Вставьте ссылку на видео";
+      
+      updatePlayButtonUI(YT.PlayerState.PAUSED);
     });
 
     // --- 2. ПЛЕЕРЫ ---
@@ -186,7 +198,7 @@
         events: {
           'onReady': () => {
             vPlayerReady = true;
-            applySyncData(); // Выполняем команду, которая ждала загрузки
+            applySyncData();
           }
         }
       });
@@ -321,8 +333,7 @@
 
       // Если это пульт ведущего
       if (isHost) {
-        if (!hPlayerReady) return; // Ждём, пока плеер проснется
-        
+        if (!hPlayerReady) return; 
         if (data.videoId && data.videoId !== currentHostId) {
           currentHostId = data.videoId;
           preparedId = data.videoId;
@@ -335,15 +346,19 @@
       }
 
       // Если это экран зрителя
-      if (!vPlayerReady) return; // ГАРАНТИЯ: ждём загрузки API Youtube!
+      if (!vPlayerReady) return; 
 
       const vScreen = document.getElementById('viewer-screen');
       const idleScreen = document.getElementById('idle-screen');
 
       // Квадрат сброса 🟥
       if (!data.videoId) {
-        vScreen.style.display = 'none';
+        // Убираем прозрачность и выключаем
+        vScreen.style.opacity = '0';
+        vScreen.style.visibility = 'hidden';
+        
         idleScreen.style.display = 'flex';
+        document.getElementById('login-btn').style.display = 'block';
         if (vPlayer.stopVideo) vPlayer.stopVideo();
         return;
       }
@@ -356,7 +371,10 @@
 
       idleScreen.style.display = 'none';
       document.getElementById('login-btn').style.display = 'none';
-      vScreen.style.display = 'block';
+      
+      // Показываем видео (Возвращаем видимость)
+      vScreen.style.opacity = '1';
+      vScreen.style.visibility = 'visible';
 
       if (actionStr === 'play') {
         const url = vPlayer.getVideoUrl && vPlayer.getVideoUrl();
