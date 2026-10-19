@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Family Standard YouTube Control</title>
+  <title>Family Standard Event</title>
 
   <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
   <script src="https://www.youtube.com/iframe_api"></script>
@@ -12,47 +12,54 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body, html { width: 100%; height: 100%; overflow: hidden; background: #0f0f0f; font-family: 'Roboto', 'Arial', sans-serif; color: #fff; }
 
-    /* ЗАСТАВКА ЗРИТЕЛЕЙ (Оригинальный стиль YouTube) */
-    #idle-screen { position: absolute; top:0; left:0; width: 100%; height: 100%; z-index: 10; display: flex; align-items: center; justify-content: center; background: #0f0f0f; }
+    /* --- ЗАСТАВКА ЗРИТЕЛЕЙ --- */
+    #idle-screen { position: absolute; top:0; left:0; width: 100%; height: 100%; z-index: 10; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #0f0f0f; }
+    .fs-text { font-size: 5vw; font-weight: 300; color: #aaa; letter-spacing: 3px; margin-bottom: 10px; text-transform: uppercase; text-align: center; }
     .yt-logo-container { font-size: 8vw; font-weight: 700; color: #fff; letter-spacing: -2px; display: flex; align-items: center; }
-    .yt-logo-red { background-color: #FF0000; color: #fff; padding: 5px 20px; border-radius: 2vw; margin-left: 5px; display: inline-block; line-height: 1.1; }
+    .yt-logo-red { background-color: #FF0000; color: #fff; padding: 0.5vw 2vw; border-radius: 1.5vw; margin-left: 5px; line-height: 1.1; }
 
-    /* Кнопка входа ведущего */
-    #login-btn { position: absolute; top: 20px; right: 20px; z-index: 30; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #aaa; padding: 10px 15px; border-radius: 8px; cursor: pointer; }
-    
-    /* Модалка ПИН-кода */
-    #pin-modal { display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 40; background: #181818; padding: 30px; border-radius: 12px; border: 1px solid #333; text-align: center; width: 90%; max-width: 320px; }
+    /* --- МОДАЛКА И КНОПКА ХОСТА --- */
+    #login-btn { position: absolute; top: 15px; right: 15px; z-index: 30; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #888; padding: 8px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; }
+    #pin-modal { display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 40; background: #181818; padding: 25px 20px; border-radius: 12px; border: 1px solid #333; text-align: center; width: 90%; max-width: 320px; }
     #pin-modal input { width: 100%; padding: 15px; font-size: 20px; text-align: center; margin-bottom: 15px; background: #000; border: 1px solid #444; color: #fff; border-radius: 8px; letter-spacing: 5px; }
     #pin-modal button { width: 100%; padding: 15px; background: #FF0000; color: #fff; border: none; font-size: 16px; cursor: pointer; font-weight: bold; border-radius: 8px; }
 
-    /* ПЛЕЕР ЗРИТЕЛЯ */
+    /* --- ПЛЕЕР ЗРИТЕЛЯ --- */
     #viewer-screen { display: none; position: absolute; top:0; left:0; width: 100%; height: 100%; z-index: 20; background: #000; }
     #viewer-player { width: 100%; height: 100%; border: none; pointer-events: none; }
 
-    /* ПУЛЬТ ВЕДУЩЕГО */
-    #host-screen { display: none; position: absolute; top:0; left:0; width: 100%; height: 100%; z-index: 50; background: #0f0f0f; padding: 20px; flex-direction: column; gap: 15px; overflow-y: auto; }
-    .input-row { display: flex; gap: 10px; }
-    .input-row input { flex: 1; padding: 15px; font-size: 16px; background: #000; border: 1px solid #333; color: #fff; border-radius: 8px; }
-    .input-row button { padding: 0 20px; background: #FF0000; color: #fff; border: none; font-weight: bold; border-radius: 8px; cursor: pointer; }
+    /* --- ПУЛЬТ ВЕДУЩЕГО --- */
+    #host-screen { display: none; position: absolute; top:0; left:0; width: 100%; height: 100%; z-index: 50; background: #0f0f0f; overflow-y: auto; }
+    .host-container { width: 100%; max-width: 500px; margin: 0 auto; padding: 20px 15px; display: flex; flex-direction: column; gap: 15px; min-height: 100%; }
     
-    /* Монитор ведущего */
+    .status-text { color: #aaa; font-size: 14px; text-align: center; font-weight: bold; }
+
+    .input-row { display: flex; gap: 8px; width: 100%; }
+    .input-row input { flex: 1; min-width: 0; padding: 14px 10px; font-size: 15px; background: #000; border: 1px solid #333; color: #fff; border-radius: 8px; }
+    .input-row button { padding: 0 15px; background: #FF0000; color: #fff; border: none; font-weight: bold; border-radius: 8px; cursor: pointer; white-space: nowrap; }
+    
     #host-monitor { width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 8px; overflow: hidden; border: 1px solid #282828; }
     #host-player { width: 100%; height: 100%; border: none; }
 
-    .btn-clear { padding: 15px; background: #1a1a1a; color: #ff4d4d; border: 1px solid #333; text-align: center; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: auto; }
-    .status-text { color: #888; font-size: 14px; text-align: center; }
+    /* --- ПАНЕЛЬ УПРАВЛЕНИЯ ПЛЕЕРОМ --- */
+    .media-controls { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 8px; width: 100%; }
+    .media-controls button { padding: 15px 0; background: #222; color: #fff; border: 1px solid #333; border-radius: 8px; font-size: 14px; font-weight: bold; cursor: pointer; transition: 0.1s; }
+    .media-controls button:active { background: #444; transform: scale(0.95); }
+    .media-controls .btn-play { background: #FF0000; border-color: #FF0000; }
+    .media-controls .btn-play:active { background: #cc0000; }
+
+    .btn-clear { width: 100%; padding: 15px; background: #1a1a1a; color: #ff4d4d; border: 1px solid #333; text-align: center; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: auto; }
   </style>
 </head>
 <body>
 
   <!-- Заставка Зрителя -->
   <div id="idle-screen">
-    <div class="yt-logo-container">
-      You<span class="yt-logo-red">Tube</span>
-    </div>
+    <div class="fs-text">Family Standard</div>
+    <div class="yt-logo-container">You<span class="yt-logo-red">Tube</span></div>
   </div>
 
-  <button id="login-btn" onclick="document.getElementById('pin-modal').style.display='block'">Управление</button>
+  <button id="login-btn" onclick="document.getElementById('pin-modal').style.display='block'">Host</button>
   
   <div id="pin-modal">
     <input type="password" id="pin" placeholder="ПИН" maxlength="4">
@@ -66,22 +73,32 @@
 
   <!-- Пульт Ведущего -->
   <div id="host-screen">
-    <div class="status-text" id="status">Вставьте ссылку и нажмите "Подготовить"</div>
-    
-    <div class="input-row">
-      <input type="text" id="manual-link" placeholder="Ссылка на YouTube...">
-      <button onclick="handleManualLink()">Подготовить</button>
-    </div>
+    <div class="host-container">
+      <div class="status-text" id="status">Вставьте ссылку на видео</div>
+      
+      <div class="input-row">
+        <input type="text" id="manual-link" placeholder="Ссылка (например из 'Поделиться')...">
+        <button onclick="handleManualLink()">Подготовить</button>
+      </div>
 
-    <div id="host-monitor">
-      <div id="host-player"></div>
-    </div>
+      <!-- Монитор на телефоне -->
+      <div id="host-monitor">
+        <div id="host-player"></div>
+      </div>
 
-    <button class="btn-clear" onclick="clearScreen()">Остановить у зрителей (Заставка)</button>
+      <!-- Панель кнопок -->
+      <div class="media-controls">
+        <button onclick="hostSeek(-10)">⏪ -10с</button>
+        <button class="btn-play" onclick="hostPlay()">▶ Play</button>
+        <button onclick="hostPause()">⏸ Pause</button>
+        <button onclick="hostSeek(10)">+10с ⏩</button>
+      </div>
+
+      <button class="btn-clear" onclick="clearScreen()">Показать заставку зрителям</button>
+    </div>
   </div>
 
   <script>
-    // ССЫЛКА НА ВАШ БЭКЕНД
     const SERVER_URL = "https://familystandard.onrender.com";
     const socket = io(SERVER_URL, { transports: ['websocket', 'polling'] });
     
@@ -89,14 +106,13 @@
     let vPlayer, hPlayer;
     let currentHostId = null;
 
-    // Универсальный парсер ссылок (с телефона, пк, поделиться и т.д.)
     function extractId(url) {
       if (!url) return null;
       const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:.*v=|.*\/|.*embed\/))([^&?]{11})/);
       return match ? match[1] : (url.trim().length === 11 ? url.trim() : null);
     }
 
-    // --- 1. Авторизация ---
+    // --- АВТОРИЗАЦИЯ ---
     function auth() {
       socket.emit('auth_pin', { pin: document.getElementById('pin').value });
     }
@@ -106,107 +122,109 @@
         isHost = true;
         document.getElementById('pin-modal').style.display = 'none';
         document.getElementById('login-btn').style.display = 'none';
-        document.getElementById('host-screen').style.display = 'flex';
+        document.getElementById('host-screen').style.display = 'block';
         initHostPlayer();
       } else {
-        alert("Неверный ПИН");
+        alert("Неверный ПИН-код");
       }
     });
 
-    // --- 2. Настройка YouTube IFrame API ---
+    // --- ПЛЕЕРЫ ---
     function onYouTubeIframeAPIReady() {
-      // Плеер Зрителя: готов сразу автоматически играть то, что пришлют
+      // Инициализируем плеер зрителей сразу (раз проблема автозапуска решена)
       vPlayer = new YT.Player('viewer-player', {
-        playerVars: { 
-          'autoplay': 1, 
-          'controls': 0, 
-          'disablekb': 1, 
-          'rel': 0,
-          'origin': window.location.origin // Важно для предотвращения блокировок
-        }
+        playerVars: { 'autoplay': 1, 'controls': 0, 'disablekb': 1, 'rel': 0, 'origin': window.location.origin }
       });
     }
 
     function initHostPlayer() {
-      // Плеер Ведущего: показывает органы управления и не стартует сам!
       hPlayer = new YT.Player('host-player', {
-        playerVars: { 
-          'autoplay': 0, 
-          'controls': 1, 
-          'rel': 0,
-          'origin': window.location.origin // Важно для предотвращения блокировок
-        },
+        playerVars: { 'autoplay': 0, 'controls': 1, 'rel': 0, 'origin': window.location.origin },
         events: {
-          'onReady': (e) => { e.target.mute(); }, // Заглушаем пульт
+          'onReady': (e) => { e.target.mute(); },
           'onStateChange': onHostStateChange
         }
       });
     }
 
-    // --- 3. Логика Пульта Ведущего ---
+    // --- ЛОГИКА ПУЛЬТА ---
     function handleManualLink() {
       const val = document.getElementById('manual-link').value;
       const vid = extractId(val);
       
       if (vid && hPlayer) {
         currentHostId = vid;
-        // CUE - загружает обложку и показывает КНОПКУ PLAY. Не ломает мобильные браузеры!
+        // Только готовим видео на пульте (загружаем обложку)
         hPlayer.cueVideoById(vid); 
-        document.getElementById('status').innerText = `Готово! Нажмите красную кнопку Play на видео.`;
+        document.getElementById('status').innerText = `Готово! Нажмите Play`;
         document.getElementById('manual-link').value = '';
       }
+    }
+
+    function hostPlay() { 
+      if (hPlayer && currentHostId) hPlayer.playVideo(); 
+    }
+    
+    function hostPause() { 
+      if (hPlayer && currentHostId) hPlayer.pauseVideo(); 
+    }
+    
+    function hostSeek(seconds) {
+      if (!hPlayer || !currentHostId) return;
+      let newTime = Math.max(0, hPlayer.getCurrentTime() + seconds);
+      hPlayer.seekTo(newTime, true);
+      
+      // Отправляем команду зрителям
+      const state = hPlayer.getPlayerState() === YT.PlayerState.PLAYING ? 'play' : 'pause';
+      socket.emit('host_action', { videoId: currentHostId, action: state, time: newTime });
     }
 
     function clearScreen() {
       socket.emit('clear_screen');
       if (hPlayer && hPlayer.stopVideo) hPlayer.stopVideo();
       currentHostId = null;
-      document.getElementById('status').innerText = "Экран зрителей сброшен на заставку";
+      document.getElementById('status').innerText = "На экранах заставка";
     }
 
-    // Перехват событий с пульта: когда ты жмешь Play/Пауза/Перемотка
     function onHostStateChange(event) {
       if (!isHost) return;
-      
       const vid = hPlayer.getVideoData().video_id;
       const time = hPlayer.getCurrentTime();
       
       if (event.data === YT.PlayerState.PLAYING) {
         socket.emit('host_action', { videoId: vid, action: 'play', time: time });
-        document.getElementById('status').innerText = `Сейчас играет: ${vid}`;
+        document.getElementById('status').innerText = `Трансляция активна`;
       } else if (event.data === YT.PlayerState.PAUSED) {
         socket.emit('host_action', { videoId: vid, action: 'pause', time: time });
+        document.getElementById('status').innerText = `Пауза`;
       }
     }
 
-    // --- 4. Автономная логика Зрителей (Прием команд) ---
+    // --- ЛОГИКА ЗРИТЕЛЕЙ ---
     socket.on('sync', (data) => {
-      if (isHost) return;
+      if (isHost || !vPlayer) return;
 
       const vScreen = document.getElementById('viewer-screen');
       const idleScreen = document.getElementById('idle-screen');
 
-      // Если команда очистить экран
+      // Сброс экрана
       if (!data.videoId) {
         vScreen.style.display = 'none';
         idleScreen.style.display = 'flex';
-        if (vPlayer && vPlayer.stopVideo) vPlayer.stopVideo();
+        if (vPlayer.stopVideo) vPlayer.stopVideo();
         return;
       }
 
-      // Прячем заставку и логин, показываем плеер
-      vScreen.style.display = 'block';
+      // Показ видео
       idleScreen.style.display = 'none';
       document.getElementById('login-btn').style.display = 'none';
+      vScreen.style.display = 'block';
 
-      // Автономное управление видео у зрителя
       if (data.action === 'play') {
-        const url = vPlayer.getVideoUrl();
+        const url = vPlayer.getVideoUrl && vPlayer.getVideoUrl();
         if (!url || !url.includes(data.videoId)) {
-          // Загружаем и автоматически запускаем новое видео
           vPlayer.loadVideoById(data.videoId, data.time);
         } else {
-          // Если видео то же самое, просто синхронизируем таймкод и играем
           vPlayer.seekTo(data.time, true);
           vPlayer.playVideo();
         }
