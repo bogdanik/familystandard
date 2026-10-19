@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Event Control System</title>
+  <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+  <script src="https://www.youtube.com/iframe_api"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body, html { width: 100%; height: 100%; overflow: hidden; background: #0a0a0a; font-family: sans-serif; color: white; }
+    
+    /* Анимированный Canvas фон для зрителей */
+    #bg-canvas { position: absolute; top:0; left:0; width: 100%; height: 100%; z-index: 1; }
+    
+    /* Модалка ПИН */
+    #pin-modal { position: absolute; z-index: 100; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(20,20,20,0.95); padding: 25px; border-radius: 16px; text-align: center; width: 85%; max-width: 340px; border: 1px solid #333; backdrop-filter: blur(10px); }
+    #pin-modal h2 { font-size: 20px; margin-bottom: 15px; }
+    #pin-modal input { width: 100%; padding: 12px; font-size: 22px; text-align: center; border-radius: 8px; border: 1px solid #444; background: #111; color: #fff; margin-bottom: 15px; letter-spacing: 4px; }
+    #pin-modal button { width: 100%; padding: 12px; font-size: 16px; font-weight: bold; background: #ff0000; color: white; border: none; border-radius: 8px; cursor: pointer; }
+    
+    /* Полноэкранный плеер для зрителей */
+    #viewer-screen { display: none; position: absolute; top:0; left:0; width: 100%; height: 100%; z-index: 10; }
+    #viewer-screen iframe { width: 100%; height: 100%; border: none; }
+
+    /* Пульт ведущего */
+    #host-controller { display: none; position: absolute; top:0; left:0; width: 100%; height: 100%; z-index: 50; background: #121212; padding: 15px; overflow-y: auto; }
+    .search-box { display: flex; gap: 8px; margin-bottom: 15px; }
+    .search-box input { flex: 1; padding: 12px; font-size: 15px; border-radius: 8px; border: 1px solid #333; background: #222; color: white; }
+    .search-box button { padding: 12px 18px; background: #ff0000; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+    
+    #host-player-wrapper { width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 12px; overflow: hidden; margin-bottom: 15px; border: 1px solid #333; }
+  </style>
+</head>
+<body>
+
+  <canvas id="bg-canvas"></canvas>
+
+  <!-- Окно ПИН-кода -->
+  <div id="pin-modal">
+    <h2>Вход в управление</h2>
+    <input type="password" id="pin-input" placeholder="ПИН" maxlength="4">
+    <button onclick="submitPin()">Войти</button>
+  </div>
+
+  <!-- Экран для Зрителей -->
+  <div id="viewer-screen">
+    <div id="viewer-player"></div>
+  </div>
+
+  <!-- Интерфейс Ведущего -->
+  <div id="host-controller">
+    <div class="search-box">
+      <input type="text" id="yt-url" placeholder="Ссылка на YouTube...">
+      <button onclick="loadHostVideo()">Запустить</button>
+    </div>
+
+    <div id="host-player-wrapper">
+      <div id="host-player"></div>
+    </div>
+  </div>
+
+  <script>
+    // =========================================================
+    // ССЫЛКА НА ВАШ СЕРВИС НА RENDER.COM
+    // Замените на реальный URL вашего сервиса на Render
+    // =========================================================
+    const RENDER_SERVER_URL = "https://your-app-name.onrender.com"; 
+
+    // Если страница запрашивается прямо с Flask, берем хост автоматически
+    const socketUrl = (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") 
+      ? "http://" + window.location.host 
+      : (RENDER_SERVER_URL.includes("your-app-name") ? window.location.origin : RENDER_SERVER_URL);
+
+    const socket = io(socketUrl, { transports: ['websocket', 'polling'] });
+
+    let isHost = false;
+    let hostPlayer, viewerPlayer;
+    let isSyncing = false;
+
+    // --- Canvas Анимация (Заставка для зрителей) ---
+    const canvas = document.getElementById('bg-canvas');
+    const ctx = canvas.getContext('2d');
+    function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    let particles = Array.from({length: 35}, () => ({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      r: Math.random() * 3 + 1,
+      dx: (Math.random() - 0.5) * 0.7,
+      dy: (Math.random() - 0.5) * 0.7
+    }));
+
+    function drawCanvas() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = 'rgba(255, 0, 0, 0.4)';
+      particles.forEach(p => {
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fill();
+        p.x += p.dx; p.y += p.dy;
+        if(p.x < 0 || p.x > canvas.width) p.dx *= -1;
+        if(p.y < 0 || p.y > canvas.height) p.dy *= -1;
+      });
+      requestAnimationFrame(drawCanvas);
+    }
+    drawCanvas();
+
+    // --- Авторизация по ПИН ---
+    function submitPin() {
+      const pin = document.getElementById('pin-input').value;
+      socket.emit('auth_pin', { pin });
+    }
+
+    socket.on('auth_result', (data) => {
+      if (data.success) {
+        isHost = true;
+        document.getElementById('pin-modal').style.display = 'none';
+        document.getElementById('host-controller').style.display = 'block';
+        initHostPlayer();
+      } else {
+        alert(data.message);
+      }
+    });
+
+    // --- Инициализация YouTube API ---
+    function onYouTubeIframeAPIReady() {
+      viewerPlayer = new YT.Player('viewer-player', {
+        height: '100%',
+        width: '100%',
+        playerVars: { 'autoplay': 1, 'controls': 0, 'rel': 0 }
+      });
+    }
+
+    function initHostPlayer() {
+      hostPlayer = new YT.Player('host-player', {
+        height: '100%',
+        width: '100%',
+        playerVars: { 'autoplay': 0, 'controls': 1 },
+        events: {
+          'onReady': (e) => e.target.mute(), // Заглушаем звук на пульте
+          'onStateChange': onHostStateChange
+        }
+      });
+    }
+
+    // --- Перехват действий Ведущего ---
+    function loadHostVideo() {
+      const input = document.getElementById('yt-url').value;
+      const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+      const match = input.match(regExp);
+      const videoId = (match && match[2].length === 11) ? match[2] : input;
+
+      if(videoId && hostPlayer) {
+        hostPlayer.loadVideoById(videoId);
+      }
+    }
+
+    function onHostStateChange(event) {
+      if (!isHost || isSyncing) return;
+
+      const videoData = hostPlayer.getVideoData();
+      const videoId = videoData.video_id;
+      const time = hostPlayer.getCurrentTime();
+
+      if (event.data === YT.PlayerState.PLAYING) {
+        socket.emit('host_control', { videoId: videoId, action: 'play', time: time });
+      } else if (event.data === YT.PlayerState.PAUSED) {
+        socket.emit('host_control', { videoId: videoId, action: 'pause', time: time });
+      }
+    }
+
+    // --- Синхронизация на экранах Зрителей ---
+    socket.on('sync_to_viewers', (data) => {
+      if (isHost || !data.videoId) return;
+
+      document.getElementById('viewer-screen').style.display = 'block';
+
+      if (data.action === 'play') {
+        const currentUrl = viewerPlayer.getVideoUrl();
+        if (!currentUrl || !currentUrl.includes(data.videoId)) {
+          viewerPlayer.loadVideoById(data.videoId, data.time);
+        } else {
+          viewerPlayer.seekTo(data.time, true);
+          viewerPlayer.playVideo();
+        }
+      } else if (data.action === 'pause') {
+        viewerPlayer.pauseVideo();
+      }
+    });
+  </script>
+</body>
+</html>
