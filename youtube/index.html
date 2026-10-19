@@ -12,58 +12,61 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body, html { width: 100%; height: 100%; overflow: hidden; background: #0f0f0f; font-family: 'Roboto', 'Arial', sans-serif; color: #fff; }
 
-    /* --- ЗАСТАВКА ЗРИТЕЛЕЙ --- */
+    /* --- ЗАСТАВКА --- */
     #idle-screen { position: absolute; top:0; left:0; width: 100%; height: 100%; z-index: 10; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #0f0f0f; }
     .fs-text { font-size: 5vw; font-weight: 300; color: #aaa; letter-spacing: 3px; margin-bottom: 10px; text-transform: uppercase; text-align: center; }
     .yt-logo-container { font-size: 8vw; font-weight: 700; color: #fff; letter-spacing: -2px; display: flex; align-items: center; }
     .yt-logo-red { background-color: #FF0000; color: #fff; padding: 0.5vw 2vw; border-radius: 1.5vw; margin-left: 5px; line-height: 1.1; }
 
-    /* --- ВХОД ХОСТА --- */
+    /* --- МОДАЛКА ВХОДА --- */
     #login-btn { position: absolute; top: 15px; right: 15px; z-index: 30; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #888; padding: 8px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; }
     #pin-modal { display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 40; background: #181818; padding: 25px 20px; border-radius: 12px; border: 1px solid #333; text-align: center; width: 90%; max-width: 320px; }
-    #pin-modal input { width: 100%; padding: 15px; font-size: 20px; text-align: center; margin-bottom: 15px; background: #000; border: 1px solid #444; color: #fff; border-radius: 8px; letter-spacing: 5px; }
+    #pin-modal input { width: 100%; padding: 15px; font-size: 24px; text-align: center; margin-bottom: 15px; background: #000; border: 1px solid #444; color: #fff; border-radius: 8px; letter-spacing: 5px; }
     #pin-modal button { width: 100%; padding: 15px; background: #FF0000; color: #fff; border: none; font-size: 16px; cursor: pointer; font-weight: bold; border-radius: 8px; }
 
     /* --- ПЛЕЕР ЗРИТЕЛЯ --- */
     #viewer-screen { display: none; position: absolute; top:0; left:0; width: 100%; height: 100%; z-index: 20; background: #000; }
+    /* Отключаем клики мыши у зрителей, чтобы плеер был "нашим" */
     #viewer-player { width: 100%; height: 100%; border: none; pointer-events: none; }
 
     /* --- ПУЛЬТ ВЕДУЩЕГО --- */
     #host-screen { display: none; position: absolute; top:0; left:0; width: 100%; height: 100%; z-index: 50; background: #0f0f0f; overflow-y: auto; }
-    .host-container { width: 100%; max-width: 500px; margin: 0 auto; padding: 20px 15px; display: flex; flex-direction: column; gap: 15px; min-height: 100%; }
+    .host-container { width: 100%; max-width: 500px; margin: 0 auto; padding: 20px 15px; display: flex; flex-direction: column; min-height: 100%; }
     
-    .status-text { color: #aaa; font-size: 14px; text-align: center; font-weight: bold; }
+    .status-text { color: #aaa; font-size: 14px; text-align: center; font-weight: bold; margin-bottom: 10px; }
 
-    /* Ввод ссылки */
-    .input-row { display: flex; gap: 8px; width: 100%; }
+    /* Инпут */
+    .input-row { display: flex; gap: 8px; width: 100%; margin-bottom: 15px; }
     .input-row input { flex: 1; min-width: 0; padding: 14px 10px; font-size: 15px; background: #000; border: 1px solid #333; color: #fff; border-radius: 8px; }
-    .input-row button { padding: 0 15px; background: #FF0000; color: #fff; border: none; font-weight: bold; border-radius: 8px; cursor: pointer; white-space: nowrap; }
+    .input-row button { padding: 0 15px; background: #222; color: #fff; border: 1px solid #333; font-weight: bold; border-radius: 8px; cursor: pointer; white-space: nowrap; }
     
-    /* Монитор */
-    #host-monitor { width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 8px; overflow: hidden; border: 1px solid #282828; }
+    /* Монитор (Кастомный без контролов Ютуба) */
+    #host-monitor { width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 8px; overflow: hidden; border: 1px solid #282828; pointer-events: none; margin-bottom: 15px; }
     #host-player { width: 100%; height: 100%; border: none; }
 
-    /* ПАНЕЛЬ УПРАВЛЕНИЯ */
-    .control-panel { background: #151515; border: 1px solid #222; border-radius: 12px; padding: 15px; display: flex; flex-direction: column; gap: 10px; }
+    /* --- ГЛАВНАЯ ПАНЕЛЬ: УПРАВЛЕНИЕ В 1 СТРОКУ --- */
+    .control-row { display: flex; justify-content: space-between; gap: 8px; width: 100%; margin-bottom: 20px; }
+    .control-row button { flex: 1; padding: 18px 0; background: #1a1a1a; color: #fff; border: 1px solid #333; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.1s; }
+    .control-row button:active { background: #333; transform: scale(0.95); }
     
-    .seek-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .seek-row button { padding: 15px; background: #222; color: #fff; border: 1px solid #333; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; transition: 0.1s; }
-    .seek-row button:active { background: #444; transform: scale(0.95); }
+    /* Play/Pause */
+    .control-row .btn-play { background: #FF0000; border-color: #FF0000; font-size: 20px; }
+    .control-row .btn-play.is-playing { background: #333; border-color: #555; }
+    
+    /* Красный квадрат (Stop) */
+    .control-row .btn-stop { background: #1a1a1a; font-size: 22px; color: #FF0000; }
 
-    .dashed-line { border: none; border-top: 2px dashed #444; margin: 5px 0; }
-
-    .play-row button { width: 100%; padding: 20px; background: #FF0000; color: #fff; font-size: 18px; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; text-transform: uppercase; transition: 0.1s; }
-    .play-row button.is-playing { background: #333; border: 1px solid #555; }
-    .play-row button:active { transform: scale(0.98); }
-
-    .stop-row { display: flex; justify-content: center; margin: 10px 0; }
-    .btn-stop-square { width: 70px; height: 70px; background: #FF0000; border: none; border-radius: 8px; color: #fff; font-size: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 0 15px rgba(255,0,0,0.3); transition: 0.1s; }
-    .btn-stop-square:active { transform: scale(0.9); box-shadow: none; }
-
-    .vol-label { font-size: 12px; color: #888; text-align: center; text-transform: uppercase; margin-top: 10px; }
+    /* --- ГРОМКОСТЬ --- */
+    .vol-label { font-size: 12px; color: #888; text-align: center; text-transform: uppercase; margin-bottom: 8px; }
     .vol-row { display: flex; justify-content: space-between; gap: 5px; }
-    .vol-row button { flex: 1; padding: 12px 0; background: #222; border: 1px solid #333; border-radius: 6px; color: #fff; font-weight: bold; cursor: pointer; }
+    .vol-row button { flex: 1; padding: 12px 0; background: #1a1a1a; border: 1px solid #333; border-radius: 6px; color: #fff; font-weight: bold; cursor: pointer; }
     .vol-row button.active { background: #fff; color: #000; border-color: #fff; }
+
+    /* --- ЛОГОТИП ВНИЗУ ПУЛЬТА --- */
+    .host-footer { margin-top: auto; padding-top: 30px; padding-bottom: 10px; display: flex; flex-direction: column; align-items: center; opacity: 0.5; }
+    .host-footer .fs-text { font-size: 16px; margin-bottom: 5px; letter-spacing: 2px; }
+    .host-footer .yt-logo-container { font-size: 24px; }
+    .host-footer .yt-logo-red { padding: 2px 10px; border-radius: 8px; }
   </style>
 </head>
 <body>
@@ -92,42 +95,38 @@
       <div class="status-text" id="status">Вставьте ссылку на видео</div>
       
       <div class="input-row">
-        <!-- Ссылка теперь не удаляется после нажатия -->
-        <input type="text" id="manual-link" placeholder="Ссылка (например из 'Поделиться')...">
+        <!-- Ссылка остается в инпуте -->
+        <input type="text" id="manual-link" placeholder="Вставьте ссылку...">
         <button onclick="handleManualLink()">Подготовить</button>
       </div>
 
-      <!-- Монитор на телефоне -->
+      <!-- Монитор (Кастомный, Ютуб-кнопки отключены) -->
       <div id="host-monitor">
         <div id="host-player"></div>
       </div>
 
-      <!-- Панель управления -->
-      <div class="control-panel">
-        <div class="seek-row">
-          <button onclick="hostSeek(-10)">⏪ -10с</button>
-          <button onclick="hostSeek(10)">+10с ⏩</button>
-        </div>
+      <!-- УПРАВЛЕНИЕ В 1 СТРОКУ -->
+      <div class="control-row">
+        <button onclick="hostSeek(-10)">-10с</button>
+        <button id="btn-play-pause" class="btn-play" onclick="togglePlayPause()">▶</button>
+        <button class="btn-stop" onclick="clearScreen()">🟥</button>
+        <button onclick="hostSeek(10)">+10с</button>
+      </div>
 
-        <hr class="dashed-line">
+      <!-- ГРОМКОСТЬ -->
+      <div class="vol-label">Уровень громкости на экранах</div>
+      <div class="vol-row">
+        <button id="vol-3" onclick="hostSetVolume(3)">3</button>
+        <button id="vol-10" onclick="hostSetVolume(10)">10</button>
+        <button id="vol-30" onclick="hostSetVolume(30)">30</button>
+        <button id="vol-60" onclick="hostSetVolume(60)">60</button>
+        <button id="vol-100" class="active" onclick="hostSetVolume(100)">100</button>
+      </div>
 
-        <div class="play-row">
-          <button id="btn-play-pause" onclick="togglePlayPause()">▶ PLAY</button>
-        </div>
-
-        <div class="stop-row">
-          <!-- Красный квадрат для сброса -->
-          <button class="btn-stop-square" onclick="clearScreen()">⏹</button>
-        </div>
-
-        <div class="vol-label">Уровень громкости</div>
-        <div class="vol-row">
-          <button id="vol-3" onclick="hostSetVolume(3)">3</button>
-          <button id="vol-10" onclick="hostSetVolume(10)">10</button>
-          <button id="vol-30" onclick="hostSetVolume(30)">30</button>
-          <button id="vol-60" onclick="hostSetVolume(60)">60</button>
-          <button id="vol-100" class="active" onclick="hostSetVolume(100)">100</button>
-        </div>
+      <!-- ЛОГОТИП ВНИЗУ ПУЛЬТА -->
+      <div class="host-footer">
+        <div class="fs-text">Family Standard</div>
+        <div class="yt-logo-container">You<span class="yt-logo-red">Tube</span></div>
       </div>
       
     </div>
@@ -139,9 +138,10 @@
     
     let isHost = false;
     let vPlayer, hPlayer;
-    let currentHostId = null;
-    let currentVol = 100; // Текущая громкость для передачи
-    let smoothVolInterval; // Интервал для плавной громкости
+    let preparedId = null;  // Видео, которое готово к запуску
+    let currentHostId = null; // Видео, которое сейчас играет
+    let currentVol = 100;
+    let smoothVolInterval;
 
     function extractId(url) {
       if (!url) return null;
@@ -149,7 +149,7 @@
       return match ? match[1] : (url.trim().length === 11 ? url.trim() : null);
     }
 
-    // --- АВТОРИЗАЦИЯ ---
+    // --- 1. АВТОРИЗАЦИЯ ---
     function auth() {
       socket.emit('auth_pin', { pin: document.getElementById('pin').value });
     }
@@ -162,155 +162,157 @@
         document.getElementById('host-screen').style.display = 'block';
         initHostPlayer();
       } else {
-        alert("Неверный ПИН-код");
+        alert("Неверный ПИН");
       }
     });
 
-    // --- ПЛЕЕРЫ ---
+    // --- 2. ПЛЕЕРЫ (Кастомный режим: controls = 0) ---
     function onYouTubeIframeAPIReady() {
       vPlayer = new YT.Player('viewer-player', {
-        playerVars: { 'autoplay': 1, 'controls': 0, 'disablekb': 1, 'rel': 0, 'origin': window.location.origin }
+        playerVars: { 'autoplay': 1, 'controls': 0, 'disablekb': 1, 'rel': 0, 'modestbranding': 1, 'origin': window.location.origin }
       });
     }
 
     function initHostPlayer() {
       if (hPlayer) return;
       hPlayer = new YT.Player('host-player', {
-        playerVars: { 'autoplay': 0, 'controls': 1, 'rel': 0, 'origin': window.location.origin },
+        playerVars: { 'autoplay': 0, 'controls': 0, 'disablekb': 1, 'rel': 0, 'modestbranding': 1, 'origin': window.location.origin },
         events: {
-          'onReady': (e) => { e.target.mute(); }, // Хост всегда без звука
+          'onReady': (e) => { e.target.mute(); },
           'onStateChange': onHostStateChange
         }
       });
     }
 
-    // --- ЛОГИКА ПУЛЬТА ---
+    // --- 3. ЛОГИКА ПУЛЬТА ---
     function handleManualLink() {
       const val = document.getElementById('manual-link').value;
       const vid = extractId(val);
       
       if (vid && hPlayer) {
-        currentHostId = vid;
-        // Подготавливаем видео (выводит обложку), не стираем ссылку из инпута
-        hPlayer.cueVideoById(vid); 
-        document.getElementById('status').innerText = `Готово! Нажмите Play`;
+        preparedId = vid; // Запоминаем, но не запускаем
+        document.getElementById('status').innerText = `Готово к запуску! Нажмите ▶`;
+        // Если видео уже играло, очищаем экран, чтобы старт был с нуля
+        if (currentHostId !== preparedId && currentHostId !== null) {
+          clearScreen(true); // true = без удаления ссылки и preparedId
+        }
       }
     }
 
-    // Универсальная кнопка-переключатель Play/Pause
     function togglePlayPause() {
-      if (!hPlayer || !currentHostId) return;
+      if (!hPlayer || !preparedId) return;
+      
       const state = hPlayer.getPlayerState();
+      
+      // Если уже играет -> ставим на паузу
       if (state === YT.PlayerState.PLAYING) {
         hPlayer.pauseVideo();
       } else {
-        hPlayer.playVideo();
+        // Если новое видео -> загружаем жестко по клику (Решает баг зависания телефонов!)
+        if (currentHostId !== preparedId) {
+          currentHostId = preparedId;
+          hPlayer.loadVideoById(currentHostId);
+        } else {
+          // Если то же самое видео -> просто снимаем с паузы
+          hPlayer.playVideo();
+        }
       }
     }
     
-    // Перемотка
     function hostSeek(seconds) {
       if (!hPlayer || !currentHostId) return;
       let newTime = Math.max(0, hPlayer.getCurrentTime() + seconds);
       hPlayer.seekTo(newTime, true);
+      emitHostAction(); // Моментально отправляем зрителям
+    }
+
+    function hostSetVolume(vol) {
+      currentVol = vol;
+      document.querySelectorAll('.vol-row button').forEach(b => b.classList.remove('active'));
+      document.getElementById('vol-' + vol).classList.add('active');
       emitHostAction();
     }
 
-    // Установка громкости (отправка на сервер)
-    function hostSetVolume(vol) {
-      currentVol = vol;
-      // Обновляем визуал кнопок
-      document.querySelectorAll('.vol-row button').forEach(b => b.classList.remove('active'));
-      document.getElementById('vol-' + vol).classList.add('active');
-      emitHostAction(); // Моментально шлем зрителям
-    }
-
-    // Кнопка СБРОСА (красный квадрат)
-    function clearScreen() {
+    // Квадратная кнопка сброса
+    function clearScreen(keepPrepared = false) {
       socket.emit('clear_screen');
       if (hPlayer && hPlayer.stopVideo) hPlayer.stopVideo();
       currentHostId = null;
-      document.getElementById('status').innerText = "На экранах заставка";
+      if (!keepPrepared) preparedId = null;
+      document.getElementById('status').innerText = "Экран сброшен (Заставка)";
       updatePlayButtonUI(YT.PlayerState.PAUSED);
     }
 
     function onHostStateChange(event) {
       if (!isHost) return;
-      if (document.hidden && event.data === YT.PlayerState.PAUSED) return; // Защита от блокировки телефона
+      // Защита от авто-паузы телефона при блокировке экрана
+      if (document.hidden && event.data === YT.PlayerState.PAUSED) return; 
       
       updatePlayButtonUI(event.data);
       emitHostAction();
     }
 
-    // Обновление цвета и текста главной кнопки Play/Pause
     function updatePlayButtonUI(state) {
       const btn = document.getElementById('btn-play-pause');
       if (state === YT.PlayerState.PLAYING) {
-        btn.innerText = '⏸ PAUSE';
+        btn.innerText = '⏸';
         btn.classList.add('is-playing');
         document.getElementById('status').innerText = `Трансляция активна`;
       } else {
-        btn.innerText = '▶ PLAY';
+        btn.innerText = '▶';
         btn.classList.remove('is-playing');
-        if(currentHostId) document.getElementById('status').innerText = `Пауза`;
+        if (currentHostId) document.getElementById('status').innerText = `Пауза`;
       }
     }
 
-    // Отправка данных на сервер (хитро склеиваем state и громкость)
     function emitHostAction() {
       if (!hPlayer || !currentHostId) return;
       const state = hPlayer.getPlayerState() === YT.PlayerState.PLAYING ? 'play' : 'pause';
       const time = hPlayer.getCurrentTime();
-      // Отправляем action в формате "play|100" чтобы не трогать Python-скрипт
       socket.emit('host_action', { videoId: currentHostId, action: `${state}|${currentVol}`, time: time });
     }
 
-    // --- ПЛАВНАЯ ГРОМКОСТЬ (ДЛЯ ЗРИТЕЛЕЙ) ---
+    // --- ПЛАВНАЯ ГРОМКОСТЬ ЗРИТЕЛЕЙ ---
     function smoothVolumeTransition(targetVol) {
       if (!vPlayer || !vPlayer.getVolume) return;
-      
       let current = vPlayer.getVolume();
       if (current === targetVol) return;
       
       clearInterval(smoothVolInterval);
-      
       smoothVolInterval = setInterval(() => {
         current = vPlayer.getVolume();
         let diff = targetVol - current;
-        
         if (Math.abs(diff) <= 2) {
           vPlayer.setVolume(targetVol);
           clearInterval(smoothVolInterval);
         } else {
           vPlayer.setVolume(current + Math.sign(diff) * 2);
         }
-      }, 40); // 40мс * ~50 шагов = 2 секунды на плавное затухание/нарастание
+      }, 40);
     }
 
-    // --- ЛОГИКА ПРИЕМА ДАННЫХ ЗРИТЕЛЯМИ ---
+    // --- 4. ПРИЕМ КОМАНД ЗРИТЕЛЯМИ ---
     socket.on('sync', (data) => {
-      // 1. Возврат состояния для пульта ведущего (если перезагрузил страницу)
+      // 1. Восстановление сессии для Ведущего (если обновил страницу)
       if (isHost) {
         if (data.videoId && data.videoId !== currentHostId) {
           currentHostId = data.videoId;
-          if (hPlayer && hPlayer.cueVideoById) {
-            const parts = data.action.split('|');
-            const actionStr = parts[0];
+          preparedId = data.videoId;
+          if (hPlayer && hPlayer.loadVideoById) {
+            const actionStr = data.action.split('|')[0];
             if (actionStr === 'play') {
               hPlayer.loadVideoById(data.videoId, data.time);
-            } else {
-              hPlayer.cueVideoById(data.videoId, data.time);
             }
           }
         }
         return;
       }
 
-      // 2. Обработка экрана зрителя
+      // 2. Экраны Зрителей
       const vScreen = document.getElementById('viewer-screen');
       const idleScreen = document.getElementById('idle-screen');
 
-      // Сброс экрана (красный квадрат)
+      // Сброс
       if (!data.videoId) {
         vScreen.style.display = 'none';
         idleScreen.style.display = 'flex';
@@ -318,15 +320,11 @@
         return;
       }
 
-      // Расшифровываем склеенную команду: "play|30" -> action: "play", volume: 30
       const parts = data.action.split('|');
       const actionStr = parts[0];
       const volTarget = parts.length > 1 ? parseInt(parts[1]) : null;
 
-      // Запускаем плавную смену громкости
-      if (volTarget !== null) {
-        smoothVolumeTransition(volTarget);
-      }
+      if (volTarget !== null) smoothVolumeTransition(volTarget);
 
       idleScreen.style.display = 'none';
       document.getElementById('login-btn').style.display = 'none';
