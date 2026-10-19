@@ -5,12 +5,10 @@ from flask_socketio import SocketIO, emit
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'event_secret_key'
 
-# Полностью открытый CORS для стабильного коннекта
 socketio = SocketIO(app, cors_allowed_origins="*")
 
-PIN = "7777"
+SECRET_PIN = "1"  # ПИН-код изменен на 1
 
-# Состояние экрана
 STATE = {
     'videoId': None,
     'action': 'pause',
@@ -28,7 +26,7 @@ def on_connect():
 
 @socketio.on('auth_pin')
 def on_auth(data):
-    if str(data.get('pin')) == PIN:
+    if str(data.get('pin')).strip() == SECRET_PIN:
         emit('auth_result', {'success': True})
         if STATE['videoId']:
             emit('sync', STATE)
@@ -41,7 +39,6 @@ def on_host_action(data):
     STATE['videoId'] = data.get('videoId')
     STATE['action'] = data.get('action')
     STATE['time'] = data.get('time', 0)
-    # Отправляем всем зрителям
     emit('sync', STATE, broadcast=True, include_self=False)
 
 @socketio.on('clear_screen')
