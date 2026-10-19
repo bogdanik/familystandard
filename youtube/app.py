@@ -9,7 +9,7 @@ app.config['SECRET_KEY'] = 'event_secret_key'
 
 socketio = SocketIO(app, cors_allowed_origins="*")
 
-# Теперь у нас 3 режима: idle (заставка), video (плеер), search (меню поиска)
+# 3 режима работы: idle (заставка), video (плеер), search (меню поиска)
 STATE = {
     'mode': 'idle',
     'videoId': None,
@@ -23,12 +23,14 @@ STATE = {
 def index():
     return jsonify({"status": "Server running", "mode": STATE['mode']})
 
-# Прямой парсер YouTube для выдачи красивых картинок без API-ключей
+# Парсер YouTube с CORS-заголовком (чтобы браузер не блокировал поиск)
 @app.route('/api/search')
 def youtube_search():
     query = request.args.get('q', '').strip()
     if not query:
-        return jsonify([])
+        resp = jsonify([])
+        resp.headers.add('Access-Control-Allow-Origin', '*')
+        return resp
 
     url = 'https://www.youtube.com/youtubei/v1/search'
     payload = {
@@ -54,18 +56,20 @@ def youtube_search():
                 title = title_runs[0].get('text') if title_runs else 'Без названия'
                 duration = v_data.get('lengthText', {}).get('simpleText', '')
                 
-                # Берем самую качественную обложку
                 thumbnails = v_data.get('thumbnail', {}).get('thumbnails', [])
                 thumb_url = thumbnails[-1].get('url') if thumbnails else f'https://i.ytimg.com/vi/{video_id}/hqdefault.jpg'
 
                 if video_id:
                     results.append({'videoId': video_id, 'title': title, 'duration': duration, 'thumbnail': thumb_url})
 
-        # Возвращаем 30 результатов (хватит на 5 страниц по 6 роликов)
-        return jsonify(results[:30])
+        resp = jsonify(results[:30])
+        resp.headers.add('Access-Control-Allow-Origin', '*')
+        return resp
     except Exception as e:
         print("Search error:", str(e))
-        return jsonify([])
+        resp = jsonify([])
+        resp.headers.add('Access-Control-Allow-Origin', '*')
+        return resp
 
 @socketio.on('connect')
 def on_connect():
@@ -73,6 +77,7 @@ def on_connect():
 
 @socketio.on('auth_pin')
 def on_auth(data):
+    # Теперь пускаем вообще всех без пароля
     emit('auth_result', {'success': True})
     emit('sync', STATE)
 
@@ -85,7 +90,6 @@ def on_host_action(data):
     STATE['time'] = data.get('time', 0)
     emit('sync', STATE, broadcast=True, include_self=False)
 
-# Новый сокет: трансляция сетки поиска на экран
 @socketio.on('host_search')
 def on_host_search(data):
     global STATE
