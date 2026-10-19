@@ -18,7 +18,7 @@
     .yt-logo-container { font-size: 8vw; font-weight: 700; color: #fff; letter-spacing: -2px; display: flex; align-items: center; }
     .yt-logo-red { background-color: #FF0000; color: #fff; padding: 0.5vw 2vw; border-radius: 1.5vw; margin-left: 5px; line-height: 1.1; }
 
-    /* --- МОДАЛКА И КНОПКА ХОСТА --- */
+    /* --- ВХОД ХОСТА --- */
     #login-btn { position: absolute; top: 15px; right: 15px; z-index: 30; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #888; padding: 8px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; }
     #pin-modal { display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 40; background: #181818; padding: 25px 20px; border-radius: 12px; border: 1px solid #333; text-align: center; width: 90%; max-width: 320px; }
     #pin-modal input { width: 100%; padding: 15px; font-size: 20px; text-align: center; margin-bottom: 15px; background: #000; border: 1px solid #444; color: #fff; border-radius: 8px; letter-spacing: 5px; }
@@ -34,21 +34,36 @@
     
     .status-text { color: #aaa; font-size: 14px; text-align: center; font-weight: bold; }
 
+    /* Ввод ссылки */
     .input-row { display: flex; gap: 8px; width: 100%; }
     .input-row input { flex: 1; min-width: 0; padding: 14px 10px; font-size: 15px; background: #000; border: 1px solid #333; color: #fff; border-radius: 8px; }
     .input-row button { padding: 0 15px; background: #FF0000; color: #fff; border: none; font-weight: bold; border-radius: 8px; cursor: pointer; white-space: nowrap; }
     
+    /* Монитор */
     #host-monitor { width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 8px; overflow: hidden; border: 1px solid #282828; }
     #host-player { width: 100%; height: 100%; border: none; }
 
-    /* --- ПАНЕЛЬ УПРАВЛЕНИЯ ПЛЕЕРОМ --- */
-    .media-controls { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 8px; width: 100%; }
-    .media-controls button { padding: 15px 0; background: #222; color: #fff; border: 1px solid #333; border-radius: 8px; font-size: 14px; font-weight: bold; cursor: pointer; transition: 0.1s; }
-    .media-controls button:active { background: #444; transform: scale(0.95); }
-    .media-controls .btn-play { background: #FF0000; border-color: #FF0000; }
-    .media-controls .btn-play:active { background: #cc0000; }
+    /* ПАНЕЛЬ УПРАВЛЕНИЯ */
+    .control-panel { background: #151515; border: 1px solid #222; border-radius: 12px; padding: 15px; display: flex; flex-direction: column; gap: 10px; }
+    
+    .seek-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .seek-row button { padding: 15px; background: #222; color: #fff; border: 1px solid #333; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; transition: 0.1s; }
+    .seek-row button:active { background: #444; transform: scale(0.95); }
 
-    .btn-clear { width: 100%; padding: 15px; background: #1a1a1a; color: #ff4d4d; border: 1px solid #333; text-align: center; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: auto; }
+    .dashed-line { border: none; border-top: 2px dashed #444; margin: 5px 0; }
+
+    .play-row button { width: 100%; padding: 20px; background: #FF0000; color: #fff; font-size: 18px; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; text-transform: uppercase; transition: 0.1s; }
+    .play-row button.is-playing { background: #333; border: 1px solid #555; }
+    .play-row button:active { transform: scale(0.98); }
+
+    .stop-row { display: flex; justify-content: center; margin: 10px 0; }
+    .btn-stop-square { width: 70px; height: 70px; background: #FF0000; border: none; border-radius: 8px; color: #fff; font-size: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 0 15px rgba(255,0,0,0.3); transition: 0.1s; }
+    .btn-stop-square:active { transform: scale(0.9); box-shadow: none; }
+
+    .vol-label { font-size: 12px; color: #888; text-align: center; text-transform: uppercase; margin-top: 10px; }
+    .vol-row { display: flex; justify-content: space-between; gap: 5px; }
+    .vol-row button { flex: 1; padding: 12px 0; background: #222; border: 1px solid #333; border-radius: 6px; color: #fff; font-weight: bold; cursor: pointer; }
+    .vol-row button.active { background: #fff; color: #000; border-color: #fff; }
   </style>
 </head>
 <body>
@@ -77,6 +92,7 @@
       <div class="status-text" id="status">Вставьте ссылку на видео</div>
       
       <div class="input-row">
+        <!-- Ссылка теперь не удаляется после нажатия -->
         <input type="text" id="manual-link" placeholder="Ссылка (например из 'Поделиться')...">
         <button onclick="handleManualLink()">Подготовить</button>
       </div>
@@ -86,15 +102,34 @@
         <div id="host-player"></div>
       </div>
 
-      <!-- Панель кнопок -->
-      <div class="media-controls">
-        <button onclick="hostSeek(-10)">⏪ -10с</button>
-        <button class="btn-play" onclick="hostPlay()">▶ Play</button>
-        <button onclick="hostPause()">⏸ Pause</button>
-        <button onclick="hostSeek(10)">+10с ⏩</button>
-      </div>
+      <!-- Панель управления -->
+      <div class="control-panel">
+        <div class="seek-row">
+          <button onclick="hostSeek(-10)">⏪ -10с</button>
+          <button onclick="hostSeek(10)">+10с ⏩</button>
+        </div>
 
-      <button class="btn-clear" onclick="clearScreen()">Показать заставку зрителям</button>
+        <hr class="dashed-line">
+
+        <div class="play-row">
+          <button id="btn-play-pause" onclick="togglePlayPause()">▶ PLAY</button>
+        </div>
+
+        <div class="stop-row">
+          <!-- Красный квадрат для сброса -->
+          <button class="btn-stop-square" onclick="clearScreen()">⏹</button>
+        </div>
+
+        <div class="vol-label">Уровень громкости</div>
+        <div class="vol-row">
+          <button id="vol-3" onclick="hostSetVolume(3)">3</button>
+          <button id="vol-10" onclick="hostSetVolume(10)">10</button>
+          <button id="vol-30" onclick="hostSetVolume(30)">30</button>
+          <button id="vol-60" onclick="hostSetVolume(60)">60</button>
+          <button id="vol-100" class="active" onclick="hostSetVolume(100)">100</button>
+        </div>
+      </div>
+      
     </div>
   </div>
 
@@ -105,6 +140,8 @@
     let isHost = false;
     let vPlayer, hPlayer;
     let currentHostId = null;
+    let currentVol = 100; // Текущая громкость для передачи
+    let smoothVolInterval; // Интервал для плавной громкости
 
     function extractId(url) {
       if (!url) return null;
@@ -137,11 +174,11 @@
     }
 
     function initHostPlayer() {
-      if (hPlayer) return; // Защита от двойной инициализации
+      if (hPlayer) return;
       hPlayer = new YT.Player('host-player', {
         playerVars: { 'autoplay': 0, 'controls': 1, 'rel': 0, 'origin': window.location.origin },
         events: {
-          'onReady': (e) => { e.target.mute(); },
+          'onReady': (e) => { e.target.mute(); }, // Хост всегда без звука
           'onStateChange': onHostStateChange
         }
       });
@@ -154,82 +191,126 @@
       
       if (vid && hPlayer) {
         currentHostId = vid;
+        // Подготавливаем видео (выводит обложку), не стираем ссылку из инпута
         hPlayer.cueVideoById(vid); 
         document.getElementById('status').innerText = `Готово! Нажмите Play`;
-        document.getElementById('manual-link').value = '';
       }
     }
 
-    function hostPlay() { 
-      if (hPlayer && currentHostId) hPlayer.playVideo(); 
+    // Универсальная кнопка-переключатель Play/Pause
+    function togglePlayPause() {
+      if (!hPlayer || !currentHostId) return;
+      const state = hPlayer.getPlayerState();
+      if (state === YT.PlayerState.PLAYING) {
+        hPlayer.pauseVideo();
+      } else {
+        hPlayer.playVideo();
+      }
     }
     
-    function hostPause() { 
-      if (hPlayer && currentHostId) hPlayer.pauseVideo(); 
-    }
-    
+    // Перемотка
     function hostSeek(seconds) {
       if (!hPlayer || !currentHostId) return;
       let newTime = Math.max(0, hPlayer.getCurrentTime() + seconds);
       hPlayer.seekTo(newTime, true);
-      
-      const state = hPlayer.getPlayerState() === YT.PlayerState.PLAYING ? 'play' : 'pause';
-      socket.emit('host_action', { videoId: currentHostId, action: state, time: newTime });
+      emitHostAction();
     }
 
+    // Установка громкости (отправка на сервер)
+    function hostSetVolume(vol) {
+      currentVol = vol;
+      // Обновляем визуал кнопок
+      document.querySelectorAll('.vol-row button').forEach(b => b.classList.remove('active'));
+      document.getElementById('vol-' + vol).classList.add('active');
+      emitHostAction(); // Моментально шлем зрителям
+    }
+
+    // Кнопка СБРОСА (красный квадрат)
     function clearScreen() {
       socket.emit('clear_screen');
       if (hPlayer && hPlayer.stopVideo) hPlayer.stopVideo();
       currentHostId = null;
       document.getElementById('status').innerText = "На экранах заставка";
+      updatePlayButtonUI(YT.PlayerState.PAUSED);
     }
 
     function onHostStateChange(event) {
       if (!isHost) return;
-
-      // ЗАЩИТА ОТ ФОНОВОГО РЕЖИМА: 
-      // Если браузер свернули/заблокировали, система ставит плеер на паузу. Игнорируем это!
-      if (document.hidden && event.data === YT.PlayerState.PAUSED) {
-        return;
-      }
-
-      const vid = hPlayer.getVideoData().video_id;
-      const time = hPlayer.getCurrentTime();
+      if (document.hidden && event.data === YT.PlayerState.PAUSED) return; // Защита от блокировки телефона
       
-      if (event.data === YT.PlayerState.PLAYING) {
-        socket.emit('host_action', { videoId: vid, action: 'play', time: time });
+      updatePlayButtonUI(event.data);
+      emitHostAction();
+    }
+
+    // Обновление цвета и текста главной кнопки Play/Pause
+    function updatePlayButtonUI(state) {
+      const btn = document.getElementById('btn-play-pause');
+      if (state === YT.PlayerState.PLAYING) {
+        btn.innerText = '⏸ PAUSE';
+        btn.classList.add('is-playing');
         document.getElementById('status').innerText = `Трансляция активна`;
-      } else if (event.data === YT.PlayerState.PAUSED) {
-        socket.emit('host_action', { videoId: vid, action: 'pause', time: time });
-        document.getElementById('status').innerText = `Пауза`;
+      } else {
+        btn.innerText = '▶ PLAY';
+        btn.classList.remove('is-playing');
+        if(currentHostId) document.getElementById('status').innerText = `Пауза`;
       }
     }
 
-    // --- ЛОГИКА ПРИЕМА ДАННЫХ ---
+    // Отправка данных на сервер (хитро склеиваем state и громкость)
+    function emitHostAction() {
+      if (!hPlayer || !currentHostId) return;
+      const state = hPlayer.getPlayerState() === YT.PlayerState.PLAYING ? 'play' : 'pause';
+      const time = hPlayer.getCurrentTime();
+      // Отправляем action в формате "play|100" чтобы не трогать Python-скрипт
+      socket.emit('host_action', { videoId: currentHostId, action: `${state}|${currentVol}`, time: time });
+    }
+
+    // --- ПЛАВНАЯ ГРОМКОСТЬ (ДЛЯ ЗРИТЕЛЕЙ) ---
+    function smoothVolumeTransition(targetVol) {
+      if (!vPlayer || !vPlayer.getVolume) return;
+      
+      let current = vPlayer.getVolume();
+      if (current === targetVol) return;
+      
+      clearInterval(smoothVolInterval);
+      
+      smoothVolInterval = setInterval(() => {
+        current = vPlayer.getVolume();
+        let diff = targetVol - current;
+        
+        if (Math.abs(diff) <= 2) {
+          vPlayer.setVolume(targetVol);
+          clearInterval(smoothVolInterval);
+        } else {
+          vPlayer.setVolume(current + Math.sign(diff) * 2);
+        }
+      }, 40); // 40мс * ~50 шагов = 2 секунды на плавное затухание/нарастание
+    }
+
+    // --- ЛОГИКА ПРИЕМА ДАННЫХ ЗРИТЕЛЯМИ ---
     socket.on('sync', (data) => {
-      // 1. ЕСЛИ ПОДКЛЮЧАЕТСЯ ИЛИ ОБНОВЛЯЕТ СТРАНИЦУ ВЕДУЩИЙ
+      // 1. Возврат состояния для пульта ведущего (если перезагрузил страницу)
       if (isHost) {
         if (data.videoId && data.videoId !== currentHostId) {
           currentHostId = data.videoId;
           if (hPlayer && hPlayer.cueVideoById) {
-            // Подтягиваем актуальное видео на пульт
-            if (data.action === 'play') {
+            const parts = data.action.split('|');
+            const actionStr = parts[0];
+            if (actionStr === 'play') {
               hPlayer.loadVideoById(data.videoId, data.time);
-              document.getElementById('status').innerText = `Трансляция активна`;
             } else {
               hPlayer.cueVideoById(data.videoId, data.time);
-              document.getElementById('status').innerText = `Готово к запуску`;
             }
           }
         }
         return;
       }
 
-      // 2. ЕСЛИ ЭТО ЭКРАН ЗРИТЕЛЯ
+      // 2. Обработка экрана зрителя
       const vScreen = document.getElementById('viewer-screen');
       const idleScreen = document.getElementById('idle-screen');
 
-      // Если сброс экрана
+      // Сброс экрана (красный квадрат)
       if (!data.videoId) {
         vScreen.style.display = 'none';
         idleScreen.style.display = 'flex';
@@ -237,12 +318,21 @@
         return;
       }
 
-      // Показ видео зрителям
+      // Расшифровываем склеенную команду: "play|30" -> action: "play", volume: 30
+      const parts = data.action.split('|');
+      const actionStr = parts[0];
+      const volTarget = parts.length > 1 ? parseInt(parts[1]) : null;
+
+      // Запускаем плавную смену громкости
+      if (volTarget !== null) {
+        smoothVolumeTransition(volTarget);
+      }
+
       idleScreen.style.display = 'none';
       document.getElementById('login-btn').style.display = 'none';
       vScreen.style.display = 'block';
 
-      if (data.action === 'play') {
+      if (actionStr === 'play') {
         const url = vPlayer.getVideoUrl && vPlayer.getVideoUrl();
         if (!url || !url.includes(data.videoId)) {
           vPlayer.loadVideoById(data.videoId, data.time);
@@ -250,7 +340,7 @@
           vPlayer.seekTo(data.time, true);
           vPlayer.playVideo();
         }
-      } else if (data.action === 'pause') {
+      } else if (actionStr === 'pause') {
         vPlayer.pauseVideo();
       }
     });
