@@ -12,66 +12,78 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body, html { width: 100%; height: 100%; overflow: hidden; background: #0f0f0f; font-family: 'Roboto', 'Arial', sans-serif; color: #fff; }
 
-    /* --- ГЛОБАЛЬНЫЕ КНОПКИ ПОВЕРХ ВСЕГО --- */
+    /* ГЛОБАЛЬНЫЕ КНОПКИ */
     #reset-btn { position: absolute; top: 12px; left: 12px; z-index: 9999; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.4); padding: 6px 10px; border-radius: 6px; font-size: 11px; cursor: pointer; }
     #reset-btn:active { background: rgba(255,0,0,0.3); color: #fff; }
-
     #login-btn { position: absolute; top: 12px; right: 12px; z-index: 9999; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #888; padding: 6px 10px; border-radius: 6px; font-size: 11px; cursor: pointer; }
 
-    /* --- ЗАСТАВКА --- */
+    /* --- ЭКРАН 1: ЗАСТАВКА --- */
     #idle-screen { position: absolute; top:0; left:0; width: 100%; height: 100%; z-index: 10; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #0f0f0f; }
     .fs-text { font-size: 5vw; font-weight: 300; color: #aaa; letter-spacing: 3px; margin-bottom: 10px; text-transform: uppercase; text-align: center; }
     .yt-logo-container { font-size: 8vw; font-weight: 700; color: #fff; letter-spacing: -2px; display: flex; align-items: center; }
     .yt-logo-red { background-color: #FF0000; color: #fff; padding: 0.5vw 2vw; border-radius: 1.5vw; margin-left: 5px; line-height: 1.1; }
 
-    /* --- ПЛЕЕР ЗРИТЕЛЯ --- */
+    /* --- ЭКРАН 2: ПЛЕЕР ЗРИТЕЛЯ --- */
     #viewer-screen { opacity: 0; visibility: hidden; position: absolute; top:0; left:0; width: 100%; height: 100%; z-index: 20; background: #000; transition: opacity 0.2s ease; }
     #viewer-player { width: 100%; height: 100%; border: none; pointer-events: none; }
+
+    /* --- ЭКРАН 3: МЕНЮ ПОИСКА НА БОЛЬШОМ ЭКРАНЕ --- */
+    #search-viewer-screen { display: none; position: absolute; top:0; left:0; width: 100%; height: 100%; z-index: 15; background: #080808; flex-direction: column; padding: 4vw; }
+    .sv-title { font-size: 3vw; color: #fff; margin-bottom: 3vw; font-weight: 300; text-align: center; letter-spacing: 2px; }
+    .sv-title span { font-weight: bold; color: #FF0000; }
+    .sv-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2vw; flex: 1; align-items: center; }
+    .sv-card { background: #151515; border-radius: 1vw; overflow: hidden; position: relative; border: 2px solid #282828; display: flex; flex-direction: column; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+    .sv-card img { width: 100%; aspect-ratio: 16/9; object-fit: cover; }
+    .sv-card .sv-info { padding: 1.5vw; }
+    .sv-card .sv-video-title { font-size: 1.6vw; color: #fff; font-weight: bold; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.3; }
+    /* Гигантская цифра в углу */
+    .sv-badge { position: absolute; top: 0; left: 0; background: #FF0000; color: #fff; font-size: 3.5vw; font-weight: bold; padding: 0.5vw 2vw; border-bottom-right-radius: 1vw; z-index: 2; box-shadow: 2px 2px 15px rgba(0,0,0,0.5); }
 
     /* --- ПУЛЬТ ВЕДУЩЕГО --- */
     #host-screen { display: none; position: absolute; top:0; left:0; width: 100%; height: 100%; z-index: 50; background: #0f0f0f; overflow-y: auto; }
     .host-container { width: 100%; max-width: 500px; margin: 0 auto; padding: 15px; display: flex; flex-direction: column; min-height: 100%; }
     
-    .status-text { color: #aaa; font-size: 13px; text-align: center; font-weight: bold; margin-bottom: 8px; margin-top: 20px; }
-
-    /* Инпут ввода ссылки */
-    .input-row { display: flex; gap: 8px; width: 100%; margin-bottom: 12px; }
+    .input-row { display: flex; gap: 8px; width: 100%; margin-bottom: 10px; }
     .input-row input { flex: 1; min-width: 0; padding: 12px 10px; font-size: 14px; background: #000; border: 1px solid #333; color: #fff; border-radius: 8px; }
-    .input-row button { padding: 0 14px; background: #222; color: #fff; border: 1px solid #333; font-weight: bold; border-radius: 8px; cursor: pointer; white-space: nowrap; }
+    .input-row button { padding: 0 14px; background: #222; color: #fff; border: 1px solid #333; font-weight: bold; border-radius: 8px; cursor: pointer; }
     
-    /* Монитор ведущего */
     #host-monitor { width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 8px; overflow: hidden; border: 1px solid #282828; pointer-events: none; margin-bottom: 8px; }
     #host-player { width: 100%; height: 100%; border: none; }
 
-    /* --- ПОЛЗУНОК ПЕРЕМОТКИ (ТАЙМЛАЙН YOUTUBE) --- */
-    .timeline-box { display: flex; flex-direction: column; gap: 4px; width: 100%; margin-bottom: 15px; background: #141414; padding: 10px; border-radius: 8px; border: 1px solid #222; }
-    .timeline-box input[type=range] { width: 100%; accent-color: #FF0000; cursor: pointer; }
-    .time-display { display: flex; justify-content: space-between; font-size: 11px; color: #888; font-family: monospace; }
-
-    /* --- ПАНЕЛЬ УПРАВЛЕНИЯ В 1 СТРОКУ --- */
-    .control-row { display: flex; justify-content: space-between; gap: 8px; width: 100%; margin-bottom: 15px; }
-    .control-row button { flex: 1; padding: 16px 0; background: #1a1a1a; color: #fff; border: 1px solid #333; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.1s; }
+    /* Панель 1 Строка */
+    .control-row { display: flex; justify-content: space-between; gap: 8px; width: 100%; margin-bottom: 15px; margin-top: 10px; }
+    .control-row button { flex: 1; padding: 16px 0; background: #1a1a1a; color: #fff; border: 1px solid #333; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; transition: 0.1s; }
     .control-row button:active { background: #333; transform: scale(0.95); }
-    
     .control-row .btn-play { background: #FF0000; border-color: #FF0000; font-size: 18px; }
     .control-row .btn-play.is-playing { background: #333; border-color: #555; }
     .control-row .btn-stop { background: #1a1a1a; font-size: 16px; color: #FF0000; border-color: #333; }
 
-    /* --- ГРОМКОСТЬ --- */
+    /* Громкость */
     .vol-label { font-size: 11px; color: #888; text-align: center; text-transform: uppercase; margin-bottom: 6px; }
-    .vol-row { display: flex; justify-content: space-between; gap: 5px; }
+    .vol-row { display: flex; justify-content: space-between; gap: 5px; margin-bottom: 20px; }
     .vol-row button { flex: 1; padding: 10px 0; background: #1a1a1a; border: 1px solid #333; border-radius: 6px; color: #fff; font-weight: bold; cursor: pointer; font-size: 12px; }
     .vol-row button.active { background: #fff; color: #000; border-color: #fff; }
 
-    /* --- ЛОГОТИП ФУТЕР --- */
+    /* --- БЛОК ПОИСКА (НОВЫЙ) --- */
+    .dashed-line { border-top: 2px dashed #333; margin-bottom: 15px; }
+    .search-pagination { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .search-pagination button { padding: 10px 15px; background: #222; color: #fff; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
+    .search-pagination button:disabled { opacity: 0.3; cursor: not-allowed; }
+    .search-pagination span { font-size: 13px; color: #aaa; font-weight: bold; }
+    
+    /* Сетка на пульте ведущего (по 2 в ряд) */
+    .search-grid-host { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+    .search-card-host { background: #1a1a1a; border: 1px solid #333; border-radius: 8px; overflow: hidden; cursor: pointer; display: flex; flex-direction: column; }
+    .search-card-host:active { border-color: #ff0000; }
+    .search-card-host img { width: 100%; aspect-ratio: 16/9; object-fit: cover; }
+    .search-card-host .info { padding: 8px; font-size: 11px; }
+    .search-card-host .title { font-weight: bold; margin-bottom: 4px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .search-card-host .badge { position: absolute; background: #ff0000; color: #fff; font-size: 13px; font-weight: bold; padding: 2px 8px; border-bottom-right-radius: 8px; z-index: 2; }
+
     .host-footer { margin-top: auto; padding-top: 20px; padding-bottom: 10px; display: flex; flex-direction: column; align-items: center; opacity: 0.4; }
     .host-footer .fs-text { font-size: 3.5vw; margin-bottom: 3px; letter-spacing: 2px; }
     .host-footer .yt-logo-container { font-size: 5vw; }
     .host-footer .yt-logo-red { padding: 2px 8px; border-radius: 6px; }
-    @media (min-width: 500px) {
-      .host-footer .fs-text { font-size: 16px; }
-      .host-footer .yt-logo-container { font-size: 24px; }
-    }
   </style>
 </head>
 <body>
@@ -80,51 +92,46 @@
   <button id="reset-btn" onclick="globalHardReset()">Сброс</button>
   <button id="login-btn" onclick="auth()">Host</button>
 
-  <!-- Заставка Зрителя -->
+  <!-- ЭКРАН 1: Заставка -->
   <div id="idle-screen">
     <div class="fs-text">Family Standard</div>
     <div class="yt-logo-container">You<span class="yt-logo-red">Tube</span></div>
   </div>
 
-  <!-- Экран Зрителя -->
+  <!-- ЭКРАН 2: Плеер -->
   <div id="viewer-screen">
     <div id="viewer-player"></div>
+  </div>
+
+  <!-- ЭКРАН 3: Меню Поиска (Для проектора) -->
+  <div id="search-viewer-screen">
+    <div class="sv-title" id="sv-title">Запрос: <span>...</span></div>
+    <div class="sv-grid" id="sv-grid">
+      <!-- Сюда вставятся 6 огромных карточек -->
+    </div>
   </div>
 
   <!-- Пульт Ведущего -->
   <div id="host-screen">
     <div class="host-container">
-      <div class="status-text" id="status">Вставьте ссылку на видео</div>
       
       <div class="input-row">
-        <input type="text" id="manual-link" placeholder="Вставьте ссылку...">
+        <input type="text" id="manual-link" placeholder="Прямая ссылка...">
         <button onclick="handleManualLink()">Подготовить</button>
       </div>
 
-      <!-- Монитор ведущего -->
       <div id="host-monitor">
         <div id="host-player"></div>
       </div>
 
-      <!-- ИНТЕРАКТИВНЫЙ ТАЙМЛАЙН YOUTUBE -->
-      <div class="timeline-box">
-        <input type="range" id="seek-bar" min="0" max="100" value="0" step="0.1" oninput="onSeekBarScrub(this.value)">
-        <div class="time-display">
-          <span id="time-curr">0:00</span>
-          <span id="time-dur">0:00</span>
-        </div>
-      </div>
-
-      <!-- УПРАВЛЕНИЕ В 1 СТРОКУ -->
       <div class="control-row">
         <button onclick="hostSeek(-10)">-10с</button>
         <button id="btn-play-pause" class="btn-play" onclick="togglePlayPause()">▶</button>
-        <button class="btn-stop" onclick="globalHardReset()">🟥</button>
+        <button class="btn-stop" onclick="clearScreen()">🟥</button>
         <button onclick="hostSeek(10)">+10с</button>
       </div>
 
-      <!-- ГРОМКОСТЬ -->
-      <div class="vol-label">Громкость на экранах</div>
+      <div class="vol-label">Громкость</div>
       <div class="vol-row">
         <button id="vol-3" onclick="hostSetVolume(3)">3</button>
         <button id="vol-10" onclick="hostSetVolume(10)">10</button>
@@ -133,7 +140,21 @@
         <button id="vol-100" class="active" onclick="hostSetVolume(100)">100</button>
       </div>
 
-      <!-- ЛОГОТИП ФУТЕР -->
+      <!-- НОВЫЙ БЛОК: ИНТЕРАКТИВНЫЙ ПОИСК -->
+      <div class="dashed-line"></div>
+      <div class="input-row">
+        <input type="text" id="search-query" placeholder="Поиск (например: Градусы Голая)..." onkeydown="if(event.key==='Enter') performSearch()">
+        <button id="search-btn" onclick="performSearch()">Найти</button>
+      </div>
+      
+      <div class="search-pagination" id="search-pagination" style="display:none;">
+        <button id="page-prev" onclick="changeSearchPage(-1)">◀ Назад</button>
+        <span id="page-info">Стр. 1</span>
+        <button id="page-next" onclick="changeSearchPage(1)">Вперед ▶</button>
+      </div>
+      
+      <div class="search-grid-host" id="search-results-host"></div>
+
       <div class="host-footer">
         <div class="fs-text">Family Standard</div>
         <div class="yt-logo-container">You<span class="yt-logo-red">Tube</span></div>
@@ -155,7 +176,11 @@
     let currentHostId = null; 
     let currentVol = 100;
     let smoothVolInterval;
-    let progressTimer = null;
+
+    // Переменные для поиска
+    let allSearchResults = [];
+    let currentSearchPage = 0;
+    let currentQuery = "";
 
     function extractId(url) {
       if (!url) return null;
@@ -163,34 +188,20 @@
       return match ? match[1] : (url.trim().length === 11 ? url.trim() : null);
     }
 
-    function formatTime(sec) {
-      if (!sec || isNaN(sec)) return "0:00";
-      sec = Math.floor(sec);
-      const m = Math.floor(sec / 60);
-      const s = sec % 60;
-      return m + ":" + (s < 10 ? "0" : "") + s;
-    }
-
     // --- 1. АВТОРИЗАЦИЯ И СБРОС ---
-    function auth() {
-      socket.emit('auth_pin', {});
-    }
-
+    function auth() { socket.emit('auth_pin', {}); }
+    
     socket.on('auth_result', (data) => {
       if (data.success) {
         isHost = true;
         document.getElementById('login-btn').style.display = 'none';
         document.getElementById('host-screen').style.display = 'block';
-        initHostPlayer();
       }
     });
 
-    // АБСОЛЮТНЫЙ СБРОС В 0 (И сервер, и все клиенты)
-    function globalHardReset() {
-      socket.emit('full_reset');
-    }
+    function globalHardReset() { socket.emit('full_reset'); }
 
-    // --- 2. БЕЗОПАСНАЯ ИНИЦИАЛИЗАЦИЯ IFRAME YOUTUBE ---
+    // --- 2. ИНИЦИАЛИЗАЦИЯ ПЛЕЕРОВ ---
     function initPlayersIfReady() {
       if (window.YT && window.YT.Player) {
         if (!vPlayer) {
@@ -199,37 +210,25 @@
             events: { 'onReady': () => { vPlayerReady = true; } }
           });
         }
+        if (isHost && !hPlayer) {
+          hPlayer = new YT.Player('host-player', {
+            playerVars: { 'autoplay': 0, 'controls': 0, 'disablekb': 1, 'rel': 0, 'modestbranding': 1, 'origin': window.location.origin },
+            events: {
+              'onReady': (e) => { e.target.mute(); hPlayerReady = true; },
+              'onStateChange': onHostStateChange
+            }
+          });
+        }
       }
     }
+    function onYouTubeIframeAPIReady() { initPlayersIfReady(); }
+    setInterval(initPlayersIfReady, 500); // Защита от зависаний API
 
-    function onYouTubeIframeAPIReady() {
-      initPlayersIfReady();
-    }
-    // Защита от пересоздания iframe: вызыв напрямую, если API уже загружен
-    setTimeout(initPlayersIfReady, 500);
-
-    function initHostPlayer() {
-      if (hPlayer || !window.YT || !window.YT.Player) return;
-      hPlayer = new YT.Player('host-player', {
-        playerVars: { 'autoplay': 0, 'controls': 0, 'disablekb': 1, 'rel': 0, 'modestbranding': 1, 'origin': window.location.origin },
-        events: {
-          'onReady': (e) => { 
-            e.target.mute(); 
-            hPlayerReady = true; 
-          },
-          'onStateChange': onHostStateChange
-        }
-      });
-    }
-
-    // --- 3. ЛОГИКА ПУЛЬТА И ТАЙМЛАЙНА ---
+    // --- 3. БАЗОВЫЙ ПУЛЬТ (PLAY / ССЫЛКИ) ---
     function handleManualLink() {
-      const val = document.getElementById('manual-link').value;
-      const vid = extractId(val);
-      
+      const vid = extractId(document.getElementById('manual-link').value);
       if (vid && hPlayerReady) {
         preparedId = vid;
-        document.getElementById('status').innerText = `Готово к запуску! Нажмите ▶`;
         if (currentHostId !== preparedId && currentHostId !== null) {
           socket.emit('clear_screen');
           currentHostId = null;
@@ -260,33 +259,6 @@
       emitHostAction(); 
     }
 
-    // Перемотка через перетаскивание ползунка пальцем
-    function onSeekBarScrub(val) {
-      if (!hPlayerReady || !currentHostId) return;
-      hPlayer.seekTo(parseFloat(val), true);
-      document.getElementById('time-curr').innerText = formatTime(val);
-      emitHostAction();
-    }
-
-    function startProgressLoop() {
-      stopProgressLoop();
-      progressTimer = setInterval(() => {
-        if (hPlayerReady && hPlayer.getCurrentTime && currentHostId) {
-          const curr = hPlayer.getCurrentTime();
-          const dur = hPlayer.getDuration() || 100;
-          const seekBar = document.getElementById('seek-bar');
-          seekBar.max = dur;
-          seekBar.value = curr;
-          document.getElementById('time-curr').innerText = formatTime(curr);
-          document.getElementById('time-dur').innerText = formatTime(dur);
-        }
-      }, 500);
-    }
-
-    function stopProgressLoop() {
-      if (progressTimer) clearInterval(progressTimer);
-    }
-
     function hostSetVolume(vol) {
       currentVol = vol;
       document.querySelectorAll('.vol-row button').forEach(b => b.classList.remove('active'));
@@ -294,10 +266,16 @@
       emitHostAction();
     }
 
+    function clearScreen() {
+      socket.emit('clear_screen');
+      if (hPlayerReady && hPlayer.stopVideo) hPlayer.stopVideo();
+      currentHostId = null;
+      updatePlayButtonUI(YT.PlayerState.PAUSED);
+    }
+
     function onHostStateChange(event) {
       if (!isHost) return;
       if (document.hidden && event.data === YT.PlayerState.PAUSED) return; 
-      
       updatePlayButtonUI(event.data);
       emitHostAction();
     }
@@ -305,15 +283,9 @@
     function updatePlayButtonUI(state) {
       const btn = document.getElementById('btn-play-pause');
       if (state === YT.PlayerState.PLAYING) {
-        btn.innerText = '⏸';
-        btn.classList.add('is-playing');
-        document.getElementById('status').innerText = `Трансляция активна`;
-        startProgressLoop();
+        btn.innerText = '⏸'; btn.classList.add('is-playing');
       } else {
-        btn.innerText = '▶';
-        btn.classList.remove('is-playing');
-        if (currentHostId) document.getElementById('status').innerText = `Пауза`;
-        stopProgressLoop();
+        btn.innerText = '▶'; btn.classList.remove('is-playing');
       }
     }
 
@@ -321,100 +293,126 @@
       if (!hPlayerReady || !currentHostId) return;
       const state = hPlayer.getPlayerState() === YT.PlayerState.PLAYING ? 'play' : 'pause';
       const time = hPlayer.getCurrentTime();
-      socket.emit('host_action', { videoId: currentHostId, action: `${state}|${currentVol}`, time: time });
+      socket.emit('host_action', { videoId: currentHostId, action: `${state}\vert{}${currentVol}`, time: time });
     }
 
-    // --- ПЛАВНАЯ ГРОМКОСТЬ ЗРИТЕЛЕЙ ---
+    // --- 4. ИНТЕРАКТИВНЫЙ ПОИСК (НОВОЕ) ---
+    async function performSearch() {
+      const q = document.getElementById('search-query').value.trim();
+      if (!q) return;
+      currentQuery = q;
+      
+      const btn = document.getElementById('search-btn');
+      btn.innerText = '⏳';
+      
+      try {
+        const res = await fetch(`${SERVER_URL}/api/search?q=${encodeURIComponent(q)}`);
+        allSearchResults = await res.json();
+        currentSearchPage = 0;
+        renderSearchPage();
+      } catch (e) {
+        alert('Ошибка при поиске');
+      }
+      btn.innerText = 'Найти';
+    }
+
+    function changeSearchPage(dir) {
+      currentSearchPage += dir;
+      renderSearchPage();
+    }
+
+    function renderSearchPage() {
+      const grid = document.getElementById('search-results-host');
+      const pag = document.getElementById('search-pagination');
+      const prevBtn = document.getElementById('page-prev');
+      const nextBtn = document.getElementById('page-next');
+      
+      grid.innerHTML = '';
+      if (allSearchResults.length === 0) {
+        pag.style.display = 'none';
+        grid.innerHTML = '<div style="color:#888; text-align:center; padding:10px; grid-column:span 2;">Ничего не найдено</div>';
+        return;
+      }
+
+      pag.style.display = 'flex';
+      prevBtn.disabled = currentSearchPage === 0;
+      nextBtn.disabled = (currentSearchPage * 6 + 6) >= allSearchResults.length;
+      document.getElementById('page-info').innerText = `Стр. ${currentSearchPage + 1}`;
+
+      const start = currentSearchPage * 6;
+      const slice = allSearchResults.slice(start, start + 6);
+
+      // Рисуем на пульте ведущего
+      slice.forEach((item, idx) => {
+        const num = idx + 1;
+        const card = document.createElement('div');
+        card.className = 'search-card-host';
+        card.onclick = () => hostPlaySearchResult(item.videoId);
+        card.innerHTML = `
+          <div style="position:relative;">
+            <div class="badge">${num}</div>
+            <img src="${item.thumbnail}" alt="thumb">
+          </div>
+          <div class="info">
+            <div class="title">${item.title}</div>
+            <div style="color:#888; margin-top:2px;">${item.duration}</div>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+
+      // Отправляем приказ вывести этот кусок сетки на экраны зрителей!
+      socket.emit('host_search', { query: currentQuery, results: slice });
+    }
+
+    function hostPlaySearchResult(vid) {
+      // 1 клик по карточке — мгновенно вырубает меню и запускает видео у всех
+      preparedId = vid;
+      currentHostId = vid;
+      if (hPlayerReady) hPlayer.loadVideoById(vid);
+    }
+
+    // --- 5. ПРИЕМ СОКЕТОВ (ЛОГИКА ЗРИТЕЛЯ) ---
     function smoothVolumeTransition(targetVol) {
       if (!vPlayerReady || !vPlayer.getVolume) return;
       let current = vPlayer.getVolume();
       if (current === targetVol) return;
-      
       clearInterval(smoothVolInterval);
       smoothVolInterval = setInterval(() => {
         current = vPlayer.getVolume();
         let diff = targetVol - current;
         if (Math.abs(diff) <= 2) {
-          vPlayer.setVolume(targetVol);
-          clearInterval(smoothVolInterval);
+          vPlayer.setVolume(targetVol); clearInterval(smoothVolInterval);
         } else {
           vPlayer.setVolume(current + Math.sign(diff) * 2);
         }
       }, 40);
     }
 
-    // --- 4. ПРИЕМ СОКЕТОВ И ПОЛНАЯ ЗАЧИСТКА ---
+    socket.on('force_reload', () => { window.location.reload(true); });
+
     socket.on('sync', (data) => {
-      // ЕСЛИ СБРОС В НОЛЬ (videoId === null)
-      if (!data || !data.videoId) {
-        preparedId = null;
-        currentHostId = null;
+      // Хост игнорирует входящие сокеты, если это не восстановление
+      if (isHost) return;
 
-        // Полностью очищаем UI
-        document.getElementById('manual-link').value = '';
-        document.getElementById('status').innerText = 'Вставьте ссылку на видео';
-        document.getElementById('seek-bar').value = 0;
-        document.getElementById('time-curr').innerText = '0:00';
-        document.getElementById('time-dur').innerText = '0:00';
-        
-        updatePlayButtonUI(YT.PlayerState.PAUSED);
-
-        // Останавливаем плееры
-        if (vPlayer && vPlayer.stopVideo) vPlayer.stopVideo();
-        if (hPlayer && hPlayer.stopVideo) hPlayer.stopVideo();
-
-        // Показываем заставку
-        const vScreen = document.getElementById('viewer-screen');
-        vScreen.style.opacity = '0';
-        vScreen.style.visibility = 'hidden';
-        document.getElementById('idle-screen').style.display = 'flex';
-        document.getElementById('login-btn').style.display = 'block';
-        return;
-      }
-
-      // ЕСЛИ ЭТО ПУЛЬТ ВЕДУЩЕГО
-      if (isHost) {
-        if (data.videoId !== currentHostId) {
-          currentHostId = data.videoId;
-          preparedId = data.videoId;
-          if (hPlayerReady && hPlayer.loadVideoById) {
-            const actionStr = data.action.split('|')[0];
-            if (actionStr === 'play') hPlayer.loadVideoById(data.videoId, data.time);
-          }
-        }
-        return;
-      }
-
-      // ЕСЛИ ЭТО ЭКРАН ЗРИТЕЛЯ
-      if (!vPlayerReady) return;
-
-      const vScreen = document.getElementById('viewer-screen');
       const idleScreen = document.getElementById('idle-screen');
+      const vScreen = document.getElementById('viewer-screen');
+      const sScreen = document.getElementById('search-viewer-screen');
 
-      const parts = data.action.split('|');
-      const actionStr = parts[0];
-      const volTarget = parts.length > 1 ? parseInt(parts[1]) : null;
-
-      if (volTarget !== null) smoothVolumeTransition(volTarget);
-
-      idleScreen.style.display = 'none';
-      document.getElementById('login-btn').style.display = 'none';
-      
-      vScreen.style.opacity = '1';
-      vScreen.style.visibility = 'visible';
-
-      if (actionStr === 'play') {
-        const url = vPlayer.getVideoUrl && vPlayer.getVideoUrl();
-        if (!url || !url.includes(data.videoId)) {
-          vPlayer.loadVideoById(data.videoId, data.time);
-        } else {
-          vPlayer.seekTo(data.time, true);
-          vPlayer.playVideo();
-        }
-      } else if (actionStr === 'pause') {
-        vPlayer.pauseVideo();
+      // 1. ЗАСТАВКА (idle)
+      if (data.mode === 'idle') {
+        vScreen.style.opacity = '0'; vScreen.style.visibility = 'hidden';
+        sScreen.style.display = 'none';
+        idleScreen.style.display = 'flex';
+        document.getElementById('login-btn').style.display = 'block';
+        if (vPlayerReady && vPlayer.stopVideo) vPlayer.stopVideo();
+        return;
       }
-    });
-  </script>
-</body>
-</html>
+
+      // 2. МЕНЮ ПОИСКА НА БОЛЬШОМ ЭКРАНЕ (search)
+      if (data.mode === 'search') {
+        vScreen.style.opacity = '0'; vScreen.style.visibility = 'hidden';
+        idleScreen.style.display = 'none';
+        document.getElementById('login-btn').style.display = 'none';
+        
+        document.getElementById('sv-title').innerHTML = `Запрос:
