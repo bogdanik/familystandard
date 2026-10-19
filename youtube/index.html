@@ -3,274 +3,206 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Family Standard Event Hub</title>
+  <title>FS Event System</title>
 
   <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
   <script src="https://www.youtube.com/iframe_api"></script>
 
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body, html { width: 100%; height: 100%; overflow: hidden; background: #080808; font-family: -apple-system, sans-serif; color: #fff; }
+    body, html { width: 100%; height: 100%; background: #000; font-family: sans-serif; color: #fff; overflow: hidden; }
 
-    /* Canvas эффекты по умолчанию для зрителей */
-    #bg-canvas { position: absolute; top:0; left:0; width: 100%; height: 100%; z-index: 1; }
+    /* Idle-экран для зрителей (Заставка) */
+    #idle-screen { position: absolute; top:0; left:0; width: 100%; height: 100%; z-index: 10; display: flex; align-items: center; justify-content: center; background: #0a0a0a; }
+    #idle-screen h1 { color: #333; font-size: 5vw; letter-spacing: 10px; text-transform: uppercase; }
 
-    /* Кнопка входа ведущего */
-    #host-login-btn { position: absolute; top: 15px; right: 15px; z-index: 20; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: #aaa; padding: 8px 16px; border-radius: 20px; font-size: 12px; cursor: pointer; backdrop-filter: blur(8px); }
+    /* Главный плеер зрителя */
+    #viewer-screen { position: absolute; top:0; left:0; width: 100%; height: 100%; z-index: 20; display: none; background: #000; }
+    #viewer-player { width: 100%; height: 100%; border: none; pointer-events: none; }
 
-    /* Окно ПИН */
-    #pin-modal { display: none; position: absolute; z-index: 100; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(20, 20, 20, 0.95); padding: 25px; border-radius: 16px; text-align: center; width: 85%; max-width: 320px; border: 1px solid #2a2a2a; backdrop-filter: blur(12px); }
-    #pin-modal input { width: 100%; padding: 12px; font-size: 24px; text-align: center; border-radius: 10px; border: 1px solid #333; background: #111; color: #fff; margin: 15px 0; letter-spacing: 6px; }
-    #pin-modal button { width: 100%; padding: 12px; font-size: 16px; font-weight: bold; background: #ff0000; color: white; border: none; border-radius: 10px; cursor: pointer; }
+    /* UI Авторизации */
+    #login-btn { position: absolute; top: 20px; right: 20px; z-index: 30; background: transparent; border: 1px solid #333; color: #555; padding: 10px 15px; border-radius: 8px; cursor: pointer; }
+    #pin-modal { display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 40; background: #111; padding: 30px; border-radius: 12px; border: 1px solid #333; text-align: center; }
+    #pin-modal input { width: 100%; padding: 15px; font-size: 20px; text-align: center; margin-bottom: 15px; background: #000; border: 1px solid #444; color: #fff; }
+    #pin-modal button { width: 100%; padding: 15px; background: #d90429; color: #fff; border: none; font-size: 16px; cursor: pointer; font-weight: bold; }
 
-    /* Главный экран Зрителя */
-    #viewer-screen { display: none; position: absolute; top:0; left:0; width: 100%; height: 100%; z-index: 30; background: #000; }
-    #viewer-screen iframe { width: 100%; height: 100%; border: none; }
-
-    /* Пульт управления для Ведущего */
-    #host-screen { display: none; position: absolute; top:0; left:0; width: 100%; height: 100%; z-index: 50; background: #0f0f0f; padding: 12px; flex-direction: column; gap: 12px; overflow-y: auto; }
+    /* Пульт Ведущего */
+    #host-screen { display: none; position: absolute; top:0; left:0; width: 100%; height: 100%; z-index: 50; background: #121212; padding: 20px; flex-direction: column; gap: 15px; }
+    .input-row { display: flex; gap: 10px; }
+    .input-row input { flex: 1; padding: 15px; font-size: 16px; background: #000; border: 1px solid #333; color: #fff; border-radius: 8px; }
+    .input-row button { padding: 0 20px; background: #d90429; color: #fff; border: none; font-weight: bold; border-radius: 8px; cursor: pointer; }
     
-    .search-box { display: flex; gap: 8px; }
-    .search-box input { flex: 1; padding: 12px; font-size: 15px; border-radius: 8px; border: 1px solid #333; background: #181818; color: #fff; }
-    .search-box button { padding: 12px 18px; background: #ff0000; color: #fff; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
-
-    #host-player-container { width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 10px; overflow: hidden; border: 1px solid #282828; }
-    .clear-btn { width: 100%; padding: 12px; background: #222; color: #ff4444; border: 1px solid #333; border-radius: 8px; font-weight: bold; cursor: pointer; }
-
-    /* Выдача результатов поиска */
-    .results-list { display: flex; flex-direction: column; gap: 10px; }
-    .video-card { display: flex; gap: 12px; background: #181818; padding: 10px; border-radius: 10px; cursor: pointer; border: 1px solid #262626; transition: background 0.2s; }
-    .video-card:active { background: #282828; }
-    .video-card img { width: 120px; height: 68px; object-fit: cover; border-radius: 6px; background: #222; }
-    .video-info { display: flex; flex-direction: column; justify-content: center; flex: 1; }
-    .video-info h4 { font-size: 13px; color: #fff; margin-bottom: 4px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.3; }
-    .video-info p { font-size: 11px; color: #888; }
+    #host-monitor { width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 8px; overflow: hidden; border: 1px solid #333; }
+    .btn-clear { padding: 15px; background: #1a1a1a; color: #ff4d4d; border: 1px solid #333; text-align: center; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: auto; }
+    .status-text { color: #888; font-size: 14px; text-align: center; }
   </style>
 </head>
 <body>
 
-  <!-- Заставка Canvas -->
-  <canvas id="bg-canvas"></canvas>
+  <!-- Заставка -->
+  <div id="idle-screen"><h1>Family Standard</h1></div>
 
-  <button id="host-login-btn" onclick="openPinModal()">Вход ведущего</button>
-
+  <!-- Кнопка и Модалка -->
+  <button id="login-btn" onclick="document.getElementById('pin-modal').style.display='block'">Host</button>
   <div id="pin-modal">
-    <h3>Family Standard</h3>
-    <p><small style="color:#888;">Введите ПИН ведущего</small></p>
-    <input type="password" id="pin-input" placeholder="ПИН" maxlength="4" pattern="\d*">
-    <button onclick="submitPin()">Войти</button>
+    <input type="password" id="pin" placeholder="ПИН-КОД" maxlength="4">
+    <button onclick="auth()">ВОЙТИ</button>
   </div>
 
-  <!-- Полноэкранный плеер для Зрителей -->
+  <!-- Экран Зрителя -->
   <div id="viewer-screen">
     <div id="viewer-player"></div>
   </div>
 
-  <!-- Пульт Ведущего -->
+  <!-- Пульт -->
   <div id="host-screen">
-    <div class="search-box">
-      <input type="text" id="yt-query" placeholder="Поиск в YouTube или ссылка..." onkeydown="if(event.key==='Enter') searchYouTube()">
-      <button onclick="searchYouTube()">Найти</button>
+    <div class="status-text" id="status">Откройте приложение YouTube, скопируйте ссылку и вернитесь сюда</div>
+    
+    <div class="input-row">
+      <input type="text" id="manual-link" placeholder="Или вставьте ссылку вручную...">
+      <button onclick="handleManualLink()">Play</button>
     </div>
 
-    <!-- Мониторный плеер без звука на телефоне -->
-    <div id="host-player-container">
+    <div id="host-monitor">
       <div id="host-player"></div>
     </div>
 
-    <button class="clear-btn" onclick="clearSpectatorScreens()">Очистить экран (Вернуть заставку)</button>
-
-    <div class="results-list" id="results-container"></div>
+    <div class="btn-clear" onclick="clearScreen()">Остановить и показать заставку</div>
   </div>
 
   <script>
-    const RENDER_SERVER_URL = "https://familystandard.onrender.com";
-
-    const socket = io(RENDER_SERVER_URL, {
-      transports: ['websocket', 'polling']
-    });
-
+    const SERVER_URL = "https://familystandard.onrender.com";
+    const socket = io(SERVER_URL, { transports: ['websocket', 'polling'] });
+    
     let isHost = false;
-    let hostPlayer, viewerPlayer;
+    let vPlayer, hPlayer;
+    let currentHostId = null;
 
-    // --- 1. Анимация фона Canvas ---
-    const canvas = document.getElementById('bg-canvas');
-    const ctx = canvas.getContext('2d');
-    function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-    window.addEventListener('resize', resizeCanvas);
-    resizeCanvas();
-
-    let particles = Array.from({length: 30}, () => ({
-      x: Math.random() * canvas.width,
-      y: Math.random() * canvas.height,
-      r: Math.random() * 3 + 1,
-      dx: (Math.random() - 0.5) * 0.7,
-      dy: (Math.random() - 0.5) * 0.7
-    }));
-
-    function animateParticles() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = 'rgba(255, 0, 0, 0.4)';
-      particles.forEach(p => {
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-        ctx.fill();
-        p.x += p.dx; p.y += p.dy;
-        if(p.x < 0 || p.x > canvas.width) p.dx *= -1;
-        if(p.y < 0 || p.y > canvas.height) p.dy *= -1;
-      });
-      requestAnimationFrame(animateParticles);
-    }
-    animateParticles();
-
-    // --- 2. Авторизация ---
-    function openPinModal() {
-      document.getElementById('pin-modal').style.display = 'block';
+    // Регулярка, которая вытаскивает ID из любых ссылок Ютуба
+    function extractId(url) {
+      if (!url) return null;
+      const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:.*v=|.*\/|.*embed\/))([^&?]{11})/);
+      return match ? match[1] : (url.length === 11 ? url : null);
     }
 
-    function submitPin() {
-      const pin = document.getElementById('pin-input').value;
-      socket.emit('auth_pin', { pin });
+    // --- Авторизация ---
+    function auth() {
+      socket.emit('auth_pin', { pin: document.getElementById('pin').value });
     }
 
     socket.on('auth_result', (data) => {
       if (data.success) {
         isHost = true;
         document.getElementById('pin-modal').style.display = 'none';
-        document.getElementById('host-login-btn').style.display = 'none';
+        document.getElementById('login-btn').style.display = 'none';
         document.getElementById('host-screen').style.display = 'flex';
         initHostPlayer();
       } else {
-        alert(data.message);
+        alert("Неверный ПИН");
       }
     });
 
-    // --- 3. YouTube API ---
+    // --- Инициализация плееров (Строго по документации YouTube API) ---
     function onYouTubeIframeAPIReady() {
-      viewerPlayer = new YT.Player('viewer-player', {
-        height: '100%',
-        width: '100%',
-        playerVars: {
-          'autoplay': 1,
-          'controls': 0,
-          'rel': 0,
-          'enablejsapi': 1,
-          'origin': window.location.origin
+      vPlayer = new YT.Player('viewer-player', {
+        playerVars: { 'autoplay': 1, 'controls': 0, 'disablekb': 1, 'rel': 0 },
+        events: {
+          'onReady': () => console.log("Viewer ready")
         }
       });
     }
 
     function initHostPlayer() {
-      hostPlayer = new YT.Player('host-player', {
-        height: '100%',
-        width: '100%',
-        playerVars: {
-          'autoplay': 0,
-          'controls': 1,
-          'enablejsapi': 1,
-          'origin': window.location.origin
-        },
+      hPlayer = new YT.Player('host-player', {
+        playerVars: { 'autoplay': 0, 'controls': 1, 'rel': 0 },
         events: {
-          'onReady': (e) => e.target.mute(),
-          'onStateChange': onHostPlayerStateChange
+          'onReady': (e) => e.target.mute(), // Ведущий не слышит звук
+          'onStateChange': onHostStateChange
         }
       });
     }
 
-    // --- 4. Прямой поиск через сервер Python ---
-    async function searchYouTube() {
-      const query = document.getElementById('yt-query').value.trim();
-      if (!query) return;
-
-      // Если вставлена прямая ссылка
-      const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-      const match = query.match(regExp);
-      if (match && match[2].length === 11) {
-        playOnHost(match[2]);
-        return;
-      }
-
-      const container = document.getElementById('results-container');
-      container.innerHTML = '<div style="text-align:center; padding:15px; color:#666;">Поиск в база данных YouTube...</div>';
-
-      try {
-        const res = await fetch(`${RENDER_SERVER_URL}/api/search?q=${encodeURIComponent(query)}`);
-        const data = await res.json();
-
-        if (Array.isArray(data) && data.length > 0) {
-          container.innerHTML = '';
-          data.forEach(item => {
-            const card = document.createElement('div');
-            card.className = 'video-card';
-            card.onclick = () => playOnHost(item.videoId);
-
-            card.innerHTML = `
-              <img src="${item.thumbnail}" alt="thumb" onerror="this.src='https://i.ytimg.com/vi/${item.videoId}/hqdefault.jpg'">
-              <div class="video-info">
-                <h4>${item.title}</h4>
-                <p>${item.channel} ${item.duration ? '• ' + item.duration : ''}</p>
-              </div>
-            `;
-            container.appendChild(card);
-          });
-        } else {
-          container.innerHTML = '<div style="text-align:center; padding:15px; color:#888;">Ничего не найдено</div>';
-        }
-      } catch (e) {
-        playOnHost(query);
-      }
-    }
-
+    // --- Логика Ведущего ---
     function playOnHost(videoId) {
-      if (hostPlayer && videoId) {
-        hostPlayer.loadVideoById(videoId);
-      }
+      if (!videoId || videoId === currentHostId) return;
+      currentHostId = videoId;
+      hPlayer.loadVideoById(videoId);
+      document.getElementById('status').innerText = `Играет: ${videoId}`;
     }
 
-    function clearSpectatorScreens() {
+    function handleManualLink() {
+      const val = document.getElementById('manual-link').value;
+      playOnHost(extractId(val));
+      document.getElementById('manual-link').value = '';
+    }
+
+    function clearScreen() {
       socket.emit('clear_screen');
+      if (hPlayer && hPlayer.stopVideo) hPlayer.stopVideo();
+      currentHostId = null;
+      document.getElementById('status').innerText = "Экран очищен";
     }
 
-    function onHostPlayerStateChange(event) {
+    // Отслеживаем паузы/перемотки на пульте и шлем на сервер
+    function onHostStateChange(event) {
       if (!isHost) return;
-
-      const videoData = hostPlayer.getVideoData();
-      const videoId = videoData.video_id;
-      const currentTime = hostPlayer.getCurrentTime();
-
+      const vid = hPlayer.getVideoData().video_id;
+      const time = hPlayer.getCurrentTime();
+      
       if (event.data === YT.PlayerState.PLAYING) {
-        socket.emit('host_control', { videoId: videoId, action: 'play', time: currentTime });
+        socket.emit('host_action', { videoId: vid, action: 'play', time: time });
       } else if (event.data === YT.PlayerState.PAUSED) {
-        socket.emit('host_control', { videoId: videoId, action: 'pause', time: currentTime });
+        socket.emit('host_action', { videoId: vid, action: 'pause', time: time });
       }
     }
 
-    // --- 5. Синхронизация Зрителей ---
-    socket.on('sync_to_viewers', (data) => {
+    // --- МАГИЯ: Автоматическое чтение буфера обмена ---
+    // Как только ведущий свернул Ютуб и открыл пульт, ссылка берется сама
+    window.addEventListener('visibilitychange', async () => {
+      if (document.visibilityState === 'visible' && isHost) {
+        try {
+          const text = await navigator.clipboard.readText();
+          const vid = extractId(text);
+          if (vid && vid !== currentHostId) {
+            playOnHost(vid);
+          }
+        } catch (err) {
+          console.log("Clipboard read denied or empty");
+        }
+      }
+    });
+
+    // --- Логика Зрителя (Прием команд) ---
+    socket.on('sync', (data) => {
       if (isHost) return;
 
-      const viewerScreen = document.getElementById('viewer-screen');
+      const vScreen = document.getElementById('viewer-screen');
+      const idleScreen = document.getElementById('idle-screen');
 
-      if (!data || !data.videoId) {
-        viewerScreen.style.display = 'none';
-        if (viewerPlayer && viewerPlayer.stopVideo) viewerPlayer.stopVideo();
+      // Если пришла команда очистки
+      if (!data.videoId) {
+        vScreen.style.display = 'none';
+        idleScreen.style.display = 'flex';
+        if (vPlayer && vPlayer.stopVideo) vPlayer.stopVideo();
         return;
       }
 
-      document.getElementById('pin-modal').style.display = 'none';
-      document.getElementById('host-login-btn').style.display = 'none';
-      viewerScreen.style.display = 'block';
+      // Показываем плеер
+      vScreen.style.display = 'block';
+      idleScreen.style.display = 'none';
+      document.getElementById('login-btn').style.display = 'none';
 
+      // Управляем видео
       if (data.action === 'play') {
-        const currentUrl = viewerPlayer.getVideoUrl();
-        if (!currentUrl || !currentUrl.includes(data.videoId)) {
-          viewerPlayer.loadVideoById(data.videoId, data.time || 0);
+        const url = vPlayer.getVideoUrl();
+        if (!url || !url.includes(data.videoId)) {
+          vPlayer.loadVideoById(data.videoId, data.time);
         } else {
-          viewerPlayer.seekTo(data.time || 0, true);
-          viewerPlayer.playVideo();
+          vPlayer.seekTo(data.time, true);
+          vPlayer.playVideo();
         }
       } else if (data.action === 'pause') {
-        viewerPlayer.pauseVideo();
+        vPlayer.pauseVideo();
       }
     });
   </script>
