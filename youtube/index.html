@@ -10,73 +10,82 @@
 
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body, html { width: 100%; height: 100%; overflow: hidden; background: #0f0f0f; font-family: 'Roboto', 'Arial', sans-serif; color: #fff; }
+    body, html { width: 100%; height: 100%; overflow: hidden; background: #080808; font-family: 'Roboto', 'Arial', sans-serif; color: #fff; }
 
-    #reset-btn { position: absolute; top: 12px; left: 12px; z-index: 9999; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.4); padding: 6px 10px; border-radius: 6px; font-size: 11px; cursor: pointer; }
+    #reset-btn { position: absolute; top: 12px; left: 12px; z-index: 9999; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.4); padding: 6px 10px; border-radius: 6px; font-size: 11px; cursor: pointer; transition: 0.2s; }
     #reset-btn:active { background: rgba(255,0,0,0.3); color: #fff; }
     #login-btn { position: absolute; top: 12px; right: 12px; z-index: 9999; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #888; padding: 6px 10px; border-radius: 6px; font-size: 11px; cursor: pointer; }
 
     /* ЗАСТАВКА */
-    #idle-screen { position: absolute; top:0; left:0; width: 100%; height: 100%; z-index: 10; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #0f0f0f; }
+    #idle-screen { position: absolute; top:0; left:0; width: 100%; height: 100%; z-index: 10; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #080808; }
     .fs-text { font-size: 5vw; font-weight: 300; color: #aaa; letter-spacing: 3px; margin-bottom: 10px; text-transform: uppercase; text-align: center; }
     .yt-logo-container { font-size: 8vw; font-weight: 700; color: #fff; letter-spacing: -2px; display: flex; align-items: center; }
     .yt-logo-red { background-color: #FF0000; color: #fff; padding: 0.5vw 2vw; border-radius: 1.5vw; margin-left: 5px; line-height: 1.1; }
 
     /* ПЛЕЕР ЗРИТЕЛЯ */
-    #viewer-screen { opacity: 0; visibility: hidden; position: absolute; top:0; left:0; width: 100%; height: 100%; z-index: 20; background: #000; transition: opacity 0.2s ease; }
+    #viewer-screen { opacity: 0; visibility: hidden; position: absolute; top:0; left:0; width: 100%; height: 100%; z-index: 20; background: #000; transition: opacity 0.3s ease; }
     #viewer-player { width: 100%; height: 100%; border: none; pointer-events: none; }
 
-    /* МЕНЮ ПОИСКА НА БОЛЬШОМ ЭКРАНЕ */
-    #search-viewer-screen { display: none; position: absolute; top:0; left:0; width: 100%; height: 100%; z-index: 15; background: #080808; flex-direction: column; padding: 4vw; }
-    .sv-title { font-size: 3vw; color: #fff; margin-bottom: 3vw; font-weight: 300; text-align: center; letter-spacing: 2px; }
-    .sv-title span { font-weight: bold; color: #FF0000; }
-    .sv-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2vw; flex: 1; align-items: center; }
-    .sv-card { background: #151515; border-radius: 1vw; overflow: hidden; position: relative; border: 2px solid #282828; display: flex; flex-direction: column; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-    .sv-card img { width: 100%; aspect-ratio: 16/9; object-fit: cover; }
-    .sv-card .sv-info { padding: 1.5vw; }
-    .sv-card .sv-video-title { font-size: 1.6vw; color: #fff; font-weight: bold; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.3; }
-    .sv-badge { position: absolute; top: 0; left: 0; background: #FF0000; color: #fff; font-size: 3.5vw; font-weight: bold; padding: 0.5vw 2vw; border-bottom-right-radius: 1vw; z-index: 2; box-shadow: 2px 2px 15px rgba(0,0,0,0.5); }
+    /* --- ОБНОВЛЕННОЕ МЕНЮ ПОИСКА (Зрители) --- */
+    #search-viewer-screen { display: none; position: absolute; top:0; left:0; width: 100%; height: 100%; z-index: 15; background: radial-gradient(circle at center, #1a1a1a 0%, #050505 100%); flex-direction: column; justify-content: center; align-items: center; padding: 3vw; gap: 3vw; }
+    .sv-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2.5vw; width: 100%; max-width: 90vw; }
+    .sv-card { background: #000; border-radius: 1.5vw; overflow: hidden; position: relative; border: 2px solid #333; display: flex; flex-direction: column; box-shadow: 0 15px 35px rgba(0,0,0,0.6); transition: transform 0.2s; }
+    .sv-card img { width: 100%; aspect-ratio: 16/9; object-fit: cover; border-bottom: 2px solid #222; }
+    .sv-card .sv-info { padding: 1.5vw; background: linear-gradient(180deg, #181818 0%, #0a0a0a 100%); flex: 1; }
+    .sv-card .sv-video-title { font-size: 1.7vw; color: #fff; font-weight: bold; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.3; }
+    .sv-badge { position: absolute; top: 0; left: 0; background: #FF0000; color: #fff; font-size: 3.5vw; font-weight: bold; padding: 0.5vw 2.5vw; border-bottom-right-radius: 1.5vw; z-index: 2; box-shadow: 3px 3px 15px rgba(255,0,0,0.3); }
+    /* Текст запроса теперь СНИЗУ */
+    .sv-title { font-size: 2vw; color: #888; text-transform: uppercase; letter-spacing: 3px; }
+    .sv-title span { font-weight: bold; color: #fff; font-size: 2.5vw; margin-left: 10px; }
 
-    /* ПУЛЬТ ВЕДУЩЕГО */
-    #host-screen { display: none; position: absolute; top:0; left:0; width: 100%; height: 100%; z-index: 50; background: #0f0f0f; overflow-y: auto; }
+    /* --- ПУЛЬТ ВЕДУЩЕГО --- */
+    #host-screen { display: none; position: absolute; top:0; left:0; width: 100%; height: 100%; z-index: 50; background: #0a0a0a; overflow-y: auto; }
     .host-container { width: 100%; max-width: 500px; margin: 0 auto; padding: 15px; display: flex; flex-direction: column; min-height: 100%; }
     
-    .input-row { display: flex; gap: 8px; width: 100%; margin-bottom: 10px; }
-    .input-row input { flex: 1; min-width: 0; padding: 12px 10px; font-size: 14px; background: #000; border: 1px solid #333; color: #fff; border-radius: 8px; }
-    .input-row button { padding: 0 14px; background: #222; color: #fff; border: 1px solid #333; font-weight: bold; border-radius: 8px; cursor: pointer; }
+    .input-row { display: flex; gap: 8px; width: 100%; margin-bottom: 12px; }
+    .input-row input { flex: 1; min-width: 0; padding: 14px 12px; font-size: 15px; background: #111; border: 1px solid #333; color: #fff; border-radius: 8px; }
+    .input-row button { padding: 0 16px; background: #222; color: #fff; border: 1px solid #444; font-weight: bold; border-radius: 8px; cursor: pointer; }
+    .input-row button:active { background: #444; }
     
-    #host-monitor { width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 8px; overflow: hidden; border: 1px solid #282828; pointer-events: none; margin-bottom: 8px; }
+    #host-monitor { width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 8px; overflow: hidden; border: 1px solid #333; pointer-events: none; margin-bottom: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
     #host-player { width: 100%; height: 100%; border: none; }
 
-    .control-row { display: flex; justify-content: space-between; gap: 8px; width: 100%; margin-bottom: 15px; margin-top: 10px; }
+    /* --- ВЕРНУЛ ПОЛЗУНОК ПЕРЕМОТКИ --- */
+    .timeline-box { display: flex; flex-direction: column; gap: 6px; width: 100%; margin-bottom: 15px; background: #111; padding: 12px; border-radius: 8px; border: 1px solid #222; }
+    .timeline-box input[type=range] { width: 100%; accent-color: #FF0000; cursor: pointer; }
+    .time-display { display: flex; justify-content: space-between; font-size: 12px; color: #888; font-family: monospace; font-weight: bold; }
+
+    /* ПАНЕЛЬ 1 СТРОКА */
+    .control-row { display: flex; justify-content: space-between; gap: 8px; width: 100%; margin-bottom: 15px; }
     .control-row button { flex: 1; padding: 16px 0; background: #1a1a1a; color: #fff; border: 1px solid #333; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; transition: 0.1s; }
     .control-row button:active { background: #333; transform: scale(0.95); }
     .control-row .btn-play { background: #FF0000; border-color: #FF0000; font-size: 18px; }
-    .control-row .btn-play.is-playing { background: #333; border-color: #555; }
+    .control-row .btn-play.is-playing { background: #222; border-color: #555; }
     .control-row .btn-stop { background: #1a1a1a; font-size: 16px; color: #FF0000; border-color: #333; }
 
-    .vol-label { font-size: 11px; color: #888; text-align: center; text-transform: uppercase; margin-bottom: 6px; }
-    .vol-row { display: flex; justify-content: space-between; gap: 5px; margin-bottom: 20px; }
-    .vol-row button { flex: 1; padding: 10px 0; background: #1a1a1a; border: 1px solid #333; border-radius: 6px; color: #fff; font-weight: bold; cursor: pointer; font-size: 12px; }
+    /* ГРОМКОСТЬ */
+    .vol-row { display: flex; justify-content: space-between; gap: 6px; margin-bottom: 25px; }
+    .vol-row button { flex: 1; padding: 12px 0; background: #111; border: 1px solid #333; border-radius: 6px; color: #888; font-weight: bold; cursor: pointer; font-size: 13px; }
     .vol-row button.active { background: #fff; color: #000; border-color: #fff; }
 
-    .dashed-line { border-top: 2px dashed #333; margin-bottom: 15px; }
-    .search-pagination { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-    .search-pagination button { padding: 10px 15px; background: #222; color: #fff; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
-    .search-pagination button:disabled { opacity: 0.3; cursor: not-allowed; }
-    .search-pagination span { font-size: 13px; color: #aaa; font-weight: bold; }
+    /* ПОИСК */
+    .dashed-line { border-top: 2px dashed #222; margin-bottom: 20px; }
+    .search-pagination { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+    .search-pagination button { padding: 12px 18px; background: #1a1a1a; color: #fff; border: 1px solid #333; border-radius: 6px; font-weight: bold; cursor: pointer; }
+    .search-pagination button:disabled { opacity: 0.3; cursor: not-allowed; border-color: transparent; }
+    .search-pagination span { font-size: 14px; color: #aaa; font-weight: bold; }
     
-    .search-grid-host { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
-    .search-card-host { background: #1a1a1a; border: 1px solid #333; border-radius: 8px; overflow: hidden; cursor: pointer; display: flex; flex-direction: column; }
-    .search-card-host:active { border-color: #ff0000; }
-    .search-card-host img { width: 100%; aspect-ratio: 16/9; object-fit: cover; }
-    .search-card-host .info { padding: 8px; font-size: 11px; }
-    .search-card-host .title { font-weight: bold; margin-bottom: 4px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-    .search-card-host .badge { position: absolute; background: #ff0000; color: #fff; font-size: 13px; font-weight: bold; padding: 2px 8px; border-bottom-right-radius: 8px; z-index: 2; }
+    .search-grid-host { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+    .search-card-host { background: #111; border: 1px solid #222; border-radius: 8px; overflow: hidden; cursor: pointer; display: flex; flex-direction: column; transition: 0.1s; }
+    .search-card-host:active { border-color: #ff0000; transform: scale(0.98); }
+    .search-card-host img { width: 100%; aspect-ratio: 16/9; object-fit: cover; border-bottom: 1px solid #222; }
+    .search-card-host .info { padding: 10px; font-size: 12px; }
+    .search-card-host .title { font-weight: bold; margin-bottom: 4px; color: #ddd; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .search-card-host .badge { position: absolute; background: #ff0000; color: #fff; font-size: 13px; font-weight: bold; padding: 3px 10px; border-bottom-right-radius: 8px; z-index: 2; }
 
-    .host-footer { margin-top: auto; padding-top: 20px; padding-bottom: 10px; display: flex; flex-direction: column; align-items: center; opacity: 0.4; }
-    .host-footer .fs-text { font-size: 3.5vw; margin-bottom: 3px; letter-spacing: 2px; }
-    .host-footer .yt-logo-container { font-size: 5vw; }
+    .host-footer { margin-top: auto; padding-top: 30px; padding-bottom: 15px; display: flex; flex-direction: column; align-items: center; opacity: 0.3; }
+    .host-footer .fs-text { font-size: 14px; margin-bottom: 4px; letter-spacing: 2px; }
+    .host-footer .yt-logo-container { font-size: 20px; }
     .host-footer .yt-logo-red { padding: 2px 8px; border-radius: 6px; }
   </style>
 </head>
@@ -94,9 +103,10 @@
     <div id="viewer-player"></div>
   </div>
 
+  <!-- Обновленный экран поиска для зрителей (Запрос снизу) -->
   <div id="search-viewer-screen">
-    <div class="sv-title" id="sv-title">Запрос: <span>...</span></div>
     <div class="sv-grid" id="sv-grid"></div>
+    <div class="sv-title" id="sv-title">Запрос: <span>...</span></div>
   </div>
 
   <div id="host-screen">
@@ -111,6 +121,15 @@
         <div id="host-player"></div>
       </div>
 
+      <!-- ВЕРНУЛСЯ ИНТЕРАКТИВНЫЙ ПОЛЗУНОК -->
+      <div class="timeline-box">
+        <input type="range" id="seek-bar" min="0" max="100" value="0" step="0.1" oninput="onSeekBarScrub(this.value)">
+        <div class="time-display">
+          <span id="time-curr">0:00</span>
+          <span id="time-dur">0:00</span>
+        </div>
+      </div>
+
       <div class="control-row">
         <button onclick="hostSeek(-10)">-10с</button>
         <button id="btn-play-pause" class="btn-play" onclick="togglePlayPause()">▶</button>
@@ -118,7 +137,6 @@
         <button onclick="hostSeek(10)">+10с</button>
       </div>
 
-      <div class="vol-label">Громкость</div>
       <div class="vol-row">
         <button id="vol-3" onclick="hostSetVolume(3)">3</button>
         <button id="vol-10" onclick="hostSetVolume(10)">10</button>
@@ -128,8 +146,9 @@
       </div>
 
       <div class="dashed-line"></div>
+      
       <div class="input-row">
-        <input type="text" id="search-query" placeholder="Поиск (например: Градусы Голая)..." onkeydown="if(event.key==='Enter') performSearch()">
+        <input type="text" id="search-query" placeholder="Поиск на YouTube..." onkeydown="if(event.key==='Enter') performSearch()">
         <button id="search-btn" onclick="performSearch()">Найти</button>
       </div>
       
@@ -161,7 +180,9 @@
     let preparedId = null;  
     let currentHostId = null; 
     let currentVol = 100;
+    
     let smoothVolInterval;
+    let progressTimer = null; // Таймер ползунка
 
     let allSearchResults = [];
     let currentSearchPage = 0;
@@ -173,12 +194,19 @@
       return match ? match[1] : (url.trim().length === 11 ? url.trim() : null);
     }
 
+    function formatTime(sec) {
+      if (!sec || isNaN(sec)) return "0:00";
+      sec = Math.floor(sec);
+      const m = Math.floor(sec / 60);
+      const s = sec % 60;
+      return m + ":" + (s < 10 ? "0" : "") + s;
+    }
+
     function auth() { socket.emit('auth_pin', {}); }
     
     socket.on('auth_result', (data) => {
       if (data.success) {
         isHost = true;
-        // Очищаем экраны зрителей, чтобы пульт ведущего не перекрывался
         document.getElementById('idle-screen').style.display = 'none';
         document.getElementById('viewer-screen').style.opacity = '0';
         document.getElementById('viewer-screen').style.visibility = 'hidden';
@@ -186,10 +214,7 @@
         
         document.getElementById('login-btn').style.display = 'none';
         document.getElementById('host-screen').style.display = 'block';
-        
         initPlayersIfReady();
-      } else {
-        alert("ОШИБКА: Сервер отклонил запрос! Убедись, что новый app.py загружен на Render и запущен.");
       }
     });
 
@@ -250,6 +275,33 @@
       emitHostAction(); 
     }
 
+    // --- ЛОГИКА ПОЛЗУНКА ---
+    function onSeekBarScrub(val) {
+      if (!hPlayerReady || !currentHostId) return;
+      hPlayer.seekTo(parseFloat(val), true);
+      document.getElementById('time-curr').innerText = formatTime(val);
+      emitHostAction();
+    }
+
+    function startProgressLoop() {
+      stopProgressLoop();
+      progressTimer = setInterval(() => {
+        if (hPlayerReady && hPlayer.getCurrentTime && currentHostId) {
+          const curr = hPlayer.getCurrentTime();
+          const dur = hPlayer.getDuration() || 100;
+          const seekBar = document.getElementById('seek-bar');
+          seekBar.max = dur;
+          seekBar.value = curr;
+          document.getElementById('time-curr').innerText = formatTime(curr);
+          document.getElementById('time-dur').innerText = formatTime(dur);
+        }
+      }, 500);
+    }
+
+    function stopProgressLoop() {
+      if (progressTimer) clearInterval(progressTimer);
+    }
+
     function hostSetVolume(vol) {
       currentVol = vol;
       document.querySelectorAll('.vol-row button').forEach(b => b.classList.remove('active'));
@@ -262,6 +314,8 @@
       if (hPlayerReady && hPlayer.stopVideo) hPlayer.stopVideo();
       currentHostId = null;
       updatePlayButtonUI(YT.PlayerState.PAUSED);
+      document.getElementById('seek-bar').value = 0;
+      document.getElementById('time-curr').innerText = '0:00';
     }
 
     function onHostStateChange(event) {
@@ -275,8 +329,10 @@
       const btn = document.getElementById('btn-play-pause');
       if (state === YT.PlayerState.PLAYING) {
         btn.innerText = '⏸'; btn.classList.add('is-playing');
+        startProgressLoop();
       } else {
         btn.innerText = '▶'; btn.classList.remove('is-playing');
+        stopProgressLoop();
       }
     }
 
@@ -287,6 +343,7 @@
       socket.emit('host_action', { videoId: currentHostId, action: `${state}|${currentVol}`, time: time });
     }
 
+    // --- ПОИСК ---
     async function performSearch() {
       const q = document.getElementById('search-query').value.trim();
       if (!q) return;
@@ -301,7 +358,7 @@
         currentSearchPage = 0;
         renderSearchPage();
       } catch (e) {
-        alert('Ошибка при поиске');
+        alert('Ошибка сервера');
       }
       btn.innerText = 'Найти';
     }
@@ -318,7 +375,7 @@
       grid.innerHTML = '';
       if (allSearchResults.length === 0) {
         pag.style.display = 'none';
-        grid.innerHTML = '<div style="color:#888; text-align:center; padding:10px; grid-column:span 2;">Ничего не найдено</div>';
+        grid.innerHTML = '<div style="color:#888; text-align:center; padding:10px; grid-column:span 2;">Ничего не найдено. Попробуй изменить запрос.</div>';
         return;
       }
 
@@ -338,7 +395,7 @@
         card.innerHTML = `
           <div style="position:relative;">
             <div class="badge">${num}</div>
-            <img src="${item.thumbnail}" alt="thumb">
+            <img src="${item.thumbnail}">
           </div>
           <div class="info">
             <div class="title">${item.title}</div>
@@ -380,6 +437,8 @@
         if (data.mode === 'idle') {
            document.getElementById('manual-link').value = '';
            document.getElementById('search-query').value = '';
+           document.getElementById('seek-bar').value = 0;
+           document.getElementById('time-curr').innerText = '0:00';
            currentHostId = null;
            preparedId = null;
            if (hPlayerReady && hPlayer.stopVideo) hPlayer.stopVideo();
