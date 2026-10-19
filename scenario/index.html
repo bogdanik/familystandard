@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Интерактивный сценарий — Ситора</title>
+    <!-- Подключение элегантных шрифтов Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-color: #121012;
+            --nude-main: #d4b29d;
+            --nude-accent: #e8d3c5;
+            --nude-dark: #8c6e5e;
+            --text-light: #f7f3f0;
+            --text-muted: #b3a59e;
+            --card-bg: rgba(255, 255, 255, 0.04);
+            --card-border: rgba(212, 178, 157, 0.18);
+            --glow: rgba(212, 178, 157, 0.12);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-light);
+            font-family: 'Montserrat', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Эффект плавающих фоновых частиц на CSS (без canvas) */
+        .ambient-glow {
+            position: absolute;
+            width: 350px;
+            height: 350px;
+            background: radial-gradient(circle, var(--glow) 0%, rgba(0,0,0,0) 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: float 14s infinite ease-in-out alternate;
+            z-index: 0;
+        }
+
+        .glow-1 { top: -10%; left: -10%; animation-delay: 0s; }
+        .glow-2 { bottom: -10%; right: -10%; animation-delay: -5s; }
+        .glow-3 { top: 40%; right: 20%; width: 250px; height: 250px; animation-delay: -9s; }
+
+        @keyframes float {
+            0% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(40px, 30px) scale(1.1); }
+            100% { transform: translate(-30px, 50px) scale(0.9); }
+        }
+
+        /* Главный контейнер */
+        .container {
+            width: 100%;
+            max-width: 680px;
+            padding: 24px;
+            z-index: 1;
+            position: relative;
+        }
+
+        /* Общие карточки и экраны */
+        .screen {
+            display: none;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .screen.active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .glass-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 36px 30px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+            text-align: center;
+            position: relative;
+        }
+
+        /* Заголовки */
+        h1, h2, h3 {
+            font-family: 'Cormorant Garamond', serif;
+            font-weight: 400;
+            color: var(--nude-accent);
+            letter-spacing: 1px;
+        }
+
+        h1 { font-size: 2.4rem; margin-bottom: 12px; }
+        h2 { font-size: 1.9rem; margin-bottom: 16px; }
+        h3 { font-size: 1.4rem; margin-bottom: 8px; }
+
+        p {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: var(--text-light);
+            font-weight: 300;
+            margin-bottom: 20px;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 24px;
+        }
+
+        /* Подарок на первом экране */
+        .gift-box {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 28px;
+            cursor: pointer;
+            position: relative;
+            transition: transform 0.4s ease;
+        }
+
+        .gift-box:hover {
+            transform: scale(1.05);
+        }
+
+        .gift-box svg {
+            width: 100%;
+            height: 100%;
+            fill: none;
+            stroke: var(--nude-main);
+            stroke-width: 1.2;
+            filter: drop-shadow(0 0 12px rgba(212, 178, 157, 0.3));
+        }
+
+        /* Заметки ведущего */
+        .note-box {
+            background: rgba(212, 178, 157, 0.05);
+            border-left: 2px solid var(--nude-main);
+            padding: 14px 18px;
+            margin: 18px 0;
+            text-align: left;
+            border-radius: 0 12px 12px 0;
+        }
+
+        .note-box p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin: 0;
+            line-height: 1.5;
+        }
+
+        .note-box strong {
+            color: var(--nude-main);
+            font-weight: 500;
+        }
+
+        /* Кнопки */
+        .btn {
+            background: linear-gradient(135deg, var(--nude-main) 0%, var(--nude-dark) 100%);
+            color: #121012;
+            border: none;
+            padding: 14px 32px;
+            border-radius: 40px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(140, 110, 94, 0.3);
+            outline: none;
+            margin-top: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px rgba(212, 178, 157, 0.4);
+            background: linear-gradient(135deg, var(--nude-accent) 0%, var(--nude-main) 100%);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text-muted);
+            border: 1px solid var(--card-border);
+            box-shadow: none;
+            margin-right: 10px;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-light);
+            border-color: var(--nude-main);
+        }
+
+        /* Навигация слайдов */
+        .nav-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 24px;
+        }
+
+        .progress-bar {
+            height: 2px;
+            background: rgba(255, 255, 255, 0.1);
+            width: 100%;
+            margin-bottom: 24px;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--nude-main);
+            width: 0%;
+            transition: width 0.4s ease;
+        }
+
+        .time-tag {
+            display: inline-block;
+            background: rgba(212, 178, 157, 0.12);
+            color: var(--nude-accent);
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+            margin-bottom: 16px;
+            border: 1px solid rgba(212, 178, 157, 0.2);
+        }
+
+        /* Блэкаут */
+        #blackout {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #000000;
+            z-index: 999;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 1.5s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        #blackout.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        #blackout p {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.8rem;
+            color: var(--nude-accent);
+            letter-spacing: 2px;
+            opacity: 0;
+            transform: scale(0.95);
+            transition: all 2s ease 0.5s;
+        }
+
+        #blackout.active p {
+            opacity: 0.7;
+            transform: scale(1);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- CSS Градиентные свечения -->
+    <div class="ambient-glow glow-1"></div>
+    <div class="ambient-glow glow-2"></div>
+    <div class="ambient-glow glow-3"></div>
+
+    <div class="container">
+        
+        <!-- ЭКРАН 1: Приветствие и Подарок -->
+        <div class="screen active" id="screen-intro">
+            <div class="glass-card">
+                <div class="gift-box" onclick="nextScreen('screen-concept')">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M20 12v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-8M4 6h16a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2z"></path>
+                        <path d="M12 22V6"></path>
+                        <path d="M12 6H7.5a2.5 2.5 0 0 1 0-5C11 1 12 6 12 6z"></path>
+                        <path d="M12 6h4.5a2.5 2.5 0 0 0 0-5C13 1 12 6 12 6z"></path>
+                    </svg>
+                </div>
+                <h1>Ситора, добрый вечер!</h1>
+                <p class="subtitle">Специально для вашего праздника</p>
+                <p>Нажмите на подарок или кнопку ниже, чтобы открыть концепцию вашего вечера.</p>
+                <button class="btn" onclick="nextScreen('screen-concept')">Открыть концепцию</button>
+            </div>
+        </div>
+
+        <!-- ЭКРАН 2: Вводное слово -->
+        <div class="screen" id="screen-concept">
+            <div class="glass-card">
+                <h2>Концепция вечера</h2>
+                <p class="subtitle">Точка отсчета</p>
+                <p>Вот набросок сценария вашей вечеринки. Давайте от него отталкиваться. Мы соединили ваши пожелания с драйвовым форматом, чтобы вечер получился лёгким, смешным и запоминающимся.</p>
+                
+                <div class="note-box">
+                    <p><strong>Акцент вечера:</strong> Никаких рамок и официоза. Настоящий профессиональный ведущий всегда филигранно чувствует гостей — всё проходит абсолютно свободно и без принуждения, так что гости сами с удовольствием вовлекаются в процесс.</p>
+                </div>
+
+                <button class="btn" onclick="startInteractive()">Смотреть варианты и тайминг</button>
+            </div>
+        </div>
+
+        <!-- ЭКРАН 3: Интерактивные слайды с вариантами -->
+        <div class="screen" id="screen-slider">
+            <div class="glass-card">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress-fill"></div>
+                </div>
+
+                <div id="slide-content">
+                    <!-- Динамическое наполнение JS -->
+                </div>
+
+                <div class="nav-controls">
+                    <button class="btn btn-secondary" id="btn-prev" onclick="prevSlide()">Назад</button>
+                    <button class="btn" id="btn-next" onclick="nextSlide()">Далее</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ЭКРАН 4: Финал и выводы -->
+        <div class="screen" id="screen-final">
+            <div class="glass-card">
+                <h2>Что мы выбираем?</h2>
+                <p class="subtitle">Финальный аккорд</p>
+                <p>К сожалению, наше время до начала работы диджея ограничено, и мы физически не успеем провести абсолютно всё, чтобы не перегрузить гостей.</p>
+
+                <div class="note-box">
+                    <p><strong>Нам стоит сконцентрироваться на 2–3 самых сочных интерактивах</strong> на ваш выбор, чтобы оставить идеальный баланс между программой, общением и танцами.</p>
+                </div>
+
+                <p style="margin-top: 20px; font-size: 0.9rem; color: var(--nude-accent);">Какие из этих вариантов откликаются вам больше всего?</p>
+
+                <button class="btn" onclick="triggerBlackout()">Завершить просмотр</button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Полный Блэкаут -->
+    <div id="blackout">
+        <p>Спасибо, Ситора! ✨</p>
+    </div>
+
+    <script>
+        // Данные интерактивов и тайминга
+        const slides = [
+            {
+                time: "20:00 – 20:45",
+                title: "Сбор гостей и мягкий старт",
+                desc: "Встреча, легкое фоновое звучание. Гости комфортно рассаживаются, пробуют напитки и закусвают.",
+                plus: "Гости спокойно погружаются в атмосферу без спешки.",
+                minus: "Первый час — время раскачки. Профессиональный ведущий выстраивает лёгкое знакомство так, что люди расслабляются естественным образом."
+            },
+            {
+                time: "Интерактив 1",
+                title: "Громкий разговор (Спешл про вас)",
+                desc: "Участник в наушниках с громкой музыкой отгадывает по губам фразы, которые ему произносит партнер. Тексты — локальные мемы и смешные факты из вашей жизни.",
+                plus: "Выглядит невероятно смешно со стороны и дает отличный контент для видео.",
+                minus: "Потребуется заранее составить 10–15 узнаваемых фраз вашей компании."
+            },
+            {
+                time: "Интерактив 2",
+                title: "10 секунд на зашквар",
+                desc: "Участник выходит в центр. За 10 секунд нужно выдать 3 ответа на провокационные вопросы (например, «3 причины соврать мужу» или «3 бесячие привычки Ситоры»).",
+                plus: "Очень быстрая динамика, моментально поднимает градус веселья.",
+                minus: "Требует моментальной реакции, но ведущий мягко вытащит любую паузу."
+            },
+            {
+                time: "Интерактив 3",
+                title: "Угадай гостя (Ваша идея)",
+                desc: "Участник тянет 2 карточки: «Имя гостя» и «Ситуация» (например: «Забыл пин-код на кассе», «Ждет очереди в туалет»). Задача — пародировать персонажа.",
+                plus: "Ваша личная задумка, которая 100% зайдёт в компании близких людей.",
+                minus: "Требует небольшого артистизма, поэтому идеально проводить её, когда все уже разогреты."
+            },
+            {
+                time: "Интерактив 4",
+                title: "Русская рулетка с телефоном",
+                desc: "Участник отдает разблокированный телефон ведущему и выполняет задание (написать шуточный текст в чат или пропеть песню в голосовом). Есть право отказаться, но за штраф.",
+                plus: "Максимальный адреналин, эмоции и шок-контент.",
+                minus: "Кто-то может побояться за телефон, но забавные штрафные задания всё сгладят."
+            },
+            {
+                time: "Интерактив 5",
+                title: "Танцевальные символы",
+                desc: "Гости танцуют, музыка резко замирает, и ведущий называет фигуру или букву. За 3 секунды нужно объединиться и изобразить символ телами.",
+                plus: "Идеально бесшовно переводит гостей из-за стола прямо на танцпол к диджею.",
+                minus: "Девушкам на каблуках может быть непривычно, поэтому фигурки сделаем простые и эстетичные."
+            }
+        ];
+
+        let currentSlide = 0;
+
+        function nextScreen(screenId) {
+            const active = document.querySelector('.screen.active');
+            if (active) {
+                active.style.opacity = '0';
+                active.style.transform = 'translateY(-20px)';
+                setTimeout(() => {
+                    active.classList.remove('active');
+                    const next = document.getElementById(screenId);
+                    next.classList.add('active');
+                }, 400);
+            }
+        }
+
+        function startInteractive() {
+            nextScreen('screen-slider');
+            renderSlide();
+        }
+
+        function renderSlide() {
+            const data = slides[currentSlide];
+            const content = document.getElementById('slide-content');
+            
+            // Прогресс бар
+            const progress = ((currentSlide + 1) / slides.length) * 100;
+            document.getElementById('progress-fill').style.width = `${progress}%`;
+
+            content.innerHTML = `
+                <span class="time-tag">${data.time}</span>
+                <h3>${data.title}</h3>
+                <p>${data.desc}</p>
+                <div class="note-box">
+                    <p><strong>Плюс:</strong> ${data.plus}</p>
+                    <p style="margin-top: 6px;"><strong>Нюанс:</strong> ${data.minus}</p>
+                </div>
+            `;
+
+            // Управление кнопками
+            document.getElementById('btn-prev').style.visibility = currentSlide === 0 ? 'hidden' : 'visible';
+            
+            const nextBtn = document.getElementById('btn-next');
+            if (currentSlide === slides.length - 1) {
+                nextBtn.innerText = 'К выводам';
+            } else {
+                nextBtn.innerText = 'Далее';
+            }
+        }
+
+        function nextSlide() {
+            if (currentSlide < slides.length - 1) {
+                currentSlide++;
+                renderSlide();
+            } else {
+                nextScreen('screen-final');
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 0) {
+                currentSlide--;
+                renderSlide();
+            }
+        }
+
+        function triggerBlackout() {
+            const blackout = document.getElementById('blackout');
+            blackout.classList.add('active');
+        }
+    </script>
+</body>
+</html>
