@@ -5,12 +5,11 @@ from flask_socketio import SocketIO, emit
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'familystandard_secret_key'
 
-# Разрешаем CORS для всех внешних сайтов/доменов
+# CORS разрешен для всех внешних подключений
 socketio = SocketIO(app, cors_allowed_origins="*")
 
 SECRET_PIN = "7777"  # Ваш ПИН-код ведущего
 
-# Состояние плеера в памяти бэкенда
 current_state = {
     'videoId': None,
     'action': 'pause',
@@ -19,13 +18,19 @@ current_state = {
 
 @app.route('/')
 def health_check():
-    return jsonify({"status": "Server running", "service": "Family Standard Socket Server"})
+    return jsonify({"status": "ok", "service": "Family Standard Render Backend"})
+
+# При подключении нового зрителя сразу отправляем текущее состояние
+@socketio.on('connect')
+def handle_connect():
+    if current_state['videoId']:
+        emit('sync_to_viewers', current_state)
 
 @socketio.on('auth_pin')
 def handle_auth(data):
     if data.get('pin') == SECRET_PIN:
         emit('auth_result', {'success': True})
-        emit('init_state', current_state)
+        emit('sync_to_viewers', current_state)
     else:
         emit('auth_result', {'success': False, 'message': 'Неверный ПИН'})
 
@@ -36,7 +41,7 @@ def handle_host_control(data):
     current_state['action'] = data.get('action')
     current_state['time'] = data.get('time', 0)
 
-    # Транслируем видео всем зрителям (исключая самого отправителя-ведущего)
+    # Транслируем событие ВСЕМ подключенным зрителям
     emit('sync_to_viewers', current_state, broadcast=True, include_self=False)
 
 if __name__ == '__main__':
