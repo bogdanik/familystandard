@@ -1,7 +1,5 @@
 {
-  "_description": "КОНФИГУРАЦИЯ МУЗЫКАЛЬНОГО ПУЛЬТА ДЕТСКОГО ВЕДУЩЕГО",
-  "event_title": "ДЕТСКИЙ ПРАЗДНИК",
-  "event_subtitle": "ПУЛЬТ УПРАВЛЕНИЯ МУЗЫКОЙ",
+  "_description": "КОНФИГУРАЦИЯ МУЗЫКАЛЬНОГО ПУЛЬТА EVENT OS - KIDS",
   "cdn_base_url": "https://pub-372ba5f717cf4a8694558f47682d65d9.r2.dev/",
   
   "bg_tracks": [
@@ -14,13 +12,19 @@
     "game2.mp3",
     "game3.mp3"
   ],
+  "entrance_tracks": [
+    "entrance1.mp3",
+    "entrance2.mp3"
+  ],
   "happy_birthday_tracks": [
     "hb1.mp3",
     "hb2.mp3"
   ],
-  "entrance_tracks": [
-    "entrance1.mp3",
-    "entrance2.mp3"
+  "bubbles_tracks": [
+    "bubbles1.mp3"
+  ],
+  "balloons_tracks": [
+    "balloons1.mp3"
   ],
   "ending_tracks": [
     "end1.mp3",
