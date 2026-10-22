@@ -184,7 +184,7 @@
             opacity: 0.85;
         }
 
-        /* 3. СРЕДНИЙ БЛОК: ИГРА И АБСОЛЮТНАЯ ПАУЗА */
+        /* 3. СРЕДНИЙ БЛОК */
         .main-action-block {
             display: flex;
             flex-direction: column;
@@ -296,7 +296,6 @@
             text-transform: uppercase;
         }
 
-        /* 5. НАЧАЛЬНЫЙ ЭКРАН ВЫБОРА ТАЙМЕРА */
         #init-overlay {
             position: fixed;
             inset: 0;
@@ -345,7 +344,6 @@
 </head>
 <body>
 
-    <!-- СТАРТОВЫЙ ВЫБОР ДЛИТЕЛЬНОСТИ -->
     <div id="init-overlay">
         <div class="setup-card">
             <div class="setup-title">EVENT OS - KIDS</div>
@@ -389,7 +387,7 @@
             </div>
         </div>
 
-        <!-- 2. ЦЕНТРАЛЬНАЯ ЗОНА С ЭКВАЛАЙЗЕРОМ И ТАЙМЕРОМ -->
+        <!-- 2. ЦЕНТРАЛЬНАЯ ЗОНА -->
         <div class="center-display">
             <canvas id="eq-canvas"></canvas>
             <div class="title-group">
@@ -398,7 +396,7 @@
             </div>
         </div>
 
-        <!-- 3. СРЕДНИЙ БЛОК: ИГРА И АБСОЛЮТНАЯ ПАУЗА -->
+        <!-- 3. СРЕДНИЙ БЛОК -->
         <div class="main-action-block">
             <button class="btn-game-giant" id="btn-game" onclick="triggerMode('game')">
                 🎮 ИГРА
@@ -440,7 +438,69 @@
         const mainAudio = document.getElementById('main-audio');
         let currentVolume = 0.30;
         let currentMode = 'bg';
-        let trackIndices = { bg: 0, game: 0, entrance: 0, hb: 0, bubbles: 0, balloons: 0, ending: 0 };
+
+        // --- УМНЫЙ СНЕЙК-РАНДОМ (КОЛОДА КАРТ БЕЗ ПОВТОРОВ) ---
+        let shuffleStore = {
+            bg: { queue: [], history: [] },
+            game: { queue: [], history: [] },
+            entrance: { queue: [], history: [] },
+            hb: { queue: [], history: [] },
+            bubbles: { queue: [], history: [] },
+            balloons: { queue: [], history: [] },
+            ending: { queue: [], history: [] }
+        };
+
+        function shuffleArray(arr) {
+            let a = [...arr];
+            for (let i = a.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [a[i], a[j]] = [a[j], a[i]];
+            }
+            return a;
+        }
+
+        function getNextTrackIndex(mode) {
+            const playlist = getPlaylist(mode);
+            if (!playlist || playlist.length === 0) return 0;
+
+            if (!shuffleStore[mode]) {
+                shuffleStore[mode] = { queue: [], history: [] };
+            }
+            let st = shuffleStore[mode];
+
+            // Если колода пуста — перемешиваем заново все треки!
+            if (st.queue.length === 0) {
+                let indices = Array.from({length: playlist.length}, (_, i) => i);
+                let newQueue = shuffleArray(indices);
+
+                // Если в колоде > 1 трека, следим, чтобы первый новый не был ровно последним проигранным
+                if (st.history.length > 0 && newQueue.length > 1) {
+                    let lastIdx = st.history[st.history.length - 1];
+                    if (newQueue[0] === lastIdx) {
+                        let endPos = newQueue.length - 1;
+                        [newQueue[0], newQueue[endPos]] = [newQueue[endPos], newQueue[0]];
+                    }
+                }
+                st.queue = newQueue;
+            }
+
+            let nextIndex = st.queue.shift();
+            st.history.push(nextIndex);
+            return nextIndex;
+        }
+
+        function getPrevTrackIndex(mode) {
+            const playlist = getPlaylist(mode);
+            if (!playlist || playlist.length === 0) return 0;
+
+            let st = shuffleStore[mode];
+            if (st && st.history.length > 1) {
+                let curr = st.history.pop();
+                st.queue.unshift(curr);
+                return st.history[st.history.length - 1];
+            }
+            return st ? (st.history[0] || 0) : 0;
+        }
 
         let selectedDurationMinutes = 40;
         let partyRemainingSeconds = 2400;
@@ -507,7 +567,7 @@
             }
 
             document.getElementById('init-overlay').style.display = 'none';
-            playCurrentModeTrack();
+            playCurrentModeTrack(true);
             drawEq();
         }
 
@@ -568,13 +628,20 @@
             }, 20);
         }
 
-        function playCurrentModeTrack() {
+        function playCurrentModeTrack(forceNew = true) {
             cancelFade();
             if (!config) return;
             const playlist = getPlaylist(currentMode);
             if (!playlist || playlist.length === 0) return;
 
-            let idx = trackIndices[currentMode] % playlist.length;
+            let idx;
+            let st = shuffleStore[currentMode];
+            if (forceNew || !st || st.history.length === 0) {
+                idx = getNextTrackIndex(currentMode);
+            } else {
+                idx = st.history[st.history.length - 1];
+            }
+
             const filename = playlist[idx];
             const fullUrl = config.cdn_base_url + filename;
 
@@ -594,11 +661,7 @@
         }
 
         mainAudio.onended = () => {
-            const playlist = getPlaylist(currentMode);
-            if (playlist.length > 0) {
-                trackIndices[currentMode] = (trackIndices[currentMode] + 1) % playlist.length;
-                playCurrentModeTrack();
-            }
+            playCurrentModeTrack(true);
         };
 
         mainAudio.ontimeupdate = () => {
@@ -635,19 +698,28 @@
         }
 
         function nextTrack() {
-            const playlist = getPlaylist(currentMode);
-            if (playlist.length > 0) {
-                trackIndices[currentMode] = (trackIndices[currentMode] + 1) % playlist.length;
-                playCurrentModeTrack();
-            }
+            playCurrentModeTrack(true);
         }
 
         function prevTrack() {
+            cancelFade();
+            if (!config) return;
             const playlist = getPlaylist(currentMode);
-            if (playlist.length > 0) {
-                trackIndices[currentMode] = (trackIndices[currentMode] - 1 + playlist.length) % playlist.length;
-                playCurrentModeTrack();
-            }
+            if (!playlist || playlist.length === 0) return;
+
+            let idx = getPrevTrackIndex(currentMode);
+            const filename = playlist[idx];
+            const fullUrl = config.cdn_base_url + filename;
+
+            document.getElementById('track-name').innerText = filename;
+            updateUIState();
+
+            mainAudio.src = fullUrl;
+            mainAudio.play().catch(e => console.log("Autoplay blocked:", e));
+
+            const btn = document.getElementById('btn-play-pause');
+            btn.classList.add('play-active');
+            btn.innerText = "⏯ Пауза";
         }
 
         function triggerMode(mode) {
@@ -655,7 +727,7 @@
                 nextTrack();
             } else {
                 currentMode = mode;
-                playCurrentModeTrack();
+                playCurrentModeTrack(true);
             }
         }
 
