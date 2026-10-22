@@ -50,38 +50,33 @@
             gap: 8px;
         }
 
-        /* 1. ВЕРХНЯЯ ПАНЕЛЬ */
+        /* 1. ВЕРХНЯЯ ПАНЕЛЬ С EVENT OS - KIDS И ПЛЕЕРОМ */
         .top-panel {
             background: var(--glass-card);
             border: 1px solid var(--glass-border);
             border-radius: 18px;
-            padding: 10px;
+            padding: 12px;
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 10px;
             backdrop-filter: blur(12px);
             box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+            text-align: center;
         }
 
-        .vol-row { display: flex; gap: 4px; }
-        .btn-vol {
-            flex: 1;
-            height: 36px;
-            border-radius: 10px;
-            border: 1px solid var(--glass-border);
-            background: rgba(30, 41, 59, 0.7);
-            color: #fff;
-            font-size: 0.8rem;
-            font-weight: 800;
-            cursor: pointer;
-            transition: all 0.15s ease;
+        .shimmer-title {
+            font-family: 'Cinzel', serif;
+            font-size: 1.6rem;
+            font-weight: 900;
+            background: linear-gradient(90deg, #ffffff 0%, #fffbeb 25%, #f59e0b 50%, #e5e7eb 75%, #ffffff 100%);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shine 4s linear infinite;
+            letter-spacing: 2px;
+            line-height: 1.1;
         }
-        .btn-vol.active {
-            background: linear-gradient(135deg, #ffffff 0%, var(--gold-main) 100%);
-            color: #000;
-            border-color: #fff;
-            box-shadow: 0 0 12px var(--gold-glow);
-        }
+        @keyframes shine { to { background-position: 200% center; } }
 
         .track-display {
             background: rgba(3, 7, 18, 0.6);
@@ -118,9 +113,9 @@
             color: #34d399;
         }
 
-        /* 2. ЦЕНТРАЛЬНАЯ ЗОНА С ЭКВАЛАЙЗЕРОМ */
+        /* 2. ЦЕНТРАЛЬНАЯ ЗОНА С ЭКВАЛАЙЗЕРОМ И ТАЙМЕРОМ */
         .center-display {
-            flex: 1.1;
+            flex: 1;
             position: relative;
             background: radial-gradient(circle, rgba(15, 23, 42, 0.9) 0%, rgba(3, 7, 18, 0.95) 100%);
             border: 1px solid var(--glass-border);
@@ -131,9 +126,8 @@
             justify-content: center;
             overflow: hidden;
             box-shadow: inset 0 0 30px rgba(0,0,0,0.8);
-            min-height: 120px;
+            min-height: 110px;
             padding: 12px;
-            gap: 10px;
         }
 
         .center-content-slot {
@@ -143,12 +137,11 @@
             align-items: center;
             justify-content: center;
             width: 100%;
-            gap: 8px;
         }
 
         .btn-start-program {
             width: 85%;
-            height: 44px;
+            height: 46px;
             border-radius: 14px;
             border: 2px solid var(--green-active);
             background: linear-gradient(135deg, rgba(16, 185, 129, 0.4) 0%, rgba(6, 78, 59, 0.3) 100%);
@@ -169,7 +162,7 @@
         .timer-box-slot {
             display: none;
             width: 85%;
-            height: 44px;
+            height: 46px;
             border-radius: 14px;
             border: 2px solid var(--gold-main);
             background: rgba(3, 7, 18, 0.85);
@@ -195,21 +188,6 @@
             100% { transform: scale(1.05); }
         }
 
-        .shimmer-title {
-            font-family: 'Cinzel', serif;
-            font-size: 1.6rem;
-            font-weight: 900;
-            background: linear-gradient(90deg, #ffffff 0%, #fffbeb 25%, #f59e0b 50%, #e5e7eb 75%, #ffffff 100%);
-            background-size: 200% auto;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: shine 4s linear infinite;
-            letter-spacing: 2px;
-            line-height: 1.1;
-            pointer-events: none;
-        }
-        @keyframes shine { to { background-position: 200% center; } }
-
         #eq-canvas {
             position: absolute;
             inset: 0;
@@ -220,82 +198,62 @@
             opacity: 0.85;
         }
 
-        /* 3. СРЕДНИЙ БЛОК С ПОЛЗУНКАМИ */
+        /* 3. КНОПКИ-ПОЛЗУНКИ ДЛЯ ФОНА И ИГРЫ */
         .main-action-block {
             display: flex;
             flex-direction: column;
             gap: 10px;
         }
 
-        .control-card {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            padding: 10px 14px;
-            border-radius: 16px;
-            background: rgba(15, 23, 42, 0.7);
-            border: 1px solid var(--glass-border);
-        }
-
-        .btn-main-title {
+        .slider-button-wrapper {
+            position: relative;
             width: 100%;
-            height: 42px;
-            border-radius: 12px;
-            font-size: 1.2rem;
-            font-weight: 900;
-            cursor: pointer;
+            height: 52px;
+            border-radius: 16px;
+            border: 1px solid var(--glass-border);
+            overflow: hidden;
             display: flex;
             align-items: center;
             justify-content: center;
+            background: rgba(30, 41, 59, 0.6);
+        }
+
+        .slider-fill {
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 30%;
+            pointer-events: none;
+            transition: width 0.05s linear;
+        }
+
+        .btn-bg-fill { background: rgba(245, 158, 11, 0.35); }
+        .btn-game-fill { background: rgba(6, 182, 212, 0.35); }
+
+        .slider-button-wrapper.active .btn-bg-fill { background: rgba(245, 158, 11, 0.7); }
+        .slider-button-wrapper.active .btn-game-fill { background: rgba(6, 182, 212, 0.7); }
+
+        .slider-button-text {
+            position: relative;
+            z-index: 2;
+            font-size: 1.15rem;
+            font-weight: 900;
             text-transform: uppercase;
             letter-spacing: 1px;
-            transition: all 0.15s ease;
-            border: 1px solid transparent;
+            pointer-events: none;
+            color: #fff;
         }
 
-        .btn-bg-card {
-            border-color: var(--gold-main);
-            background: rgba(245, 158, 11, 0.15);
-            color: #fef08a;
-        }
-        .btn-bg-card.active {
-            background: var(--gold-main);
-            color: #000;
-            box-shadow: 0 0 25px var(--gold-glow);
-        }
-
-        .btn-game-card {
-            border-color: var(--cyan-accent);
-            background: rgba(6, 182, 212, 0.15);
-            color: #cffafe;
-        }
-        .btn-game-card.active {
-            background: var(--cyan-accent);
-            color: #000;
-            box-shadow: 0 0 25px var(--cyan-accent);
-        }
-
-        .slider-row {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 0 4px;
-        }
-        .slider-label {
-            font-size: 0.72rem;
-            font-weight: 800;
-            color: #94a3b8;
-            text-transform: uppercase;
-            min-width: 70px;
-        }
-        .vol-slider {
-            flex: 1;
-            height: 6px;
-            border-radius: 3px;
-            background: rgba(255, 255, 255, 0.2);
-            outline: none;
-            accent-color: var(--gold-main);
+        .slider-range-input {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
             cursor: pointer;
+            z-index: 3;
+            -webkit-appearance: none;
         }
 
         /* 4. НИЖНЯЯ ПАНЕЛЬ */
@@ -398,7 +356,7 @@
 <body>
 
     <div id="init-overlay" class="modal-overlay">
-        <button onclick="initAudioAndPlayBg()" class="btn-main-title btn-bg-card" style="height: 70px; width: 100%; max-width: 360px;">
+        <button onclick="initAudioAndPlayBg()" class="btn-start-program" style="height: 70px; width: 100%; max-width: 360px;">
             ВКЛЮЧИТЬ ПУЛЬТ
         </button>
     </div>
@@ -424,13 +382,7 @@
 
         <!-- 1. ВЕРХНЯЯ ПАНЕЛЬ -->
         <div class="top-panel">
-            <div class="vol-row">
-                <button class="btn-vol" onclick="setMasterVolume(0.03, this)">3%</button>
-                <button class="btn-vol" onclick="setMasterVolume(0.10, this)">10%</button>
-                <button class="btn-vol active" onclick="setMasterVolume(0.30, this)">30%</button>
-                <button class="btn-vol" onclick="setMasterVolume(0.60, this)">60%</button>
-                <button class="btn-vol" onclick="setMasterVolume(1.00, this)">100%</button>
-            </div>
+            <h1 class="shimmer-title">EVENT OS - KIDS</h1>
 
             <div class="track-display">
                 <div class="track-title" id="track-name">Загрузка...</div>
@@ -454,50 +406,42 @@
                 <div class="timer-box-slot" id="timer-slot">
                     <div class="countdown-timer" id="timer-display">40:00</div>
                 </div>
-
-                <h1 class="shimmer-title">EVENT OS - KIDS</h1>
             </div>
         </div>
 
-        <!-- 3. СРЕДНИЙ БЛОК: ФОН И ИГРА С ИНДИВИДУАЛЬНЫМИ ПОЛЗУНКАМИ -->
+        <!-- 3. КНОПКИ-ПОЛЗУНКИ ФОН И ИГРА -->
         <div class="main-action-block">
             
-            <!-- БЛОК ФОН -->
-            <div class="control-card">
-                <button class="btn-main-title btn-bg-card" id="btn-bg" onclick="toggleMode('bg')">
-                    ФОН
-                </button>
-                <div class="slider-row">
-                    <span class="slider-label" id="bg-vol-label">Громкость</span>
-                    <input type="range" class="vol-slider" id="bg-slider" min="0" max="1" step="0.01" value="0.3" oninput="setChannelVolume('bg', this.value)" onclick="event.stopPropagation()">
-                </div>
+            <!-- КНОПКА-ПОЛЗУНОК ФОН -->
+            <div class="slider-button-wrapper" id="wrap-bg">
+                <div class="slider-fill btn-bg-fill" id="fill-bg" style="width: 30%;"></div>
+                <span class="slider-button-text">ФОН</span>
+                <input type="range" class="slider-range-input" id="range-bg" min="0" max="1" step="0.01" value="0.3" 
+                       oninput="handleSliderInput('bg', this.value)" onclick="handleSliderClick(event, 'bg')">
             </div>
 
-            <!-- БЛОК ИГРА -->
-            <div class="control-card">
-                <button class="btn-main-title btn-game-card" id="btn-game" onclick="toggleMode('game')">
-                    ИГРА
-                </button>
-                <div class="slider-row">
-                    <span class="slider-label" id="game-vol-label">Громкость</span>
-                    <input type="range" class="vol-slider" id="game-slider" min="0" max="1" step="0.01" value="0.3" oninput="setChannelVolume('game', this.value)" onclick="event.stopPropagation()">
-                </div>
+            <!-- КНОПКА-ПОЛЗУНОК ИГРА -->
+            <div class="slider-button-wrapper" id="wrap-game">
+                <div class="slider-fill btn-game-fill" id="fill-game" style="width: 30%;"></div>
+                <span class="slider-button-text">ИГРА</span>
+                <input type="range" class="slider-range-input" id="range-game" min="0" max="1" step="0.01" value="0.3" 
+                       oninput="handleSliderInput('game', this.value)" onclick="handleSliderClick(event, 'game')">
             </div>
 
         </div>
 
         <!-- 4. НИЖНЯЯ ПАНЕЛЬ -->
         <div class="bottom-grid">
-            <button class="btn-spec hb" id="btn-hb" onclick="toggleMode('hb')">
+            <button class="btn-spec hb" id="btn-hb" onclick="triggerMode('hb')">
                 Birthday
             </button>
-            <button class="btn-spec bubbles" id="btn-bubbles" onclick="toggleMode('bubbles')">
+            <button class="btn-spec bubbles" id="btn-bubbles" onclick="triggerMode('bubbles')">
                 Ленты - Пузыри
             </button>
-            <button class="btn-spec flashmob" id="btn-fm1" onclick="toggleMode('flashmob1')">
+            <button class="btn-spec flashmob" id="btn-fm1" onclick="triggerMode('flashmob1')">
                 Флешмоб
             </button>
-            <button class="btn-spec flashmob-sm" id="btn-fm2" onclick="toggleMode('flashmob2')">
+            <button class="btn-spec flashmob-sm" id="btn-fm2" onclick="triggerMode('flashmob2')">
                 Флешмоб задания
             </button>
         </div>
@@ -506,8 +450,10 @@
 
     </div>
 
+    <!-- АУДИОПЛЕЕРЫ + ПРЕДЗАГРУЗЧИК -->
     <audio id="bg-audio" crossorigin="anonymous"></audio>
     <audio id="sfx-audio" crossorigin="anonymous"></audio>
+    <audio id="preload-audio" preload="auto" style="display:none;"></audio>
 
     <script>
         const socket = io("https://kids-aqxx.onrender.com");
@@ -515,14 +461,18 @@
 
         const bgAudio = document.getElementById('bg-audio');
         const sfxAudio = document.getElementById('sfx-audio');
+        const preloadAudio = document.getElementById('preload-audio');
 
-        let masterVolume = 0.30;
         let bgVolume = 0.30;
         let gameVolume = 0.30;
 
+        let bgFadeInterval = null;
         let sfxFadeInterval = null;
 
-        let currentMode = 'none'; // 'bg', 'game', 'hb', 'hb_bg', 'bubbles', 'flashmob1', 'flashmob2', 'none'
+        let isDragAction = false;
+        let dragStartTime = 0;
+
+        let currentMode = 'none';
         let isGlobalPaused = false;
 
         let partyStarted = false;
@@ -581,33 +531,77 @@
             return nextIndex;
         }
 
-        function setMasterVolume(v, btn) {
-            masterVolume = v;
-            document.querySelectorAll('.btn-vol').forEach(b => b.classList.remove('active'));
-            if (btn) btn.classList.add('active');
+        // --- ПРЕДЗАГРУЗКА СЛЕДУЮЩЕГО ТРЕКА В БУФЕР ---
+        function preloadNextTrack(mode) {
+            if (!config) return;
+            const playlist = getPlaylist(mode);
+            if (!playlist || playlist.length <= 1) return;
 
-            applyAudioVolumes();
+            let st = shuffleStore[mode];
+            let nextIdx = (st && st.queue.length > 0) ? st.queue[0] : 0;
+            const filename = playlist[nextIdx];
+            if (filename) {
+                preloadAudio.src = config.cdn_base_url + filename;
+                preloadAudio.load();
+            }
         }
 
-        function setChannelVolume(channel, val) {
-            if (channel === 'bg') bgVolume = parseFloat(val);
-            if (channel === 'game') gameVolume = parseFloat(val);
-
-            applyAudioVolumes();
+        // --- ОБРАБОТКА ПОЛЗУНКОВ И КЛИКОВ ---
+        function handleSliderInput(mode, val) {
+            isDragAction = true;
+            let percent = (val * 100) + '%';
+            if (mode === 'bg') {
+                bgVolume = parseFloat(val);
+                document.getElementById('fill-bg').style.width = percent;
+                if (currentMode === 'bg' && !bgAudio.paused) bgAudio.volume = bgVolume;
+            } else if (mode === 'game') {
+                gameVolume = parseFloat(val);
+                document.getElementById('fill-game').style.width = percent;
+                if (currentMode === 'game' && !sfxAudio.paused && !sfxFadeInterval) sfxAudio.volume = gameVolume;
+            }
         }
 
-        function applyAudioVolumes() {
-            if (isGlobalPaused) {
-                bgAudio.volume = 0;
-                sfxAudio.volume = 0;
+        function handleSliderClick(e, mode) {
+            if (isDragAction) {
+                isDragAction = false;
                 return;
             }
+            triggerMode(mode);
+        }
 
-            bgAudio.volume = bgVolume * masterVolume;
+        // --- ПЛАВНЫЕ НАРАСТАНИЯ И ЗАТУХАНИЯ (FADE IN / FADE OUT) ---
+        function fadeInAudio(audioEl, targetVol, duration = 1200, callback) {
+            audioEl.volume = 0;
+            audioEl.play().then(() => {
+                let start = performance.now();
+                let timer = requestAnimationFrame(function step(now) {
+                    let progress = Math.min((now - start) / duration, 1);
+                    audioEl.volume = targetVol * progress;
+                    if (progress < 1) requestAnimationFrame(step);
+                    else if (callback) callback();
+                });
+            }).catch(e => console.log(e));
+        }
 
-            if (!sfxFadeInterval) {
-                sfxAudio.volume = gameVolume * masterVolume;
+        function fadeOutAudio(audioEl, duration = 1000, callback) {
+            let startVol = audioEl.volume;
+            if (startVol === 0 || audioEl.paused) {
+                audioEl.pause();
+                if (callback) callback();
+                return;
             }
+            let start = performance.now();
+            let timer = requestAnimationFrame(function step(now) {
+                let progress = Math.min((now - start) / duration, 1);
+                audioEl.volume = startVol * (1 - progress);
+                if (progress < 1) {
+                    requestAnimationFrame(step);
+                } else {
+                    audioEl.pause();
+                    audioEl.volume = startVol;
+                    if (callback) callback();
+                }
+            });
         }
 
         function initAudioAndPlayBg() {
@@ -631,7 +625,7 @@
 
             document.getElementById('init-overlay').style.display = 'none';
             
-            toggleMode('bg');
+            triggerMode('bg');
             drawEq();
         }
 
@@ -666,10 +660,7 @@
 
             document.getElementById('duration-modal').style.display = 'none';
 
-            const vol100Btn = document.querySelectorAll('.btn-vol')[4];
-            setMasterVolume(1.00, vol100Btn);
-
-            toggleMode('entrance');
+            triggerMode('entrance');
         }
 
         function updateTimerDisplay() {
@@ -725,48 +716,27 @@
             document.getElementById('track-name').innerText = filename;
             isGlobalPaused = false;
 
+            // Подгружаем следующий трек заранее
+            preloadNextTrack(mode);
+
             if (mode === 'bg') {
-                sfxAudio.pause();
+                fadeOutAudio(sfxAudio, 800);
+
                 bgAudio.src = fullUrl;
-                bgAudio.play().catch(e => console.log(e));
+                fadeInAudio(bgAudio, bgVolume, 1200);
             } else {
-                bgAudio.pause(); // При включении игры или интерактива фон полностью останавливается
+                fadeOutAudio(bgAudio, 800);
 
                 sfxAudio.src = fullUrl;
 
                 if (mode === 'game') {
                     sfxAudio.currentTime = 15;
-                    sfxAudio.volume = 0;
-
-                    if (sfxFadeInterval) cancelAnimationFrame(sfxFadeInterval);
-
-                    const fadeStart = performance.now();
-                    function fadeSfxStep(now) {
-                        const elapsed = now - fadeStart;
-                        const progress = Math.min(elapsed / 2000, 1);
-                        sfxAudio.volume = (gameVolume * masterVolume) * progress;
-
-                        if (progress < 1) {
-                            sfxFadeInterval = requestAnimationFrame(fadeSfxStep);
-                        } else {
-                            sfxFadeInterval = null;
-                        }
-                    }
-
-                    sfxAudio.play().then(() => {
-                        sfxFadeInterval = requestAnimationFrame(fadeSfxStep);
-                    }).catch(e => console.log(e));
-
+                    fadeInAudio(sfxAudio, gameVolume, 2000);
                 } else {
-                    if (sfxFadeInterval) {
-                        cancelAnimationFrame(sfxFadeInterval);
-                        sfxFadeInterval = null;
-                    }
-                    sfxAudio.play().catch(e => console.log(e));
+                    fadeInAudio(sfxAudio, gameVolume, 1200);
                 }
             }
 
-            applyAudioVolumes();
             updateUIState();
 
             const btn = document.getElementById('btn-play-pause');
@@ -774,11 +744,11 @@
             btn.innerText = "Пауза";
         }
 
-        function toggleMode(mode) {
-            // Если режим уже активен — нажимаем для выключения (полная тишина)
+        function triggerMode(mode) {
+            // Повторный клик по кнопке активного режима -> Плавное отключение (тишина)
             if (currentMode === mode && (!bgAudio.paused || !sfxAudio.paused)) {
-                bgAudio.pause();
-                sfxAudio.pause();
+                fadeOutAudio(bgAudio, 1000);
+                fadeOutAudio(sfxAudio, 1000);
                 currentMode = 'none';
                 clearActiveHighlights();
                 const btn = document.getElementById('btn-play-pause');
@@ -787,7 +757,6 @@
                 return;
             }
 
-            // Иначе переключаемся на выбранный режим
             currentMode = mode;
             playModeTrack(mode);
         }
@@ -803,10 +772,7 @@
             } else if (currentMode === 'hb_bg') {
                 playModeTrack('hb_bg');
             } else {
-                // Если игра закончилась — наступает полная тишина
                 currentMode = 'none';
-                sfxAudio.pause();
-                applyAudioVolumes();
                 updateUIState();
             }
         };
@@ -838,17 +804,15 @@
             const btn = document.getElementById('btn-play-pause');
             if (isGlobalPaused) {
                 isGlobalPaused = false;
-                if (currentMode === 'bg') bgAudio.play();
-                else if (currentMode !== 'none') sfxAudio.play();
-                applyAudioVolumes();
+                if (currentMode === 'bg') fadeInAudio(bgAudio, bgVolume, 800);
+                else if (currentMode !== 'none') fadeInAudio(sfxAudio, gameVolume, 800);
                 btn.classList.add('play-active');
                 btn.innerText = "Пауза";
                 updateUIState();
             } else {
                 isGlobalPaused = true;
-                bgAudio.pause();
-                sfxAudio.pause();
-                applyAudioVolumes();
+                fadeOutAudio(bgAudio, 800);
+                fadeOutAudio(sfxAudio, 800);
                 btn.classList.remove('play-active');
                 btn.innerText = "Пуск";
                 clearActiveHighlights();
@@ -856,8 +820,8 @@
         }
 
         function clearActiveHighlights() {
-            document.getElementById('btn-bg').classList.remove('active');
-            document.getElementById('btn-game').classList.remove('active');
+            document.getElementById('wrap-bg').classList.remove('active');
+            document.getElementById('wrap-game').classList.remove('active');
             document.getElementById('btn-hb').classList.remove('active');
             document.getElementById('btn-bubbles').classList.remove('active');
             document.getElementById('btn-fm1').classList.remove('active');
@@ -866,8 +830,8 @@
 
         function updateUIState() {
             clearActiveHighlights();
-            if (currentMode === 'bg') document.getElementById('btn-bg').classList.add('active');
-            else if (currentMode === 'game') document.getElementById('btn-game').classList.add('active');
+            if (currentMode === 'bg') document.getElementById('wrap-bg').classList.add('active');
+            else if (currentMode === 'game') document.getElementById('wrap-game').classList.add('active');
             else if (currentMode === 'hb' || currentMode === 'hb_bg') document.getElementById('btn-hb').classList.add('active');
             else if (currentMode === 'bubbles') document.getElementById('btn-bubbles').classList.add('active');
             else if (currentMode === 'flashmob1') document.getElementById('btn-fm1').classList.add('active');
