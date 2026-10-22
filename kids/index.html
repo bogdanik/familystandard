@@ -37,7 +37,6 @@
             position: relative;
         }
 
-        /* ПОЛНОЭКРАННЫЙ ХОЛСТ */
         #eq-canvas {
             position: fixed;
             inset: 0;
@@ -60,7 +59,6 @@
             gap: 6px;
         }
 
-        /* 1. ВЕРХНИЙ БЛОК */
         .top-section {
             display: flex;
             flex-direction: column;
@@ -89,31 +87,31 @@
         .mode-triggers-row {
             display: flex;
             width: 100%;
-            gap: 10px;
+            gap: 12px;
         }
+
         .btn-mode-trigger {
             flex: 1;
-            height: 48px;
-            border-radius: 14px;
+            height: 64px;
+            border-radius: 18px;
             border: 1px solid var(--glass-border);
-            background: rgba(15, 23, 42, 0.8);
+            background: rgba(15, 23, 42, 0.82);
             color: #fff;
-            font-size: 1rem;
+            font-size: 1.3rem;
             font-weight: 900;
             cursor: pointer;
             backdrop-filter: blur(12px);
             transition: all 0.15s ease;
             text-transform: uppercase;
-            letter-spacing: 1.5px;
-            box-shadow: 0 4px 18px rgba(0,0,0,0.4);
+            letter-spacing: 2px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.45);
         }
         .btn-mode-trigger:active { transform: scale(0.96); }
-        .btn-mode-trigger.bg-mode { border-color: var(--gold-main); color: #fef08a; background: rgba(245, 158, 11, 0.25); }
-        .btn-mode-trigger.bg-mode.active { background: var(--gold-main); color: #000; box-shadow: 0 0 25px var(--gold-glow); }
-        .btn-mode-trigger.game-mode { border-color: var(--cyan-accent); color: #cffafe; background: rgba(6, 182, 212, 0.25); }
-        .btn-mode-trigger.game-mode.active { background: var(--cyan-accent); color: #000; box-shadow: 0 0 25px var(--cyan-accent); }
+        .btn-mode-trigger.bg-mode { border-color: var(--gold-main); color: #fef08a; background: rgba(245, 158, 11, 0.28); }
+        .btn-mode-trigger.bg-mode.active { background: var(--gold-main); color: #000; box-shadow: 0 0 28px var(--gold-glow); }
+        .btn-mode-trigger.game-mode { border-color: var(--cyan-accent); color: #cffafe; background: rgba(6, 182, 212, 0.28); }
+        .btn-mode-trigger.game-mode.active { background: var(--cyan-accent); color: #000; box-shadow: 0 0 28px var(--cyan-accent); }
 
-        /* 2. ЦЕНТРАЛЬНЫЙ АНКОР: СТАРТ ПРОГРАММЫ С ОГРОМНЫМ ТАЙМЕРОМ */
         .center-anchor {
             display: flex;
             flex-direction: column;
@@ -158,7 +156,7 @@
         }
         .countdown-timer {
             font-family: 'Cinzel', monospace;
-            font-size: 5.2rem; /* УВЕЛИЧЕНО В 3 РАЗА */
+            font-size: 5.2rem;
             font-weight: 900;
             color: #ffffff;
             text-shadow: 0 0 25px var(--gold-glow);
@@ -172,7 +170,6 @@
         }
         @keyframes timerPulse { 0% { transform: scale(1); } 100% { transform: scale(1.05); } }
 
-        /* 3. НИЖНИЙ БЛОК */
         .bottom-section {
             display: flex;
             flex-direction: column;
@@ -180,7 +177,6 @@
             width: 100%;
         }
 
-        /* КНОПКИ ГРОМКОСТИ С НАДПИСЯМИ НАВЕРХУ */
         .sliders-stack {
             display: flex;
             flex-direction: column;
@@ -196,24 +192,18 @@
 
         .volume-channel-header {
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             align-items: center;
-            padding: 0 4px;
+            width: 100%;
+            text-align: center;
         }
 
         .volume-channel-label {
-            font-size: 0.78rem;
+            font-size: 0.92rem;
             font-weight: 900;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            color: #cbd5e1;
-        }
-
-        .volume-channel-val {
-            font-size: 0.8rem;
-            font-weight: 800;
-            color: var(--gold-main);
-            font-family: monospace;
+            letter-spacing: 1.2px;
+            color: #e2e8f0;
         }
 
         .preset-btn-row {
@@ -438,9 +428,9 @@
             <div>
                 <div class="duration-label" style="margin-bottom: 12px;">Сколько минут длится праздник?</div>
                 <div class="duration-row">
-                    <button class="btn-dur" onclick="confirmProgramStart(20)">20 мин</button>
-                    <button class="btn-dur active" onclick="confirmProgramStart(40)">40 мин</button>
-                    <button class="btn-dur" onclick="confirmProgramStart(60)">60 мин</button>
+                    <button class="btn-dur" id="dur-btn-20" onclick="selectDurationPreset(20)">20 мин</button>
+                    <button class="btn-dur active" id="dur-btn-40" onclick="selectDurationPreset(40)">40 мин</button>
+                    <button class="btn-dur" id="dur-btn-60" onclick="selectDurationPreset(60)">60 мин</button>
                 </div>
             </div>
             <button onclick="closeDurationModal()" style="background: transparent; color: #94a3b8; border: none; font-weight: 800; cursor: pointer;">
@@ -476,39 +466,36 @@
             
             <div class="sliders-stack">
                 
-                <!-- ГРОМКОСТЬ ФОНА -->
+                <!-- ГРОМКОСТЬ ФОНА (100%) -->
                 <div class="volume-channel-block">
                     <div class="volume-channel-header">
                         <span class="volume-channel-label">ГРОМКОСТЬ ФОНА</span>
-                        <span class="volume-channel-val" id="val-bg">30%</span>
                     </div>
                     <div class="preset-btn-row bg-vol-row">
                         <button class="btn-vol-preset" data-val="0.03" onclick="setVolumePreset('bg', 0.03)">3</button>
-                        <button class="btn-vol-preset active" data-val="0.3" onclick="setVolumePreset('bg', 0.3)">30</button>
+                        <button class="btn-vol-preset" data-val="0.3" onclick="setVolumePreset('bg', 0.3)">30</button>
                         <button class="btn-vol-preset" data-val="0.6" onclick="setVolumePreset('bg', 0.6)">60</button>
-                        <button class="btn-vol-preset" data-val="1.0" onclick="setVolumePreset('bg', 1.0)">100</button>
+                        <button class="btn-vol-preset active" data-val="1.0" onclick="setVolumePreset('bg', 1.0)">100</button>
                     </div>
                 </div>
 
-                <!-- ГРОМКОСТЬ ИГРЫ -->
+                <!-- ГРОМКОСТЬ ИГРЫ (100%) -->
                 <div class="volume-channel-block">
                     <div class="volume-channel-header">
                         <span class="volume-channel-label">ГРОМКОСТЬ ИГРЫ</span>
-                        <span class="volume-channel-val" id="val-game">30%</span>
                     </div>
                     <div class="preset-btn-row game-vol-row">
                         <button class="btn-vol-preset" data-val="0.03" onclick="setVolumePreset('game', 0.03)">3</button>
-                        <button class="btn-vol-preset active" data-val="0.3" onclick="setVolumePreset('game', 0.3)">30</button>
+                        <button class="btn-vol-preset" data-val="0.3" onclick="setVolumePreset('game', 0.3)">30</button>
                         <button class="btn-vol-preset" data-val="0.6" onclick="setVolumePreset('game', 0.6)">60</button>
-                        <button class="btn-vol-preset" data-val="1.0" onclick="setVolumePreset('game', 1.0)">100</button>
+                        <button class="btn-vol-preset active" data-val="1.0" onclick="setVolumePreset('game', 1.0)">100</button>
                     </div>
                 </div>
 
-                <!-- ПРОЧИЕ ЗВУКИ -->
+                <!-- ПРОЧИЕ ЗВУКИ (100%) -->
                 <div class="volume-channel-block">
                     <div class="volume-channel-header">
                         <span class="volume-channel-label">ПРОЧИЕ ЗВУКИ</span>
-                        <span class="volume-channel-val" id="val-other">100%</span>
                     </div>
                     <div class="preset-btn-row other-vol-row">
                         <button class="btn-vol-preset" data-val="0.03" onclick="setVolumePreset('other', 0.03)">3</button>
@@ -564,11 +551,13 @@
         const sfxAudio = document.getElementById('sfx-audio');
         const preloadAudio = document.getElementById('preload-audio');
 
-        let bgVolume = 0.30;
-        let gameVolume = 0.30;
+        let bgVolume = 1.0;
+        let gameVolume = 1.0;
         let otherVolume = 1.0;
 
         let currentMode = 'none';
+        let isPaused = false;
+        let selectedDurationMins = 40; // По умолчанию 40 минут
 
         let partyStarted = false;
         let partyRemainingSeconds = 2400;
@@ -576,8 +565,7 @@
 
         let fadeIntervals = {
             bg: null,
-            game: null,
-            other: null
+            sfx: null
         };
 
         let shuffleStore = {
@@ -595,11 +583,15 @@
             return Math.pow(parseFloat(val), 2);
         }
 
-        // ПЛАВНЫЙ ГРАДИЕНТНЫЙ ПЕРЕХОД ГРОМКОСТИ ЗА 3 СЕКУНДЫ
-        function fadeAudioTo(audioEl, targetVol, duration = 3000, channelKey) {
-            if (fadeIntervals[channelKey]) {
-                cancelAnimationFrame(fadeIntervals[channelKey]);
+        function fadeAudioChannel(channel, targetVol, duration = 2000, callback) {
+            let audioEl = (channel === 'bg') ? bgAudio : sfxAudio;
+            if (!audioEl) return;
+
+            if (fadeIntervals[channel]) {
+                cancelAnimationFrame(fadeIntervals[channel]);
+                fadeIntervals[channel] = null;
             }
+
             let startVol = audioEl.volume;
             let start = performance.now();
 
@@ -609,38 +601,66 @@
                 audioEl.volume = startVol + (targetVol - startVol) * progress;
 
                 if (progress < 1) {
-                    fadeIntervals[channelKey] = requestAnimationFrame(step);
+                    fadeIntervals[channel] = requestAnimationFrame(step);
                 } else {
-                    fadeIntervals[channelKey] = null;
+                    fadeIntervals[channel] = null;
+                    if (callback) callback();
                 }
             }
-            fadeIntervals[channelKey] = requestAnimationFrame(step);
+            fadeIntervals[channel] = requestAnimationFrame(step);
+        }
+
+        function fadeInChannel(channel, targetVol, duration = 2000) {
+            let audioEl = (channel === 'bg') ? bgAudio : sfxAudio;
+            if (!audioEl) return;
+
+            if (fadeIntervals[channel]) {
+                cancelAnimationFrame(fadeIntervals[channel]);
+                fadeIntervals[channel] = null;
+            }
+
+            audioEl.volume = 0;
+            audioEl.play().then(() => {
+                fadeAudioChannel(channel, targetVol, duration);
+            }).catch(e => console.log("Play error:", e));
+        }
+
+        function fadeOutChannel(channel, duration = 2000, callback) {
+            let audioEl = (channel === 'bg') ? bgAudio : sfxAudio;
+            if (!audioEl) return;
+
+            if (audioEl.paused || audioEl.volume === 0) {
+                audioEl.pause();
+                if (callback) callback();
+                return;
+            }
+
+            fadeAudioChannel(channel, 0, duration, () => {
+                audioEl.pause();
+                if (callback) callback();
+            });
         }
 
         function setVolumePreset(channel, val) {
-            let percentStr = Math.round(val * 100) + '%';
             let targetPerceptual = getPerceptualVolume(val);
 
             if (channel === 'bg') {
                 bgVolume = val;
-                document.getElementById('val-bg').innerText = percentStr;
                 updatePresetBtnUI('bg-vol-row', val);
                 if (currentMode === 'bg' && !bgAudio.paused) {
-                    fadeAudioTo(bgAudio, targetPerceptual, 3000, 'bg');
+                    fadeAudioChannel('bg', targetPerceptual, 2000);
                 }
             } else if (channel === 'game') {
                 gameVolume = val;
-                document.getElementById('val-game').innerText = percentStr;
                 updatePresetBtnUI('game-vol-row', val);
                 if (currentMode === 'game' && !sfxAudio.paused) {
-                    fadeAudioTo(sfxAudio, targetPerceptual, 3000, 'game');
+                    fadeAudioChannel('sfx', targetPerceptual, 2000);
                 }
             } else if (channel === 'other') {
                 otherVolume = val;
-                document.getElementById('val-other').innerText = percentStr;
                 updatePresetBtnUI('other-vol-row', val);
                 if (currentMode !== 'bg' && currentMode !== 'game' && currentMode !== 'none' && !sfxAudio.paused) {
-                    fadeAudioTo(sfxAudio, targetPerceptual, 3000, 'other');
+                    fadeAudioChannel('sfx', targetPerceptual, 2000);
                 }
             }
         }
@@ -722,50 +742,27 @@
             }
         }
 
-        function resetOtherVolumeToFull() {
-            otherVolume = 1.0;
-            document.getElementById('val-other').innerText = '100%';
-            updatePresetBtnUI('other-vol-row', 1.0);
-        }
-
-        function fadeInAudio(audioEl, targetVol, duration = 1200) {
-            audioEl.volume = 0;
-            audioEl.play().then(() => {
-                let start = performance.now();
-                requestAnimationFrame(function step(now) {
-                    let progress = Math.min((now - start) / duration, 1);
-                    audioEl.volume = targetVol * progress;
-                    if (progress < 1) requestAnimationFrame(step);
-                });
-            }).catch(e => console.log("Play error:", e));
-        }
-
-        function fadeOutAudio(audioEl, duration = 800, callback) {
-            let startVol = audioEl.volume;
-            if (startVol === 0 || audioEl.paused) {
-                audioEl.pause();
-                if (callback) callback();
-                return;
-            }
-            let start = performance.now();
-            requestAnimationFrame(function step(now) {
-                let progress = Math.min((now - start) / duration, 1);
-                audioEl.volume = startVol * (1 - progress);
-                if (progress < 1) {
-                    requestAnimationFrame(step);
-                } else {
-                    audioEl.pause();
-                    audioEl.volume = startVol;
-                    if (callback) callback();
-                }
+        function preloadEntranceTracks() {
+            if (!config || !config.entrance_tracks) return;
+            config.entrance_tracks.forEach(track => {
+                const preloader = new Audio();
+                preloader.src = config.cdn_base_url + track;
+                preloader.preload = 'auto';
+                preloader.load();
             });
         }
 
+        function resetOtherVolumeToFull() {
+            otherVolume = 1.0;
+            updatePresetBtnUI('other-vol-row', 1.0);
+        }
+
+        // МОМЕНТАЛЬНЫЙ ЗАПУСК ФОНА БЕЗ ЗАВИСШЕЙ ПЛАШКИ
         function initAudioAndPlayBg() {
             document.getElementById('init-overlay').style.display = 'none';
             initParticles();
-            triggerMode('bg');
             drawEq();
+            triggerMode('bg');
         }
 
         function openDurationModal() {
@@ -776,9 +773,18 @@
             document.getElementById('duration-modal').style.display = 'none';
         }
 
-        function confirmProgramStart(mins) {
+        function selectDurationPreset(mins) {
+            selectedDurationMins = mins;
+            document.querySelectorAll('.btn-dur').forEach(b => b.classList.remove('active'));
+            document.getElementById(`dur-btn-${mins}`).classList.add('active');
+
+            // Запускаем отсчёт и сразу включем фанфары (entrance) прямо в пользовательском клике
+            confirmProgramStart();
+        }
+
+        function confirmProgramStart() {
             partyStarted = true;
-            partyRemainingSeconds = mins * 60;
+            partyRemainingSeconds = selectedDurationMins * 60;
             updateTimerDisplay();
 
             document.getElementById('btn-start-prog').style.display = 'none';
@@ -798,7 +804,10 @@
             }, 1000);
 
             document.getElementById('duration-modal').style.display = 'none';
-            triggerMode('entrance');
+
+            // ГАРАНТИРОВАННЫЙ ЗАПУСК ФАНФАР ПРИ СТАРТЕ ПРОГРАММЫ
+            currentMode = 'entrance';
+            playModeTrack('entrance');
         }
 
         function updateTimerDisplay() {
@@ -820,6 +829,10 @@
 
         socket.on('config_data', (data) => {
             config = data;
+            preloadEntranceTracks();
+            if (config.bg_tracks && config.bg_tracks.length > 0) {
+                document.getElementById('track-name').innerText = config.bg_tracks[0];
+            }
         });
 
         function getPlaylist(mode) {
@@ -853,13 +866,14 @@
 
             document.getElementById('track-name').innerText = filename;
             preloadNextTrack(mode);
+            isPaused = false;
 
             if (mode === 'bg') {
-                fadeOutAudio(sfxAudio, 600);
+                fadeOutChannel('sfx', 2000);
                 bgAudio.src = fullUrl;
-                fadeInAudio(bgAudio, getPerceptualVolume(bgVolume), 1200);
+                fadeInChannel('bg', getPerceptualVolume(bgVolume), 2000);
             } else {
-                fadeOutAudio(bgAudio, 600);
+                fadeOutChannel('bg', 2000);
 
                 if (mode !== 'game') {
                     resetOtherVolumeToFull();
@@ -881,7 +895,7 @@
                             console.log("Seek error:", e);
                         }
                     }
-                    fadeInAudio(sfxAudio, targetVol, 1200);
+                    fadeInChannel('sfx', targetVol, 2000);
                 };
 
                 sfxAudio.load();
@@ -905,10 +919,11 @@
             const fullUrl = config.cdn_base_url + filename;
 
             document.getElementById('track-name').innerText = filename;
+            isPaused = false;
 
             if (currentMode === 'bg') {
                 bgAudio.src = fullUrl;
-                fadeInAudio(bgAudio, getPerceptualVolume(bgVolume), 800);
+                fadeInChannel('bg', getPerceptualVolume(bgVolume), 2000);
             } else {
                 if (currentMode !== 'game') resetOtherVolumeToFull();
 
@@ -921,7 +936,7 @@
                     if (currentMode === 'game' && sfxAudio.duration > 15) {
                         try { sfxAudio.currentTime = 15; } catch(e){}
                     }
-                    fadeInAudio(sfxAudio, targetVol, 800);
+                    fadeInChannel('sfx', targetVol, 2000);
                 };
                 sfxAudio.load();
             }
@@ -929,8 +944,8 @@
         }
 
         function triggerMode(mode) {
-            if (currentMode === mode && (!bgAudio.paused || !sfxAudio.paused)) {
-                stopAllSounds();
+            if (currentMode === mode) {
+                togglePlayStop();
                 return;
             }
 
@@ -938,21 +953,39 @@
             playModeTrack(mode);
         }
 
-        function togglePlayStop() {
-            if (!bgAudio.paused || !sfxAudio.paused) {
-                stopAllSounds();
-            } else {
-                triggerMode(currentMode === 'none' ? 'bg' : currentMode);
-            }
+        function getActiveAudio() {
+            if (currentMode === 'bg') return bgAudio;
+            if (currentMode !== 'none') return sfxAudio;
+            return null;
         }
 
-        function stopAllSounds() {
-            fadeOutAudio(bgAudio, 800);
-            fadeOutAudio(sfxAudio, 800);
-            currentMode = 'none';
-            document.getElementById('stop-icon').innerText = '▶';
-            document.getElementById('btn-track-time').innerText = '00:00 / 00:00';
-            clearActiveHighlights();
+        function getTargetVolumeForMode(mode) {
+            if (mode === 'bg') return getPerceptualVolume(bgVolume);
+            if (mode === 'game') return getPerceptualVolume(gameVolume);
+            return getPerceptualVolume(otherVolume);
+        }
+
+        function togglePlayStop() {
+            let activeAudio = getActiveAudio();
+            let channel = (currentMode === 'bg') ? 'bg' : 'sfx';
+
+            if (!activeAudio || !activeAudio.src) {
+                currentMode = 'bg';
+                playModeTrack('bg');
+                return;
+            }
+
+            if (!activeAudio.paused) {
+                fadeOutChannel(channel, 2000, () => {
+                    isPaused = true;
+                    document.getElementById('stop-icon').innerText = '▶';
+                });
+            } else {
+                let targetVol = getTargetVolumeForMode(currentMode);
+                isPaused = false;
+                document.getElementById('stop-icon').innerText = '⏹';
+                fadeInChannel(channel, targetVol, 2000);
+            }
         }
 
         bgAudio.onended = () => {
@@ -975,7 +1008,7 @@
             if (currentMode === 'bg') {
                 const cur = formatTime(bgAudio.currentTime);
                 const dur = formatTime(bgAudio.duration);
-                document.getElementById('stop-icon').innerText = '⏹';
+                document.getElementById('stop-icon').innerText = bgAudio.paused ? '▶' : '⏹';
                 document.getElementById('btn-track-time').innerText = `${cur} / ${dur}`;
             }
         };
@@ -984,7 +1017,7 @@
             if (currentMode !== 'bg' && currentMode !== 'none') {
                 const cur = formatTime(sfxAudio.currentTime);
                 const dur = formatTime(sfxAudio.duration);
-                document.getElementById('stop-icon').innerText = '⏹';
+                document.getElementById('stop-icon').innerText = sfxAudio.paused ? '▶' : '⏹';
                 document.getElementById('btn-track-time').innerText = `${cur} / ${dur}`;
             }
         };
@@ -1022,7 +1055,7 @@
             }
         }
 
-        /* --- СИМУЛЯЦИЯ ПОЛНОЭКРАННОГО ЭКВАЛАЙЗЕРА И ЧАСТИЦ (БЕЗ CORS) --- */
+        /* --- СИМУЛЯЦИЯ ПОЛНОЭКРАННОГО ЭКВАЛАЙЗЕРА И ЧАСТИЦ --- */
         const eqCanvas = document.getElementById('eq-canvas');
         const eqCtx = eqCanvas.getContext('2d');
         const halfBars = 32;
