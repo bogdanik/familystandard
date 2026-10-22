@@ -16,7 +16,7 @@
             --glass-card: rgba(15, 23, 42, 0.82);
             --glass-border: rgba(255, 255, 255, 0.15);
             --gold-main: #f59e0b;
-            --gold-glow: rgba(245, 158, 11, 0.5);
+            --gold-glow: rgba(245, 158, 11, 0.55);
             --green-active: #10b981;
             --red-accent: #ef4444;
             --red-glow: rgba(239, 68, 68, 0.55);
@@ -56,8 +56,8 @@
             height: 100dvh;
             max-width: 480px;
             margin: 0 auto;
-            padding: 12px 14px;
-            gap: 8px;
+            padding: 10px 14px;
+            gap: 6px;
         }
 
         /* 1. ВЕРХНИЙ БЛОК */
@@ -65,13 +65,13 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
             width: 100%;
         }
 
         .shimmer-title {
             font-family: 'Cinzel', serif;
-            font-size: 1.9rem;
+            font-size: 1.85rem;
             font-weight: 900;
             background: linear-gradient(90deg, #ffffff 0%, #fffbeb 20%, #f59e0b 50%, #e5e7eb 80%, #ffffff 100%);
             background-size: 200% auto;
@@ -89,16 +89,16 @@
         .mode-triggers-row {
             display: flex;
             width: 100%;
-            gap: 12px;
+            gap: 10px;
         }
         .btn-mode-trigger {
             flex: 1;
-            height: 52px;
-            border-radius: 16px;
+            height: 48px;
+            border-radius: 14px;
             border: 1px solid var(--glass-border);
             background: rgba(15, 23, 42, 0.8);
             color: #fff;
-            font-size: 1.05rem;
+            font-size: 1rem;
             font-weight: 900;
             cursor: pointer;
             backdrop-filter: blur(12px);
@@ -113,7 +113,7 @@
         .btn-mode-trigger.game-mode { border-color: var(--cyan-accent); color: #cffafe; background: rgba(6, 182, 212, 0.25); }
         .btn-mode-trigger.game-mode.active { background: var(--cyan-accent); color: #000; box-shadow: 0 0 25px var(--cyan-accent); }
 
-        /* 2. ЦЕНТРАЛЬНЫЙ АНКОР: СТАРТ ПРОГРАММЫ */
+        /* 2. ЦЕНТРАЛЬНЫЙ АНКОР: СТАРТ ПРОГРАММЫ С ОГРОМНЫМ ТАЙМЕРОМ */
         .center-anchor {
             display: flex;
             flex-direction: column;
@@ -147,26 +147,27 @@
         .timer-box-slot {
             display: none;
             width: 100%;
-            height: 56px;
-            border-radius: 18px;
+            height: 95px;
+            border-radius: 22px;
             border: 2px solid var(--gold-main);
-            background: rgba(3, 7, 18, 0.9);
+            background: rgba(3, 7, 18, 0.92);
             align-items: center;
             justify-content: center;
-            box-shadow: 0 0 30px var(--gold-glow);
+            box-shadow: 0 0 35px var(--gold-glow);
             backdrop-filter: blur(12px);
         }
         .countdown-timer {
             font-family: 'Cinzel', monospace;
-            font-size: 2.2rem;
+            font-size: 5.2rem; /* УВЕЛИЧЕНО В 3 РАЗА */
             font-weight: 900;
             color: #ffffff;
-            text-shadow: 0 0 20px var(--gold-glow);
+            text-shadow: 0 0 25px var(--gold-glow);
             letter-spacing: 2px;
+            line-height: 1;
         }
         .countdown-timer.ending-warning {
             color: #ef4444;
-            text-shadow: 0 0 25px var(--red-glow);
+            text-shadow: 0 0 30px var(--red-glow);
             animation: timerPulse 1s infinite alternate;
         }
         @keyframes timerPulse { 0% { transform: scale(1); } 100% { transform: scale(1.05); } }
@@ -175,91 +176,101 @@
         .bottom-section {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
             width: 100%;
         }
 
+        /* КНОПКИ ГРОМКОСТИ С НАДПИСЯМИ НАВЕРХУ */
         .sliders-stack {
             display: flex;
             flex-direction: column;
-            gap: 7px;
+            gap: 8px;
         }
 
-        .slider-full-wrapper {
-            position: relative;
-            width: 100%;
-            height: 44px;
-            border-radius: 14px;
-            border: 1px solid var(--glass-border);
-            overflow: hidden;
+        .volume-channel-block {
             display: flex;
-            align-items: center;
+            flex-direction: column;
+            gap: 4px;
+            width: 100%;
+        }
+
+        .volume-channel-header {
+            display: flex;
             justify-content: space-between;
-            padding: 0 16px;
-            background: rgba(15, 23, 42, 0.78);
-            backdrop-filter: blur(12px);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.25);
+            align-items: center;
+            padding: 0 4px;
         }
 
-        .slider-fill-bar {
-            position: absolute;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: 30%;
-            pointer-events: none;
-            transition: width 0.05s linear;
-        }
-
-        .bg-fill { background: rgba(245, 158, 11, 0.35); }
-        .game-fill { background: rgba(6, 182, 212, 0.35); }
-        .other-fill { background: rgba(168, 85, 247, 0.35); }
-
-        .slider-full-wrapper.active .bg-fill { background: rgba(245, 158, 11, 0.75); }
-        .slider-full-wrapper.active .game-fill { background: rgba(6, 182, 212, 0.75); }
-        .slider-full-wrapper.active .other-fill { background: rgba(168, 85, 247, 0.75); }
-
-        .slider-text-label {
-            position: relative;
-            z-index: 2;
-            font-size: 0.85rem;
+        .volume-channel-label {
+            font-size: 0.78rem;
             font-weight: 900;
             text-transform: uppercase;
             letter-spacing: 1px;
-            pointer-events: none;
-            color: #fff;
+            color: #cbd5e1;
         }
 
-        .slider-percent-val {
-            position: relative;
-            z-index: 2;
-            font-size: 0.82rem;
+        .volume-channel-val {
+            font-size: 0.8rem;
             font-weight: 800;
             color: var(--gold-main);
             font-family: monospace;
-            pointer-events: none;
         }
 
-        .slider-native-input {
-            position: absolute;
-            inset: 0;
+        .preset-btn-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 6px;
             width: 100%;
-            height: 100%;
-            opacity: 0;
+        }
+
+        .btn-vol-preset {
+            height: 38px;
+            border-radius: 12px;
+            border: 1px solid var(--glass-border);
+            background: rgba(15, 23, 42, 0.75);
+            color: #f1f5f9;
+            font-size: 0.95rem;
+            font-weight: 900;
             cursor: pointer;
-            z-index: 3;
-            -webkit-appearance: none;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(8px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+        }
+        .btn-vol-preset:active { transform: scale(0.95); }
+
+        .bg-vol-row .btn-vol-preset.active {
+            background: var(--gold-main);
+            color: #000;
+            border-color: var(--gold-main);
+            box-shadow: 0 0 15px var(--gold-glow);
+        }
+
+        .game-vol-row .btn-vol-preset.active {
+            background: var(--cyan-accent);
+            color: #000;
+            border-color: var(--cyan-accent);
+            box-shadow: 0 0 15px var(--cyan-accent);
+        }
+
+        .other-vol-row .btn-vol-preset.active {
+            background: var(--purple-accent);
+            color: #fff;
+            border-color: var(--purple-accent);
+            box-shadow: 0 0 15px var(--purple-accent);
         }
 
         .control-row-3 {
             display: grid;
             grid-template-columns: 0.75fr 1.6fr 0.75fr;
-            gap: 10px;
+            gap: 8px;
         }
 
         .btn-ctrl {
-            height: 52px;
-            border-radius: 16px;
+            height: 48px;
+            border-radius: 14px;
             border: 1px solid var(--glass-border);
             background: rgba(30, 41, 59, 0.85);
             color: #fff;
@@ -295,8 +306,8 @@
         }
 
         .btn-spec {
-            height: 46px;
-            border-radius: 14px;
+            height: 44px;
+            border-radius: 12px;
             border: 1px solid var(--glass-border);
             background: rgba(15, 23, 42, 0.8);
             color: #fff;
@@ -334,8 +345,8 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 3px;
-            padding-top: 2px;
+            gap: 2px;
+            padding-top: 1px;
         }
 
         .track-name-display {
@@ -464,29 +475,49 @@
         <div class="bottom-section">
             
             <div class="sliders-stack">
-                <div class="slider-full-wrapper" id="wrap-bg">
-                    <div class="slider-fill-bar bg-fill" id="fill-bg" style="width: 30%;"></div>
-                    <span class="slider-text-label">ГРОМКОСТЬ ФОНА</span>
-                    <span class="slider-percent-val" id="val-bg">30%</span>
-                    <input type="range" class="slider-native-input" id="range-bg" min="0" max="1" step="0.01" value="0.3" 
-                           oninput="handleSliderInput('bg', this.value)">
+                
+                <!-- ГРОМКОСТЬ ФОНА -->
+                <div class="volume-channel-block">
+                    <div class="volume-channel-header">
+                        <span class="volume-channel-label">ГРОМКОСТЬ ФОНА</span>
+                        <span class="volume-channel-val" id="val-bg">30%</span>
+                    </div>
+                    <div class="preset-btn-row bg-vol-row">
+                        <button class="btn-vol-preset" data-val="0.03" onclick="setVolumePreset('bg', 0.03)">3</button>
+                        <button class="btn-vol-preset active" data-val="0.3" onclick="setVolumePreset('bg', 0.3)">30</button>
+                        <button class="btn-vol-preset" data-val="0.6" onclick="setVolumePreset('bg', 0.6)">60</button>
+                        <button class="btn-vol-preset" data-val="1.0" onclick="setVolumePreset('bg', 1.0)">100</button>
+                    </div>
                 </div>
 
-                <div class="slider-full-wrapper" id="wrap-game">
-                    <div class="slider-fill-bar game-fill" id="fill-game" style="width: 30%;"></div>
-                    <span class="slider-text-label">ГРОМКОСТЬ ИГРЫ</span>
-                    <span class="slider-percent-val" id="val-game">30%</span>
-                    <input type="range" class="slider-native-input" id="range-game" min="0" max="1" step="0.01" value="0.3" 
-                           oninput="handleSliderInput('game', this.value)">
+                <!-- ГРОМКОСТЬ ИГРЫ -->
+                <div class="volume-channel-block">
+                    <div class="volume-channel-header">
+                        <span class="volume-channel-label">ГРОМКОСТЬ ИГРЫ</span>
+                        <span class="volume-channel-val" id="val-game">30%</span>
+                    </div>
+                    <div class="preset-btn-row game-vol-row">
+                        <button class="btn-vol-preset" data-val="0.03" onclick="setVolumePreset('game', 0.03)">3</button>
+                        <button class="btn-vol-preset active" data-val="0.3" onclick="setVolumePreset('game', 0.3)">30</button>
+                        <button class="btn-vol-preset" data-val="0.6" onclick="setVolumePreset('game', 0.6)">60</button>
+                        <button class="btn-vol-preset" data-val="1.0" onclick="setVolumePreset('game', 1.0)">100</button>
+                    </div>
                 </div>
 
-                <div class="slider-full-wrapper" id="wrap-other">
-                    <div class="slider-fill-bar other-fill" id="fill-other" style="width: 100%;"></div>
-                    <span class="slider-text-label">ПРОЧИЕ ЗВУКИ</span>
-                    <span class="slider-percent-val" id="val-other">100%</span>
-                    <input type="range" class="slider-native-input" id="range-other" min="0" max="1" step="0.01" value="1.0" 
-                           oninput="handleSliderInput('other', this.value)">
+                <!-- ПРОЧИЕ ЗВУКИ -->
+                <div class="volume-channel-block">
+                    <div class="volume-channel-header">
+                        <span class="volume-channel-label">ПРОЧИЕ ЗВУКИ</span>
+                        <span class="volume-channel-val" id="val-other">100%</span>
+                    </div>
+                    <div class="preset-btn-row other-vol-row">
+                        <button class="btn-vol-preset" data-val="0.03" onclick="setVolumePreset('other', 0.03)">3</button>
+                        <button class="btn-vol-preset" data-val="0.3" onclick="setVolumePreset('other', 0.3)">30</button>
+                        <button class="btn-vol-preset" data-val="0.6" onclick="setVolumePreset('other', 0.6)">60</button>
+                        <button class="btn-vol-preset active" data-val="1.0" onclick="setVolumePreset('other', 1.0)">100</button>
+                    </div>
                 </div>
+
             </div>
 
             <div class="control-row-3">
@@ -521,7 +552,6 @@
 
     </div>
 
-    <!-- ТЕГИ AUDIO БЕЗ CROSSORIGIN ДЛЯ ПОЛНОЙ ОБХОДА CORS -->
     <audio id="bg-audio"></audio>
     <audio id="sfx-audio"></audio>
     <audio id="preload-audio" preload="auto" style="display:none;"></audio>
@@ -544,6 +574,12 @@
         let partyRemainingSeconds = 2400;
         let partyTimerInterval = null;
 
+        let fadeIntervals = {
+            bg: null,
+            game: null,
+            other: null
+        };
+
         let shuffleStore = {
             bg: { queue: [], history: [] },
             game: { queue: [], history: [] },
@@ -557,6 +593,69 @@
 
         function getPerceptualVolume(val) {
             return Math.pow(parseFloat(val), 2);
+        }
+
+        // ПЛАВНЫЙ ГРАДИЕНТНЫЙ ПЕРЕХОД ГРОМКОСТИ ЗА 3 СЕКУНДЫ
+        function fadeAudioTo(audioEl, targetVol, duration = 3000, channelKey) {
+            if (fadeIntervals[channelKey]) {
+                cancelAnimationFrame(fadeIntervals[channelKey]);
+            }
+            let startVol = audioEl.volume;
+            let start = performance.now();
+
+            function step(now) {
+                let elapsed = now - start;
+                let progress = Math.min(elapsed / duration, 1);
+                audioEl.volume = startVol + (targetVol - startVol) * progress;
+
+                if (progress < 1) {
+                    fadeIntervals[channelKey] = requestAnimationFrame(step);
+                } else {
+                    fadeIntervals[channelKey] = null;
+                }
+            }
+            fadeIntervals[channelKey] = requestAnimationFrame(step);
+        }
+
+        function setVolumePreset(channel, val) {
+            let percentStr = Math.round(val * 100) + '%';
+            let targetPerceptual = getPerceptualVolume(val);
+
+            if (channel === 'bg') {
+                bgVolume = val;
+                document.getElementById('val-bg').innerText = percentStr;
+                updatePresetBtnUI('bg-vol-row', val);
+                if (currentMode === 'bg' && !bgAudio.paused) {
+                    fadeAudioTo(bgAudio, targetPerceptual, 3000, 'bg');
+                }
+            } else if (channel === 'game') {
+                gameVolume = val;
+                document.getElementById('val-game').innerText = percentStr;
+                updatePresetBtnUI('game-vol-row', val);
+                if (currentMode === 'game' && !sfxAudio.paused) {
+                    fadeAudioTo(sfxAudio, targetPerceptual, 3000, 'game');
+                }
+            } else if (channel === 'other') {
+                otherVolume = val;
+                document.getElementById('val-other').innerText = percentStr;
+                updatePresetBtnUI('other-vol-row', val);
+                if (currentMode !== 'bg' && currentMode !== 'game' && currentMode !== 'none' && !sfxAudio.paused) {
+                    fadeAudioTo(sfxAudio, targetPerceptual, 3000, 'other');
+                }
+            }
+        }
+
+        function updatePresetBtnUI(rowClass, val) {
+            const row = document.querySelector('.' + rowClass);
+            if (!row) return;
+            const btns = row.querySelectorAll('.btn-vol-preset');
+            btns.forEach(btn => {
+                if (parseFloat(btn.dataset.val) === val) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
         }
 
         function shuffleArray(arr) {
@@ -625,37 +724,8 @@
 
         function resetOtherVolumeToFull() {
             otherVolume = 1.0;
-            document.getElementById('range-other').value = 1.0;
-            document.getElementById('fill-other').style.width = '100%';
             document.getElementById('val-other').innerText = '100%';
-        }
-
-        function handleSliderInput(mode, val) {
-            let percentVal = Math.round(val * 100);
-            let percentStr = percentVal + '%';
-
-            if (mode === 'bg') {
-                bgVolume = parseFloat(val);
-                document.getElementById('fill-bg').style.width = percentStr;
-                document.getElementById('val-bg').innerText = percentStr;
-                if (currentMode === 'bg' && !bgAudio.paused) {
-                    bgAudio.volume = getPerceptualVolume(bgVolume);
-                }
-            } else if (mode === 'game') {
-                gameVolume = parseFloat(val);
-                document.getElementById('fill-game').style.width = percentStr;
-                document.getElementById('val-game').innerText = percentStr;
-                if (currentMode === 'game' && !sfxAudio.paused) {
-                    sfxAudio.volume = getPerceptualVolume(gameVolume);
-                }
-            } else if (mode === 'other') {
-                otherVolume = parseFloat(val);
-                document.getElementById('fill-other').style.width = percentStr;
-                document.getElementById('val-other').innerText = percentStr;
-                if (currentMode !== 'bg' && currentMode !== 'game' && currentMode !== 'none' && !sfxAudio.paused) {
-                    sfxAudio.volume = getPerceptualVolume(otherVolume);
-                }
-            }
+            updatePresetBtnUI('other-vol-row', 1.0);
         }
 
         function fadeInAudio(audioEl, targetVol, duration = 1200) {
@@ -929,9 +999,6 @@
         function clearActiveHighlights() {
             document.getElementById('btn-eq-bg').classList.remove('active');
             document.getElementById('btn-eq-game').classList.remove('active');
-            document.getElementById('wrap-bg').classList.remove('active');
-            document.getElementById('wrap-game').classList.remove('active');
-            document.getElementById('wrap-other').classList.remove('active');
             document.getElementById('btn-hb').classList.remove('active');
             document.getElementById('btn-bubbles').classList.remove('active');
             document.getElementById('btn-fm1').classList.remove('active');
@@ -942,24 +1009,16 @@
             clearActiveHighlights();
             if (currentMode === 'bg') {
                 document.getElementById('btn-eq-bg').classList.add('active');
-                document.getElementById('wrap-bg').classList.add('active');
             } else if (currentMode === 'game') {
                 document.getElementById('btn-eq-game').classList.add('active');
-                document.getElementById('wrap-game').classList.add('active');
             } else if (currentMode === 'hb' || currentMode === 'hb_bg') {
                 document.getElementById('btn-hb').classList.add('active');
-                document.getElementById('wrap-other').classList.add('active');
             } else if (currentMode === 'bubbles') {
                 document.getElementById('btn-bubbles').classList.add('active');
-                document.getElementById('wrap-other').classList.add('active');
             } else if (currentMode === 'flashmob1') {
                 document.getElementById('btn-fm1').classList.add('active');
-                document.getElementById('wrap-other').classList.add('active');
             } else if (currentMode === 'flashmob2') {
                 document.getElementById('btn-fm2').classList.add('active');
-                document.getElementById('wrap-other').classList.add('active');
-            } else if (currentMode === 'entrance') {
-                document.getElementById('wrap-other').classList.add('active');
             }
         }
 
