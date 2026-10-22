@@ -964,4 +964,16 @@
 
                 let barGradient = eqCtx.createLinearGradient(0, height, 0, height - h);
                 barGradient.addColorStop(0, 'rgba(3, 7, 18, 0.0)');
-                barGradient.addColorStop(0.5, 'rgba(245, 158,
+                barGradient.addColorStop(0.5, 'rgba(245, 158, 11, 0.25)');
+                barGradient.addColorStop(0.85, 'rgba(245, 158, 11, 0.7)');
+                barGradient.addColorStop(1, 'rgba(255, 255, 255, 1.0)');
+
+                eqCtx.fillStyle = barGradient;
+
+                drawRoundedBar(eqCtx, xLeft, height - h, actualBarWidth, h, 3);
+                drawRoundedBar(eqCtx, xRight, height - h, actualBarWidth, h, 3);
+            }
+        }
+    </script>
+</body>
+</html>
