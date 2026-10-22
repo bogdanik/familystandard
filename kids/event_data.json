@@ -29,11 +29,12 @@
     "bubbles1.mp3", "bubbles2.mp3", "bubbles3.mp3", "bubbles4.mp3", "bubbles5.mp3"
   ],
   "flashmob1_tracks": [
-    "fm1.mp3", "fm2.mp3", "fm3.mp3", "fm4.mp3", "fm5.mp3", "fm6.mp3", "fm7.mp3",
-    "fm8.mp3", "fm9.mp3", "fm10.mp3", "fm11.mp3", "fm12.mp3", "fm13.mp3", "fm14.mp3"
+    "fm1.mp3"
   ],
   "flashmob2_tracks": [
-    "fm_task1.mp3", "fm_task2.mp3", "fm_task3.mp3"
+    "fm_task1.mp3", "fm_task2.mp3", "fm_task3.mp3", "fm_task4.mp3", "fm_task5.mp3",
+    "fm_task6.mp3", "fm_task7.mp3", "fm_task8.mp3", "fm_task9.mp3", "fm_task10.mp3",
+    "fm_task11.mp3", "fm_task12.mp3", "fm_task13.mp3", "fm_task14.mp3"
   ],
   "ending_tracks": [
     "end1.mp3", "end2.mp3", "end3.mp3", "end4.mp3", "end5.mp3"
