@@ -3,28 +3,11 @@
   "cdn_base_url": "https://pub-372ba5f717cf4a8694558f47682d65d9.r2.dev/kids/",
   
   "bg_tracks": [
-    "fn1.mp3",
-    "fn2.mp3",
-    "fn3.mp3",
-    "fn4.mp3",
-    "fn5.mp3",
-    "fn6.mp3",
-    "fn7.mp3",
-    "fn8.mp3",
-    "fn9.mp3",
-    "fn10.mp3",
-    "fn11.mp3",
-    "fn12.mp3",
-    "fn13.mp3",
-    "fn14.mp3",
-    "fn15.mp3",
-    "fn16.mp3",
-    "fn17.mp3",
-    "fn18.mp3",
-    "fn19.mp3",
-    "fn20.mp3",
-    "fn21.mp3",
-    "fn22.mp3"
+    "fn1.mp3", "fn2.mp3", "fn3.mp3", "fn4.mp3", "fn5.mp3",
+    "fn6.mp3", "fn7.mp3", "fn8.mp3", "fn9.mp3", "fn10.mp3",
+    "fn11.mp3", "fn12.mp3", "fn13.mp3", "fn14.mp3", "fn15.mp3",
+    "fn16.mp3", "fn17.mp3", "fn18.mp3", "fn19.mp3", "fn20.mp3",
+    "fn21.mp3", "fn22.mp3"
   ],
   "game_tracks": [
     "game1.mp3",
@@ -39,8 +22,21 @@
     "hb1.mp3",
     "hb2.mp3"
   ],
+  "happy_birthday_bg_tracks": [
+    "hb_bg1.mp3",
+    "hb_bg2.mp3"
+  ],
   "bubbles_tracks": [
     "bubbles1.mp3"
+  ],
+  "flashmob1_tracks": [
+    "fm1_1.mp3",
+    "fm1_2.mp3"
+  ],
+  "flashmob2_tracks": [
+    "fm_task1.mp3",
+    "fm_task2.mp3",
+    "fm_task3.mp3"
   ],
   "ending_tracks": [
     "end1.mp3",
