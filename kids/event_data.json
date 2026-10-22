@@ -5,7 +5,26 @@
   "bg_tracks": [
     "fn1.mp3",
     "fn2.mp3",
-    "fn3.mp3"
+    "fn3.mp3",
+    "fn4.mp3",
+    "fn5.mp3",
+    "fn6.mp3",
+    "fn7.mp3",
+    "fn8.mp3",
+    "fn9.mp3",
+    "fn10.mp3",
+    "fn11.mp3",
+    "fn12.mp3",
+    "fn13.mp3",
+    "fn14.mp3",
+    "fn15.mp3",
+    "fn16.mp3",
+    "fn17.mp3",
+    "fn18.mp3",
+    "fn19.mp3",
+    "fn20.mp3",
+    "fn21.mp3",
+    "fn22.mp3"
   ],
   "game_tracks": [
     "game1.mp3",
@@ -22,9 +41,6 @@
   ],
   "bubbles_tracks": [
     "bubbles1.mp3"
-  ],
-  "balloons_tracks": [
-    "balloons1.mp3"
   ],
   "ending_tracks": [
     "end1.mp3",
