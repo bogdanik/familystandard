@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Пульт Ведущего Детских Праздников</title>
+    <link rel="icon" href="data:,">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+
+    <style>
+        :root {
+            --bg-dark: #090d16;
+            --card-bg: rgba(21, 29, 46, 0.9);
+            --border-color: rgba(255, 255, 255, 0.12);
+            --gold-main: #f59e0b;
+            --gold-glow: rgba(245, 158, 11, 0.4);
+            --green-active: #10b981;
+            --red-accent: #ef4444;
+            --blue-accent: #3b82f6;
+            --purple-accent: #8b5cf6;
+            --font-main: 'Plus Jakarta Sans', -apple-system, sans-serif;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: var(--font-main); user-select: none; }
+        body { background: var(--bg-dark); color: #f8fafc; min-height: 100vh; padding: 16px; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; }
+
+        .container { width: 100%; max-width: 600px; display: flex; flex-direction: column; gap: 16px; margin: 0 auto; }
+
+        /* ШАПКА */
+        .header { text-align: center; padding: 12px 0; }
+        .header h1 { font-size: 1.8rem; font-weight: 900; color: #fff; text-transform: uppercase; letter-spacing: 1px; }
+        .header p { font-size: 0.9rem; color: #94a3b8; font-weight: 600; }
+
+        /* БЛОК ФОНОВОЙ МУЗЫКИ */
+        .card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 20px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); backdrop-filter: blur(10px); }
+        .card-title { font-size: 1rem; font-weight: 800; color: #94a3b8; text-transform: uppercase; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+        .now-playing-tag { font-size: 0.8rem; color: var(--gold-main); background: rgba(245, 158, 11, 0.15); padding: 4px 10px; border-radius: 20px; font-weight: 700; }
+
+        /* ГРОМКОСТЬ */
+        .vol-row { display: flex; gap: 8px; margin-bottom: 16px; }
+        .btn-vol { flex: 1; height: 44px; border-radius: 12px; border: 1px solid var(--border-color); background: rgba(30, 41, 59, 0.8); color: #fff; font-size: 0.95rem; font-weight: 800; cursor: pointer; transition: all 0.2s; }
+        .btn-vol.active { background: var(--gold-main); color: #000; border-color: var(--gold-main); box-shadow: 0 0 15px var(--gold-glow); }
+
+        .track-info { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; background: rgba(0,0,0,0.3); padding: 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); }
+        .track-name { font-size: 1rem; font-weight: 800; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .track-time { font-size: 0.8rem; color: #64748b; font-weight: 700; font-family: monospace; }
+
+        /* УПРАВЛЕНИЕ ФОНОМ */
+        .controls-row { display: flex; gap: 10px; }
+        .btn-control { flex: 1; height: 50px; border-radius: 14px; border: 1px solid var(--border-color); background: rgba(30, 41, 59, 0.9); color: #fff; font-size: 1.1rem; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s; }
+        .btn-control:active { transform: scale(0.97); }
+        .btn-control.playing { background: rgba(16, 185, 129, 0.2); border-color: var(--green-active); color: #34d399; }
+
+        /* КНОПКА "ИГРА" */
+        .btn-game-master { width: 100%; height: 75px; border-radius: 20px; border: 2px solid var(--gold-main); background: linear-gradient(135deg, rgba(245, 158, 11, 0.3) 0%, rgba(245, 158, 11, 0.05) 100%); color: #fff; font-size: 1.5rem; font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 12px; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 0 25px var(--gold-glow); transition: all 0.2s; }
+        .btn-game-master.active { background: var(--gold-main); color: #000; box-shadow: 0 0 40px var(--gold-main); }
+        .btn-game-master:active { transform: scale(0.98); }
+
+        /* СПЕЦ-КНОПКИ */
+        .special-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .btn-special { height: 60px; border-radius: 16px; border: 1px solid var(--border-color); background: rgba(30, 41, 59, 0.8); color: #fff; font-size: 1rem; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s; }
+        .btn-special:active { transform: scale(0.97); }
+        .btn-special.hb { border-color: #f472b6; background: rgba(244, 114, 182, 0.15); color: #fbcfe8; }
+        .btn-special.hb.active { background: #f472b6; color: #000; box-shadow: 0 0 20px rgba(244, 114, 182, 0.5); }
+
+        .btn-special.entrance { border-color: var(--blue-accent); background: rgba(59, 130, 246, 0.15); color: #bfdbfe; }
+        .btn-special.entrance.active { background: var(--blue-accent); color: #fff; box-shadow: 0 0 20px rgba(59, 130, 246, 0.5); }
+
+        .btn-special.ending { border-color: var(--purple-accent); background: rgba(139, 92, 246, 0.15); color: #ddd6fe; grid-column: span 2; }
+        .btn-special.ending.active { background: var(--purple-accent); color: #fff; box-shadow: 0 0 20px rgba(139, 92, 246, 0.5); }
+
+        .btn-stop-all { width: 100%; height: 50px; border-radius: 14px; border: 1px solid var(--red-accent); background: rgba(239, 68, 68, 0.15); color: #fca5a5; font-size: 1rem; font-weight: 800; cursor: pointer; transition: all 0.2s; }
+        .btn-stop-all:active { transform: scale(0.98); background: var(--red-accent); color: #fff; }
+
+        /* ЭКВАЛАЙЗЕР */
+        #eq-canvas { width: 100%; height: 60px; border-radius: 12px; background: rgba(0,0,0,0.4); margin-top: 8px; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <div class="header">
+            <h1 id="event-title">ДЕТСКИЙ ПРАЗДНИК</h1>
+            <p id="event-subtitle">ПУЛЬТ УПРАВЛЕНИЯ МУЗЫКОЙ</p>
+        </div>
+
+        <!-- КНОПКА СТАРТА АУДИО (ЕСЛИ БРАУЗЕР БЛОКИРУЕТ АВТОПЛЕЙ) -->
+        <button id="btn-audio-init" onclick="initAudioEngine()" class="btn-game-master" style="background: var(--green-active); border-color: var(--green-active);">
+            🔊 ВКЛЮЧИТЬ ЗВУК
+        </button>
+
+        <!-- БЛОК ФОНОВОЙ МУЗЫКИ -->
+        <div class="card" id="bg-card" style="display: none;">
+            <div class="card-title">
+                <span>Фоновая музыка</span>
+                <span class="now-playing-tag" id="mode-tag">ФОН</span>
+            </div>
+
+            <!-- ГРОМКОСТЬ -->
+            <div class="vol-row">
+                <button class="btn-vol" onclick="setVolume(0.03, this)">3%</button>
+                <button class="btn-vol" onclick="setVolume(0.10, this)">10%</button>
+                <button class="btn-vol active" onclick="setVolume(0.30, this)">30%</button>
+                <button class="btn-vol" onclick="setVolume(0.60, this)">60%</button>
+                <button class="btn-vol" onclick="setVolume(1.00, this)">100%</button>
+            </div>
+
+            <div class="track-info">
+                <div class="track-name" id="track-name">Загрузка...</div>
+                <div class="track-time" id="track-time">00:00 / 00:00</div>
+            </div>
+
+            <div class="controls-row">
+                <button class="btn-control" onclick="prevTrack()">⏮ Пред</button>
+                <button class="btn-control playing" id="btn-play-pause" onclick="togglePlayPause()">⏯ Пауза</button>
+                <button class="btn-control" onclick="nextTrack()">След ⏭</button>
+            </div>
+
+            <canvas id="eq-canvas"></canvas>
+        </div>
+
+        <!-- КНОПКА "ИГРА" -->
+        <div class="card" id="game-card" style="display: none;">
+            <button class="btn-game-master" id="btn-game" onclick="triggerMode('game')">
+                🎮 ИГРА
+            </button>
+        </div>
+
+        <!-- СПЕЦ-КНОПКИ -->
+        <div class="card" id="special-card" style="display: none;">
+            <div class="card-title">Спец-Треки</div>
+            <div class="special-grid">
+                <button class="btn-special hb" id="btn-hb" onclick="triggerMode('hb')">
+                    🎂 Happy Birthday
+                </button>
+                <button class="btn-special entrance" id="btn-entrance" onclick="triggerMode('entrance')">
+                    🚀 Выход Персонажа
+                </button>
+                <button class="btn-special ending" id="btn-ending" onclick="triggerMode('ending')">
+                    🏁 Завершение Праздника
+                </button>
+            </div>
+        </div>
+
+        <!-- СТОП -->
+        <div class="card" id="stop-card" style="display: none;">
+            <button class="btn-stop-all" onclick="stopAllAndResumeBg()">
+                ⏹ ТИШИНА / ВЕРНУТЬ ФОН
+            </button>
+        </div>
+
+    </div>
+
+    <!-- АУДИО ТЭГ ДЛЯ ПРОИГРЫВАНИЯ -->
+    <audio id="main-audio" crossorigin="anonymous"></audio>
+
+    <script>
+        const socket = io();
+        let config = null;
+
+        const mainAudio = document.getElementById('main-audio');
+        let currentVolume = 0.30;
+        let currentMode = 'bg'; // bg, game, hb, entrance, ending
+        let trackIndices = { bg: 0, game: 0, hb: 0, entrance: 0, ending: 0 };
+
+        let audioCtx = null;
+        let analyser = null;
+        let dataArray = null;
+
+        // ИНИЦИАЛИЗАЦИЯ ЗВУКА ПРИ ПЕРВОМ КЛИКЕ
+        function initAudioEngine() {
+            if (!audioCtx) {
+                const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                audioCtx = new AudioCtx();
+                analyser = audioCtx.createAnalyser();
+                analyser.fftSize = 64;
+                dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+                const source = audioCtx.createMediaElementSource(mainAudio);
+                source.connect(analyser);
+                analyser.connect(audioCtx.destination);
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+
+            document.getElementById('btn-audio-init').style.display = 'none';
+            document.getElementById('bg-card').style.display = 'block';
+            document.getElementById('game-card').style.display = 'block';
+            document.getElementById('special-card').style.display = 'block';
+            document.getElementById('stop-card').style.display = 'block';
+
+            playCurrentModeTrack();
+            drawEq();
+        }
+
+        // ПОЛУЧЕНИЕ КОНФИГУРАЦИИ
+        socket.on('config_data', (data) => {
+            config = data;
+            if (config.event_title) document.getElementById('event-title').innerText = config.event_title;
+            if (config.event_subtitle) document.getElementById('event-subtitle').innerText = config.event_subtitle;
+        });
+
+        // СПИСОК ТРЕКОВ ДЛЯ ТЕКУЩЕГО РЕЖИМА
+        function getPlaylist(mode) {
+            if (!config) return [];
+            if (mode === 'game') return config.game_tracks || [];
+            if (mode === 'hb') return config.happy_birthday_tracks || [];
+            if (mode === 'entrance') return config.entrance_tracks || [];
+            if (mode === 'ending') return config.ending_tracks || [];
+            return config.bg_tracks || [];
+        }
+
+        // ПРОИГРЫВАНИЕ ТРЕКА
+        function playCurrentModeTrack() {
+            if (!config) return;
+            const playlist = getPlaylist(currentMode);
+            if (!playlist || playlist.length === 0) return;
+
+            let idx = trackIndices[currentMode] % playlist.length;
+            const filename = playlist[idx];
+            const fullUrl = config.cdn_base_url + filename;
+
+            document.getElementById('track-name').innerText = filename;
+            updateModeUI();
+
+            if (!mainAudio.src.endsWith(filename)) {
+                mainAudio.src = fullUrl;
+                mainAudio.volume = currentVolume;
+                mainAudio.play().catch(e => console.log("Autoplay blocked:", e));
+            } else {
+                if (mainAudio.paused) mainAudio.play();
+            }
+        }
+
+        // АВТО-ПЕРЕХОД ПО ОКОНЧАНИИ ТРЕКА
+        mainAudio.onended = () => {
+            const playlist = getPlaylist(currentMode);
+            if (playlist.length > 0) {
+                trackIndices[currentMode] = (trackIndices[currentMode] + 1) % playlist.length;
+                playCurrentModeTrack();
+            }
+        };
+
+        // ТАЙМЕР ВРЕМЕНИ
+        mainAudio.ontimeupdate = () => {
+            const cur = formatTime(mainAudio.currentTime);
+            const dur = formatTime(mainAudio.duration);
+            document.getElementById('track-time').innerText = `${cur} / ${dur}`;
+        };
+
+        function formatTime(s) {
+            if (!s || isNaN(s)) return "00:00";
+            const m = Math.floor(s / 60);
+            const sec = Math.floor(s % 60);
+            return `${String(m).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
+        }
+
+        // УПРАВЛЕНИЕ ГРОМКОСТЬЮ
+        function setVolume(v, btn) {
+            currentVolume = v;
+            mainAudio.volume = currentVolume;
+            document.querySelectorAll('.btn-vol').forEach(b => b.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+        }
+
+        // ПАУЗА / ПУСК
+        function togglePlayPause() {
+            const btn = document.getElementById('btn-play-pause');
+            if (mainAudio.paused) {
+                mainAudio.play();
+                btn.classList.add('playing');
+                btn.innerText = "⏯ Пауза";
+            } else {
+                mainAudio.pause();
+                btn.classList.remove('playing');
+                btn.innerText = "▶ Пуск";
+            }
+        }
+
+        function nextTrack() {
+            const playlist = getPlaylist(currentMode);
+            if (playlist.length > 0) {
+                trackIndices[currentMode] = (trackIndices[currentMode] + 1) % playlist.length;
+                playCurrentModeTrack();
+            }
+        }
+
+        function prevTrack() {
+            const playlist = getPlaylist(currentMode);
+            if (playlist.length > 0) {
+                trackIndices[currentMode] = (trackIndices[currentMode] - 1 + playlist.length) % playlist.length;
+                playCurrentModeTrack();
+            }
+        }
+
+        // ВЫБОР РЕЖИМА (ИГРА, HB, ВЫХОД, ФИНАЛ)
+        function triggerMode(mode) {
+            if (currentMode === mode) {
+                // Повторный клик переключает на следующий трек в этом же режиме
+                nextTrack();
+            } else {
+                currentMode = mode;
+                playCurrentModeTrack();
+            }
+        }
+
+        // ВЕРНУТЬ ФОН
+        function stopAllAndResumeBg() {
+            currentMode = 'bg';
+            playCurrentModeTrack();
+        }
+
+        // ОБНОВЛЕНИЕ ИНТЕРФЕЙСА В ЗАВИСИМОСТИ ОТ РЕЖИМА
+        function updateModeUI() {
+            const tag = document.getElementById('mode-tag');
+            document.getElementById('btn-game').classList.remove('active');
+            document.getElementById('btn-hb').classList.remove('active');
+            document.getElementById('btn-entrance').classList.remove('active');
+            document.getElementById('btn-ending').classList.remove('active');
+
+            if (currentMode === 'game') {
+                tag.innerText = '🎮 ИГРА';
+                document.getElementById('btn-game').classList.add('active');
+            } else if (currentMode === 'hb') {
+                tag.innerText = '🎂 HAPPY BIRTHDAY';
+                document.getElementById('btn-hb').classList.add('active');
+            } else if (currentMode === 'entrance') {
+                tag.innerText = '🚀 ВЫХОД';
+                document.getElementById('btn-entrance').classList.add('active');
+            } else if (currentMode === 'ending') {
+                tag.innerText = '🏁 ФИНАЛ';
+                document.getElementById('btn-ending').classList.add('active');
+            } else {
+                tag.innerText = '🍃 ФОН';
+            }
+        }
+
+        // ЭКВАЛАЙЗЕР
+        const eqCanvas = document.getElementById('eq-canvas');
+        const eqCtx = eqCanvas.getContext('2d');
+        function drawEq() {
+            requestAnimationFrame(drawEq);
+            eqCtx.clearRect(0, 0, eqCanvas.width, eqCanvas.height);
+            if (!analyser || mainAudio.paused) return;
+
+            analyser.getByteFrequencyData(dataArray);
+            const barWidth = (eqCanvas.width / dataArray.length) * 2.5;
+            let x = 0;
+
+            for (let i = 0; i < dataArray.length; i++) {
+                const barHeight = (dataArray[i] / 255) * eqCanvas.height;
+                eqCtx.fillStyle = '#f59e0b';
+                eqCtx.fillRect(x, eqCanvas.height - barHeight, barWidth - 2, barHeight);
+                x += barWidth;
+            }
+        }
+    </script>
+</body>
+</html>
