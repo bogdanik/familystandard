@@ -3,104 +3,372 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Пульт Ведущего Детских Праздников</title>
+    <title>Event OS - Kids</title>
     <link rel="icon" href="data:,">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@800;900&family=Plus+Jakarta+Sans:wght@600;800;900&display=swap" rel="stylesheet">
     <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
 
     <style>
         :root {
-            --bg-dark: #090d16;
-            --card-bg: rgba(21, 29, 46, 0.9);
-            --border-color: rgba(255, 255, 255, 0.12);
+            --bg-black: #030712;
+            --glass-card: rgba(15, 23, 42, 0.88);
+            --glass-border: rgba(255, 255, 255, 0.15);
             --gold-main: #f59e0b;
             --gold-glow: rgba(245, 158, 11, 0.4);
             --green-active: #10b981;
             --red-accent: #ef4444;
+            --red-glow: rgba(239, 68, 68, 0.4);
+            --pink-accent: #ec4899;
             --blue-accent: #3b82f6;
             --purple-accent: #8b5cf6;
-            --font-main: 'Plus Jakarta Sans', -apple-system, sans-serif;
+            --cyan-accent: #06b6d4;
+            --font-main: -apple-system, BlinkMacSystemFont, "Plus Jakarta Sans", sans-serif;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: var(--font-main); user-select: none; }
-        body { background: var(--bg-dark); color: #f8fafc; min-height: 100vh; padding: 16px; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: var(--font-main); user-select: none; -webkit-tap-highlight-color: transparent; }
+        
+        html, body { 
+            width: 100%; 
+            height: 100dvh; 
+            background: var(--bg-black); 
+            color: #f8fafc; 
+            overflow: hidden; 
+            position: relative;
+        }
 
-        .container { width: 100%; max-width: 600px; display: flex; flex-direction: column; gap: 16px; margin: 0 auto; }
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100dvh;
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 10px 12px 10px 12px;
+            position: relative;
+            z-index: 10;
+            gap: 8px;
+        }
 
-        /* ШАПКА */
-        .header { text-align: center; padding: 12px 0; }
-        .header h1 { font-size: 1.8rem; font-weight: 900; color: #fff; text-transform: uppercase; letter-spacing: 1px; }
-        .header p { font-size: 0.9rem; color: #94a3b8; font-weight: 600; }
+        /* 1. ВЕРХНЯЯ ПАНЕЛЬ */
+        .top-panel {
+            background: var(--glass-card);
+            border: 1px solid var(--glass-border);
+            border-radius: 18px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+        }
 
-        /* БЛОК ФОНОВОЙ МУЗЫКИ */
-        .card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 20px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); backdrop-filter: blur(10px); }
-        .card-title { font-size: 1rem; font-weight: 800; color: #94a3b8; text-transform: uppercase; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
-        .now-playing-tag { font-size: 0.8rem; color: var(--gold-main); background: rgba(245, 158, 11, 0.15); padding: 4px 10px; border-radius: 20px; font-weight: 700; }
+        .vol-row { display: flex; gap: 4px; }
+        .btn-vol {
+            flex: 1;
+            height: 36px;
+            border-radius: 10px;
+            border: 1px solid var(--glass-border);
+            background: rgba(30, 41, 59, 0.7);
+            color: #fff;
+            font-size: 0.8rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        .btn-vol.active {
+            background: linear-gradient(135deg, #ffffff 0%, var(--gold-main) 100%);
+            color: #000;
+            border-color: #fff;
+            box-shadow: 0 0 12px var(--gold-glow);
+        }
 
-        /* ГРОМКОСТЬ */
-        .vol-row { display: flex; gap: 8px; margin-bottom: 16px; }
-        .btn-vol { flex: 1; height: 44px; border-radius: 12px; border: 1px solid var(--border-color); background: rgba(30, 41, 59, 0.8); color: #fff; font-size: 0.95rem; font-weight: 800; cursor: pointer; transition: all 0.2s; }
-        .btn-vol.active { background: var(--gold-main); color: #000; border-color: var(--gold-main); box-shadow: 0 0 15px var(--gold-glow); }
+        .track-display {
+            background: rgba(3, 7, 18, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            padding: 6px 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .track-title { font-size: 0.82rem; font-weight: 800; color: #e2e8f0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 65%; }
+        .track-time { font-size: 0.75rem; font-weight: 800; color: var(--gold-main); font-family: monospace; }
 
-        .track-info { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; background: rgba(0,0,0,0.3); padding: 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); }
-        .track-name { font-size: 1rem; font-weight: 800; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .track-time { font-size: 0.8rem; color: #64748b; font-weight: 700; font-family: monospace; }
+        .player-row { display: flex; gap: 6px; }
+        .btn-player {
+            flex: 1;
+            height: 40px;
+            border-radius: 10px;
+            border: 1px solid var(--glass-border);
+            background: rgba(30, 41, 59, 0.8);
+            color: #fff;
+            font-size: 0.9rem;
+            font-weight: 800;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s ease;
+        }
+        .btn-player:active { transform: scale(0.96); }
+        .btn-player.play-active {
+            background: rgba(16, 185, 129, 0.25);
+            border-color: var(--green-active);
+            color: #34d399;
+        }
 
-        /* УПРАВЛЕНИЕ ФОНОМ */
-        .controls-row { display: flex; gap: 10px; }
-        .btn-control { flex: 1; height: 50px; border-radius: 14px; border: 1px solid var(--border-color); background: rgba(30, 41, 59, 0.9); color: #fff; font-size: 1.1rem; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s; }
-        .btn-control:active { transform: scale(0.97); }
-        .btn-control.playing { background: rgba(16, 185, 129, 0.2); border-color: var(--green-active); color: #34d399; }
+        /* 2. ЦЕНТРАЛЬНАЯ ЗОНА С ТАЙМЕРОМ И ЭКВАЛАЙЗЕРОМ */
+        .center-display {
+            flex: 1;
+            position: relative;
+            background: radial-gradient(circle, rgba(15, 23, 42, 0.9) 0%, rgba(3, 7, 18, 0.95) 100%);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            box-shadow: inset 0 0 30px rgba(0,0,0,0.8);
+            min-height: 110px;
+        }
 
-        /* КНОПКА "ИГРА" */
-        .btn-game-master { width: 100%; height: 75px; border-radius: 20px; border: 2px solid var(--gold-main); background: linear-gradient(135deg, rgba(245, 158, 11, 0.3) 0%, rgba(245, 158, 11, 0.05) 100%); color: #fff; font-size: 1.5rem; font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 12px; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 0 25px var(--gold-glow); transition: all 0.2s; }
-        .btn-game-master.active { background: var(--gold-main); color: #000; box-shadow: 0 0 40px var(--gold-main); }
-        .btn-game-master:active { transform: scale(0.98); }
+        .title-group {
+            z-index: 10;
+            text-align: center;
+            padding: 0 10px;
+            pointer-events: none;
+        }
+        .shimmer-title {
+            font-family: 'Cinzel', serif;
+            font-size: 1.5rem;
+            font-weight: 900;
+            background: linear-gradient(90deg, #ffffff 0%, #fffbeb 25%, #f59e0b 50%, #e5e7eb 75%, #ffffff 100%);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shine 4s linear infinite;
+            letter-spacing: 2px;
+            line-height: 1.2;
+        }
+        @keyframes shine { to { background-position: 200% center; } }
 
-        /* СПЕЦ-КНОПКИ */
-        .special-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .btn-special { height: 60px; border-radius: 16px; border: 1px solid var(--border-color); background: rgba(30, 41, 59, 0.8); color: #fff; font-size: 1rem; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s; }
-        .btn-special:active { transform: scale(0.97); }
-        .btn-special.hb { border-color: #f472b6; background: rgba(244, 114, 182, 0.15); color: #fbcfe8; }
-        .btn-special.hb.active { background: #f472b6; color: #000; box-shadow: 0 0 20px rgba(244, 114, 182, 0.5); }
+        .countdown-timer {
+            font-family: 'Cinzel', monospace;
+            font-size: 2.8rem;
+            font-weight: 900;
+            color: #ffffff;
+            text-shadow: 0 0 20px var(--gold-glow);
+            letter-spacing: 2px;
+            margin-top: 2px;
+        }
+        .countdown-timer.ending-warning {
+            color: #ef4444;
+            text-shadow: 0 0 25px var(--red-glow);
+            animation: timerPulse 1s infinite alternate;
+        }
+        @keyframes timerPulse {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.05); }
+        }
 
-        .btn-special.entrance { border-color: var(--blue-accent); background: rgba(59, 130, 246, 0.15); color: #bfdbfe; }
-        .btn-special.entrance.active { background: var(--blue-accent); color: #fff; box-shadow: 0 0 20px rgba(59, 130, 246, 0.5); }
+        #eq-canvas {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 5;
+            pointer-events: none;
+            opacity: 0.85;
+        }
 
-        .btn-special.ending { border-color: var(--purple-accent); background: rgba(139, 92, 246, 0.15); color: #ddd6fe; grid-column: span 2; }
-        .btn-special.ending.active { background: var(--purple-accent); color: #fff; box-shadow: 0 0 20px rgba(139, 92, 246, 0.5); }
+        /* 3. СРЕДНИЙ БЛОК: ИГРА И АБСОЛЮТНАЯ ПАУЗА */
+        .main-action-block {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
 
-        .btn-stop-all { width: 100%; height: 50px; border-radius: 14px; border: 1px solid var(--red-accent); background: rgba(239, 68, 68, 0.15); color: #fca5a5; font-size: 1rem; font-weight: 800; cursor: pointer; transition: all 0.2s; }
-        .btn-stop-all:active { transform: scale(0.98); background: var(--red-accent); color: #fff; }
+        .btn-game-giant {
+            width: 100%;
+            height: 58px;
+            border-radius: 16px;
+            border: 2px solid var(--gold-main);
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.35) 0%, rgba(245, 158, 11, 0.1) 100%);
+            color: #ffffff;
+            font-size: 1.35rem;
+            font-weight: 900;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 0 20px var(--gold-glow);
+            transition: all 0.15s ease;
+        }
+        .btn-game-giant.active {
+            background: var(--gold-main);
+            color: #000;
+            box-shadow: 0 0 35px var(--gold-main);
+        }
+        .btn-game-giant:active { transform: scale(0.97); }
 
-        /* ЭКВАЛАЙЗЕР */
-        #eq-canvas { width: 100%; height: 60px; border-radius: 12px; background: rgba(0,0,0,0.4); margin-top: 8px; }
+        .btn-absolute-pause {
+            width: 100%;
+            height: 46px;
+            border-radius: 14px;
+            border: 2px solid var(--red-accent);
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.4) 0%, rgba(153, 27, 27, 0.25) 100%);
+            color: #ffffff;
+            font-size: 0.95rem;
+            font-weight: 900;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            box-shadow: 0 0 15px var(--red-glow);
+            transition: all 0.15s ease;
+        }
+        .btn-absolute-pause:active { transform: scale(0.96); background: var(--red-accent); color: #fff; }
+
+        /* 4. НИЖНЯЯ ПАНЕЛЬ */
+        .bottom-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .btn-spec {
+            height: 46px;
+            border-radius: 12px;
+            border: 1px solid var(--glass-border);
+            background: rgba(30, 41, 59, 0.7);
+            color: #fff;
+            font-size: 0.85rem;
+            font-weight: 800;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.15s ease;
+        }
+        .btn-spec:active { transform: scale(0.96); }
+
+        .btn-spec.entrance { border-color: var(--blue-accent); background: rgba(59, 130, 246, 0.2); color: #bfdbfe; }
+        .btn-spec.entrance.active { background: var(--blue-accent); color: #fff; box-shadow: 0 0 20px rgba(59, 130, 246, 0.6); }
+
+        .btn-spec.hb { border-color: var(--pink-accent); background: rgba(236, 72, 153, 0.2); color: #fbcfe8; }
+        .btn-spec.hb.active { background: var(--pink-accent); color: #fff; box-shadow: 0 0 20px rgba(236, 72, 153, 0.6); }
+
+        .btn-spec.bubbles { border-color: var(--cyan-accent); background: rgba(6, 182, 212, 0.2); color: #cffafe; }
+        .btn-spec.bubbles.active { background: var(--cyan-accent); color: #000; box-shadow: 0 0 20px rgba(6, 182, 212, 0.6); }
+
+        .btn-spec.balloons { border-color: var(--purple-accent); background: rgba(139, 92, 246, 0.2); color: #ddd6fe; }
+        .btn-spec.balloons.active { background: var(--purple-accent); color: #fff; box-shadow: 0 0 20px rgba(139, 92, 246, 0.6); }
+
+        .btn-spec.ending {
+            grid-column: span 2;
+            height: 50px;
+            border-color: rgba(255, 255, 255, 0.3);
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.3) 0%, rgba(139, 92, 246, 0.3) 100%);
+            color: #ffffff;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .btn-spec.ending.active { background: var(--red-accent); color: #fff; box-shadow: 0 0 25px var(--red-accent); }
+
+        .footer-branding {
+            text-align: center;
+            font-size: 0.72rem;
+            font-weight: 800;
+            color: rgba(255, 255, 255, 0.35);
+            letter-spacing: 2px;
+            padding-top: 2px;
+            text-transform: uppercase;
+        }
+
+        /* 5. НАЧАЛЬНЫЙ ЭКРАН ВЫБОРА ТАЙМЕРА */
+        #init-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            background: var(--bg-black);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .setup-card {
+            background: var(--glass-card);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 28px 20px;
+            width: 100%;
+            max-width: 380px;
+            text-align: center;
+            box-shadow: 0 0 40px var(--gold-glow);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .setup-title { font-family: 'Cinzel', serif; font-size: 1.6rem; font-weight: 900; color: #fff; letter-spacing: 2px; }
+        .duration-label { font-size: 0.85rem; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; }
+        .duration-row { display: flex; gap: 8px; }
+        .btn-dur {
+            flex: 1;
+            height: 52px;
+            border-radius: 14px;
+            border: 1px solid var(--glass-border);
+            background: rgba(30, 41, 59, 0.8);
+            color: #fff;
+            font-size: 1rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        .btn-dur.active {
+            background: var(--gold-main);
+            color: #000;
+            border-color: var(--gold-main);
+            box-shadow: 0 0 15px var(--gold-glow);
+        }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        
-        <div class="header">
-            <h1 id="event-title">ДЕТСКИЙ ПРАЗДНИК</h1>
-            <p id="event-subtitle">ПУЛЬТ УПРАВЛЕНИЯ МУЗЫКОЙ</p>
-        </div>
-
-        <!-- КНОПКА СТАРТА АУДИО (ЕСЛИ БРАУЗЕР БЛОКИРУЕТ АВТОПЛЕЙ) -->
-        <button id="btn-audio-init" onclick="initAudioEngine()" class="btn-game-master" style="background: var(--green-active); border-color: var(--green-active);">
-            🔊 ВКЛЮЧИТЬ ЗВУК
-        </button>
-
-        <!-- БЛОК ФОНОВОЙ МУЗЫКИ -->
-        <div class="card" id="bg-card" style="display: none;">
-            <div class="card-title">
-                <span>Фоновая музыка</span>
-                <span class="now-playing-tag" id="mode-tag">ФОН</span>
+    <!-- СТАРТОВЫЙ ВЫБОР ДЛИТЕЛЬНОСТИ -->
+    <div id="init-overlay">
+        <div class="setup-card">
+            <div class="setup-title">EVENT OS - KIDS</div>
+            
+            <div>
+                <div class="duration-label" style="margin-bottom: 12px;">Длительность программы</div>
+                <div class="duration-row">
+                    <button class="btn-dur" onclick="selectDuration(20, this)">20 мин</button>
+                    <button class="btn-dur active" onclick="selectDuration(40, this)">40 мин</button>
+                    <button class="btn-dur" onclick="selectDuration(60, this)">60 мин</button>
+                </div>
             </div>
 
-            <!-- ГРОМКОСТЬ -->
+            <button onclick="startPartySystem()" class="btn-game-giant" style="height: 60px; margin-top: 8px;">
+                🚀 СТАРТ
+            </button>
+        </div>
+    </div>
+
+    <div class="app-container">
+
+        <!-- 1. ВЕРХНЯЯ ПАНЕЛЬ -->
+        <div class="top-panel">
             <div class="vol-row">
                 <button class="btn-vol" onclick="setVolume(0.03, this)">3%</button>
                 <button class="btn-vol" onclick="setVolume(0.10, this)">10%</button>
@@ -109,53 +377,60 @@
                 <button class="btn-vol" onclick="setVolume(1.00, this)">100%</button>
             </div>
 
-            <div class="track-info">
-                <div class="track-name" id="track-name">Загрузка...</div>
+            <div class="track-display">
+                <div class="track-title" id="track-name">Загрузка...</div>
                 <div class="track-time" id="track-time">00:00 / 00:00</div>
             </div>
 
-            <div class="controls-row">
-                <button class="btn-control" onclick="prevTrack()">⏮ Пред</button>
-                <button class="btn-control playing" id="btn-play-pause" onclick="togglePlayPause()">⏯ Пауза</button>
-                <button class="btn-control" onclick="nextTrack()">След ⏭</button>
+            <div class="player-row">
+                <button class="btn-player" onclick="prevTrack()">⏮ Пред</button>
+                <button class="btn-player play-active" id="btn-play-pause" onclick="togglePlayPause()">⏯ Пауза</button>
+                <button class="btn-player" onclick="nextTrack()">След ⏭</button>
             </div>
-
-            <canvas id="eq-canvas"></canvas>
         </div>
 
-        <!-- КНОПКА "ИГРА" -->
-        <div class="card" id="game-card" style="display: none;">
-            <button class="btn-game-master" id="btn-game" onclick="triggerMode('game')">
+        <!-- 2. ЦЕНТРАЛЬНАЯ ЗОНА С ЭКВАЛАЙЗЕРОМ И ТАЙМЕРОМ -->
+        <div class="center-display">
+            <canvas id="eq-canvas"></canvas>
+            <div class="title-group">
+                <h1 class="shimmer-title">EVENT OS - KIDS</h1>
+                <div class="countdown-timer" id="timer-display">40:00</div>
+            </div>
+        </div>
+
+        <!-- 3. СРЕДНИЙ БЛОК: ИГРА И АБСОЛЮТНАЯ ПАУЗА -->
+        <div class="main-action-block">
+            <button class="btn-game-giant" id="btn-game" onclick="triggerMode('game')">
                 🎮 ИГРА
             </button>
-        </div>
-
-        <!-- СПЕЦ-КНОПКИ -->
-        <div class="card" id="special-card" style="display: none;">
-            <div class="card-title">Спец-Треки</div>
-            <div class="special-grid">
-                <button class="btn-special hb" id="btn-hb" onclick="triggerMode('hb')">
-                    🎂 Happy Birthday
-                </button>
-                <button class="btn-special entrance" id="btn-entrance" onclick="triggerMode('entrance')">
-                    🚀 Выход Персонажа
-                </button>
-                <button class="btn-special ending" id="btn-ending" onclick="triggerMode('ending')">
-                    🏁 Завершение Праздника
-                </button>
-            </div>
-        </div>
-
-        <!-- СТОП -->
-        <div class="card" id="stop-card" style="display: none;">
-            <button class="btn-stop-all" onclick="stopAllAndResumeBg()">
-                ⏹ ТИШИНА / ВЕРНУТЬ ФОН
+            <button class="btn-absolute-pause" onclick="smoothStopAll()">
+                🛑 АБСОЛЮТНАЯ ПАУЗА
             </button>
         </div>
+
+        <!-- 4. НИЖНЯЯ ПАНЕЛЬ -->
+        <div class="bottom-grid">
+            <button class="btn-spec entrance" id="btn-entrance" onclick="triggerMode('entrance')">
+                🚀 Выход
+            </button>
+            <button class="btn-spec hb" id="btn-hb" onclick="triggerMode('hb')">
+                🎂 Birthday
+            </button>
+            <button class="btn-spec bubbles" id="btn-bubbles" onclick="triggerMode('bubbles')">
+                🫧 Пузыри
+            </button>
+            <button class="btn-spec balloons" id="btn-balloons" onclick="triggerMode('balloons')">
+                🎈 Шарики
+            </button>
+            <button class="btn-spec ending" id="btn-ending" onclick="triggerMode('ending')">
+                🏁 Завершение Праздника
+            </button>
+        </div>
+
+        <div class="footer-branding">EVENT OS - KIDS COMPANY 2026</div>
 
     </div>
 
-    <!-- АУДИО ТЭГ ДЛЯ ПРОИГРЫВАНИЯ -->
     <audio id="main-audio" crossorigin="anonymous"></audio>
 
     <script>
@@ -164,20 +439,63 @@
 
         const mainAudio = document.getElementById('main-audio');
         let currentVolume = 0.30;
-        let currentMode = 'bg'; // bg, game, hb, entrance, ending
-        let trackIndices = { bg: 0, game: 0, hb: 0, entrance: 0, ending: 0 };
+        let currentMode = 'bg';
+        let trackIndices = { bg: 0, game: 0, entrance: 0, hb: 0, bubbles: 0, balloons: 0, ending: 0 };
+
+        let selectedDurationMinutes = 40;
+        let partyRemainingSeconds = 2400;
+        let partyTimerInterval = null;
+
+        let fadeInterval = null;
 
         let audioCtx = null;
         let analyser = null;
         let dataArray = null;
 
-        // ИНИЦИАЛИЗАЦИЯ ЗВУКА ПРИ ПЕРВОМ КЛИКЕ
+        function selectDuration(mins, btn) {
+            selectedDurationMinutes = mins;
+            document.querySelectorAll('.btn-dur').forEach(b => b.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+        }
+
+        function startPartySystem() {
+            partyRemainingSeconds = selectedDurationMinutes * 60;
+            updateTimerDisplay();
+
+            if (partyTimerInterval) clearInterval(partyTimerInterval);
+            partyTimerInterval = setInterval(() => {
+                if (partyRemainingSeconds > 0) {
+                    partyRemainingSeconds--;
+                    updateTimerDisplay();
+                } else {
+                    clearInterval(partyTimerInterval);
+                }
+            }, 1000);
+
+            initAudioEngine();
+        }
+
+        function updateTimerDisplay() {
+            const m = Math.floor(partyRemainingSeconds / 60);
+            const s = Math.floor(partyRemainingSeconds % 60);
+            const str = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+            
+            const timerEl = document.getElementById('timer-display');
+            timerEl.innerText = str;
+
+            if (partyRemainingSeconds <= 600) {
+                timerEl.classList.add('ending-warning');
+            } else {
+                timerEl.classList.remove('ending-warning');
+            }
+        }
+
         function initAudioEngine() {
             if (!audioCtx) {
                 const AudioCtx = window.AudioContext || window.webkitAudioContext;
                 audioCtx = new AudioCtx();
                 analyser = audioCtx.createAnalyser();
-                analyser.fftSize = 64;
+                analyser.fftSize = 256;
                 dataArray = new Uint8Array(analyser.frequencyBinCount);
 
                 const source = audioCtx.createMediaElementSource(mainAudio);
@@ -188,35 +506,70 @@
                 audioCtx.resume();
             }
 
-            document.getElementById('btn-audio-init').style.display = 'none';
-            document.getElementById('bg-card').style.display = 'block';
-            document.getElementById('game-card').style.display = 'block';
-            document.getElementById('special-card').style.display = 'block';
-            document.getElementById('stop-card').style.display = 'block';
-
+            document.getElementById('init-overlay').style.display = 'none';
             playCurrentModeTrack();
             drawEq();
         }
 
-        // ПОЛУЧЕНИЕ КОНФИГУРАЦИИ
         socket.on('config_data', (data) => {
             config = data;
-            if (config.event_title) document.getElementById('event-title').innerText = config.event_title;
-            if (config.event_subtitle) document.getElementById('event-subtitle').innerText = config.event_subtitle;
         });
 
-        // СПИСОК ТРЕКОВ ДЛЯ ТЕКУЩЕГО РЕЖИМА
         function getPlaylist(mode) {
             if (!config) return [];
+            
+            if (mode === 'bg') {
+                if (partyRemainingSeconds <= 600 && config.ending_tracks && config.ending_tracks.length > 0) {
+                    return config.ending_tracks;
+                }
+                return config.bg_tracks || [];
+            }
+
             if (mode === 'game') return config.game_tracks || [];
-            if (mode === 'hb') return config.happy_birthday_tracks || [];
             if (mode === 'entrance') return config.entrance_tracks || [];
+            if (mode === 'hb') return config.happy_birthday_tracks || [];
+            if (mode === 'bubbles') return config.bubbles_tracks || [];
+            if (mode === 'balloons') return config.balloons_tracks || [];
             if (mode === 'ending') return config.ending_tracks || [];
             return config.bg_tracks || [];
         }
 
-        // ПРОИГРЫВАНИЕ ТРЕКА
+        function cancelFade() {
+            if (fadeInterval) {
+                clearInterval(fadeInterval);
+                fadeInterval = null;
+            }
+            mainAudio.volume = currentVolume;
+        }
+
+        function smoothStopAll() {
+            if (fadeInterval) clearInterval(fadeInterval);
+
+            let steps = 10;
+            let stepVol = mainAudio.volume / steps;
+
+            fadeInterval = setInterval(() => {
+                if (mainAudio.volume > stepVol) {
+                    mainAudio.volume -= stepVol;
+                } else {
+                    mainAudio.volume = 0;
+                    mainAudio.pause();
+                    clearInterval(fadeInterval);
+                    fadeInterval = null;
+                    
+                    mainAudio.volume = currentVolume;
+                    
+                    const btn = document.getElementById('btn-play-pause');
+                    btn.classList.remove('play-active');
+                    btn.innerText = "▶ Пуск";
+                    
+                    clearActiveHighlights();
+                }
+            }, 20);
+        }
+
         function playCurrentModeTrack() {
+            cancelFade();
             if (!config) return;
             const playlist = getPlaylist(currentMode);
             if (!playlist || playlist.length === 0) return;
@@ -226,18 +579,20 @@
             const fullUrl = config.cdn_base_url + filename;
 
             document.getElementById('track-name').innerText = filename;
-            updateModeUI();
+            updateUIState();
 
             if (!mainAudio.src.endsWith(filename)) {
                 mainAudio.src = fullUrl;
-                mainAudio.volume = currentVolume;
                 mainAudio.play().catch(e => console.log("Autoplay blocked:", e));
             } else {
                 if (mainAudio.paused) mainAudio.play();
             }
+
+            const btn = document.getElementById('btn-play-pause');
+            btn.classList.add('play-active');
+            btn.innerText = "⏯ Пауза";
         }
 
-        // АВТО-ПЕРЕХОД ПО ОКОНЧАНИИ ТРЕКА
         mainAudio.onended = () => {
             const playlist = getPlaylist(currentMode);
             if (playlist.length > 0) {
@@ -246,7 +601,6 @@
             }
         };
 
-        // ТАЙМЕР ВРЕМЕНИ
         mainAudio.ontimeupdate = () => {
             const cur = formatTime(mainAudio.currentTime);
             const dur = formatTime(mainAudio.duration);
@@ -260,25 +614,23 @@
             return `${String(m).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
         }
 
-        // УПРАВЛЕНИЕ ГРОМКОСТЬЮ
         function setVolume(v, btn) {
             currentVolume = v;
-            mainAudio.volume = currentVolume;
+            cancelFade();
             document.querySelectorAll('.btn-vol').forEach(b => b.classList.remove('active'));
             if (btn) btn.classList.add('active');
         }
 
-        // ПАУЗА / ПУСК
         function togglePlayPause() {
             const btn = document.getElementById('btn-play-pause');
             if (mainAudio.paused) {
+                cancelFade();
                 mainAudio.play();
-                btn.classList.add('playing');
+                btn.classList.add('play-active');
                 btn.innerText = "⏯ Пауза";
+                updateUIState();
             } else {
-                mainAudio.pause();
-                btn.classList.remove('playing');
-                btn.innerText = "▶ Пуск";
+                smoothStopAll();
             }
         }
 
@@ -298,10 +650,8 @@
             }
         }
 
-        // ВЫБОР РЕЖИМА (ИГРА, HB, ВЫХОД, ФИНАЛ)
         function triggerMode(mode) {
-            if (currentMode === mode) {
-                // Повторный клик переключает на следующий трек в этом же режиме
+            if (currentMode === mode && !mainAudio.paused) {
                 nextTrack();
             } else {
                 currentMode = mode;
@@ -309,54 +659,109 @@
             }
         }
 
-        // ВЕРНУТЬ ФОН
-        function stopAllAndResumeBg() {
-            currentMode = 'bg';
-            playCurrentModeTrack();
-        }
-
-        // ОБНОВЛЕНИЕ ИНТЕРФЕЙСА В ЗАВИСИМОСТИ ОТ РЕЖИМА
-        function updateModeUI() {
-            const tag = document.getElementById('mode-tag');
+        function clearActiveHighlights() {
             document.getElementById('btn-game').classList.remove('active');
-            document.getElementById('btn-hb').classList.remove('active');
             document.getElementById('btn-entrance').classList.remove('active');
+            document.getElementById('btn-hb').classList.remove('active');
+            document.getElementById('btn-bubbles').classList.remove('active');
+            document.getElementById('btn-balloons').classList.remove('active');
             document.getElementById('btn-ending').classList.remove('active');
-
-            if (currentMode === 'game') {
-                tag.innerText = '🎮 ИГРА';
-                document.getElementById('btn-game').classList.add('active');
-            } else if (currentMode === 'hb') {
-                tag.innerText = '🎂 HAPPY BIRTHDAY';
-                document.getElementById('btn-hb').classList.add('active');
-            } else if (currentMode === 'entrance') {
-                tag.innerText = '🚀 ВЫХОД';
-                document.getElementById('btn-entrance').classList.add('active');
-            } else if (currentMode === 'ending') {
-                tag.innerText = '🏁 ФИНАЛ';
-                document.getElementById('btn-ending').classList.add('active');
-            } else {
-                tag.innerText = '🍃 ФОН';
-            }
         }
 
-        // ЭКВАЛАЙЗЕР
+        function updateUIState() {
+            clearActiveHighlights();
+            if (currentMode === 'game') document.getElementById('btn-game').classList.add('active');
+            else if (currentMode === 'entrance') document.getElementById('btn-entrance').classList.add('active');
+            else if (currentMode === 'hb') document.getElementById('btn-hb').classList.add('active');
+            else if (currentMode === 'bubbles') document.getElementById('btn-bubbles').classList.add('active');
+            else if (currentMode === 'balloons') document.getElementById('btn-balloons').classList.add('active');
+            else if (currentMode === 'ending') document.getElementById('btn-ending').classList.add('active');
+        }
+
+        // --- ЭКВАЛАЙЗЕР ---
         const eqCanvas = document.getElementById('eq-canvas');
         const eqCtx = eqCanvas.getContext('2d');
+        const halfBars = 28;
+        let eqBars = new Array(halfBars).fill(4);
+        let idleTime = 0;
+
+        function drawRoundedBar(ctx, x, y, w, h, r) {
+            if (h < 1) return;
+            r = Math.min(r, w / 2, h / 2);
+            ctx.beginPath();
+            ctx.moveTo(x + r, y);
+            ctx.lineTo(x + w - r, y);
+            ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+            ctx.lineTo(x + w, y + h);
+            ctx.lineTo(x, y + h);
+            ctx.lineTo(x, y + r);
+            ctx.quadraticCurveTo(x, y, x + r, y);
+            ctx.closePath();
+            ctx.fill();
+        }
+
         function drawEq() {
             requestAnimationFrame(drawEq);
+            eqCanvas.width = eqCanvas.offsetWidth;
+            eqCanvas.height = eqCanvas.offsetHeight;
+            
             eqCtx.clearRect(0, 0, eqCanvas.width, eqCanvas.height);
-            if (!analyser || mainAudio.paused) return;
+            if (!eqCanvas.width || !eqCanvas.height) return;
 
-            analyser.getByteFrequencyData(dataArray);
-            const barWidth = (eqCanvas.width / dataArray.length) * 2.5;
-            let x = 0;
+            idleTime -= 0.04;
+            const width = eqCanvas.width;
+            const height = eqCanvas.height;
+            const barSpacing = 2.5;
+            const barWidth = ((width / 2) / halfBars);
+            const actualBarWidth = Math.max(1.5, barWidth - barSpacing);
 
-            for (let i = 0; i < dataArray.length; i++) {
-                const barHeight = (dataArray[i] / 255) * eqCanvas.height;
-                eqCtx.fillStyle = '#f59e0b';
-                eqCtx.fillRect(x, eqCanvas.height - barHeight, barWidth - 2, barHeight);
-                x += barWidth;
+            let isAudioActive = analyser && !mainAudio.paused;
+
+            if (isAudioActive) {
+                analyser.getByteFrequencyData(dataArray);
+            }
+
+            let rawValues = new Float32Array(halfBars);
+            for (let k = 0; k < halfBars; k++) {
+                if (isAudioActive) {
+                    let logIndex = Math.floor(Math.pow(k / halfBars, 1.2) * (dataArray.length * 0.6));
+                    rawValues[k] = dataArray[logIndex] || 0;
+                } else {
+                    rawValues[k] = Math.sin(idleTime * 1.8 + k * 0.3) * 8 + 12;
+                }
+            }
+
+            let smoothedValues = new Float32Array(halfBars);
+            for (let k = 0; k < halfBars; k++) {
+                let p2 = rawValues[Math.max(0, k - 2)];
+                let p1 = rawValues[Math.max(0, k - 1)];
+                let curr = rawValues[k];
+                let n1 = rawValues[Math.min(halfBars - 1, k + 1)];
+                let n2 = rawValues[Math.min(halfBars - 1, k + 2)];
+                smoothedValues[k] = p2 * 0.08 + p1 * 0.24 + curr * 0.36 + n1 * 0.24 + n2 * 0.08;
+            }
+
+            for (let k = 0; k < halfBars; k++) {
+                let targetH = (smoothedValues[k] / 255) * (height * 0.85);
+                if (targetH < 3) targetH = 3;
+
+                if (targetH > eqBars[k]) eqBars[k] += (targetH - eqBars[k]) * 0.25;
+                else eqBars[k] += (targetH - eqBars[k]) * 0.09;
+
+                let h = eqBars[k];
+                let xLeft = k * barWidth + barSpacing / 2;
+                let xRight = width - (k + 1) * barWidth + barSpacing / 2;
+
+                let barGradient = eqCtx.createLinearGradient(0, height, 0, height - h);
+                barGradient.addColorStop(0, 'rgba(3, 7, 18, 0.0)');
+                barGradient.addColorStop(0.5, 'rgba(245, 158, 11, 0.25)');
+                barGradient.addColorStop(0.85, 'rgba(245, 158, 11, 0.7)');
+                barGradient.addColorStop(1, 'rgba(255, 255, 255, 1.0)');
+
+                eqCtx.fillStyle = barGradient;
+
+                drawRoundedBar(eqCtx, xLeft, height - h, actualBarWidth, h, 3);
+                drawRoundedBar(eqCtx, xRight, height - h, actualBarWidth, h, 3);
             }
         }
     </script>
