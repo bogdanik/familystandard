@@ -22,6 +22,7 @@
             --red-glow: rgba(239, 68, 68, 0.4);
             --pink-accent: #ec4899;
             --cyan-accent: #06b6d4;
+            --purple-accent: #a855f7;
             --font-main: -apple-system, BlinkMacSystemFont, "Plus Jakarta Sans", sans-serif;
         }
 
@@ -117,9 +118,9 @@
             color: #34d399;
         }
 
-        /* 2. ЦЕНТРАЛЬНАЯ ЗОНА С ЭКВАЛАЙЗЕРОМ */
+        /* 2. ЦЕНТРАЛЬНАЯ ЗОНА */
         .center-display {
-            flex: 1;
+            flex: 1.1;
             position: relative;
             background: radial-gradient(circle, rgba(15, 23, 42, 0.9) 0%, rgba(3, 7, 18, 0.95) 100%);
             border: 1px solid var(--glass-border);
@@ -130,80 +131,29 @@
             justify-content: center;
             overflow: hidden;
             box-shadow: inset 0 0 30px rgba(0,0,0,0.8);
-            min-height: 110px;
+            min-height: 120px;
+            padding: 12px;
+            gap: 10px;
         }
 
-        .title-group {
+        .center-content-slot {
             z-index: 10;
-            text-align: center;
-            padding: 0 10px;
-            pointer-events: none;
-        }
-        .shimmer-title {
-            font-family: 'Cinzel', serif;
-            font-size: 1.8rem;
-            font-weight: 900;
-            background: linear-gradient(90deg, #ffffff 0%, #fffbeb 25%, #f59e0b 50%, #e5e7eb 75%, #ffffff 100%);
-            background-size: 200% auto;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: shine 4s linear infinite;
-            letter-spacing: 2px;
-            line-height: 1.2;
-        }
-        @keyframes shine { to { background-position: 200% center; } }
-
-        #eq-canvas {
-            position: absolute;
-            inset: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 5;
-            pointer-events: none;
-            opacity: 0.85;
-        }
-
-        /* 3. СРЕДНИЙ БЛОК */
-        .main-action-block {
             display: flex;
             flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
             gap: 8px;
         }
 
-        .btn-game-giant {
-            width: 100%;
-            height: 58px;
-            border-radius: 16px;
-            border: 2px solid var(--gold-main);
-            background: linear-gradient(135deg, rgba(245, 158, 11, 0.35) 0%, rgba(245, 158, 11, 0.1) 100%);
-            color: #ffffff;
-            font-size: 1.35rem;
-            font-weight: 900;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            box-shadow: 0 0 20px var(--gold-glow);
-            transition: all 0.15s ease;
-        }
-        .btn-game-giant.active {
-            background: var(--gold-main);
-            color: #000;
-            box-shadow: 0 0 35px var(--gold-main);
-        }
-        .btn-game-giant:active { transform: scale(0.97); }
-
         .btn-start-program {
-            width: 100%;
-            height: 52px;
+            width: 85%;
+            height: 46px;
             border-radius: 14px;
             border: 2px solid var(--green-active);
-            background: linear-gradient(135deg, rgba(16, 185, 129, 0.35) 0%, rgba(6, 78, 59, 0.2) 100%);
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.4) 0%, rgba(6, 78, 59, 0.3) 100%);
             color: #ffffff;
-            font-size: 1rem;
+            font-size: 0.95rem;
             font-weight: 900;
             cursor: pointer;
             display: flex;
@@ -219,18 +169,18 @@
 
         .timer-box-slot {
             display: none;
-            width: 100%;
-            height: 52px;
+            width: 85%;
+            height: 46px;
             border-radius: 14px;
             border: 2px solid var(--gold-main);
-            background: rgba(15, 23, 42, 0.95);
+            background: rgba(3, 7, 18, 0.85);
             align-items: center;
             justify-content: center;
             box-shadow: 0 0 20px var(--gold-glow);
         }
         .countdown-timer {
             font-family: 'Cinzel', monospace;
-            font-size: 2.2rem;
+            font-size: 2.1rem;
             font-weight: 900;
             color: #ffffff;
             text-shadow: 0 0 15px var(--gold-glow);
@@ -246,6 +196,79 @@
             100% { transform: scale(1.05); }
         }
 
+        .shimmer-title {
+            font-family: 'Cinzel', serif;
+            font-size: 1.6rem;
+            font-weight: 900;
+            background: linear-gradient(90deg, #ffffff 0%, #fffbeb 25%, #f59e0b 50%, #e5e7eb 75%, #ffffff 100%);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shine 4s linear infinite;
+            letter-spacing: 2px;
+            line-height: 1.1;
+            pointer-events: none;
+        }
+        @keyframes shine { to { background-position: 200% center; } }
+
+        #eq-canvas {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 5;
+            pointer-events: none;
+            opacity: 0.85;
+        }
+
+        /* 3. СРЕДНИЙ БЛОК: ФОН И ИГРА */
+        .main-action-block {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .btn-main-giant {
+            width: 100%;
+            height: 54px;
+            border-radius: 16px;
+            font-size: 1.25rem;
+            font-weight: 900;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.15s ease;
+        }
+        .btn-main-giant:active { transform: scale(0.97); }
+
+        .btn-bg-giant {
+            border: 2px solid var(--gold-main);
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.35) 0%, rgba(245, 158, 11, 0.1) 100%);
+            color: #ffffff;
+            box-shadow: 0 0 20px var(--gold-glow);
+        }
+        .btn-bg-giant.active {
+            background: var(--gold-main);
+            color: #000;
+            box-shadow: 0 0 35px var(--gold-main);
+        }
+
+        .btn-game-giant {
+            border: 2px solid var(--cyan-accent);
+            background: linear-gradient(135deg, rgba(6, 182, 212, 0.35) 0%, rgba(6, 182, 212, 0.1) 100%);
+            color: #ffffff;
+            box-shadow: 0 0 20px rgba(6, 182, 212, 0.3);
+        }
+        .btn-game-giant.active {
+            background: var(--cyan-accent);
+            color: #000;
+            box-shadow: 0 0 35px var(--cyan-accent);
+        }
+
         /* 4. НИЖНЯЯ ПАНЕЛЬ */
         .bottom-grid {
             display: grid;
@@ -254,12 +277,12 @@
         }
 
         .btn-spec {
-            height: 48px;
+            height: 46px;
             border-radius: 12px;
             border: 1px solid var(--glass-border);
             background: rgba(30, 41, 59, 0.7);
             color: #fff;
-            font-size: 0.88rem;
+            font-size: 0.85rem;
             font-weight: 800;
             cursor: pointer;
             display: flex;
@@ -270,20 +293,24 @@
         }
         .btn-spec:active { transform: scale(0.96); }
 
-        .btn-spec.bg { border-color: var(--gold-main); background: rgba(245, 158, 11, 0.2); color: #fef08a; }
-        .btn-spec.bg.active { background: var(--gold-main); color: #000; box-shadow: 0 0 20px var(--gold-glow); }
-
         .btn-spec.hb { border-color: var(--pink-accent); background: rgba(236, 72, 153, 0.2); color: #fbcfe8; }
         .btn-spec.hb.active { background: var(--pink-accent); color: #fff; box-shadow: 0 0 20px rgba(236, 72, 153, 0.6); }
 
-        .btn-spec.bubbles {
-            grid-column: span 2;
-            height: 50px;
-            border-color: var(--cyan-accent);
-            background: rgba(6, 182, 212, 0.2);
-            color: #cffafe;
-        }
+        .btn-spec.bubbles { border-color: var(--cyan-accent); background: rgba(6, 182, 212, 0.2); color: #cffafe; }
         .btn-spec.bubbles.active { background: var(--cyan-accent); color: #000; box-shadow: 0 0 20px rgba(6, 182, 212, 0.6); }
+
+        .btn-spec.flashmob { border-color: var(--purple-accent); background: rgba(168, 85, 247, 0.2); color: #f3e8ff; }
+        .btn-spec.flashmob.active { background: var(--purple-accent); color: #fff; box-shadow: 0 0 20px rgba(168, 85, 247, 0.6); }
+
+        /* МАЛЕНЬКАЯ КНОПКА ДЛЯ ФЛЕШМОБ ЗАДАНИЙ */
+        .btn-spec.flashmob-sm {
+            border-color: rgba(168, 85, 247, 0.6);
+            background: rgba(168, 85, 247, 0.12);
+            color: #e9d5ff;
+            font-size: 0.76rem;
+            padding: 0 4px;
+        }
+        .btn-spec.flashmob-sm.active { background: var(--purple-accent); color: #fff; box-shadow: 0 0 15px rgba(168, 85, 247, 0.5); }
 
         .footer-branding {
             text-align: center;
@@ -345,7 +372,7 @@
 <body>
 
     <div id="init-overlay" class="modal-overlay">
-        <button onclick="initAudioAndPlayBg()" class="btn-game-giant" style="height: 80px; width: 100%; max-width: 360px;">
+        <button onclick="initAudioAndPlayBg()" class="btn-main-giant btn-bg-giant" style="height: 80px; width: 100%; max-width: 360px;">
             🔊 ВКЛЮЧИТЬ ПУЛЬТ
         </button>
     </div>
@@ -372,11 +399,11 @@
         <!-- 1. ВЕРХНЯЯ ПАНЕЛЬ -->
         <div class="top-panel">
             <div class="vol-row">
-                <button class="btn-vol" onclick="setVolume(0.03, this)">3%</button>
-                <button class="btn-vol" onclick="setVolume(0.10, this)">10%</button>
-                <button class="btn-vol active" onclick="setVolume(0.30, this)">30%</button>
-                <button class="btn-vol" onclick="setVolume(0.60, this)">60%</button>
-                <button class="btn-vol" onclick="setVolume(1.00, this)">100%</button>
+                <button class="btn-vol" onclick="setMasterVolume(0.03, this)">3%</button>
+                <button class="btn-vol" onclick="setMasterVolume(0.10, this)">10%</button>
+                <button class="btn-vol active" onclick="setMasterVolume(0.30, this)">30%</button>
+                <button class="btn-vol" onclick="setMasterVolume(0.60, this)">60%</button>
+                <button class="btn-vol" onclick="setMasterVolume(1.00, this)">100%</button>
             </div>
 
             <div class="track-display">
@@ -391,39 +418,46 @@
             </div>
         </div>
 
-        <!-- 2. ЦЕНТРАЛЬНАЯ ЗОНА С ЭКВАЛАЙЗЕРОМ -->
+        <!-- 2. ЦЕНТРАЛЬНАЯ ЗОНА С ЭКВАЛАЙЗЕРОМ И ТАЙМЕРОМ -->
         <div class="center-display">
             <canvas id="eq-canvas"></canvas>
-            <div class="title-group">
+            
+            <div class="center-content-slot">
+                <button class="btn-start-program" id="btn-start-prog" onclick="openDurationModal()">
+                    🚀 СТАРТ ПРОГРАММЫ
+                </button>
+
+                <div class="timer-box-slot" id="timer-slot">
+                    <div class="countdown-timer" id="timer-display">40:00</div>
+                </div>
+
                 <h1 class="shimmer-title">EVENT OS - KIDS</h1>
             </div>
         </div>
 
-        <!-- 3. СРЕДНИЙ БЛОК -->
+        <!-- 3. СРЕДНИЙ БЛОК: ФОН И ИГРА -->
         <div class="main-action-block">
-            <button class="btn-game-giant" id="btn-game" onclick="triggerMode('game')">
+            <button class="btn-main-giant btn-bg-giant" id="btn-bg" onclick="triggerMode('bg')">
+                🍃 ФОН
+            </button>
+            <button class="btn-main-giant btn-game-giant" id="btn-game" onclick="triggerMode('game')">
                 🎮 ИГРА
             </button>
-
-            <button class="btn-start-program" id="btn-start-prog" onclick="openDurationModal()">
-                🚀 СТАРТ ПРОГРАММЫ
-            </button>
-
-            <div class="timer-box-slot" id="timer-slot">
-                <div class="countdown-timer" id="timer-display">40:00</div>
-            </div>
         </div>
 
         <!-- 4. НИЖНЯЯ ПАНЕЛЬ -->
         <div class="bottom-grid">
-            <button class="btn-spec bg" id="btn-bg" onclick="triggerMode('bg')">
-                🍃 Фон
-            </button>
             <button class="btn-spec hb" id="btn-hb" onclick="triggerMode('hb')">
                 🎂 Birthday
             </button>
             <button class="btn-spec bubbles" id="btn-bubbles" onclick="triggerMode('bubbles')">
-                🫧 Пузыри
+                🎗️ Ленты - 🫧 Пузыри
+            </button>
+            <button class="btn-spec flashmob" id="btn-fm1" onclick="triggerMode('flashmob1')">
+                💃 Флешмоб
+            </button>
+            <button class="btn-spec flashmob-sm" id="btn-fm2" onclick="triggerMode('flashmob2')">
+                🎯 Флешмоб задания
             </button>
         </div>
 
@@ -431,22 +465,27 @@
 
     </div>
 
-    <audio id="main-audio" crossorigin="anonymous"></audio>
+    <audio id="bg-audio" crossorigin="anonymous"></audio>
+    <audio id="sfx-audio" crossorigin="anonymous"></audio>
 
     <script>
-        // ПРЯМОЕ ПОДКЛЮЧЕНИЕ К БЭКЕНДУ НА RENDER
         const socket = io("https://kids-aqxx.onrender.com");
         let config = null;
 
-        const mainAudio = document.getElementById('main-audio');
-        let currentVolume = 0.30;
+        const bgAudio = document.getElementById('bg-audio');
+        const sfxAudio = document.getElementById('sfx-audio');
+
+        let targetMasterVolume = 0.30;
+        let currentMasterVolume = 0.30;
+        let volumeRampInterval = null;
+        let sfxFadeInterval = null;
+
         let currentMode = 'bg';
+        let isGlobalPaused = false;
 
         let partyStarted = false;
         let partyRemainingSeconds = 2400;
         let partyTimerInterval = null;
-
-        let fadeInterval = null;
 
         let audioCtx = null;
         let analyser = null;
@@ -457,7 +496,10 @@
             game: { queue: [], history: [] },
             entrance: { queue: [], history: [] },
             hb: { queue: [], history: [] },
-            bubbles: { queue: [], history: [] }
+            hb_bg: { queue: [], history: [] },
+            bubbles: { queue: [], history: [] },
+            flashmob1: { queue: [], history: [] },
+            flashmob2: { queue: [], history: [] }
         };
 
         function shuffleArray(arr) {
@@ -510,6 +552,49 @@
             return st ? (st.history[0] || 0) : 0;
         }
 
+        function setMasterVolume(targetVol, btn) {
+            targetMasterVolume = targetVol;
+            document.querySelectorAll('.btn-vol').forEach(b => b.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+
+            const duration = 1500;
+            const startTime = performance.now();
+            const startVol = currentMasterVolume;
+
+            if (volumeRampInterval) cancelAnimationFrame(volumeRampInterval);
+
+            function step(now) {
+                const elapsed = now - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                
+                currentMasterVolume = startVol + (targetMasterVolume - startVol) * progress;
+                applyAudioVolumes();
+
+                if (progress < 1) {
+                    volumeRampInterval = requestAnimationFrame(step);
+                }
+            }
+            volumeRampInterval = requestAnimationFrame(step);
+        }
+
+        function applyAudioVolumes() {
+            if (isGlobalPaused) {
+                bgAudio.volume = 0;
+                sfxAudio.volume = 0;
+                return;
+            }
+
+            if (currentMode === 'bg') {
+                bgAudio.volume = currentMasterVolume;
+                sfxAudio.volume = 0;
+            } else {
+                bgAudio.volume = Math.min(currentMasterVolume, 0.03);
+                if (!sfxFadeInterval) {
+                    sfxAudio.volume = currentMasterVolume;
+                }
+            }
+        }
+
         function initAudioAndPlayBg() {
             if (!audioCtx) {
                 const AudioCtx = window.AudioContext || window.webkitAudioContext;
@@ -518,8 +603,11 @@
                 analyser.fftSize = 256;
                 dataArray = new Uint8Array(analyser.frequencyBinCount);
 
-                const source = audioCtx.createMediaElementSource(mainAudio);
-                source.connect(analyser);
+                const srcBg = audioCtx.createMediaElementSource(bgAudio);
+                const srcSfx = audioCtx.createMediaElementSource(sfxAudio);
+
+                srcBg.connect(analyser);
+                srcSfx.connect(analyser);
                 analyser.connect(audioCtx.destination);
             }
             if (audioCtx.state === 'suspended') {
@@ -529,7 +617,7 @@
             document.getElementById('init-overlay').style.display = 'none';
             
             currentMode = 'bg';
-            playCurrentModeTrack(true);
+            playModeTrack('bg', true);
             drawEq();
         }
 
@@ -565,10 +653,9 @@
             document.getElementById('duration-modal').style.display = 'none';
 
             const vol100Btn = document.querySelectorAll('.btn-vol')[4];
-            setVolume(1.00, vol100Btn);
+            setMasterVolume(1.00, vol100Btn);
 
-            currentMode = 'entrance';
-            playCurrentModeTrack(true);
+            triggerMode('entrance');
         }
 
         function updateTimerDisplay() {
@@ -605,54 +692,22 @@
             if (mode === 'game') return config.game_tracks || [];
             if (mode === 'entrance') return config.entrance_tracks || [];
             if (mode === 'hb') return config.happy_birthday_tracks || [];
+            if (mode === 'hb_bg') return config.happy_birthday_bg_tracks || config.happy_birthday_tracks || [];
             if (mode === 'bubbles') return config.bubbles_tracks || [];
+            if (mode === 'flashmob1') return config.flashmob1_tracks || [];
+            if (mode === 'flashmob2') return config.flashmob2_tracks || [];
             return config.bg_tracks || [];
         }
 
-        function cancelFade() {
-            if (fadeInterval) {
-                clearInterval(fadeInterval);
-                fadeInterval = null;
-            }
-            mainAudio.volume = currentVolume;
-        }
-
-        function smoothStopAll() {
-            if (fadeInterval) clearInterval(fadeInterval);
-
-            let steps = 10;
-            let stepVol = mainAudio.volume / steps;
-
-            fadeInterval = setInterval(() => {
-                if (mainAudio.volume > stepVol) {
-                    mainAudio.volume -= stepVol;
-                } else {
-                    mainAudio.volume = 0;
-                    mainAudio.pause();
-                    clearInterval(fadeInterval);
-                    fadeInterval = null;
-                    
-                    mainAudio.volume = currentVolume;
-                    
-                    const btn = document.getElementById('btn-play-pause');
-                    btn.classList.remove('play-active');
-                    btn.innerText = "▶ Пуск";
-                    
-                    clearActiveHighlights();
-                }
-            }, 20);
-        }
-
-        function playCurrentModeTrack(forceNew = true) {
-            cancelFade();
+        function playModeTrack(mode, forceNew = true) {
             if (!config) return;
-            const playlist = getPlaylist(currentMode);
+            const playlist = getPlaylist(mode);
             if (!playlist || playlist.length === 0) return;
 
             let idx;
-            let st = shuffleStore[currentMode];
+            let st = shuffleStore[mode];
             if (forceNew || !st || st.history.length === 0) {
-                idx = getNextTrackIndex(currentMode);
+                idx = getNextTrackIndex(mode);
             } else {
                 idx = st.history[st.history.length - 1];
             }
@@ -663,26 +718,88 @@
             document.getElementById('track-name').innerText = filename;
             updateUIState();
 
-            if (!mainAudio.src.endsWith(filename)) {
-                mainAudio.src = fullUrl;
-                mainAudio.play().catch(e => console.log("Autoplay blocked:", e));
+            isGlobalPaused = false;
+
+            if (mode === 'bg') {
+                if (!bgAudio.src.endsWith(filename)) bgAudio.src = fullUrl;
+                bgAudio.play().catch(e => console.log(e));
             } else {
-                if (mainAudio.paused) mainAudio.play();
+                if (!sfxAudio.src.endsWith(filename)) sfxAudio.src = fullUrl;
+
+                if (mode === 'game') {
+                    sfxAudio.currentTime = 15;
+                    sfxAudio.volume = 0;
+
+                    if (sfxFadeInterval) cancelAnimationFrame(sfxFadeInterval);
+
+                    const fadeStart = performance.now();
+                    function fadeSfxStep(now) {
+                        const elapsed = now - fadeStart;
+                        const progress = Math.min(elapsed / 2000, 1);
+                        sfxAudio.volume = currentMasterVolume * progress;
+
+                        if (progress < 1) {
+                            sfxFadeInterval = requestAnimationFrame(fadeSfxStep);
+                        } else {
+                            sfxFadeInterval = null;
+                        }
+                    }
+
+                    sfxAudio.play().then(() => {
+                        sfxFadeInterval = requestAnimationFrame(fadeSfxStep);
+                    }).catch(e => console.log(e));
+
+                } else {
+                    if (sfxFadeInterval) {
+                        cancelAnimationFrame(sfxFadeInterval);
+                        sfxFadeInterval = null;
+                    }
+                    sfxAudio.play().catch(e => console.log(e));
+                }
+
+                if (bgAudio.paused) bgAudio.play().catch(e => console.log(e));
             }
+
+            applyAudioVolumes();
 
             const btn = document.getElementById('btn-play-pause');
             btn.classList.add('play-active');
-            btn.innerText = "GM Пауза";
+            btn.innerText = "⏯ Пауза";
         }
 
-        mainAudio.onended = () => {
-            playCurrentModeTrack(true);
+        bgAudio.onended = () => {
+            if (currentMode === 'bg') playModeTrack('bg', true);
         };
 
-        mainAudio.ontimeupdate = () => {
-            const cur = formatTime(mainAudio.currentTime);
-            const dur = formatTime(mainAudio.duration);
-            document.getElementById('track-time').innerText = `${cur} / ${dur}`;
+        // --- АВТО-ПЕРЕХОД ПОСЛЕ ВЫНОСА ТОРТА НА HAPPY BIRTHDAY ФОН ---
+        sfxAudio.onended = () => {
+            if (currentMode === 'hb') {
+                currentMode = 'hb_bg';
+                playModeTrack('hb_bg', true);
+            } else if (currentMode === 'hb_bg') {
+                playModeTrack('hb_bg', true);
+            } else {
+                currentMode = 'bg';
+                sfxAudio.pause();
+                applyAudioVolumes();
+                updateUIState();
+            }
+        };
+
+        bgAudio.ontimeupdate = () => {
+            if (currentMode === 'bg') {
+                const cur = formatTime(bgAudio.currentTime);
+                const dur = formatTime(bgAudio.duration);
+                document.getElementById('track-time').innerText = `${cur} / ${dur}`;
+            }
+        };
+
+        sfxAudio.ontimeupdate = () => {
+            if (currentMode !== 'bg') {
+                const cur = formatTime(sfxAudio.currentTime);
+                const dur = formatTime(sfxAudio.duration);
+                document.getElementById('track-time').innerText = `${cur} / ${dur}`;
+            }
         };
 
         function formatTime(s) {
@@ -692,32 +809,32 @@
             return `${String(m).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
         }
 
-        function setVolume(v, btn) {
-            currentVolume = v;
-            cancelFade();
-            document.querySelectorAll('.btn-vol').forEach(b => b.classList.remove('active'));
-            if (btn) btn.classList.add('active');
-        }
-
         function togglePlayPause() {
             const btn = document.getElementById('btn-play-pause');
-            if (mainAudio.paused) {
-                cancelFade();
-                mainAudio.play();
+            if (isGlobalPaused) {
+                isGlobalPaused = false;
+                bgAudio.play();
+                if (currentMode !== 'bg') sfxAudio.play();
+                applyAudioVolumes();
                 btn.classList.add('play-active');
                 btn.innerText = "⏯ Пауза";
                 updateUIState();
             } else {
-                smoothStopAll();
+                isGlobalPaused = true;
+                bgAudio.pause();
+                sfxAudio.pause();
+                applyAudioVolumes();
+                btn.classList.remove('play-active');
+                btn.innerText = "▶ Пуск";
+                clearActiveHighlights();
             }
         }
 
         function nextTrack() {
-            playCurrentModeTrack(true);
+            playModeTrack(currentMode, true);
         }
 
         function prevTrack() {
-            cancelFade();
             if (!config) return;
             const playlist = getPlaylist(currentMode);
             if (!playlist || playlist.length === 0) return;
@@ -729,20 +846,26 @@
             document.getElementById('track-name').innerText = filename;
             updateUIState();
 
-            mainAudio.src = fullUrl;
-            mainAudio.play().catch(e => console.log("Autoplay blocked:", e));
-
-            const btn = document.getElementById('btn-play-pause');
-            btn.classList.add('play-active');
-            btn.innerText = "⏯ Пауза";
+            if (currentMode === 'bg') {
+                bgAudio.src = fullUrl;
+                bgAudio.play();
+            } else {
+                sfxAudio.src = fullUrl;
+                if (currentMode === 'game') sfxAudio.currentTime = 15;
+                sfxAudio.play();
+            }
+            applyAudioVolumes();
         }
 
         function triggerMode(mode) {
-            if (currentMode === mode && !mainAudio.paused) {
+            if (currentMode === mode && !isGlobalPaused) {
                 nextTrack();
             } else {
                 currentMode = mode;
-                playCurrentModeTrack(true);
+                if (mode === 'bg') {
+                    sfxAudio.pause();
+                }
+                playModeTrack(mode, true);
             }
         }
 
@@ -751,14 +874,18 @@
             document.getElementById('btn-game').classList.remove('active');
             document.getElementById('btn-hb').classList.remove('active');
             document.getElementById('btn-bubbles').classList.remove('active');
+            document.getElementById('btn-fm1').classList.remove('active');
+            document.getElementById('btn-fm2').classList.remove('active');
         }
 
         function updateUIState() {
             clearActiveHighlights();
             if (currentMode === 'bg') document.getElementById('btn-bg').classList.add('active');
             else if (currentMode === 'game') document.getElementById('btn-game').classList.add('active');
-            else if (currentMode === 'hb') document.getElementById('btn-hb').classList.add('active');
+            else if (currentMode === 'hb' || currentMode === 'hb_bg') document.getElementById('btn-hb').classList.add('active');
             else if (currentMode === 'bubbles') document.getElementById('btn-bubbles').classList.add('active');
+            else if (currentMode === 'flashmob1') document.getElementById('btn-fm1').classList.add('active');
+            else if (currentMode === 'flashmob2') document.getElementById('btn-fm2').classList.add('active');
         }
 
         // --- ЭКВАЛАЙЗЕР ---
@@ -798,7 +925,7 @@
             const barWidth = ((width / 2) / halfBars);
             const actualBarWidth = Math.max(1.5, barWidth - barSpacing);
 
-            let isAudioActive = analyser && !mainAudio.paused;
+            let isAudioActive = analyser && (!bgAudio.paused || !sfxAudio.paused) && !isGlobalPaused;
 
             if (isAudioActive) {
                 analyser.getByteFrequencyData(dataArray);
@@ -837,16 +964,4 @@
 
                 let barGradient = eqCtx.createLinearGradient(0, height, 0, height - h);
                 barGradient.addColorStop(0, 'rgba(3, 7, 18, 0.0)');
-                barGradient.addColorStop(0.5, 'rgba(245, 158, 11, 0.25)');
-                barGradient.addColorStop(0.85, 'rgba(245, 158, 11, 0.7)');
-                barGradient.addColorStop(1, 'rgba(255, 255, 255, 1.0)');
-
-                eqCtx.fillStyle = barGradient;
-
-                drawRoundedBar(eqCtx, xLeft, height - h, actualBarWidth, h, 3);
-                drawRoundedBar(eqCtx, xRight, height - h, actualBarWidth, h, 3);
-            }
-        }
-    </script>
-</body>
-</html>
+                barGradient.addColorStop(0.5, 'rgba(245, 158,
