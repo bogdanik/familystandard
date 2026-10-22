@@ -466,7 +466,7 @@
             
             <div class="sliders-stack">
                 
-                <!-- ГРОМКОСТЬ ФОНА (100%) -->
+                <!-- ГРОМКОСТЬ ФОНА -->
                 <div class="volume-channel-block">
                     <div class="volume-channel-header">
                         <span class="volume-channel-label">ГРОМКОСТЬ ФОНА</span>
@@ -479,7 +479,7 @@
                     </div>
                 </div>
 
-                <!-- ГРОМКОСТЬ ИГРЫ (100%) -->
+                <!-- ГРОМКОСТЬ ИГРЫ -->
                 <div class="volume-channel-block">
                     <div class="volume-channel-header">
                         <span class="volume-channel-label">ГРОМКОСТЬ ИГРЫ</span>
@@ -492,7 +492,7 @@
                     </div>
                 </div>
 
-                <!-- ПРОЧИЕ ЗВУКИ (100%) -->
+                <!-- ПРОЧИЕ ЗВУКИ -->
                 <div class="volume-channel-block">
                     <div class="volume-channel-header">
                         <span class="volume-channel-label">ПРОЧИЕ ЗВУКИ</span>
@@ -557,7 +557,7 @@
 
         let currentMode = 'none';
         let isPaused = false;
-        let selectedDurationMins = 40; // По умолчанию 40 минут
+        let selectedDurationMins = 40; 
 
         let partyStarted = false;
         let partyRemainingSeconds = 2400;
@@ -583,46 +583,32 @@
             return Math.pow(parseFloat(val), 2);
         }
 
+        // НАДЁЖНЫЙ ТАЙМЕР ДАЖЕ ДЛЯ СВЁРНУТЫХ ВКЛАДОК
         function fadeAudioChannel(channel, targetVol, duration = 2000, callback) {
             let audioEl = (channel === 'bg') ? bgAudio : sfxAudio;
             if (!audioEl) return;
 
             if (fadeIntervals[channel]) {
-                cancelAnimationFrame(fadeIntervals[channel]);
+                clearInterval(fadeIntervals[channel]);
                 fadeIntervals[channel] = null;
             }
 
             let startVol = audioEl.volume;
-            let start = performance.now();
+            let start = Date.now();
 
-            function step(now) {
-                let elapsed = now - start;
+            fadeIntervals[channel] = setInterval(() => {
+                let elapsed = Date.now() - start;
                 let progress = Math.min(elapsed / duration, 1);
-                audioEl.volume = startVol + (targetVol - startVol) * progress;
+                
+                let newVol = startVol + (targetVol - startVol) * progress;
+                audioEl.volume = Math.max(0, Math.min(1, newVol));
 
-                if (progress < 1) {
-                    fadeIntervals[channel] = requestAnimationFrame(step);
-                } else {
+                if (progress >= 1) {
+                    clearInterval(fadeIntervals[channel]);
                     fadeIntervals[channel] = null;
                     if (callback) callback();
                 }
-            }
-            fadeIntervals[channel] = requestAnimationFrame(step);
-        }
-
-        function fadeInChannel(channel, targetVol, duration = 2000) {
-            let audioEl = (channel === 'bg') ? bgAudio : sfxAudio;
-            if (!audioEl) return;
-
-            if (fadeIntervals[channel]) {
-                cancelAnimationFrame(fadeIntervals[channel]);
-                fadeIntervals[channel] = null;
-            }
-
-            audioEl.volume = 0;
-            audioEl.play().then(() => {
-                fadeAudioChannel(channel, targetVol, duration);
-            }).catch(e => console.log("Play error:", e));
+            }, 50); // Выполняется 20 раз в секунду, не блокируется браузером
         }
 
         function fadeOutChannel(channel, duration = 2000, callback) {
@@ -699,7 +685,6 @@
             if (st.queue.length === 0) {
                 let indices = Array.from({length: playlist.length}, (_, i) => i);
                 let newQueue = shuffleArray(indices);
-
                 if (st.history.length > 0 && newQueue.length > 1) {
                     let lastIdx = st.history[st.history.length - 1];
                     if (newQueue[0] === lastIdx) {
@@ -732,7 +717,6 @@
             if (!config) return;
             const playlist = getPlaylist(mode);
             if (!playlist || playlist.length <= 1) return;
-
             let st = shuffleStore[mode];
             let nextIdx = (st && st.queue.length > 0) ? st.queue[0] : 0;
             const filename = playlist[nextIdx];
@@ -757,7 +741,6 @@
             updatePresetBtnUI('other-vol-row', 1.0);
         }
 
-        // МОМЕНТАЛЬНЫЙ ЗАПУСК ФОНА БЕЗ ЗАВИСШЕЙ ПЛАШКИ
         function initAudioAndPlayBg() {
             document.getElementById('init-overlay').style.display = 'none';
             initParticles();
@@ -777,8 +760,6 @@
             selectedDurationMins = mins;
             document.querySelectorAll('.btn-dur').forEach(b => b.classList.remove('active'));
             document.getElementById(`dur-btn-${mins}`).classList.add('active');
-
-            // Запускаем отсчёт и сразу включем фанфары (entrance) прямо в пользовательском клике
             confirmProgramStart();
         }
 
@@ -805,14 +786,12 @@
 
             document.getElementById('duration-modal').style.display = 'none';
 
-            // ГАРАНТИРОВАННЫЙ ЗАПУСК ФАНФАР ПРИ СТАРТЕ ПРОГРАММЫ
             currentMode = 'entrance';
-            playModeTrack('entrance');
+            playFile('entrance', getPlaylist('entrance')[getNextTrackIndex('entrance')]);
         }
 
         function updateTimerDisplay() {
             if (!partyStarted) return;
-            
             const m = Math.floor(partyRemainingSeconds / 60);
             const s = Math.floor(partyRemainingSeconds % 60);
             const str = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
@@ -820,11 +799,8 @@
             const timerEl = document.getElementById('timer-display');
             timerEl.innerText = str;
 
-            if (partyRemainingSeconds <= 600) {
-                timerEl.classList.add('ending-warning');
-            } else {
-                timerEl.classList.remove('ending-warning');
-            }
+            if (partyRemainingSeconds <= 600) timerEl.classList.add('ending-warning');
+            else timerEl.classList.remove('ending-warning');
         }
 
         socket.on('config_data', (data) => {
@@ -837,14 +813,12 @@
 
         function getPlaylist(mode) {
             if (!config) return [];
-            
             if (mode === 'bg') {
                 if (partyStarted && partyRemainingSeconds <= 600 && config.ending_tracks && config.ending_tracks.length > 0) {
                     return config.ending_tracks;
                 }
                 return config.bg_tracks || [];
             }
-
             if (mode === 'game') return config.game_tracks || [];
             if (mode === 'entrance') return config.entrance_tracks || [];
             if (mode === 'hb') return config.happy_birthday_tracks || [];
@@ -855,53 +829,59 @@
             return config.bg_tracks || [];
         }
 
-        function playModeTrack(mode) {
-            if (!config) return;
-            const playlist = getPlaylist(mode);
-            if (!playlist || playlist.length === 0) return;
-
-            let idx = getNextTrackIndex(mode);
-            const filename = playlist[idx];
+        // ЕДИНАЯ И НАДЁЖНАЯ ФУНКЦИЯ ВОСПРОИЗВЕДЕНИЯ ФАЙЛА
+        function playFile(mode, filename) {
+            if (!filename) return;
             const fullUrl = config.cdn_base_url + filename;
 
             document.getElementById('track-name').innerText = filename;
-            preloadNextTrack(mode);
             isPaused = false;
+            document.getElementById('stop-icon').innerText = '⏹';
 
             if (mode === 'bg') {
                 fadeOutChannel('sfx', 2000);
+                
                 bgAudio.src = fullUrl;
-                fadeInChannel('bg', getPerceptualVolume(bgVolume), 2000);
+                bgAudio.volume = 0; // Строго в 0 перед стартом
+                
+                // Гарантированно ждем начала воспроизведения, затем включаем плавный звук
+                let playPromise = bgAudio.play();
+                if (playPromise !== undefined) {
+                    playPromise.then(() => {
+                        fadeAudioChannel('bg', getPerceptualVolume(bgVolume), 2000);
+                    }).catch(e => console.log("BG play error:", e));
+                }
             } else {
                 fadeOutChannel('bg', 2000);
 
                 if (mode !== 'game') {
-                    resetOtherVolumeToFull();
+                    resetOtherVolumeToFull(); 
                 }
-
-                sfxAudio.oncanplaythrough = null;
-                sfxAudio.src = fullUrl;
-
                 let targetVol = (mode === 'game') ? getPerceptualVolume(gameVolume) : getPerceptualVolume(otherVolume);
 
-                sfxAudio.oncanplaythrough = () => {
-                    sfxAudio.oncanplaythrough = null;
-                    if (mode === 'game') {
-                        try {
-                            if (sfxAudio.duration > 15) {
-                                sfxAudio.currentTime = 15;
-                            }
-                        } catch (e) {
-                            console.log("Seek error:", e);
+                sfxAudio.src = fullUrl;
+                sfxAudio.volume = 0; // Строго в 0 перед стартом
+
+                let playPromise = sfxAudio.play();
+                if (playPromise !== undefined) {
+                    playPromise.then(() => {
+                        if (mode === 'game' && sfxAudio.duration > 15) {
+                            try { sfxAudio.currentTime = 15; } catch(e){}
                         }
-                    }
-                    fadeInChannel('sfx', targetVol, 2000);
-                };
-
-                sfxAudio.load();
+                        fadeAudioChannel('sfx', targetVol, 2000);
+                    }).catch(e => console.log("SFX play error:", e));
+                }
             }
-
             updateUIState();
+        }
+
+        function playModeTrack(mode) {
+            if (!config) return;
+            const playlist = getPlaylist(mode);
+            if (!playlist || playlist.length === 0) return;
+            let idx = getNextTrackIndex(mode);
+            preloadNextTrack(mode);
+            playFile(mode, playlist[idx]);
         }
 
         function nextTrack() {
@@ -913,42 +893,22 @@
             if (currentMode === 'none' || !config) return;
             const playlist = getPlaylist(currentMode);
             if (!playlist || playlist.length === 0) return;
-
             let idx = getPrevTrackIndex(currentMode);
-            const filename = playlist[idx];
-            const fullUrl = config.cdn_base_url + filename;
-
-            document.getElementById('track-name').innerText = filename;
-            isPaused = false;
-
-            if (currentMode === 'bg') {
-                bgAudio.src = fullUrl;
-                fadeInChannel('bg', getPerceptualVolume(bgVolume), 2000);
-            } else {
-                if (currentMode !== 'game') resetOtherVolumeToFull();
-
-                sfxAudio.oncanplaythrough = null;
-                sfxAudio.src = fullUrl;
-                let targetVol = (currentMode === 'game') ? getPerceptualVolume(gameVolume) : getPerceptualVolume(otherVolume);
-
-                sfxAudio.oncanplaythrough = () => {
-                    sfxAudio.oncanplaythrough = null;
-                    if (currentMode === 'game' && sfxAudio.duration > 15) {
-                        try { sfxAudio.currentTime = 15; } catch(e){}
-                    }
-                    fadeInChannel('sfx', targetVol, 2000);
-                };
-                sfxAudio.load();
-            }
-            updateUIState();
+            playFile(currentMode, playlist[idx]);
         }
 
         function triggerMode(mode) {
             if (currentMode === mode) {
-                togglePlayStop();
+                // ЛОГИКА ПЕРЕКЛЮЧАТЕЛЕЙ (TOGGLE)
+                if (mode === 'bubbles' || mode === 'flashmob1' || mode === 'flashmob2' || mode === 'hb') {
+                    // Если повторно нажали на спец-эффект — отключаем его и плавно возвращаем фон
+                    triggerMode('bg');
+                } else {
+                    // Если повторно нажали Фон или Игра — ставим на паузу
+                    togglePlayStop();
+                }
                 return;
             }
-
             currentMode = mode;
             playModeTrack(mode);
         }
@@ -984,7 +944,11 @@
                 let targetVol = getTargetVolumeForMode(currentMode);
                 isPaused = false;
                 document.getElementById('stop-icon').innerText = '⏹';
-                fadeInChannel(channel, targetVol, 2000);
+                
+                activeAudio.volume = 0;
+                activeAudio.play().then(() => {
+                    fadeAudioChannel(channel, targetVol, 2000);
+                }).catch(e => console.log("Resume error:", e));
             }
         }
 
