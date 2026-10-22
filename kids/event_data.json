@@ -10,37 +10,32 @@
     "fn21.mp3", "fn22.mp3"
   ],
   "game_tracks": [
-    "game1.mp3",
-    "game2.mp3",
-    "game3.mp3"
+    "game1.mp3", "game2.mp3", "game3.mp3", "game4.mp3", "game5.mp3", "game6.mp3", "game7.mp3", "game8.mp3", "game9.mp3", "game10.mp3",
+    "game11.mp3", "game12.mp3", "game13.mp3", "game14.mp3", "game15.mp3", "game16.mp3", "game17.mp3", "game18.mp3", "game19.mp3", "game20.mp3",
+    "game21.mp3", "game22.mp3", "game23.mp3", "game24.mp3", "game25.mp3", "game26.mp3", "game27.mp3", "game28.mp3", "game29.mp3", "game30.mp3",
+    "game31.mp3", "game32.mp3", "game33.mp3", "game34.mp3", "game35.mp3", "game36.mp3", "game37.mp3", "game38.mp3", "game39.mp3", "game40.mp3",
+    "game41.mp3", "game42.mp3", "game43.mp3", "game44.mp3", "game45.mp3", "game46.mp3", "game47.mp3", "game48.mp3"
   ],
   "entrance_tracks": [
-    "entrance1.mp3",
-    "entrance2.mp3"
+    "entrance1.mp3"
   ],
   "happy_birthday_tracks": [
-    "hb1.mp3",
-    "hb2.mp3"
+    "hb1.mp3"
   ],
   "happy_birthday_bg_tracks": [
-    "hb_bg1.mp3",
-    "hb_bg2.mp3"
+    "hb_bg1.mp3"
   ],
   "bubbles_tracks": [
-    "bubbles1.mp3",
-    "bubbles2.mp3"
+    "bubbles1.mp3", "bubbles2.mp3", "bubbles3.mp3", "bubbles4.mp3", "bubbles5.mp3"
   ],
   "flashmob1_tracks": [
-    "fm1_1.mp3",
-    "fm1_2.mp3"
+    "fm1.mp3", "fm2.mp3", "fm3.mp3", "fm4.mp3", "fm5.mp3", "fm6.mp3", "fm7.mp3",
+    "fm8.mp3", "fm9.mp3", "fm10.mp3", "fm11.mp3", "fm12.mp3", "fm13.mp3", "fm14.mp3"
   ],
   "flashmob2_tracks": [
-    "fm_task1.mp3",
-    "fm_task2.mp3",
-    "fm_task3.mp3"
+    "fm_task1.mp3", "fm_task2.mp3", "fm_task3.mp3"
   ],
   "ending_tracks": [
-    "end1.mp3",
-    "end2.mp3"
+    "end1.mp3", "end2.mp3", "end3.mp3", "end4.mp3", "end5.mp3"
   ]
 }
