@@ -441,7 +441,6 @@
 
     <div class="app-container">
 
-        <!-- 1. ВЕРХНИЙ БЛОК -->
         <div class="top-section">
             <h1 class="shimmer-title">EVENT OS - KIDS</h1>
             <div class="mode-triggers-row">
@@ -450,7 +449,6 @@
             </div>
         </div>
 
-        <!-- 2. СТАРТ ПРОГРАММЫ ПОСЕРЕДИНЕ -->
         <div class="center-anchor">
             <button class="btn-start-program" id="btn-start-prog" onclick="openDurationModal()">
                 🚀 СТАРТ ПРОГРАММЫ
@@ -461,12 +459,10 @@
             </div>
         </div>
 
-        <!-- 3. НИЖНИЙ БЛОК -->
         <div class="bottom-section">
             
             <div class="sliders-stack">
                 
-                <!-- ГРОМКОСТЬ ФОНА -->
                 <div class="volume-channel-block">
                     <div class="volume-channel-header">
                         <span class="volume-channel-label">ГРОМКОСТЬ ФОНА</span>
@@ -479,7 +475,6 @@
                     </div>
                 </div>
 
-                <!-- ГРОМКОСТЬ ИГРЫ -->
                 <div class="volume-channel-block">
                     <div class="volume-channel-header">
                         <span class="volume-channel-label">ГРОМКОСТЬ ИГРЫ</span>
@@ -492,7 +487,6 @@
                     </div>
                 </div>
 
-                <!-- ПРОЧИЕ ЗВУКИ -->
                 <div class="volume-channel-block">
                     <div class="volume-channel-header">
                         <span class="volume-channel-label">ПРОЧИЕ ЗВУКИ</span>
@@ -559,9 +553,12 @@
         let isPaused = false;
         let selectedDurationMins = 40; 
 
+        // ИСПРАВЛЕНИЕ: Абсолютные величины времени, чтобы исключить ускорение
         let partyStarted = false;
+        let partyEndTime = 0; 
         let partyRemainingSeconds = 2400;
         let partyTimerInterval = null;
+        let isEndingPhase = false; // Флаг для смены музыки
 
         let fadeIntervals = {
             bg: null,
@@ -583,7 +580,6 @@
             return Math.pow(parseFloat(val), 2);
         }
 
-        // НАДЁЖНЫЙ ТАЙМЕР ДАЖЕ ДЛЯ СВЁРНУТЫХ ВКЛАДОК
         function fadeAudioChannel(channel, targetVol, duration = 2000, callback) {
             let audioEl = (channel === 'bg') ? bgAudio : sfxAudio;
             if (!audioEl) return;
@@ -608,7 +604,7 @@
                     fadeIntervals[channel] = null;
                     if (callback) callback();
                 }
-            }, 50); // Выполняется 20 раз в секунду, не блокируется браузером
+            }, 50); 
         }
 
         function fadeOutChannel(channel, duration = 2000, callback) {
@@ -765,18 +761,39 @@
 
         function confirmProgramStart() {
             partyStarted = true;
+            isEndingPhase = false; // Сброс состояния окончания
+            shuffleStore['bg'] = { queue: [], history: [] }; // Полный сброс очереди фона
+
+            // ИСПРАВЛЕНИЕ: Абсолютный расчет времени
+            partyEndTime = Date.now() + (selectedDurationMins * 60 * 1000);
             partyRemainingSeconds = selectedDurationMins * 60;
+            
             updateTimerDisplay();
 
             document.getElementById('btn-start-prog').style.display = 'none';
             document.getElementById('timer-slot').style.display = 'flex';
 
             if (partyTimerInterval) clearInterval(partyTimerInterval);
+            
             partyTimerInterval = setInterval(() => {
-                if (partyRemainingSeconds > 0) {
-                    partyRemainingSeconds--;
-                    updateTimerDisplay();
-                } else {
+                let now = Date.now();
+                // Расчет на основе системных часов, чтобы таймер не скакал
+                partyRemainingSeconds = Math.max(0, Math.floor((partyEndTime - now) / 1000));
+                
+                updateTimerDisplay();
+
+                // ИСПРАВЛЕНИЕ: Плавная замена музыки при достижении 10 минут
+                if (partyRemainingSeconds <= 600 && partyRemainingSeconds > 0 && !isEndingPhase) {
+                    isEndingPhase = true;
+                    // Принудительно очищаем старую очередь, чтобы сразу взять треки из ending_tracks
+                    shuffleStore['bg'] = { queue: [], history: [] };
+                    
+                    if (currentMode === 'bg') {
+                        playModeTrack('bg');
+                    }
+                }
+
+                if (partyRemainingSeconds <= 0) {
                     clearInterval(partyTimerInterval);
                     partyStarted = false;
                     document.getElementById('timer-slot').style.display = 'none';
@@ -829,7 +846,6 @@
             return config.bg_tracks || [];
         }
 
-        // ЕДИНАЯ И НАДЁЖНАЯ ФУНКЦИЯ ВОСПРОИЗВЕДЕНИЯ ФАЙЛА
         function playFile(mode, filename) {
             if (!filename) return;
             const fullUrl = config.cdn_base_url + filename;
@@ -842,9 +858,8 @@
                 fadeOutChannel('sfx', 2000);
                 
                 bgAudio.src = fullUrl;
-                bgAudio.volume = 0; // Строго в 0 перед стартом
+                bgAudio.volume = 0; 
                 
-                // Гарантированно ждем начала воспроизведения, затем включаем плавный звук
                 let playPromise = bgAudio.play();
                 if (playPromise !== undefined) {
                     playPromise.then(() => {
@@ -860,7 +875,7 @@
                 let targetVol = (mode === 'game') ? getPerceptualVolume(gameVolume) : getPerceptualVolume(otherVolume);
 
                 sfxAudio.src = fullUrl;
-                sfxAudio.volume = 0; // Строго в 0 перед стартом
+                sfxAudio.volume = 0;
 
                 let playPromise = sfxAudio.play();
                 if (playPromise !== undefined) {
@@ -899,12 +914,9 @@
 
         function triggerMode(mode) {
             if (currentMode === mode) {
-                // ЛОГИКА ПЕРЕКЛЮЧАТЕЛЕЙ (TOGGLE)
                 if (mode === 'bubbles' || mode === 'flashmob1' || mode === 'flashmob2' || mode === 'hb') {
-                    // Если повторно нажали на спец-эффект — отключаем его и плавно возвращаем фон
                     triggerMode('bg');
                 } else {
-                    // Если повторно нажали Фон или Игра — ставим на паузу
                     togglePlayStop();
                 }
                 return;
